@@ -1,0 +1,283 @@
+* {
+  font-family: Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 18px;
+  box-sizing: border-box;
+  /* cursor: none !important; */
+  /* cursor: url("./asset/svg/dot.svg") !important; */
+}
+
+html {
+  -webkit-text-size-adjust: content-box;
+  -moz-text-size-adjust: content-box;
+  -ms-text-size-adjust: content-box;
+
+  width: auto;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+body {
+  margin: 0;
+}
+
+div {
+  margin: 0;
+}
+
+#nonhovera:hover {
+  opacity: 100% !important;
+}
+
+.container {
+  float: left;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.container-verical {
+  float: left;
+  white-space: nowrap;
+  overflow-y: scroll;
+}
+
+.container-fit {
+  float: left;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+}
+
+.desktop {
+  display: block;
+}
+
+.mobile {
+  display: none;
+}
+
+.lang {
+  text-decoration: underline;
+}
+
+.normal {
+  height: 600px;
+}
+
+.medium {
+  height: 400px;
+}
+
+.small {
+  height: 200px;
+}
+
+.gallery {
+  white-space: nowrap;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+a:hover {
+  opacity: 0%;
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  color: white;
+  background: black;
+}
+
+::selection {
+  color: white;
+  background: black;
+}
+
+p {
+  display: block;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+#topnav {
+  width: 100vw;
+  position: fixed;
+  opacity: 100%;
+  z-index: 1;
+}
+
+/* #toprect {
+  width: 100vw;
+  height: 28px;
+  position: fixed;
+  background-color: white;
+  z-index: -1;
+} */
+
+.botnav {
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.left {
+  float: left;
+  padding: 5px;
+  width: 33.33%;
+  text-align: left;
+}
+
+.right {
+  float: left;
+  padding: 5px;
+  width: 33.33%;
+  text-align: right;
+}
+
+.topleft {
+  float: left;
+  padding: 5px;
+  width: 50%;
+  text-align: left;
+}
+
+.topright {
+  float: left;
+  padding: 5px;
+  width: 50%;
+  text-align: right;
+}
+
+.center {
+  float: left;
+  padding: 5px;
+  width: 33.33%;
+  text-align: center;
+}
+
+.col-1 {
+  width: 8.33%;
+}
+.col-2 {
+  width: 16.66%;
+}
+.col-3 {
+  width: 25%;
+}
+.col-4 {
+  width: 33.33%;
+}
+.col-5 {
+  width: 41.66%;
+}
+.col-6 {
+  width: 50%;
+}
+.col-7 {
+  width: 58.33%;
+}
+.col-8 {
+  width: 66.66%;
+}
+.col-9 {
+  width: 75%;
+}
+.col-10 {
+  width: 83.33%;
+}
+.col-11 {
+  width: 91.66%;
+}
+.col-12 {
+  width: 100%;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 5px;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.rect28 {
+  width: 100%;
+  height: 28px;
+}
+
+.rect10 {
+  width: 100%;
+  height: 10px;
+}
+
+#video-desktop {
+  display: block;
+}
+
+#video-mobile {
+  display: none;
+}
+
+@media only screen and (max-width: 768px) {
+  /* For mobile phones: */
+  [class*="col-"] {
+    width: 100%;
+  }
+
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: block;
+  }
+
+  .container {
+    height: 200px;
+  }
+
+  [class*="gallery"] {
+    white-space: nowrap;
+    height: 200px !important;
+  }
+
+  .fit {
+    height: auto !important;
+    width: 80% !important;
+  }
+
+  .eng {
+    display: block;
+  }
+
+  .ita {
+    display: none;
+  }
+
+  .rightmobile {
+    width: 66.66% !important;
+  }
+}
+
+/* .cursor2 {
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  background-color: black;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: width 0.3s, height 0.3s, opacity 0.3s;
+} */

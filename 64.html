@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta charset="utf-8">
+    <meta name="pinterest" content="nopin" />
+    <title>64</title>
+    <link rel="icon" type="image" href="asset/64/off.png">
+  </head>
+  <body onload="init()">
+<div id="box">
+<img onclick="change1();" class="swt" id="swt1" src="asset/64/off.png">
+<img onclick="change2();"class="swt" id="swt2" src="asset/64/off.png">
+<img onclick="change3();"class="swt" id="swt3" src="asset/64/off.png">
+<img onclick="change4();"class="swt" id="swt4" src="asset/64/off.png">
+<img onclick="change5();"class="swt" id="swt5" src="asset/64/off.png">
+<img onclick="change6();"class="swt" id="swt6" src="asset/64/off.png">
+<img id="lamp" src="asset/64/lamp_off.png">
+<div>
+  </body>
+
+  <style media="screen">
+
+* {
+  margin: 0;
+}
+
+#box {
+  margin: 0% 0% 0% 0%;
+
+}
+
+.swt {
+width:11%;
+cursor: pointer;
+padding: 6% 0;
+margin:0;
+
+}
+
+#lamp {
+width:30%;
+  margin: 0;
+}
+
+@media only screen and (max-width: 600px) {
+  body {
+  margin:0;
+  }
+
+  #box {
+  margin: 0% 5% 0 5%;
+
+}
+
+  * {
+    margin: 0;
+    padding:0;
+  }
+
+  .swt {
+  width:30%;
+  cursor: pointer;
+  margin:0;
+  }
+
+  #swt2 {
+  margin-left: 4%;
+  margin-right: 4%;
+  }
+
+  #swt3 {
+    float:right;
+  }
+
+  #swt5 {
+  margin-left: 4%;
+  margin-right: 4%;
+  }
+
+  #swt6 {
+    float:right;
+  }
+
+
+
+  #lamp {
+  width:100%;
+  }
+
+
+}
+
+  </style>
+
+  <script type="text/javascript">
+
+    let s1 = document.getElementById("swt1");
+    let s2 = document.getElementById("swt2");
+    let s3 = document.getElementById("swt3");
+    let s4 = document.getElementById("swt4");
+    let s5 = document.getElementById("swt5");
+    let s6 = document.getElementById("swt6");
+
+
+var v1 = Math.round(Math.random());
+var v2 = Math.round(Math.random());
+var v3 = Math.round(Math.random());
+var v4 = Math.round(Math.random());
+var v5 = Math.round(Math.random());
+var v6 = Math.round(Math.random());
+
+
+
+
+var k1 = Math.round(Math.random());
+
+var k2 = Math.round(Math.random());
+
+var k3 = Math.round(Math.random());
+
+var k4 = Math.round(Math.random());
+
+var k5 = Math.round(Math.random());
+
+var k6 = Math.round(Math.random());
+
+
+
+
+var key = k1.toString()+k2.toString()+k3.toString()+k4.toString()+k5.toString()+k6.toString();
+console.log("Soluzione:"+key);
+
+var comb = v1.toString()+v2.toString()+v3.toString()+v4.toString()+v5.toString()+v6.toString();
+console.log("Situazione iniziale:"+comb);
+
+
+function verify(){
+    var comb = v1.toString()+v2.toString()+v3.toString()+v4.toString()+v5.toString()+v6.toString();
+    console.log("Storico tentativi:"+comb);
+if (key==comb) {
+  lamp.src = "asset/64/lamp_on.png";
+} else {
+  lamp.src = "asset/64/lamp_off.png";
+}
+}
+
+function change1() {
+  if (v1==0) {
+    v1=1;
+    s1.src = "asset/64/on.png";
+  } else {
+    v1=0;
+    s1.src = "asset/64/off.png";
+  }
+  verify();
+}
+
+function change2() {
+  if (v2==0) {
+    v2=1;
+    s2.src = "asset/64/on.png";
+  } else {
+    v2=0;
+    s2.src = "asset/64/off.png";
+  }
+  verify();
+}
+
+function change3() {
+  if (v3==0) {
+    v3=1;
+    s3.src = "asset/64/on.png";
+  } else {
+    v3=0;
+    s3.src = "asset/64/off.png";
+  }
+  verify();
+}
+
+function change4() {
+  if (v4==0) {
+    v4=1;
+    s4.src = "asset/64/on.png";
+  } else {
+    v4=0;
+    s4.src = "asset/64/off.png";
+  }
+  verify();
+}
+
+function change5() {
+  if (v5==0) {
+    v5=1;
+    s5.src = "asset/64/on.png";
+  } else {
+    v5=0;
+    s5.src = "asset/64/off.png";
+  }
+  verify();
+}
+
+function change6() {
+  if (v6==0) {
+    v6=1;
+    s6.src = "asset/64/on.png";
+  } else {
+    v6=0;
+    s6.src = "asset/64/off.png";
+  }
+  verify();
+}
+
+function skin() {
+
+if (v1 == 1) {
+    s1.src = "asset/64/on.png";
+} else {
+  s1.src = "asset/64/off.png";
+}
+
+if (v2 == 1) {
+    s2.src = "asset/64/on.png";
+} else {
+  s2.src = "asset/64/off.png";
+}
+
+if (v3 == 1) {
+    s3.src = "asset/64/on.png";
+} else {
+  s3.src = "asset/64/off.png";
+}
+
+if (v4 == 1) {
+    s4.src = "asset/64/on.png";
+} else {
+  s4.src = "asset/64/off.png";
+}
+
+if (v5 == 1) {
+    s5.src = "asset/64/on.png";
+} else {
+  s5.src = "asset/64/off.png";
+}
+
+if (v6 == 1) {
+    s6.src = "asset/64/on.png";
+} else {
+  s6.src = "asset/64/off.png";
+}
+}
+
+function init() {
+  skin();
+  verify();
+}
+
+
+  </script>
+</html>
