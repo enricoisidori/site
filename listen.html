@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Listen</title>
+  </head>
+  <body>
+    <div id="overlisten" class="overlay">
+      <div id="controls" class="txt">
+        <span id="duration">00:00</span><br />
+        <a onclick="pause(); enableScroll();"> Back </a>
+      </div>
+    </div>
+
+    <div class="txt list">
+      <a href="draw.html"> Back </a>
+      <br />
+      <a onclick="play0(); showover();">Listen </a> <br />
+      <a onclick="play0(); showover();">00:00 Bianca </a> <br />
+      <a onclick="play1(); showover();">00:15 Marta </a> <br />
+      <a onclick="play2(); showover();">00:28 Alice </a> <br />
+      <a onclick="play3(); showover();">00:41 Irene </a> <br />
+      <a onclick="play4(); showover();">01:10 Marco </a> <br />
+      <a onclick="play5(); showover();">01:33 Davide </a> <br />
+      <a onclick="play6(); showover();">01:39 Giulia </a> <br />
+      <a onclick="play7(); showover();">01:49 Enrico </a> <br />
+      <a onclick="play8(); showover();">02:43 Filippo </a> <br />
+      <a onclick="play9(); showover();">02:56 Mattia </a> <br />
+      <a onclick="play10(); showover();">02:58 Matteo </a> <br />
+      <a onclick="play11(); showover();">03:00 Nino </a> <br />
+      <a onclick="play12(); showover();">03:06 Nausica </a> <br />
+      <a onclick="play13(); showover();">03:17 Federico </a> <br />
+      <a onclick="play14(); showover();">03:24 Beatrice </a> <br />
+      <a onclick="play15(); showover();">03:34 Bianca </a> <br />
+      <a onclick="play16(); showover();">03:37 Marco </a> <br />
+      <a onclick="play17(); showover();">03:58 Enea </a> <br />
+      <a onclick="play18(); showover();">04:32 Diletta </a> <br />
+      <a onclick="play19(); showover();">04:36 Daniel </a> <br />
+      <a onclick="play20(); showover();">04:40 Davide </a> <br />
+      <a onclick="play21(); showover();">04:47 Davide </a> <br />
+      <a onclick="play22(); showover();">04:52 Carlo </a> <br />
+      <a onclick="play23(); showover();">04:57 Oreste </a> <br />
+      <a onclick="play24(); showover();">05:46 Davide </a> <br />
+      <a onclick="play25(); showover();">05:52 Giulia </a> <br />
+      <a onclick="play26(); showover();">06:09 Jenny </a> <br />
+      <a onclick="play27(); showover();">06:20 Maurizia </a> <br />
+      <a onclick="play28(); showover();">06:39 Mia </a> <br />
+      <a onclick="play29(); showover();">06:46 Alberto </a> <br />
+      <a onclick="play30(); showover();">06:50 Alessio </a> <br />
+      <a onclick="play31(); showover();">06:54 Gaia </a> <br />
+      <a onclick="play32(); showover();">06:59 Martina </a> <br />
+      <a onclick="play33(); showover();">07:06 Ginevra </a> <br />
+      <a onclick="play34(); showover();">07:14 Marcello </a> <br />
+      <a onclick="play35(); showover();">07:22 Marika </a> <br />
+      <a onclick="play36(); showover();">07:37 Eva </a> <br />
+      <a onclick="play37(); showover();">08:16 Luca </a> <br />
+      <a onclick="play38(); showover();">08:19 Aron </a> <br />
+      <a onclick="play39(); showover();">08:24 Elisa </a> <br />
+      <a onclick="play40(); showover();">08:37 Valentina </a> <br />
+      <a onclick="play41(); showover();">08:48 Giacomo </a> <br />
+      <a onclick="play42(); showover();">08:57 Matteo </a> <br />
+      <a onclick="play43(); showover();">09:07 Elena </a> <br />
+      <a onclick="play44(); showover();">09:15 Pietro </a> <br />
+      <a onclick="play45(); showover();">09:19 Martina </a> <br />
+      <a onclick="play46(); showover();">09:29 Andrea </a> <br />
+      <a onclick="play47(); showover();">09:35 Matteo </a> <br />
+      <a onclick="play48(); showover();">09:44 Giulia </a> <br />
+      <a onclick="play49(); showover();">09:50 Erica </a> <br />
+      <a onclick="play50(); showover();">09:54 Ludovica </a> <br />
+      <a onclick="play51(); showover();">10:10 Ilaria </a> <br />
+      <a onclick="play52(); showover();">10:29 Bella </a> <br />
+      <a onclick="play53(); showover();">11:05 Tommaso </a> <br />
+      <a onclick="play54(); showover();">11:21 Roberta </a> <br />
+      <a onclick="play55(); showover();">11:35 Davide </a> <br />
+      <a onclick="play56(); showover();">11:38 Fabrizio </a> <br />
+      <a onclick="play57(); showover();">11:52 Stefano </a> <br />
+      <a onclick="play58(); showover();">11:57 Luisa </a> <br />
+      <a onclick="play59(); showover();">12:07 Giulia </a> <br />
+      <a onclick="play60(); showover();">12:12 Camilla </a> <br />
+      <a onclick="play61(); showover();">12:19 Martina </a> <br />
+      <a onclick="play62(); showover();">12:35 Lavinia </a> <br />
+      <a onclick="play63(); showover();">13:00 Caterina </a> <br />
+      <a onclick="play64(); showover();">13:05 Matteo </a> <br />
+      <a onclick="play65(); showover();">13:11 Ambra </a> <br />
+      <a onclick="play66(); showover();">13:18 Sofia </a> <br />
+      <a onclick="play67(); showover();">13:25 Giuseppe </a> <br />
+      <a onclick="play68(); showover();">13:28 Sara </a> <br />
+      <a onclick="play69(); showover();">13:33 Dante </a> <br />
+      <a onclick="play70(); showover();">13:48 Giacomo </a> <br />
+      <a onclick="play71(); showover();">13:50 Allegra </a> <br />
+      <a onclick="play72(); showover();">13:58 Matilde </a> <br />
+      <a onclick="play73(); showover();">14:10 Selene </a> <br />
+      <a onclick="play74(); showover();">14:19 Samuele </a> <br />
+      <a onclick="play75(); showover();">14:25 Simone </a> <br />
+      <a onclick="play76(); showover();">14:33 Nicola </a> <br />
+      <a onclick="play77(); showover();">14:42 Damiano </a> <br />
+      <a onclick="play78(); showover();">14:45 Pasquale </a> <br />
+      <a onclick="play79(); showover();">14:50 Alice </a> <br />
+      <a onclick="play80(); showover();">14:55 Irene </a> <br />
+      <a onclick="play81(); showover();">15:02 Corrado </a> <br />
+      <a onclick="play82(); showover();">15:08 Andrea </a> <br />
+      <a onclick="play83(); showover();">15:19 Noemi </a> <br />
+      <a onclick="play84(); showover();">15:30 Guido </a> <br />
+      <a onclick="play85(); showover();">15:56 Andrea </a> <br />
+      <a onclick="play86(); showover();">16:01 Laura </a> <br />
+      <a onclick="play87(); showover();">16:22 Chiara </a> <br />
+      <a onclick="play88(); showover();">16:38 Camilla </a> <br />
+      <a onclick="play89(); showover();">16:45 Martina </a> <br />
+      <a onclick="play90(); showover();">16:56 Iacopo </a> <br />
+      <a onclick="play91(); showover();">17:07 Iacopo </a> <br />
+      <a onclick="play92(); showover();">17:20 Martina </a> <br />
+      <a onclick="play93(); showover();">18:30 Emiliano </a> <br />
+      <a onclick="play94(); showover();">18:44 Emma </a> <br />
+      <a onclick="play95(); showover();">18:58 Mattia </a> <br />
+      <a onclick="play96(); showover();">19:02 Alice </a> <br />
+      <a onclick="play97(); showover();">19:05 Francesco </a> <br />
+      <a onclick="play98(); showover();">19:23 Francesco </a> <br />
+      <a onclick="play99(); showover();">19:28 Matteo </a> <br />
+
+      <a href="draw.html"> Back </a>
+    </div>
+
+    <style media="screen">
+      * {
+        font-family: Helvetica Neue, Arial, sans-serif;
+      }
+
+      body {
+        margin: 15px;
+      }
+
+      .landing {
+        display: block;
+        background-color: white;
+        z-index: 1;
+      }
+
+      .txt {
+        width: 100%;
+        font-size: 250%;
+        z-index: 2;
+        font-weight: 500;
+        line-height: 1.06;
+      }
+
+      @media (min-width: 1025px) {
+        /* big landscape tablets, laptops, and desktops */
+        .txt {
+          width: 100%;
+          font-size: 100pt;
+          z-index: 2;
+          font-weight: 500;
+          line-height: 1.06;
+        }
+      }
+
+      a {
+        text-decoration: none;
+        color: black;
+        z-index: 2;
+      }
+
+      a:hover {
+        color: grey;
+        cursor: pointer;
+      }
+
+      .listen {
+        text-align: center;
+        position: absolute;
+        top: 0;
+        margin-top: 15px;
+      }
+
+      .draw {
+        text-align: center;
+        position: absolute;
+        bottom: 0;
+        margin-bottom: 15px;
+      }
+
+      .gif {
+        width: 100%;
+        position: absolute;
+        margin-top: 40vh;
+        z-index: 0;
+      }
+
+      .overlay {
+        display: none;
+        background-color: white;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 1;
+      }
+
+      #controls {
+        display: none;
+        margin-left: 15px;
+        margin-top: 15px;
+        position: absolute;
+        z-index: 7 !important;
+      }
+
+      .list {
+        cursor: pointer;
+        z-index: 1;
+      }
+    </style>
+
+    <script>
+      function disableScroll() {
+        // Get the current page scroll position
+        scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        (scrollLeft =
+          window.pageXOffset || document.documentElement.scrollLeft),
+          // if any scroll is attempted, set this to the previous value
+          (window.onscroll = function () {
+            window.scrollTo(scrollLeft, scrollTop);
+          });
+      }
+
+      function enableScroll() {
+        window.onscroll = function () {};
+      }
+
+      function showover() {
+        document.getElementById("overlisten").style.display = "block";
+        document.getElementById("controls").style.display = "block";
+
+        disableScroll();
+      }
+
+      var audio = new Audio("./asset/draw/draw-a-line.mp3");
+
+      audio.addEventListener(
+        "timeupdate",
+        function () {
+          var duration = document.getElementById("duration");
+          var s = parseInt(audio.currentTime % 60);
+          var m = parseInt((audio.currentTime / 60) % 60);
+          if (m < 10) {
+            m = "0" + m;
+          }
+          if (s < 10) {
+            s = "0" + s;
+          }
+          duration.innerHTML = m + ":" + s;
+        },
+        false
+      );
+
+      function play0() {
+        audio.currentTime = 0;
+        audio.play();
+      }
+
+      function play1() {
+        audio.currentTime = 15;
+        audio.play();
+      }
+
+      function play2() {
+        audio.currentTime = 28;
+        audio.play();
+      }
+
+      function play3() {
+        audio.currentTime = 41;
+        audio.play();
+      }
+
+      function play4() {
+        audio.currentTime = 70;
+        audio.play();
+      }
+      function play5() {
+        audio.currentTime = 93;
+        audio.play();
+      }
+
+      function play6() {
+        audio.currentTime = 99;
+        audio.play();
+      }
+
+      function play7() {
+        audio.currentTime = 109;
+        audio.play();
+      }
+
+      function play8() {
+        audio.currentTime = 163;
+        audio.play();
+      }
+
+      function play9() {
+        audio.currentTime = 176;
+        audio.play();
+      }
+
+      function play10() {
+        audio.currentTime = 178;
+        audio.play();
+      }
+
+      function play11() {
+        audio.currentTime = 181;
+        audio.play();
+      }
+
+      function play12() {
+        audio.currentTime = 186;
+        audio.play();
+      }
+
+      function play13() {
+        audio.currentTime = 197;
+        audio.play();
+      }
+
+      function play14() {
+        audio.currentTime = 204;
+        audio.play();
+      }
+
+      function play15() {
+        audio.currentTime = 214;
+        audio.play();
+      }
+
+      function play16() {
+        audio.currentTime = 217;
+        audio.play();
+      }
+
+      function play17() {
+        audio.currentTime = 238;
+        audio.play();
+      }
+
+      function play18() {
+        audio.currentTime = 272;
+        audio.play();
+      }
+      function play19() {
+        audio.currentTime = 276;
+        audio.play();
+      }
+
+      function play20() {
+        audio.currentTime = 280;
+        audio.play();
+      }
+
+      function play21() {
+        audio.currentTime = 287;
+        audio.play();
+      }
+
+      function play22() {
+        audio.currentTime = 292;
+        audio.play();
+      }
+
+      function play23() {
+        audio.currentTime = 297;
+        audio.play();
+      }
+
+      function play24() {
+        audio.currentTime = 346;
+        audio.play();
+      }
+
+      function play25() {
+        audio.currentTime = 352;
+        audio.play();
+      }
+
+      function play26() {
+        audio.currentTime = 369;
+        audio.play();
+      }
+
+      function play27() {
+        audio.currentTime = 380;
+        audio.play();
+      }
+
+      function play28() {
+        audio.currentTime = 399;
+        audio.play();
+      }
+
+      function play29() {
+        audio.currentTime = 406;
+        audio.play();
+      }
+
+      function play30() {
+        audio.currentTime = 410;
+        audio.play();
+      }
+
+      function play31() {
+        audio.currentTime = 414;
+        audio.play();
+      }
+
+      function play32() {
+        audio.currentTime = 419;
+        audio.play();
+      }
+
+      function play33() {
+        audio.currentTime = 426;
+        audio.play();
+      }
+
+      function play34() {
+        audio.currentTime = 434;
+        audio.play();
+      }
+
+      function play35() {
+        audio.currentTime = 442;
+        audio.play();
+      }
+
+      function play36() {
+        audio.currentTime = 457;
+        audio.play();
+      }
+
+      function play37() {
+        audio.currentTime = 496;
+        audio.play();
+      }
+
+      function play38() {
+        audio.currentTime = 499;
+        audio.play();
+      }
+
+      function play39() {
+        audio.currentTime = 504;
+        audio.play();
+      }
+
+      function play40() {
+        audio.currentTime = 517;
+        audio.play();
+      }
+
+      function play41() {
+        audio.currentTime = 528;
+        audio.play();
+      }
+
+      function play42() {
+        audio.currentTime = 537;
+        audio.play();
+      }
+
+      function play43() {
+        audio.currentTime = 547;
+        audio.play();
+      }
+
+      function play44() {
+        audio.currentTime = 555;
+        audio.play();
+      }
+
+      function play45() {
+        audio.currentTime = 559;
+        audio.play();
+      }
+
+      function play46() {
+        audio.currentTime = 569;
+        audio.play();
+      }
+
+      function play47() {
+        audio.currentTime = 575;
+        audio.play();
+      }
+
+      function play48() {
+        audio.currentTime = 584;
+        audio.play();
+      }
+
+      function play49() {
+        audio.currentTime = 590;
+        audio.play();
+      }
+
+      function play50() {
+        audio.currentTime = 594;
+        audio.play();
+      }
+
+      function play51() {
+        audio.currentTime = 610;
+        audio.play();
+      }
+
+      function play52() {
+        audio.currentTime = 629;
+        audio.play();
+      }
+
+      function play53() {
+        audio.currentTime = 665;
+        audio.play();
+      }
+
+      const addb = 2;
+
+      function play54() {
+        audio.currentTime = 681;
+        audio.play();
+      }
+
+      function play55() {
+        audio.currentTime = 695;
+        audio.play();
+      }
+
+      function play56() {
+        audio.currentTime = 698;
+        audio.play();
+      }
+
+      function play57() {
+        audio.currentTime = 712;
+        audio.play();
+      }
+
+      function play58() {
+        audio.currentTime = 717;
+        audio.play();
+      }
+
+      function play59() {
+        audio.currentTime = 727;
+        audio.play();
+      }
+
+      function play60() {
+        audio.currentTime = 732;
+        audio.play();
+      }
+
+      function play61() {
+        audio.currentTime = 739;
+        audio.play();
+      }
+
+      function play62() {
+        audio.currentTime = 755;
+        audio.play();
+      }
+
+      function play63() {
+        audio.currentTime = 780;
+        audio.play();
+      }
+
+      function play64() {
+        audio.currentTime = 785;
+        audio.play();
+      }
+
+      function play65() {
+        audio.currentTime = 791;
+        audio.play();
+      }
+
+      function play66() {
+        audio.currentTime = 798;
+        audio.play();
+      }
+
+      function play67() {
+        audio.currentTime = 805;
+        audio.play();
+      }
+
+      function play68() {
+        audio.currentTime = 808;
+        audio.play();
+      }
+
+      function play69() {
+        audio.currentTime = 813;
+        audio.play();
+      }
+
+      function play70() {
+        audio.currentTime = 828;
+        audio.play();
+      }
+
+      function play71() {
+        audio.currentTime = 830;
+        audio.play();
+      }
+
+      function play72() {
+        audio.currentTime = 838;
+        audio.play();
+      }
+
+      function play73() {
+        audio.currentTime = 850;
+        audio.play();
+      }
+
+      function play74() {
+        audio.currentTime = 859;
+        audio.play();
+      }
+
+      function play75() {
+        audio.currentTime = 865;
+        audio.play();
+      }
+
+      function play76() {
+        audio.currentTime = 873;
+        audio.play();
+      }
+
+      function play77() {
+        audio.currentTime = 882;
+        audio.play();
+      }
+
+      function play78() {
+        audio.currentTime = 885;
+        audio.play();
+      }
+
+      function play79() {
+        audio.currentTime = 890;
+        audio.play();
+      }
+
+      function play80() {
+        audio.currentTime = 895;
+        audio.play();
+      }
+
+      function play81() {
+        audio.currentTime = 902;
+        audio.play();
+      }
+
+      function play82() {
+        audio.currentTime = 908;
+        audio.play();
+      }
+
+      function play83() {
+        audio.currentTime = 919;
+        audio.play();
+      }
+
+      function play84() {
+        audio.currentTime = 930;
+        audio.play();
+      }
+
+      function play85() {
+        audio.currentTime = 956;
+        audio.play();
+      }
+
+      function play86() {
+        audio.currentTime = 961;
+        audio.play();
+      }
+
+      function play87() {
+        audio.currentTime = 982;
+        audio.play();
+      }
+
+      function play88() {
+        audio.currentTime = 998;
+        audio.play();
+      }
+
+      function play89() {
+        audio.currentTime = 1005;
+        audio.play();
+      }
+
+      function play90() {
+        audio.currentTime = 1016;
+        audio.play();
+      }
+
+      function play91() {
+        audio.currentTime = 1027;
+        audio.play();
+      }
+
+      function play92() {
+        audio.currentTime = 1040;
+        audio.play();
+      }
+
+      function play93() {
+        audio.currentTime = 1110;
+        audio.play();
+      }
+
+      function play94() {
+        audio.currentTime = 1124;
+        audio.play();
+      }
+
+      function play95() {
+        audio.currentTime = 1138;
+        audio.play();
+      }
+
+      function play96() {
+        audio.currentTime = 1142;
+        audio.play();
+      }
+
+      function play97() {
+        audio.currentTime = 1145;
+        audio.play();
+      }
+
+      function play98() {
+        audio.currentTime = 1163;
+        audio.play();
+      }
+
+      function play99() {
+        audio.currentTime = 1168;
+        audio.play();
+      }
+
+      function pause() {
+        audio.pause();
+        document.getElementById("overlisten").style.display = "none";
+        document.getElementById("controls").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

@@ -71,12 +71,27 @@ div {
   height: 400px;
 }
 
+.m-w {
+  width: 356px;
+}
+
+.m-h {
+  height: 200px;
+}
+
 .small {
   height: 200px;
 }
 
 .gallery {
   white-space: nowrap;
+}
+
+.mobile-g {
+  white-space: nowrap;
+  height: 420px;
+  margin-left: 25px;
+  margin-right: 25px;
 }
 
 a {
@@ -230,10 +245,26 @@ p {
   display: none;
 }
 
+.container-mobile {
+  width: 100%;
+  float: left;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 @media only screen and (max-width: 768px) {
   /* For mobile phones: */
   [class*="col-"] {
     width: 100%;
+  }
+
+  .medium {
+    height: 200px;
+  }
+
+  .container {
+    height: 200px;
   }
 
   .desktop {
@@ -242,10 +273,6 @@ p {
 
   .mobile {
     display: block;
-  }
-
-  .container {
-    height: 200px;
   }
 
   [class*="gallery"] {

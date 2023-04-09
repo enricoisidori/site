@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Draw a line from one side of the page to the other</title>
+  </head>
+  <body>
+    <div class="overlay txt" id="error">Works only on mobile and tablet</div>
+    <div class="overlay" id="overdraw">
+      <div class="txt listen">
+        <a href="listen.html"> Listen </a>
+      </div>
+      <div class="cont"></div>
+      <div class="txt draw">
+        <a onclick="show()"> Draw </a>
+      </div>
+
+      <img src="./asset/draw/draw-a-line.gif" />
+    </div>
+
+    <canvas
+      id="canvas"
+      ontouchmove="sound(event);"
+      onmousedown="justsound();"
+      onmousemove="sound()"
+      onmouseup="soundstop(event);"
+      ontouchend="soundstop(event)"
+    ></canvas>
+    <div id="lin1"></div>
+    <div id="lin2"></div>
+
+    <div onClick="window.location.reload();" id="bigbtn" class="txt">
+      <a>Back</a>
+    </div>
+  </body>
+  <style>
+    * {
+      font-family: Helvetica Neue, Arial, sans-serif;
+    }
+
+    img {
+      pointer-events: none;
+    }
+
+    .cont {
+      width: 100vw;
+      height: 100vh;
+      z-index: -5;
+    }
+
+    body {
+      margin: 15px !important;
+      overflow-y: hidden; /* Hide vertical scrollbar */
+      overflow-x: hidden; /* Hide horizontal scrollbar */
+      background-color: white;
+    }
+
+    .overlay {
+      display: block;
+      background-color: white;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0px;
+      left: 0px;
+      z-index: 2;
+    }
+
+    .txt {
+      width: 100%;
+      font-size: 250%;
+      z-index: 2;
+      font-weight: 500;
+    }
+
+    @media (min-width: 1025px) {
+      /* big landscape tablets, laptops, and desktops */
+
+      img {
+        pointer-events: none;
+        position: absolute;
+        top: -30%;
+      }
+
+      .txt {
+        width: 100%;
+        font-size: 100pt;
+        z-index: 2;
+        font-weight: 500;
+        line-height: 51pt;
+        background-color: transparent;
+      }
+
+      .listen {
+        text-align: center;
+        position: absolute;
+        top: 0;
+        padding-top: 30px;
+      }
+
+      .draw {
+        text-align: center;
+        position: absolute;
+        bottom: 0;
+        padding-bottom: 30px;
+      }
+    }
+
+    img {
+      width: 100vw;
+      margin-top: 30vh;
+    }
+
+    a {
+      text-decoration: none;
+      color: black;
+      z-index: 2;
+    }
+
+    a:hover {
+      color: grey;
+      cursor: pointer;
+    }
+
+    .listen {
+      text-align: center;
+      position: absolute;
+      top: 0;
+      margin-top: 15px;
+    }
+
+    .draw {
+      text-align: center;
+      position: absolute;
+      bottom: 0;
+      margin-bottom: 15px;
+    }
+
+    .gif {
+      width: 100%;
+      position: absolute;
+      margin-top: 40vh;
+      z-index: 0;
+    }
+
+    #bigbtn {
+      margin: 30px 15px 15px 15px;
+      display: none;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0px;
+      left: 0px;
+      z-index: 16;
+    }
+
+    #canvas {
+      border: 0px solid black;
+      background-color: white;
+    }
+
+    .stroke-color {
+      display: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+    }
+
+    #lin1 {
+      display: none;
+      width: 30px;
+      height: 2px;
+      top: 50vh;
+      background-color: black;
+      right: 0;
+      position: absolute;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    #lin2 {
+      display: none;
+      width: 30px;
+      height: 2px;
+      background-color: black;
+      top: 50vh;
+      left: 0;
+      z-index: 2;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    #error {
+      display: none;
+      z-index: 15 !important;
+    }
+
+    body {
+      margin: 0;
+    }
+  </style>
+
+  <script>
+    let canvas = document.getElementById("canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let context = canvas.getContext("2d");
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    let restore_array = [];
+    let start_index = -1;
+    let stroke_color = "black";
+    let stroke_width = "2";
+    let is_drawing = false;
+
+    function change_width(element) {
+      stroke_width = element.innerHTML;
+    }
+
+    function start(event) {
+      is_drawing = true;
+      context.beginPath();
+      context.moveTo(getX(event), getY(event));
+      event.preventDefault();
+    }
+
+    function draw(event) {
+      if (is_drawing) {
+        context.lineTo(getX(event), getY(event));
+        context.strokeStyle = stroke_color;
+        context.lineWidth = stroke_width;
+        context.lineCap = "round";
+        context.lineJoin = "round";
+        context.stroke();
+      }
+      event.preventDefault();
+    }
+
+    function stop(event) {
+      if (is_drawing) {
+        context.stroke();
+        context.closePath();
+        is_drawing = false;
+        stroke_color = "rgba(0,0,0,0)";
+      }
+      event.preventDefault();
+      restore_array.push(
+        context.getImageData(0, 0, canvas.width, canvas.height)
+      );
+      start_index += 1;
+    }
+
+    function getX(event) {
+      if (event.pageX == undefined) {
+        return event.targetTouches[0].pageX - canvas.offsetLeft;
+      } else {
+        return event.pageX - canvas.offsetLeft;
+      }
+    }
+
+    function getY(event) {
+      if (event.pageY == undefined) {
+        return event.targetTouches[0].pageY - canvas.offsetTop;
+      } else {
+        return event.pageY - canvas.offsetTop;
+      }
+    }
+
+    canvas.addEventListener("touchstart", start, false);
+    canvas.addEventListener("touchmove", draw, false);
+    canvas.addEventListener("touchend", stop, false);
+    canvas.addEventListener("mousedown", start, false);
+    canvas.addEventListener("mousemove", draw, false);
+    canvas.addEventListener("mouseup", stop, false);
+    canvas.addEventListener("mouseout", stop, false);
+
+    function Restore() {
+      if (start_index <= 0) {
+        Clear();
+      } else {
+        start_index += -1;
+        restore_array.pop();
+        if (event.type != "mouseout") {
+          context.putImageData(restore_array[start_index], 0, 0);
+        }
+      }
+    }
+
+    function Clear() {
+      context.fillStyle = "white";
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      restore_array = [];
+      start_index = -1;
+    }
+
+    // create web audio api context
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    console.log(audioCtx);
+    console.log(audioCtx.state);
+
+    // create Oscillator node
+    var oscillator = audioCtx.createOscillator();
+    oscillator.connect(audioCtx.destination);
+    //show canvas and create audioCtx
+
+    function show() {
+      audioCtx.resume().then(() => console.log(audioCtx.state));
+      document.getElementById("overdraw").style.display = "none";
+      document.getElementById("lin1").style.display = "block";
+      document.getElementById("lin2").style.display = "block";
+    }
+
+    function sound() {
+      let height = screen.height;
+      if (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        )
+      ) {
+        var yc = height - event.touches[0].clientY;
+        oscillator.frequency.value = -yc;
+        oscillator.type = "sine";
+        oscillator.start();
+      } else {
+        let width = screen.width;
+        let height = screen.height;
+        var xc = event.clientX;
+        var yc = screen.height - event.clientY - 100;
+        oscillator.frequency.value = yc;
+        oscillator.type = "sine";
+      }
+    }
+
+    function justsound() {
+      oscillator.start();
+    }
+
+    function soundstop() {
+      oscillator.stop();
+      document.getElementById("bigbtn").style.display = "block";
+    }
+  </script>
+</html>
