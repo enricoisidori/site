@@ -8,14 +8,14 @@
 }
 
 html {
-  -webkit-text-size-adjust: content-box;
-  -moz-text-size-adjust: content-box;
-  -ms-text-size-adjust: content-box;
-
   width: auto;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
+
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 body {
