@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Precisamente Casuale</title>
+  </head>
+
+  <body>
+    <div id="testo">
+      <a id="position" target="_blank"
+        ><span id="latitude"></span> N, <span id="longitude"></span> E <br
+      /></a>
+      <span id="hour"></span> <br />
+      <br />
+      <span id="height"></span>cm <br />
+      <span id="verticalangle"></span>° <br />
+      <span id="horizontalangle"></span>° <br />
+      <br />
+      <i>f</i>/<span id="aperture"></span> <br />
+      1/<span id="shutterspeed"></span> <br />
+      ISO<span id="iso"></span> <br />
+      <span id="focallength"></span>mm <br />
+    </div>
+  </body>
+
+  <style>
+    #testo {
+      font-size: 12pt;
+      font-family: "Courier New", Courier, monospace;
+      color: black;
+    }
+
+    body {
+      background-color: white;
+      margin: none;
+    }
+
+    a {
+      text-decoration: none;
+      color: black;
+    }
+  </style>
+
+  <script>
+    function generateRandom(max = 100, min = 0) {
+      let rand = Math.random() * (max - min) + min;
+      console.log(rand);
+      return rand;
+    }
+
+    function generateRandomFloor(max = 100, min = 0) {
+      let rand = Math.floor(Math.random() * (max - min) + min);
+      console.log(rand);
+      return rand;
+    }
+
+    let latitude = generateRandom(45.49741960855827, 45.443278642791384);
+    let longitude = generateRandom(9.217931012017788, 9.141070512063713);
+    let height = generateRandomFloor(10, 200);
+    let verticalangle = generateRandomFloor(0, 360);
+    let horizontalangle = generateRandomFloor(-90, 90);
+    let aperture = generateRandomFloor(5, 12);
+    let shutterspeed = generateRandomFloor(1, 2000);
+    let iso = generateRandomFloor(100, 6400);
+    let focallength = generateRandomFloor(15, 200);
+
+    let hrs = Math.round(Math.random() * 23);
+    let mins = Math.round(Math.random() * 59);
+    let hFormat = hrs < 10 ? "0" : "";
+    let mFormat = mins < 10 ? "0" : "";
+
+    document.getElementById("latitude").innerHTML = latitude;
+    document.getElementById("longitude").innerHTML = longitude;
+    document.getElementById("position").href =
+      "https://www.google.com/maps/place/" + latitude + "," + longitude;
+    document.getElementById("hour").innerHTML =
+      hFormat + hrs + ":" + mFormat + mins;
+    document.getElementById("height").innerHTML = height;
+    document.getElementById("verticalangle").innerHTML = verticalangle;
+    document.getElementById("horizontalangle").innerHTML = horizontalangle;
+    document.getElementById("aperture").innerHTML = aperture;
+    document.getElementById("shutterspeed").innerHTML = shutterspeed;
+    document.getElementById("shutterspeed").innerHTML = shutterspeed;
+    document.getElementById("iso").innerHTML = iso;
+    document.getElementById("focallength").innerHTML = focallength;
+  </script>
+</html>
+
+<!-- 
+0 0
+45.468212942936354, 9.182257975113380
+
++3 +3
+45.495279038103730, 9.259110668243366  
+
++3 -3
+45.495279038103730, 9.143830931254035
+
+-3 +3
+45.441148114924516, 9.259110668243366
+
+-3 -3
+45.441148114924516, 9.143830931254035
+-->
