@@ -11,9 +11,9 @@
   <body>
     <div id="testo">
       <a id="position" target="_blank"
-        ><span id="latitude"></span> N
+        ><span id="distanzax"></span> cm,
         <br class="mobile" />
-        <span id="longitude"></span> E <br
+        <span id="distanzay"></span> cm<br
       /></a>
       <span id="hour"></span> <br />
       <br />
@@ -81,9 +81,12 @@
     let ShutterArray = [];
     let ShuttercutArray = [];
     let IsoArray = [];
+    let distanzax = generateRandomFloor(0, 1480);
+    let distanzay = generateRandomFloor(0, 1480);
+
     let latitude = generateRandom(45.49741960855827, 45.443278642791384);
     let longitude = generateRandom(9.217931012017788, 9.141070512063713);
-    let height = generateRandomFloor(40, 160); //misurare bene
+    let height = generateRandomFloor(25, 165); //misurare bene
     let verticalangle = generateRandomFloor(0, 360);
     let horizontalangle = generateRandomFloor(-90, 90);
     let focal;
@@ -91,7 +94,7 @@
     let iso;
     let aperture;
 
-    let hrs = Math.round(Math.random() * 23);
+    let hrs = 20;
     let mins = Math.round(Math.random() * 59);
     let hFormat = hrs < 10 ? "0" : "";
     let mFormat = mins < 10 ? "0" : "";
@@ -436,8 +439,8 @@
     iso = IsoArray[Math.floor(Math.random() * IsoArray.length)];
     aperture = ApertureArray[Math.floor(Math.random() * ApertureArray.length)];
 
-    document.getElementById("latitude").innerHTML = latitude;
-    document.getElementById("longitude").innerHTML = longitude;
+    document.getElementById("distanzax").innerHTML = distanzax;
+    document.getElementById("distanzay").innerHTML = distanzay;
     document.getElementById("position").href =
       "https://www.google.com/maps/place/" + latitude + "," + longitude;
     document.getElementById("hour").innerHTML =
