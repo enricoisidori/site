@@ -31,7 +31,7 @@ document.documentElement.style.cursor = 'url("./asset/svg/dot.svg"), auto';
 let language = "eng";
 
 function changelang() {
-  console.log("attiva");
+  console.log(language);
   let langbtn = document.querySelectorAll(".lang").length;
   if (language == "eng") {
     for (i = 0; i < langbtn; i++) {
