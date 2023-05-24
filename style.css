@@ -1,7 +1,9 @@
 * {
-  font-family: Helvetica, sans-serif;
-  font-size: 16px;
-  line-height: 18px;
+  font-family: "neue-haas-grotesk-text", Helvetica, sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 12pt;
+  line-height: 14pt;
   box-sizing: border-box;
   /* cursor: none !important; */
   cursor: url("./asset/svg/dot.svg") !important;
@@ -227,6 +229,10 @@ p {
 .rect28 {
   width: 100%;
   height: 28px;
+}
+
+.spacer {
+  width: 100%;
 }
 
 .rect10 {
