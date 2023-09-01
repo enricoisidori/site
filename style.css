@@ -29,6 +29,24 @@ video::-webkit-media-controls {
   display: none;
 }
 
+*::-webkit-media-controls-panel {
+  display: none !important;
+
+  -webkit-appearance: none;
+}
+
+*::--webkit-media-controls-play-button {
+  display: none !important;
+
+  -webkit-appearance: none;
+}
+
+*::-webkit-media-controls-start-playback-button {
+  display: none !important;
+
+  -webkit-appearance: none;
+}
+
 /* Could Use thise as well for Individual Controls */
 /* video::-webkit-media-controls-play-button {}
 
