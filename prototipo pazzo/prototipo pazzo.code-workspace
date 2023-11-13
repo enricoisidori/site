@@ -1,0 +1,13 @@
+{
+  "folders": [
+	{
+		"path": "."
+	},
+	{
+		"path": "../prototipo pixel dentro i pixel"
+	}
+],
+  "settings": {
+    "liveServer.settings.multiRootWorkspaceName": "prototipo pazzo"
+  }
+}
