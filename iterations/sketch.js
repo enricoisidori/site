@@ -92,8 +92,8 @@ function draw() {
       mouseXPos = map(noiseX, 0, width, 30, width);
       mouseYPos = map(noiseY, 400, height, 30, height);
     } else {
-      let noiseX = noise(xOffset) * 400;
-      let noiseY = noise(yOffset) * 400;
+      let noiseX = noise(xOffset) * 50;
+      let noiseY = noise(yOffset) * 50;
 
       // Check if touch events are available
       if (touches.length > 0) {
