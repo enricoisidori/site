@@ -97,11 +97,11 @@ function draw() {
 
       // Check if touch events are available
       if (touches.length > 0) {
-        mouseXPos = map(touches[0].x + noiseX * 4, 0, width, 30, width);
-        mouseYPos = map(touches[0].y + noiseY * 4, 0, height, 30, height);
+        mouseXPos = map(touches[0].x + noiseX * 10, 0, width, 30, width);
+        mouseYPos = map(touches[0].y + noiseY * 10, 0, height, 30, height);
       } else {
-        mouseXPos = map(mouseX + noiseX * 100, 0, width, 30, width);
-        mouseYPos = map(mouseY + noiseY + 100, 0, height, 30, height);
+        mouseXPos = map(mouseX + noiseX * 200, 0, width, 30, width);
+        mouseYPos = map(mouseY + noiseY + 200, 0, height, 30, height);
       }
     }
   }
