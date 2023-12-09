@@ -64,17 +64,36 @@ function openModal(modelUrl, caption) {
       mouseX = 0,
       mouseY = 0;
 
-    viewerContainer.addEventListener("mousedown", (event) => {
+    viewerContainer.addEventListener("mousedown", handleMouseDown);
+    viewerContainer.addEventListener("touchstart", handleTouchStart);
+
+    viewerContainer.addEventListener("mouseup", handleMouseUp);
+    viewerContainer.addEventListener("touchend", handleTouchEnd);
+
+    viewerContainer.addEventListener("mousemove", handleMouseMove);
+    viewerContainer.addEventListener("touchmove", handleTouchMove);
+
+    function handleMouseDown(event) {
       mouseDown = true;
       mouseX = event.clientX;
       mouseY = event.clientY;
-    });
+    }
 
-    viewerContainer.addEventListener("mouseup", () => {
+    function handleTouchStart(event) {
+      mouseDown = true;
+      mouseX = event.touches[0].clientX;
+      mouseY = event.touches[0].clientY;
+    }
+
+    function handleMouseUp() {
       mouseDown = false;
-    });
+    }
 
-    viewerContainer.addEventListener("mousemove", (event) => {
+    function handleTouchEnd() {
+      mouseDown = false;
+    }
+
+    function handleMouseMove(event) {
       if (!mouseDown) return;
 
       const deltaX = event.clientX - mouseX;
@@ -83,32 +102,28 @@ function openModal(modelUrl, caption) {
       mouseX = event.clientX;
       mouseY = event.clientY;
 
+      rotateModel(deltaX, deltaY);
+    }
+
+    function handleTouchMove(event) {
+      if (!mouseDown || event.touches.length !== 1) {
+        mouseDown = false;
+        return;
+      }
+
+      const deltaX = event.touches[0].clientX - mouseX;
+      const deltaY = event.touches[0].clientY - mouseY;
+
+      mouseX = event.touches[0].clientX;
+      mouseY = event.touches[0].clientY;
+
+      rotateModel(deltaX, deltaY);
+    }
+
+    function rotateModel(deltaX, deltaY) {
       cone.rotation.y += deltaX * 0.01;
       cone.rotation.x += deltaY * 0.01;
-    });
-
-    // Abilita la rotazione del modello al movimento del mouse e touch su dispositivi mobili
-    var touchStartX = 0,
-      touchStartY = 0;
-
-    viewerContainer.addEventListener("touchstart", (event) => {
-      touchStartX = event.touches[0].clientX;
-      touchStartY = event.touches[0].clientY;
-    });
-
-    viewerContainer.addEventListener("touchmove", (event) => {
-      const touchX = event.touches[0].clientX;
-      const touchY = event.touches[0].clientY;
-
-      const deltaX = touchX - touchStartX;
-      const deltaY = touchY - touchStartY;
-
-      touchStartX = touchX;
-      touchStartY = touchY;
-
-      cone.rotation.y += deltaX * 0.01;
-      cone.rotation.x += deltaY * 0.01;
-    });
+    }
 
     // Render loop
     var animate = function () {
@@ -125,6 +140,17 @@ function openModal(modelUrl, caption) {
 
     animate();
   });
+
+  // Disabilita lo scroll del body quando il modello è aperto
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  var modal = document.getElementById("myModal");
+  modal.style.display = "none";
+
+  // Ripristina lo scroll e la posizione del body
+  document.body.style.overflow = "auto";
 }
 
 // Chiudi il modello al clic su desktop
@@ -147,14 +173,6 @@ function handleWindowTouch(event) {
     closeModal();
     location.reload();
   }
-}
-
-function closeModal() {
-  var modal = document.getElementById("myModal");
-  modal.style.display = "none";
-
-  // Ripristina lo scroll e la posizione del body
-  document.body.style.overflow = "auto";
 }
 
 //location.reload();
