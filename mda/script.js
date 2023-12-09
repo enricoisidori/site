@@ -8,7 +8,7 @@ const galleryItems = Array.from(document.querySelectorAll(".gallery-item"));
 
 galleryItems.forEach((item, index) => {
   item.addEventListener("click", () => {
-    openModal("assets/" + (index + 1) + ".glb", "Item " + (index + 1));
+    openModal("mda/" + (index + 1) + ".glb", "Item " + (index + 1));
   });
 });
 
