@@ -8,7 +8,7 @@ const galleryItems = Array.from(document.querySelectorAll(".gallery-item"));
 
 galleryItems.forEach((item, index) => {
   item.addEventListener("click", () => {
-    openModal("mda/" + (index + 1) + ".glb", "Item " + (index + 1));
+    openModal("mda/" + (index + 1) + ".glb");
   });
 });
 
@@ -107,9 +107,24 @@ function openModal(modelUrl, caption) {
 //   modal.style.display = "none";
 // }
 
-window.onclick = function (event) {
+// Chiudi il modello al clic su desktop
+window.addEventListener("click", handleWindowClick);
+
+// Chiudi il modello al tocco su dispositivi mobili
+window.addEventListener("touchstart", handleWindowTouch);
+
+function handleWindowClick(event) {
   var modal = document.getElementById("myModal");
   if (event.target == modal) {
     location.reload();
   }
-};
+}
+
+function handleWindowTouch(event) {
+  var modal = document.getElementById("myModal");
+  if (event.target == modal) {
+    location.reload();
+  }
+}
+
+//location.reload();
