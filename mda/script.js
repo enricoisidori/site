@@ -1,4 +1,3 @@
-// script.js
 import * as THREE from "https://cdn.skypack.dev/three@0.133.1/build/three.module.js";
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.133.1/examples/jsm/loaders/GLTFLoader.js";
 
@@ -88,75 +87,28 @@ function openModal(modelUrl, caption) {
       cone.rotation.x += deltaY * 0.01;
     });
 
-    // ...
-
     // Abilita la rotazione del modello al movimento del mouse e touch su dispositivi mobili
-    var mouseDown = false,
-      mouseX = 0,
-      mouseY = 0;
+    var touchStartX = 0,
+      touchStartY = 0;
 
-    viewerContainer.addEventListener("mousedown", handleMouseDown);
-    viewerContainer.addEventListener("touchstart", handleTouchStart);
+    viewerContainer.addEventListener("touchstart", (event) => {
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    });
 
-    viewerContainer.addEventListener("mouseup", handleMouseUp);
-    viewerContainer.addEventListener("touchend", handleTouchEnd);
+    viewerContainer.addEventListener("touchmove", (event) => {
+      const touchX = event.touches[0].clientX;
+      const touchY = event.touches[0].clientY;
 
-    viewerContainer.addEventListener("mousemove", handleMouseMove);
-    viewerContainer.addEventListener("touchmove", handleTouchMove);
+      const deltaX = touchX - touchStartX;
+      const deltaY = touchY - touchStartY;
 
-    function handleMouseDown(event) {
-      mouseDown = true;
-      mouseX = event.clientX;
-      mouseY = event.clientY;
-    }
+      touchStartX = touchX;
+      touchStartY = touchY;
 
-    function handleTouchStart(event) {
-      mouseDown = true;
-      mouseX = event.touches[0].clientX;
-      mouseY = event.touches[0].clientY;
-    }
-
-    function handleMouseUp() {
-      mouseDown = false;
-    }
-
-    function handleTouchEnd() {
-      mouseDown = false;
-    }
-
-    function handleMouseMove(event) {
-      if (!mouseDown) return;
-
-      const deltaX = event.clientX - mouseX;
-      const deltaY = event.clientY - mouseY;
-
-      mouseX = event.clientX;
-      mouseY = event.clientY;
-
-      rotateModel(deltaX, deltaY);
-    }
-
-    function handleTouchMove(event) {
-      if (!mouseDown || event.touches.length !== 1) {
-        mouseDown = false;
-        return;
-      }
-
-      const deltaX = event.touches[0].clientX - mouseX;
-      const deltaY = event.touches[0].clientY - mouseY;
-
-      mouseX = event.touches[0].clientX;
-      mouseY = event.touches[0].clientY;
-
-      rotateModel(deltaX, deltaY);
-    }
-
-    function rotateModel(deltaX, deltaY) {
       cone.rotation.y += deltaX * 0.01;
       cone.rotation.x += deltaY * 0.01;
-    }
-
-    // ...
+    });
 
     // Render loop
     var animate = function () {
@@ -164,18 +116,16 @@ function openModal(modelUrl, caption) {
         cone.rotation.y += 0.01;
       }
 
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
+      // Aggiorna il render solo se il modello è visibile
+      if (modal.style.display === "block") {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
     };
 
     animate();
   });
 }
-
-// function closeModal() {
-//   var modal = document.getElementById("myModal");
-//   modal.style.display = "none";
-// }
 
 // Chiudi il modello al clic su desktop
 window.addEventListener("click", handleWindowClick);
@@ -186,6 +136,7 @@ window.addEventListener("touchstart", handleWindowTouch);
 function handleWindowClick(event) {
   var modal = document.getElementById("myModal");
   if (event.target == modal) {
+    closeModal();
     location.reload();
   }
 }
@@ -193,8 +144,17 @@ function handleWindowClick(event) {
 function handleWindowTouch(event) {
   var modal = document.getElementById("myModal");
   if (event.target == modal) {
+    closeModal();
     location.reload();
   }
+}
+
+function closeModal() {
+  var modal = document.getElementById("myModal");
+  modal.style.display = "none";
+
+  // Ripristina lo scroll e la posizione del body
+  document.body.style.overflow = "auto";
 }
 
 //location.reload();
