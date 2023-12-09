@@ -88,6 +88,76 @@ function openModal(modelUrl, caption) {
       cone.rotation.x += deltaY * 0.01;
     });
 
+    // ...
+
+    // Abilita la rotazione del modello al movimento del mouse e touch su dispositivi mobili
+    var mouseDown = false,
+      mouseX = 0,
+      mouseY = 0;
+
+    viewerContainer.addEventListener("mousedown", handleMouseDown);
+    viewerContainer.addEventListener("touchstart", handleTouchStart);
+
+    viewerContainer.addEventListener("mouseup", handleMouseUp);
+    viewerContainer.addEventListener("touchend", handleTouchEnd);
+
+    viewerContainer.addEventListener("mousemove", handleMouseMove);
+    viewerContainer.addEventListener("touchmove", handleTouchMove);
+
+    function handleMouseDown(event) {
+      mouseDown = true;
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+    }
+
+    function handleTouchStart(event) {
+      mouseDown = true;
+      mouseX = event.touches[0].clientX;
+      mouseY = event.touches[0].clientY;
+    }
+
+    function handleMouseUp() {
+      mouseDown = false;
+    }
+
+    function handleTouchEnd() {
+      mouseDown = false;
+    }
+
+    function handleMouseMove(event) {
+      if (!mouseDown) return;
+
+      const deltaX = event.clientX - mouseX;
+      const deltaY = event.clientY - mouseY;
+
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+
+      rotateModel(deltaX, deltaY);
+    }
+
+    function handleTouchMove(event) {
+      if (!mouseDown || event.touches.length !== 1) {
+        mouseDown = false;
+        return;
+      }
+
+      const deltaX = event.touches[0].clientX - mouseX;
+      const deltaY = event.touches[0].clientY - mouseY;
+
+      mouseX = event.touches[0].clientX;
+      mouseY = event.touches[0].clientY;
+
+      rotateModel(deltaX, deltaY);
+    }
+
+    function rotateModel(deltaX, deltaY) {
+      cone.rotation.y += deltaX * 0.01;
+      cone.rotation.x += deltaY * 0.01;
+    }
+
+    // ...
+
     // Render loop
     var animate = function () {
       if (cone) {
