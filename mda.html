@@ -15,15 +15,22 @@
 }
 
 
+/* * {
+  cursor:none !important;
+} */
+
+
+
       body {
-        margin: 0;
-        /* margin-top: 2px;
+        margin-top: 2px;
+        margin-bottom: 2px;
         margin-left: 5px;
-        margin-right: 5px; */
+        margin-right: 5px;
         font-family: "Times New Roman", Times, serif;
         color: white;
         background-color: rgb(0, 0, 0);
         font-size: 12pt;
+  
         
         
 
@@ -33,7 +40,9 @@
         color: white;
         text-align: left;
         width: 100vw;
-        left: 1px;
+        left: 5px;
+        top:2px;
+        position: fixed;
         z-index: 2;
 
       }
@@ -47,7 +56,7 @@
 
       .gallery-item {
         width: 100vw;
-        height: 14pt;
+        height: 18pt;
         margin: 0;
         cursor: pointer;
   
@@ -106,7 +115,7 @@
       #close-modal {
         position: absolute;
         top: 1px;
-        right: 4px;
+        right: 3px;
         color: #ffffff;
         font-size: 30pt;
         line-height: 25pt;
@@ -135,7 +144,7 @@
       MUSEUM of DIGITAL ARCHEOLOGY <br />
       Traces of the human being era in a non-physical world <br /><br />
     </header>
-
+    <br /><br /><br /><br />
     <div class="gallery-item" onclick="openModal('mda/1.glb')">
       <img class="preview" src="mda/img/1.png" />manhole.glb
     </div>
@@ -230,7 +239,7 @@
 
 
 
-    <br />
+
 
     <div class="about">
       Through the collaboration of an AI team specialized in digital archeology and one in 3d model reconstruction, it was possible to observe pieces of the physical world dating back to the human era. At that time, HB (human being) inhabited partly an "external" physical space and partly a digital space. The process of digital archeology has dug deep into the many layers deposited in digital space by our HB ancestors. There are few traces left intact, but it has been possible to bring out photographs and descriptions of the physical world from which some objects could be reconstructed. In this exhibit we can observe objects of which no photogrammetry has been found but only descriptions, these objects were useful in managing "roads": that is, of the a physical transportation system of the HB.
