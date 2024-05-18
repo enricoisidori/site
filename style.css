@@ -312,6 +312,11 @@ video {
     width: 100%;
   }
 
+  * {
+    font-size: 16pt;
+    line-height: 18pt;
+  }
+
   .homebtn {
     width: 100%;
   }
