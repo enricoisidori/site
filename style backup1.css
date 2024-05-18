@@ -1,17 +1,15 @@
-.btn.active {
-  color: black;
+@font-face {
+  font-family: "Arial Narrow", Arial, sans-serif;
 }
 
-/* Resto del CSS */
-@import url("https://fonts.cdnfonts.com/css/helvetica-lt-narrow");
-
 * {
-  font-family: "Helvetica LT Narrow", sans-serif;
-  font-weight: 400;
+  font: 30px "Arial Narrow", Arial, sans-serif;
+  font-weight: 500;
   font-style: normal;
-  font-size: 14pt;
-  line-height: 16pt;
+  font-size: 15pt;
+  line-height: 18pt;
   box-sizing: border-box;
+  /* cursor: none !important; */
   cursor: url("./asset/svg/dot.svg") !important;
 }
 
@@ -24,12 +22,11 @@ html {
   -webkit-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
-  background-color: white;
 }
 
 body {
-  margin: 2.5px;
-  background-color: white;
+  margin: 0;
+  cursor: url("./asset/svg/dot.svg");
 }
 
 video::-webkit-media-controls {
@@ -38,21 +35,39 @@ video::-webkit-media-controls {
 
 *::-webkit-media-controls-panel {
   display: none !important;
+
   -webkit-appearance: none;
 }
 
 *::--webkit-media-controls-play-button {
   display: none !important;
+
   -webkit-appearance: none;
 }
 
 *::-webkit-media-controls-start-playback-button {
   display: none !important;
+
   -webkit-appearance: none;
 }
 
+/* Could Use thise as well for Individual Controls */
+/* video::-webkit-media-controls-play-button {}
+
+video::-webkit-media-controls-volume-slider {}
+
+video::-webkit-media-controls-mute-button {}
+
+video::-webkit-media-controls-timeline {}
+
+video::-webkit-media-controls-current-time-display {} */
+
 div {
   margin: 0;
+}
+
+#nonhovera:hover {
+  opacity: 100% !important;
 }
 
 .container {
@@ -60,96 +75,73 @@ div {
   white-space: nowrap;
   overflow-x: auto;
   overflow-y: hidden;
-  margin-bottom: -4px;
 }
 
-a:link {
-  color: black;
-  text-decoration: underline;
-}
-
-.homebtn {
+.container-verical {
   float: left;
-  width: 16.66%;
-  text-align: left;
+  white-space: nowrap;
+  overflow-y: scroll;
 }
 
-.homebtn a {
+.container-fit {
+  float: left;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+}
+
+.desktop {
+  display: block;
+}
+
+.mobile {
+  display: none;
+}
+
+.normal {
+  height: 600px;
+}
+
+.medium {
+  height: 400px;
+}
+
+.m-w {
+  width: 356px;
+}
+
+.m-h {
+  height: 200px;
+}
+
+.small {
+  height: 200px;
+}
+
+.gallery {
+  white-space: nowrap;
+}
+
+.mobile-g {
+  white-space: nowrap;
+  height: 420px;
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+a {
+  color: black;
   text-decoration: none;
-}
-
-.thumb {
-  width: 100%;
-}
-
-p.thumb {
-  margin: -2.5px 0 0px 0;
-}
-
-img.thumb {
-  object-fit: cover;
-  aspect-ratio: 3/2;
-}
-
-.thumb:hover {
-  cursor: pointer;
-}
-
-.btn {
-  mix-blend-mode: difference;
-  color: grey;
-}
-
-#works {
-  color: black;
-}
-
-.btn:hover {
-  color: black;
-  cursor: pointer;
-}
-
-.btn:active {
-  color: black;
-}
-
-btn:visited {
-  color: black;
-}
-
-btn:focus {
-  color: black;
-}
-
-.aboutpage {
-  display: none;
-}
-
-.artistpage {
-  display: none;
-}
-
-.designerpage {
-  display: none;
-}
-
-.digitalpage {
-  display: none;
-}
-
-a:visited {
-  color: black;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 a:hover {
-  color: black;
-}
-
-a:active {
-  color: black;
+  opacity: 0%;
 }
 
 ::-moz-selection {
+  /* Code for Firefox */
   color: white;
   background: black;
 }
@@ -170,82 +162,57 @@ p {
 #topnav {
   width: 100vw;
   position: fixed;
-  z-index: 3;
-}
-
-#toprect {
-  width: 100vw;
-  height: 88px;
-}
-
-.rectabout {
-  height: 100vh;
-  background-color: white;
-  position: absolute;
-}
-
-.aboutpage {
+  opacity: 100%;
   z-index: 1;
 }
 
-.abouttext {
-  z-index: 2;
+/* #toprect {
+  width: 100vw;
+  height: 28px;
+  position: fixed;
+  background-color: white;
+  z-index: -1;
+} */
+
+.botnav {
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .left {
   float: left;
-  padding: 2.5px;
+  padding: 5px;
   width: 33.33%;
   text-align: left;
 }
 
 .right {
   float: left;
-  padding: 2.5px;
+  padding: 5px;
   width: 33.33%;
   text-align: right;
 }
 
+.topleft {
+  float: left;
+  padding: 5px;
+  width: 50%;
+  text-align: left;
+}
+
 .topright {
   float: left;
-  padding: 2.5px;
+  padding: 5px;
   width: 50%;
   text-align: right;
 }
 
 .center {
   float: left;
-  padding: 2.5px;
+  padding: 5px;
   width: 33.33%;
   text-align: center;
-}
-
-table {
-  border-collapse: separate;
-  text-align: left;
-  text-indent: 0%;
-  border-spacing: 2px;
-  padding: 0 !important;
-  border-spacing: 0px;
-}
-
-th {
-  width: 16.66%;
-  text-align: left;
-  vertical-align: text-top;
-  padding: 2.5px !important;
-}
-
-.menu {
-  width: 50%;
-  float: left;
-
-  padding: 0px 2.5px 0px 2.5px;
-}
-
-.div100 {
-  width: 100%;
-  float: left;
 }
 
 .col-1 {
@@ -287,10 +254,7 @@ th {
 
 [class*="col-"] {
   float: left;
-  padding-left: 2.5px;
-  padding-right: 2.5px;
-  padding-top: 2.5px;
-  padding-bottom: 0px;
+  padding: 5px;
 }
 
 .row::after {
@@ -299,24 +263,47 @@ th {
   display: table;
 }
 
-.gallery {
+.rect28 {
+  width: 100%;
+  height: 28px;
+}
+
+.spacer {
   width: 100%;
 }
 
-video {
-  height: 700px;
+.rect10 {
+  width: 100%;
+  height: 10px;
+}
+
+#video-desktop {
+  display: block;
+}
+
+#video-mobile {
+  display: none;
+}
+
+.container-mobile {
+  width: 100%;
+  float: left;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 @media only screen and (max-width: 768px) {
+  /* For mobile phones: */
   [class*="col-"] {
     width: 100%;
   }
 
-  .homebtn {
-    width: 100%;
+  .medium {
+    height: 200px;
   }
 
-  .medium {
+  .container {
     height: 200px;
   }
 
@@ -328,8 +315,9 @@ video {
     display: block;
   }
 
-  video {
-    height: 200px;
+  [class*="gallery"] {
+    white-space: nowrap;
+    height: 200px !important;
   }
 
   .fit {
@@ -349,3 +337,14 @@ video {
     width: 66.66% !important;
   }
 }
+
+/* .cursor2 {
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  background-color: black;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: width 0.3s, height 0.3s, opacity 0.3s;
+} */

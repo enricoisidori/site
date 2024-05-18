@@ -1,102 +1,124 @@
-document.documentElement.style.cursor = 'url("./asset/svg/dot.svg"), auto';
+document.addEventListener("DOMContentLoaded", function () {
+  const filterButtons = document.querySelectorAll(".btn[data-filter]");
+  const items = document.querySelectorAll(
+    ".artistpage, .designerpage, .digitalpage"
+  );
+  const aboutButton = document.querySelector("#about");
+  const worksButton = document.querySelector("#works");
+  const aboutItems = document.querySelectorAll(".aboutpage");
 
-//CAMBIA PAGINA IN AUTOMATICO
-// var caseList = ["progetto.html", "progetto-1.html", "progetto-2.html"];
-// current = $(location)
-//   .attr("pathname")
-//   .substr($(location).attr("pathname").lastIndexOf("/") + 1); // get current page: just last part - page name and extension
-// if ($.inArray(current, caseList) !== -1) {
-//   //check if it is in array
-//   index = $.inArray(current, caseList);
-// }
+  const artistText = document.querySelectorAll(".artistpart");
+  const designerText = document.querySelectorAll(".designerpart");
+  const digitalText = document.querySelectorAll(".digitalpart");
 
-// function next() {
-//   console.log("next");
-//   if (index < caseList.length - 1) {
-//     next = caseList[index + 1];
-//     window.location.href = next;
-//     console.log("+");
-//   }
-// }
+  // Function to show all items
+  function showAllItems() {
+    items.forEach((item) => {
+      item.style.display = "block";
+    });
+    // Reset text colors
+    resetTextColors();
+  }
 
-// function prev() {
-//   console.log("prev");
-//   if (index >= 0 + 1) {
-//     prev = caseList[index - 1];
-//     window.location.href = prev;
-//     console.log("-");
-//   }
-// }
+  // Function to hide all items
+  function hideAllItems() {
+    items.forEach((item) => {
+      item.style.display = "none";
+    });
+    aboutItems.forEach((item) => {
+      item.style.display = "none";
+    });
+  }
 
-let language = "eng";
+  // Function to filter items
+  function filterItems(filter) {
+    items.forEach((item) => {
+      if (item.classList.contains(filter)) {
+        item.style.display = "block";
+      } else {
+        item.style.display = "none";
+      }
+    });
+    // Update text colors based on the active filter
+    updateTextColors(filter);
+  }
 
-function changelang() {
-  console.log(language);
-  let langbtn = document.querySelectorAll(".lang").length;
-  if (language == "eng") {
-    for (i = 0; i < langbtn; i++) {
-      document.getElementsByClassName("ita")[i].style.display = "block";
-      document.getElementsByClassName("eng")[i].style.display = "none";
-      language = "ita";
-      document.getElementsByClassName("lang")[i].innerHTML = "ENG";
-    }
-  } else if (language == "ita") {
-    for (i = 0; i < langbtn; i++) {
-      document.getElementsByClassName("ita")[i].style.display = "none";
-      document.getElementsByClassName("eng")[i].style.display = "block";
-      language = "eng";
-      document.getElementsByClassName("lang")[i].innerHTML = "ITA";
+  // Function to reset text colors to default
+  function resetTextColors() {
+    artistText.forEach((text) => (text.style.color = "black"));
+    designerText.forEach((text) => (text.style.color = "black"));
+    digitalText.forEach((text) => (text.style.color = "black"));
+  }
+
+  // Function to update text colors based on the active filter
+  function updateTextColors(filter) {
+    resetTextColors();
+    if (filter === "artistpage") {
+      designerText.forEach((text) => (text.style.color = "grey"));
+      digitalText.forEach((text) => (text.style.color = "grey"));
+    } else if (filter === "designerpage") {
+      artistText.forEach((text) => (text.style.color = "grey"));
+      digitalText.forEach((text) => (text.style.color = "grey"));
+    } else if (filter === "digitalpage") {
+      artistText.forEach((text) => (text.style.color = "grey"));
+      designerText.forEach((text) => (text.style.color = "grey"));
     }
   }
-}
 
-// $(document).ready(function () {
-//   $(document).mousemove(function (e) {
-//     var cpos = { top: e.pageY, left: e.pageX };
-//     $("#besideMouse").offset(cpos);
-//   });
-// });
+  // Function to show about items
+  function showAboutItems() {
+    aboutItems.forEach((item) => {
+      item.style.display = "block";
+    });
+  }
 
-// function mobilecheck() {
-//   let check = false;
-//   (function (a) {
-//     if (
-//       /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(
-//         a
-//       ) ||
-//       /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(
-//         a.substr(0, 4)
-//       )
-//     )
-//       check = true;
-//   })(navigator.userAgent || navigator.vendor || window.opera);
-//   return check;
-// };
+  // Function to hide about items
+  function hideAboutItems() {
+    aboutItems.forEach((item) => {
+      item.style.display = "none";
+    });
+  }
 
-// function iframe() {
-//   if (check) {
-//     var iFrameID = document.getElementsByClassName("idIframe");
-//     if (iFrameID) {
-//       // here you can make the height, I delete it first, then I make it again
-//       iFrameID.height = "400";
-//       iFrameID.width = "711";
-//     }
-//   }
-// }
+  // Initial display of all items
+  showAllItems();
 
-// function init() {
-//   mobilecheck();
-//   iframe();
-// }
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      // Check if the clicked button is already active
+      if (button.classList.contains("active")) {
+        // If active, deactivate it and show all items
+        button.classList.remove("active");
+        showAllItems();
+      } else {
+        // Otherwise, remove active class from all buttons and activate the clicked one
+        filterButtons.forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+        // Filter items based on the clicked button's data-filter attribute
+        const filter = button.getAttribute("data-filter");
+        filterItems(filter);
+      }
+    });
+  });
 
-// UPDATE: I was able to get this working again... Enjoy!
+  aboutButton.addEventListener("click", function () {
+    hideAllItems();
+    showAboutItems();
+    aboutButton.classList.add("active");
+    worksButton.classList.remove("active");
+    aboutButton.style.color = "black";
+    worksButton.style.color = "grey";
+  });
 
-// var cursorinner = document.querySelector(".cursor2");
-// var a = document.querySelectorAll("a");
+  worksButton.addEventListener("click", function () {
+    hideAboutItems(); // Hide about items when clicking Works
+    showAllItems();
+    aboutButton.classList.remove("active");
+    worksButton.classList.add("active");
+    aboutButton.style.color = "grey";
+    worksButton.style.color = "black";
+  });
 
-// document.addEventListener("mousemove", function (e) {
-//   var x = e.clientX;
-//   var y = e.clientY;
-//   cursorinner.style.left = x + "px";
-//   cursorinner.style.top = y + "px";
-// });
+  // Initial state for About and Works buttons
+  worksButton.classList.add("active");
+  worksButton.style.color = "black";
+});
