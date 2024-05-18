@@ -23,6 +23,11 @@ html {
   background-color: white;
 }
 
+#toprectsigle {
+  height: 36pt;
+  width: 100%;
+}
+
 body {
   margin: 2.5px;
   background-color: white;
@@ -65,7 +70,6 @@ div {
 
 a:link {
   color: black;
-  text-decoration: underline;
 }
 
 .homebtn {
@@ -89,6 +93,10 @@ p.thumb {
 img.thumb {
   object-fit: cover;
   aspect-ratio: 3/2;
+}
+
+.plainlink {
+  text-decoration: none !important;
 }
 
 .thumb:hover {
@@ -143,6 +151,7 @@ a:visited {
 
 a:hover {
   color: black;
+  text-decoration: none;
 }
 
 a:active {
@@ -189,7 +198,7 @@ p {
 }
 
 .abouttext {
-  z-index: 2;
+  z-index: 1;
 }
 
 .left {
@@ -312,17 +321,17 @@ video {
     width: 100%;
   }
 
+  #toprect {
+    height: 101px;
+  }
+
   * {
-    font-size: 16pt;
+    font-size: 17pt;
     line-height: 18pt;
   }
 
   .homebtn {
     width: 100%;
-  }
-
-  .medium {
-    height: 200px;
   }
 
   .desktop {
@@ -332,25 +341,14 @@ video {
   .mobile {
     display: block;
   }
+}
 
-  video {
-    height: 200px;
-  }
+.closebtn {
+  text-decoration: none !important;
+  color: grey !important;
+}
 
-  .fit {
-    height: auto !important;
-    width: 80% !important;
-  }
-
-  .eng {
-    display: block;
-  }
-
-  .ita {
-    display: none;
-  }
-
-  .rightmobile {
-    width: 66.66% !important;
-  }
+.closebtn:hover {
+  text-decoration: none !important;
+  color: black !important;
 }
