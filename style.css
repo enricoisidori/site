@@ -23,13 +23,49 @@ html {
   background-color: white;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
+.info {
+  /* overflow-y: scroll; */
+  position: fixed;
+}
+
+.outdent {
+  float: left;
+  padding-left: 2.5px;
+  padding-right: 2.5px;
+  padding-top: 2.5px;
+  padding-bottom: 0px;
+  margin-left: 40px;
+
+  width: calc(100% - 40px);
+  text-indent: -40px;
+}
+
 #toprectsigle {
-  height: 36pt;
+  height: 42.66px;
+  /* margin-bottom: 16px; */
+  width: 100%;
+}
+
+/* br {
+  line-height: 10px;
+} */
+
+.description .bio {
+  margin-bottom: 5px;
+}
+
+.imgpro {
   width: 100%;
 }
 
 body {
   margin: 2.5px;
+  margin-bottom: 5px;
   background-color: white;
 }
 
@@ -56,6 +92,10 @@ video::-webkit-media-controls {
   -webkit-appearance: none;
 }
 
+.toprectabout {
+  height: 16pt;
+}
+
 div {
   margin: 0;
 }
@@ -70,12 +110,6 @@ div {
 
 a:link {
   color: black;
-}
-
-.homebtn {
-  float: left;
-  width: 16.66%;
-  text-align: left;
 }
 
 .homebtn a {
@@ -93,6 +127,10 @@ p.thumb {
 img.thumb {
   object-fit: cover;
   aspect-ratio: 3/2;
+}
+
+.imgpro {
+  width: 100%;
 }
 
 .plainlink {
@@ -190,7 +228,7 @@ p {
 .rectabout {
   height: 100vh;
   background-color: white;
-  position: absolute;
+  overflow-y: scroll;
 }
 
 .aboutpage {
@@ -204,22 +242,17 @@ p {
 .left {
   float: left;
   padding: 2.5px;
-  width: 33.33%;
+  padding-bottom: 0;
+  width: 50%;
   text-align: left;
 }
 
 .right {
   float: left;
   padding: 2.5px;
-  width: 33.33%;
-  text-align: right;
-}
-
-.topright {
-  float: left;
-  padding: 2.5px;
+  padding-bottom: 0;
   width: 50%;
-  text-align: right;
+  text-align: left;
 }
 
 .center {
@@ -250,6 +283,16 @@ th {
   float: left;
 
   padding: 0px 2.5px 0px 2.5px;
+}
+
+.closebtn {
+  text-decoration: none !important;
+  color: grey !important;
+}
+
+.closebtn:hover {
+  text-decoration: none !important;
+  color: black !important;
 }
 
 .div100 {
@@ -325,13 +368,22 @@ video {
     height: 101px;
   }
 
+  #toprectsigle {
+    height: 49.5px;
+    /* margin-bottom: 18pt; */
+  }
+
   * {
     font-size: 17pt;
     line-height: 18pt;
   }
 
-  .homebtn {
-    width: 100%;
+  .info {
+    position: relative;
+  }
+
+  .footer {
+    padding-top: 18px;
   }
 
   .desktop {
@@ -341,14 +393,12 @@ video {
   .mobile {
     display: block;
   }
-}
 
-.closebtn {
-  text-decoration: none !important;
-  color: grey !important;
-}
+  .outdent {
+    width: calc(100%-40px) !important;
+  }
 
-.closebtn:hover {
-  text-decoration: none !important;
-  color: black !important;
+  .toprectabout {
+    height: 18pt;
+  }
 }

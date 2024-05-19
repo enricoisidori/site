@@ -3,9 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const items = document.querySelectorAll(
     ".artistpage, .designerpage, .digitalpage"
   );
-  const aboutButton = document.querySelector("#about");
-  const worksButton = document.querySelector("#works");
-  const aboutItems = document.querySelectorAll(".aboutpage");
 
   const artistText = document.querySelectorAll(".artistpart");
   const designerText = document.querySelectorAll(".designerpart");
@@ -23,9 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to hide all items
   function hideAllItems() {
     items.forEach((item) => {
-      item.style.display = "none";
-    });
-    aboutItems.forEach((item) => {
       item.style.display = "none";
     });
   }
@@ -65,20 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Function to show about items
-  function showAboutItems() {
-    aboutItems.forEach((item) => {
-      item.style.display = "block";
-    });
-  }
-
-  // Function to hide about items
-  function hideAboutItems() {
-    aboutItems.forEach((item) => {
-      item.style.display = "none";
-    });
-  }
-
   // Initial display of all items
   showAllItems();
 
@@ -100,25 +80,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  aboutButton.addEventListener("click", function () {
-    hideAllItems();
-    showAboutItems();
-    aboutButton.classList.add("active");
-    worksButton.classList.remove("active");
-    aboutButton.style.color = "black";
-    worksButton.style.color = "grey";
-  });
-
-  worksButton.addEventListener("click", function () {
-    hideAboutItems(); // Hide about items when clicking Works
-    showAllItems();
-    aboutButton.classList.remove("active");
-    worksButton.classList.add("active");
-    aboutButton.style.color = "grey";
-    worksButton.style.color = "black";
-  });
-
-  // Initial state for About and Works buttons
+  // Initial state for Works button
+  const worksButton = document.querySelector("#works");
   worksButton.classList.add("active");
   worksButton.style.color = "black";
 });
