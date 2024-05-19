@@ -22,7 +22,6 @@ html {
   background-color: white;
 }
 
-html,
 body {
   overflow-x: hidden;
 }
@@ -53,10 +52,6 @@ body {
 /* br {
   line-height: 10px;
 } */
-
-.description .bio {
-  margin-bottom: 5px;
-}
 
 .imgpro {
   width: 100%;
@@ -99,20 +94,13 @@ div {
   margin: 0;
 }
 
-.container {
-  float: left;
-  white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  margin-bottom: -4px;
-}
-
 a:link {
   color: black;
 }
 
 .homebtn a {
   text-decoration: none;
+  color: black;
 }
 
 .thumb {
@@ -158,16 +146,8 @@ img.thumb {
   color: black;
 }
 
-btn:visited {
-  color: black;
-}
-
 btn:focus {
   color: black;
-}
-
-.aboutpage {
-  display: none;
 }
 
 .artistpage {
@@ -184,6 +164,10 @@ btn:focus {
 
 a:visited {
   color: black;
+}
+
+.btn:visited {
+  color: grey;
 }
 
 a:hover {
@@ -222,20 +206,6 @@ p {
 #toprect {
   width: 100vw;
   height: 88px;
-}
-
-.rectabout {
-  height: 100vh;
-  background-color: white;
-  overflow-y: scroll;
-}
-
-.aboutpage {
-  z-index: 1;
-}
-
-.abouttext {
-  z-index: 1;
 }
 
 .left {
@@ -363,6 +333,10 @@ video {
     width: 100%;
   }
 
+  /* .btn:hover {
+    color: grey;
+  } */
+
   #toprect {
     height: 101px;
   }
@@ -383,6 +357,7 @@ video {
 
   .footer {
     padding-top: 18px;
+    padding-bottom: 5px;
   }
 
   .desktop {

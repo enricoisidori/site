@@ -1,5 +1,3 @@
-// document.documentElement.style.cursor = 'url("./asset/svg/dot.svg"), auto';
-
 document.addEventListener("DOMContentLoaded", function () {
   const filterButtons = document.querySelectorAll(".btn[data-filter]");
   const items = document.querySelectorAll(
@@ -17,13 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     // Reset text colors
     resetTextColors();
-  }
-
-  // Function to hide all items
-  function hideAllItems() {
-    items.forEach((item) => {
-      item.style.display = "none";
-    });
   }
 
   // Function to filter items
@@ -81,9 +72,31 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
-
-  // Initial state for Works button
-  const worksButton = document.querySelector("#works");
-  worksButton.classList.add("active");
-  worksButton.style.color = "black";
 });
+
+function hasTouch() {
+  return (
+    "ontouchstart" in document.documentElement ||
+    navigator.maxTouchPoints > 0 ||
+    navigator.msMaxTouchPoints > 0
+  );
+}
+
+if (hasTouch()) {
+  // remove all the :hover stylesheets
+  try {
+    // prevent exception on browsers not supporting DOM styleSheets properly
+    for (var si in document.styleSheets) {
+      var styleSheet = document.styleSheets[si];
+      if (!styleSheet.rules) continue;
+
+      for (var ri = styleSheet.rules.length - 1; ri >= 0; ri--) {
+        if (!styleSheet.rules[ri].selectorText) continue;
+
+        if (styleSheet.rules[ri].selectorText.match(":hover")) {
+          styleSheet.deleteRule(ri);
+        }
+      }
+    }
+  } catch (ex) {}
+}
