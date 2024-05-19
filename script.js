@@ -1,3 +1,5 @@
+// document.documentElement.style.cursor = 'url("./asset/svg/dot.svg"), auto';
+
 document.addEventListener("DOMContentLoaded", function () {
   const filterButtons = document.querySelectorAll(".btn[data-filter]");
   const items = document.querySelectorAll(
