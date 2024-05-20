@@ -66,11 +66,16 @@ document.addEventListener("DOMContentLoaded", function () {
       if (button.classList.contains("active")) {
         // If active, deactivate it and show all items
         button.classList.remove("active");
+        button.classList.add("inactive");
         showAllItems();
       } else {
         // Otherwise, remove active class from all buttons and activate the clicked one
-        filterButtons.forEach((btn) => btn.classList.remove("active"));
+        filterButtons.forEach((btn) => {
+          btn.classList.remove("active");
+          btn.classList.add("inactive");
+        });
         button.classList.add("active");
+        button.classList.remove("inactive");
         // Filter items based on the clicked button's data-filter attribute
         const filter = button.getAttribute("data-filter");
         filterItems(filter);

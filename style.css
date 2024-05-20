@@ -13,7 +13,7 @@
 html {
   width: auto;
   background-color: white;
-  /* -webkit-tap-highlight-color: rgba(0, 0, 0, 0); */
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 html {
@@ -121,6 +121,16 @@ video .thumb {
   width: 100%;
 }
 
+/* Aggiungi questa classe per i pulsanti non attivi */
+.btn.inactive {
+  color: grey;
+}
+
+/* Assicurati che il colore resti grigio anche in hover */
+.btn.inactive:hover {
+  color: grey;
+}
+
 .plainlink {
   text-decoration: none !important;
 }
@@ -153,6 +163,10 @@ btn:focus {
 
 .artistpage {
   display: none;
+}
+
+.fluxtext {
+  margin: -2.5px 0 1.5px 0;
 }
 
 .designerpage {
