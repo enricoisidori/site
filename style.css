@@ -53,6 +53,9 @@ html {
 body {
   margin: 2.5px;
   background-color: white;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .btn.active {
@@ -106,6 +109,12 @@ p.thumb {
 img.thumb {
   object-fit: cover;
   aspect-ratio: 3/2;
+}
+
+video .thumb {
+  object-fit: cover;
+  aspect-ratio: 3/2;
+  width: 100%;
 }
 
 .imgpro {
@@ -320,10 +329,6 @@ th {
 
 .gallery {
   width: 100%;
-}
-
-video {
-  height: 700px;
 }
 
 @media only screen and (max-width: 768px) {

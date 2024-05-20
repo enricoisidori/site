@@ -53,7 +53,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Initial display of all items
-  showAllItems();
+  // showAllItems();
+
+  // Activate the artist button and filter items by artistpage on initial load
+  const artistButton = document.querySelector(".btn[data-filter='artistpage']");
+  artistButton.classList.add("active");
+  filterItems("artistpage");
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", function () {
