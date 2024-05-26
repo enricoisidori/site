@@ -166,7 +166,7 @@ btn:focus {
 }
 
 .fluxtext {
-  margin: -2.5px 0 3.5px 0;
+  margin: -2.5px 0 2.5px 0;
 }
 
 .designerpage {
@@ -356,6 +356,10 @@ th {
 
   #toprect {
     height: 101px;
+  }
+
+  .fluxtext {
+    margin: 0px 0 5px 0;
   }
 
   #toprectsigle {
