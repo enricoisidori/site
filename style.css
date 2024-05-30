@@ -56,6 +56,7 @@ body {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .btn.active {
@@ -115,6 +116,11 @@ video .thumb {
   object-fit: cover;
   aspect-ratio: 3/2;
   width: 100%;
+}
+
+video {
+  max-width: 100%;
+  height: auto;
 }
 
 .imgpro {
@@ -281,6 +287,25 @@ th {
 
 .div100 {
   width: 100%;
+}
+
+.div50 {
+  width: 50%;
+}
+
+.div33 {
+  width: 33.33%;
+}
+
+.div25 {
+  width: 25%;
+}
+
+.colum2 {
+  padding-bottom: 2.5px !important;
+}
+
+[class*="div"] {
   float: left;
 }
 
