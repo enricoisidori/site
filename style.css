@@ -301,6 +301,11 @@ th {
   width: 25%;
 }
 
+sup {
+  font-size: 10pt;
+  line-height: 0pt;
+}
+
 .colum2 {
   padding-bottom: 2.5px !important;
 }
