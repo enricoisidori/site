@@ -1,5 +1,18 @@
 /* Resto del CSS */
 @import url("https://fonts.cdnfonts.com/css/helvetica-lt-narrow");
+/* .info,
+.topnav,
+header,
+.footer,
+.fluxtext,
+[class*="page"] {
+  font-family: "Helvetica LT Narrow", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14pt;
+  line-height: 16pt;
+  box-sizing: border-box;
+} */
 
 * {
   font-family: "Helvetica LT Narrow", sans-serif;
@@ -26,12 +39,7 @@ html {
 
 .outdent {
   float: left;
-  padding-left: 2.5px;
-  padding-right: 2.5px;
-  padding-top: 2.5px;
-  padding-bottom: 0px;
   margin-left: 40px;
-
   width: calc(100% - 40px);
   text-indent: -40px;
 }
@@ -45,10 +53,6 @@ html {
 /* br {
   line-height: 10px;
 } */
-
-.imgpro {
-  width: 100%;
-}
 
 body {
   margin: 2.5px;
@@ -148,10 +152,23 @@ video {
 .btn {
   mix-blend-mode: difference;
   color: grey;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
 }
 
 #works {
   color: black;
+}
+
+/* .text-container {
+  font-family: "Tinos", serif;
+  font-weight: 400;
+  font-style: normal;
+} */
+
+#content {
+  margin-top: -16pt;
 }
 
 .btn:hover {
@@ -202,12 +219,12 @@ a:active {
 
 ::-moz-selection {
   color: white;
-  background: black;
+  background: grey;
 }
 
 ::selection {
   color: white;
-  background: black;
+  background: grey;
 }
 
 p {
@@ -227,6 +244,11 @@ p {
 #toprect {
   width: 100vw;
   height: 88px;
+}
+
+.toprectpage {
+  width: 100vw;
+  height: 16pt;
 }
 
 .left {
@@ -283,6 +305,11 @@ th {
 .closebtn:hover {
   text-decoration: none !important;
   color: black !important;
+}
+
+.langbtn {
+  float: right;
+  margin-right: 5px;
 }
 
 .div100 {
@@ -393,19 +420,23 @@ sup {
     height: 101px;
   }
 
+  #content {
+    margin-top: 0pt;
+  }
+
   .fluxtext {
     margin: 0px 0 5px 0;
   }
 
   #toprectsigle {
-    height: 49.5px;
+    height: 42.66px;
     /* margin-bottom: 18pt; */
   }
 
-  * {
+  /* {
     font-size: 17pt;
     line-height: 18pt;
-  }
+  } */
 
   .info {
     position: relative;

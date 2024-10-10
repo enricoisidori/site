@@ -110,3 +110,21 @@ if (hasTouch()) {
     }
   } catch (ex) {}
 }
+
+// Stato iniziale (Inglese)
+let currentLang = "en";
+
+// Funzione per aggiornare il testo
+function updateText() {
+  document.getElementById("content").innerHTML = texts[currentLang].content;
+  document.getElementById("description").innerHTML =
+    texts[currentLang].description;
+}
+
+// Gestore per il cambio lingua
+document.getElementById("lang-toggle").addEventListener("click", function () {
+  currentLang = currentLang === "en" ? "it" : "en";
+  document.getElementById("lang-toggle").innerHTML =
+    currentLang === "en" ? "ITA" : "ENG";
+  updateText();
+});
