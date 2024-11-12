@@ -4,6 +4,19 @@ document.addEventListener("DOMContentLoaded", function () {
     ".artistpage, .designerpage, .digitalpage"
   );
 
+  document.addEventListener(
+    "click",
+    function () {
+      let videos = document.querySelectorAll("video");
+      videos.forEach((video) => {
+        video.play().catch((error) => {
+          console.error("Autoplay prevented:", error);
+        });
+      });
+    },
+    { once: true }
+  );
+
   const artistText = document.querySelectorAll(".artistpart");
   const designerText = document.querySelectorAll(".designerpart");
   const digitalText = document.querySelectorAll(".digitalpart");
