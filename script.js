@@ -7,12 +7,15 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener(
     "click",
     function () {
-      let videos = document.querySelectorAll("video");
-      videos.forEach((video) => {
-        video.play().catch((error) => {
-          console.error("Autoplay prevented:", error);
+      // Verifica se la pagina non è quella in cui vuoi disabilitare lo script
+      if (window.location.pathname !== "/specta.html") {
+        let videos = document.querySelectorAll("video");
+        videos.forEach((video) => {
+          video.play().catch((error) => {
+            console.error("Autoplay prevented:", error);
+          });
         });
-      });
+      }
     },
     { once: true }
   );

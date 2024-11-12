@@ -5,15 +5,12 @@
 header,
 .footer,
 .fluxtext,
-[class*="page"] {
-  font-family: "Helvetica LT Narrow", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 14pt;
-  line-height: 16pt;
-  box-sizing: border-box;
-} */
+*/
 
+/* [class*="page"]:hover {
+  -webkit-filter: invert();
+  filter: invert();
+} */
 * {
   font-family: "Helvetica LT Narrow", sans-serif;
   font-weight: 400;
@@ -419,6 +416,10 @@ sup {
   width: 100%;
 }
 
+.mobile {
+  display: none;
+}
+
 @media only screen and (max-width: 768px) {
   [class*="col-"] {
     width: 100%;
@@ -471,7 +472,7 @@ sup {
   }
 
   .mobile {
-    display: block;
+    display: inline;
   }
 
   p.thumb {
