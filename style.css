@@ -316,8 +316,20 @@ th {
   width: 100%;
 }
 
-.div50 {
+.div50l {
   width: 50%;
+  float: left;
+  padding-right: 2.5px;
+  padding-bottom: 2.5px;
+  padding-top: 2.5px;
+}
+
+.div50r {
+  width: 50%;
+  float: left;
+  padding-left: 2.5px;
+  padding-bottom: 2.5px;
+  padding-top: 2.5px;
 }
 
 .div33 {
@@ -409,6 +421,14 @@ sup {
 
 @media only screen and (max-width: 768px) {
   [class*="col-"] {
+    width: 100%;
+  }
+
+  .div50l {
+    width: 100%;
+  }
+
+  .div50r {
     width: 100%;
   }
 
