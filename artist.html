@@ -61,6 +61,13 @@
       </div></a
     >
 
+    <a href="6am.html">
+      <div class="designerpage col-6">
+        <img class="thumb" src="asset/6am/6am-1.jpg" /><br />
+        <p class="thumb">6AM</p>
+      </div></a
+    >
+
     <a href="iperstizioni.html">
       <div class="artistpage col-6">
         <img class="thumb" src="asset/iperstizioni/jpg/m10.jpg" /><br />
@@ -193,6 +200,13 @@
     </div>
 
     <div class="spacer5"></div>
-    <script src="script.js"></script>
+    <script src="script.js">
+
+      document.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+              sessionStorage.setItem('allowAutoplay', 'true');
+          });
+      });
+    </script>
   </body>
 </html>

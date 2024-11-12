@@ -52,6 +52,7 @@
         Links<br />
         <a href="https://capsule.global/plaza" target="_blank"
           >capsule.global/plaza </a>
+          <br> <br>
       </p>
     </div>
     <div class="col-4"></div>
@@ -74,6 +75,16 @@
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.1/jquery.min.js"></script>
-    <script src="script.js"></script>
+    <script src="script.js">
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (sessionStorage.getItem('allowAutoplay')) {
+        document.querySelectorAll('video').forEach(video => {
+            video.play();
+        });
+        sessionStorage.removeItem('allowAutoplay');
+    }
+});
+    </script>
   </body>
 </html>
