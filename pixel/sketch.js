@@ -2,7 +2,7 @@ let img;
 
 function preload() {
   // Carica l'immagine
-  img = loadImage("7a47734e.gif");
+  img = loadImage("https://picsum.photos/200/300");
 }
 
 function setup() {
@@ -50,6 +50,6 @@ function draw() {
   }
 }
 
-// setInterval(function () {
-//   img = loadImage("https://picsum.photos/200/300");
-// }, 5000);
+setInterval(function () {
+  img = loadImage("https://picsum.photos/200/300");
+}, 5000);
