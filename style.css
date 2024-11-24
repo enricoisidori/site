@@ -26,6 +26,10 @@ html {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+a:-webkit-any-link {
+  text-decoration: underline;
+}
+
 html {
   overflow-x: hidden;
 }
@@ -84,7 +88,7 @@ video::-webkit-media-controls {
 }
 
 .toprectabout {
-  height: 16pt;
+  height: 21.5px;
 }
 
 div {
@@ -96,6 +100,11 @@ a:link {
 }
 
 .homebtn a {
+  text-decoration: none;
+  color: black;
+}
+
+.homebtn a:hover {
   text-decoration: none;
   color: black;
 }
@@ -130,12 +139,12 @@ video {
 
 /* Aggiungi questa classe per i pulsanti non attivi */
 .btn.inactive {
-  color: grey;
+  color: rgb(140, 140, 140);
 }
 
 /* Assicurati che il colore resti grigio anche in hover */
 .btn.inactive:hover {
-  color: grey;
+  color: rgb(140, 140, 140);
 }
 
 .plainlink {
@@ -148,7 +157,7 @@ video {
 
 .btn {
   mix-blend-mode: difference;
-  color: grey;
+  color: rgb(140, 140, 140);
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
@@ -202,7 +211,7 @@ a:visited {
 }
 
 .btn:visited {
-  color: grey;
+  color: rgb(140, 140, 140);
 }
 
 a:hover {
@@ -216,12 +225,12 @@ a:active {
 
 ::-moz-selection {
   color: white;
-  background: grey;
+  background: rgb(140, 140, 140);
 }
 
 ::selection {
   color: white;
-  background: grey;
+  background: rgb(140, 140, 140);
 }
 
 p {
@@ -240,7 +249,7 @@ p {
 
 #toprect {
   width: 100vw;
-  height: 88px;
+  height: 66px; /* 88px */
 }
 
 .toprectpage {
@@ -296,7 +305,7 @@ th {
 
 .closebtn {
   text-decoration: none !important;
-  color: grey !important;
+  color: rgb(140, 140, 140) !important;
 }
 
 .closebtn:hover {
@@ -434,11 +443,11 @@ sup {
   }
 
   /* .btn:hover {
-    color: grey;
+    color: rgb(140, 140, 140);
   } */
 
   #toprect {
-    height: 101px;
+    height: 66px; /* 101px; */
   }
 
   #content {
@@ -481,9 +490,5 @@ sup {
 
   .outdent {
     width: calc(100%-40px) !important;
-  }
-
-  .toprectabout {
-    height: 18pt;
   }
 }
