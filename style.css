@@ -11,10 +11,10 @@ header,
   -webkit-filter: invert();
   filter: invert();
 } */
+
 * {
   font-family: "Helvetica LT Narrow", sans-serif;
   font-weight: 400;
-  font-style: normal;
   font-size: 14pt;
   line-height: 16pt;
   box-sizing: border-box;
@@ -139,12 +139,12 @@ video {
 
 /* Aggiungi questa classe per i pulsanti non attivi */
 .btn.inactive {
-  color: rgb(140, 140, 140);
+  color: grey;
 }
 
 /* Assicurati che il colore resti grigio anche in hover */
 .btn.inactive:hover {
-  color: rgb(140, 140, 140);
+  color: black;
 }
 
 .plainlink {
@@ -156,13 +156,26 @@ video {
 }
 
 .btn {
-  mix-blend-mode: difference;
-  color: rgb(140, 140, 140);
+  text-decoration: none !important;
+  color: grey;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
 }
 
+.btnabout {
+  text-decoration: none !important;
+  color: grey;
+}
+
+.btnabout:hover {
+  text-decoration: none;
+  color: black !important;
+}
+
+.btnabout:visited {
+  color: grey;
+}
 #works {
   color: black;
 }
@@ -211,7 +224,7 @@ a:visited {
 }
 
 .btn:visited {
-  color: rgb(140, 140, 140);
+  color: grey;
 }
 
 a:hover {
@@ -225,12 +238,12 @@ a:active {
 
 ::-moz-selection {
   color: white;
-  background: rgb(140, 140, 140);
+  background: black;
 }
 
 ::selection {
   color: white;
-  background: rgb(140, 140, 140);
+  background: black;
 }
 
 p {
@@ -305,7 +318,7 @@ th {
 
 .closebtn {
   text-decoration: none !important;
-  color: rgb(140, 140, 140) !important;
+  color: grey !important;
 }
 
 .closebtn:hover {
@@ -443,7 +456,7 @@ sup {
   }
 
   /* .btn:hover {
-    color: rgb(140, 140, 140);
+    color: grey;
   } */
 
   #toprect {
