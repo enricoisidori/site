@@ -34,9 +34,14 @@ html {
   overflow-x: hidden;
 }
 
-/* .info {
-  position: ;
-} */
+.info {
+  position: fixed; /* Rende la colonna fissa rispetto al viewport */
+  top: 0; /* Posiziona il blocco in alto */
+  left: 0; /* Posiziona il blocco a sinistra */
+  height: 100vh; /* Limita l'altezza al viewport */
+  overflow-y: auto; /* Abilita lo scroll interno */
+  width: 25%; /* Definisci la larghezza della colonna */
+}
 
 .outdent {
   float: left;
