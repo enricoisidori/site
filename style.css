@@ -34,9 +34,9 @@ html {
   overflow-x: hidden;
 }
 
-.info {
-  position: fixed;
-}
+/* .info {
+  position: ;
+} */
 
 .outdent {
   float: left;
