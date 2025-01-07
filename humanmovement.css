@@ -1,0 +1,518 @@
+/* Resto del CSS */
+@import url("https://fonts.cdnfonts.com/css/helvetica-lt-narrow");
+/* .info,
+.topnav,
+header,
+.footer,
+.fluxtext,
+*/
+
+/* [class*="page"]:hover {
+  -webkit-filter: invert();
+  filter: invert();
+} */
+
+* {
+  font-family: "Arial", sans-serif;
+  font-weight: 400;
+  font-size: 10pt;
+  line-height: 12pt;
+  /* letter-spacing: 0px */
+  box-sizing: border-box;
+}
+
+html {
+  width: auto;
+  background-color: white;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+a:-webkit-any-link {
+  text-decoration: underline;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+.info {
+  position: fixed; /* Rende la colonna fissa rispetto al viewport */
+  top: 0; /* Posiziona il blocco in alto */
+  left: 0; /* Posiziona il blocco a sinistra */
+  height: 100vh; /* Limita l'altezza al viewport */
+  overflow-y: auto; /* Abilita lo scroll interno */
+  width: 25%; /* Definisci la larghezza della colonna */
+}
+
+/* .title {
+  font-weight: bold;
+}
+
+.payhip-buy-button {
+  font-weight: bold;
+}
+
+.price {
+  font-weight: bold;
+} */
+
+.outdent {
+  float: left;
+  margin-left: 40px;
+  width: calc(100% - 40px);
+  text-indent: -40px;
+}
+
+#toprectsigle {
+  height: 42.66px;
+  /* margin-bottom: 16px; */
+  width: 100%;
+}
+
+/* br {
+  line-height: 10px;
+} */
+
+body {
+  margin: 2.5px;
+  background-color: white;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.btn.active {
+  color: black;
+}
+
+video::-webkit-media-controls {
+  display: none;
+}
+
+*::-webkit-media-controls-panel {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+*::--webkit-media-controls-play-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+*::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.toprectabout {
+  height: 21.5px;
+}
+
+div {
+  margin: 0;
+}
+
+a:link {
+  color: black;
+}
+a:visited {
+  color: rgb(190, 190, 190);
+}
+
+.homebtn a {
+  text-decoration: none;
+  color: black;
+}
+
+.homebtn a:hover {
+  text-decoration: none;
+  color: black;
+}
+
+.thumb {
+  width: 100%;
+}
+
+p.thumb {
+  margin: -3px 0 0px 0;
+}
+
+img.thumb {
+}
+
+video .thumb {
+  object-fit: cover;
+  aspect-ratio: 3/2;
+  width: 100%;
+}
+
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+.imgpro {
+  width: 100%;
+}
+
+/* Aggiungi questa classe per i pulsanti non attivi */
+.btn.inactive {
+  color: grey;
+}
+
+/* Assicurati che il colore resti grigio anche in hover */
+.btn.inactive:hover {
+  color: black;
+}
+
+.plainlink {
+  text-decoration: none !important;
+}
+
+.btn {
+  text-decoration: none !important;
+  color: grey;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+.btnabout {
+  text-decoration: none !important;
+  color: grey;
+}
+
+.btnabout:hover {
+  text-decoration: none;
+  color: black !important;
+}
+
+.btnabout:visited {
+  color: grey;
+}
+#works {
+  color: black;
+}
+
+/* .text-container {
+  font-family: "Tinos", serif;
+  font-weight: 400;
+  font-style: normal;
+} */
+
+#content {
+  margin-top: -16pt;
+}
+
+.btn:hover {
+  color: black;
+  cursor: pointer;
+}
+
+.btn:active {
+  color: black;
+}
+
+btn:focus {
+  color: black;
+}
+
+.artistpage {
+  display: none;
+}
+
+.fluxtext {
+  margin: -2.5px 0 2.5px 0;
+}
+
+.designerpage {
+  display: none;
+}
+
+.digitalpage {
+  display: none;
+}
+
+.btn:visited {
+  color: grey;
+}
+
+a:hover {
+  color: black;
+  text-decoration: none;
+}
+
+a:active {
+  color: black;
+}
+
+::-moz-selection {
+  color: white;
+  background: black;
+}
+
+::selection {
+  color: white;
+  background: black;
+}
+
+p {
+  display: block;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+#topnav {
+  width: 100vw;
+  position: fixed;
+  height: 14px;
+}
+
+#toprect {
+  width: 100vw;
+  height: 16pt; /* 88px */
+}
+
+.toprectpage {
+  width: 100vw;
+  height: 16pt;
+}
+
+.left {
+  float: left;
+  padding: 2.5px;
+  padding-bottom: 0;
+  width: 50%;
+  text-align: left;
+}
+
+.right {
+  float: left;
+  padding: 2.5px;
+  padding-bottom: 0;
+  width: 50%;
+  text-align: left;
+}
+
+.center {
+  float: left;
+  padding: 2.5px;
+  width: 33.33%;
+  text-align: center;
+}
+
+table {
+  border-collapse: separate;
+  text-align: left;
+  text-indent: 0%;
+  border-spacing: 2px;
+  padding: 0 !important;
+  border-spacing: 0px;
+}
+
+th {
+  width: 16.66%;
+  text-align: left;
+  vertical-align: text-top;
+  padding: 2.5px !important;
+}
+
+.menu {
+  width: 50%;
+  float: left;
+
+  padding: 0px 2.5px 0px 2.5px;
+}
+
+.closebtn {
+  text-decoration: none !important;
+  color: grey !important;
+}
+
+.closebtn:hover {
+  text-decoration: none !important;
+  color: black !important;
+}
+
+.langbtn {
+  float: right;
+  margin-right: 5px;
+}
+
+.div100 {
+  width: 100%;
+}
+
+.div50l {
+  width: 50%;
+  float: left;
+  padding-right: 2.5px;
+  padding-bottom: 2.5px;
+  padding-top: 2.5px;
+}
+
+.div50r {
+  width: 50%;
+  float: left;
+  padding-left: 2.5px;
+  padding-bottom: 2.5px;
+  padding-top: 2.5px;
+}
+
+.div33 {
+  width: 33.33%;
+}
+
+.div25 {
+  width: 25%;
+}
+
+sup {
+  font-size: 10pt;
+  line-height: 0pt;
+}
+
+.colum2 {
+  padding-bottom: 2.5px !important;
+}
+
+[class*="div"] {
+  float: left;
+}
+
+.col-1 {
+  width: 8.33%;
+}
+.col-2 {
+  width: 16.66%;
+}
+
+.col-2bis {
+  width: 22.22%;
+}
+
+.col-3 {
+  width: 25%;
+}
+.col-4 {
+  width: 33.33%;
+}
+.col-5 {
+  width: 41.66%;
+}
+.col-6 {
+  width: 50%;
+}
+.col-7 {
+  width: 58.33%;
+}
+.col-8 {
+  width: 66.66%;
+}
+.col-9 {
+  width: 75%;
+}
+.col-10 {
+  width: 83.33%;
+}
+.col-11 {
+  width: 91.66%;
+}
+.col-12 {
+  width: 100%;
+}
+
+[class*="col-"] {
+  float: left;
+  padding-left: 2.5px;
+  padding-right: 2.5px;
+  padding-top: 2.5px;
+  padding-bottom: 0px;
+}
+
+.spacer5 {
+  float: left;
+  width: 100%;
+  height: 10px;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.gallery {
+  width: 100%;
+}
+
+.mobile {
+  display: none;
+}
+
+@media only screen and (max-width: 768px) {
+  [class*="col-"] {
+    width: 100%;
+  }
+
+  .div50l {
+    width: 100%;
+  }
+
+  .div50r {
+    width: 100%;
+  }
+
+  /* .btn:hover {
+    color: grey;
+  } */
+
+  #toprect {
+    height: 16pt; /* 101px; */
+  }
+
+  #content {
+    margin-top: 0pt;
+  }
+
+  .fluxtext {
+    margin: 0px 0 5px 0;
+  }
+
+  #toprectsigle {
+    height: 42.66px;
+    /* margin-bottom: 18pt; */
+  }
+
+  /* {
+    font-size: 17pt;
+    line-height: 18pt;
+  } */
+
+  .info {
+    position: relative;
+  }
+
+  .footer {
+    padding-top: 18px;
+  }
+
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: inline;
+  }
+
+  p.thumb {
+    margin: -2.5px 0 1.5px 0;
+  }
+
+  .outdent {
+    width: calc(100%-40px) !important;
+  }
+}
