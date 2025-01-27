@@ -75,7 +75,7 @@ html {
 
 body {
   margin: 2.5px;
-  background-color: white;
+
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -136,9 +136,6 @@ a:visited {
 
 p.thumb {
   margin: -3px 0 0px 0;
-}
-
-img.thumb {
 }
 
 video .thumb {

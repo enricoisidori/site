@@ -1545,5 +1545,118 @@
   </span>
 </div>
 
+<style>
+  canvas,
+  video {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: -3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  video {
+    display: none; /* Nascondiamo il video originale */
+  }
+</style>
+</head>
+<body>
+<video id="video" autoplay muted playsinline></video>
+<canvas id="canvasOutput"></canvas>
+
+<script>
+  const video = document.getElementById("video");
+  const canvasOutput = document.getElementById("canvasOutput");
+  const ctxOutput = canvasOutput.getContext("2d");
+
+  // Variabili per il calcolo della differenza
+  let previousFrame = null;
+
+  // Accesso alla webcam
+  navigator.mediaDevices
+    .getUserMedia({ video: { facingMode: "user" } })
+    .then((stream) => {
+      video.srcObject = stream;
+
+      // Avvia l'elaborazione una volta che il video è pronto
+      video.addEventListener("play", () => {
+        canvasOutput.width = video.videoWidth;
+        canvasOutput.height = video.videoHeight;
+
+        processFrames();
+      });
+    })
+    .catch((error) => {
+      console.error("Errore nell'accesso alla webcam:", error);
+    });
+
+  function processFrames() {
+    if (video.paused || video.ended) return;
+
+    const width = video.videoWidth;
+    const height = video.videoHeight;
+
+    // Crea un canvas temporaneo per il frame corrente
+    const canvasTemp = document.createElement("canvas");
+    const ctxTemp = canvasTemp.getContext("2d");
+    canvasTemp.width = width;
+    canvasTemp.height = height;
+
+    // Disegna il frame corrente sul canvas temporaneo
+    ctxTemp.drawImage(video, 0, 0, width, height);
+
+    // Ottieni i pixel del frame corrente
+    const currentFrame = ctxTemp.getImageData(0, 0, width, height);
+
+    if (previousFrame) {
+      // Calcola la differenza tra il frame corrente e quello precedente
+      const diff = ctxOutput.createImageData(width, height);
+      for (let i = 0; i < currentFrame.data.length; i += 4) {
+        const r = Math.abs(currentFrame.data[i] - previousFrame.data[i]);
+        const g = Math.abs(
+          currentFrame.data[i + 1] - previousFrame.data[i + 1]
+        );
+        const b = Math.abs(
+          currentFrame.data[i + 2] - previousFrame.data[i + 2]
+        );
+
+        // Calcola l'intensità del movimento
+        const intensity = (r + g + b) / 3;
+
+        // Imposta il colore del movimento
+        if (intensity > 20) {
+          // Soglia
+          diff.data[i] = 0; // Rosso
+          diff.data[i + 1] = 0; // Verde
+          diff.data[i + 2] = 0; // Blu (modifica qui per personalizzare)
+        } else {
+          diff.data[i] = 255; // Sfondo nero
+          diff.data[i + 1] = 255;
+          diff.data[i + 2] = 255;
+        }
+
+        diff.data[i + 3] = 255; // Opacità
+      }
+
+      // Disegna il risultato sul canvas di output
+      ctxOutput.putImageData(diff, 0, 0);
+    }
+
+    // Salva il frame corrente come frame precedente
+    previousFrame = currentFrame;
+
+    // Richiama la funzione al prossimo frame
+    requestAnimationFrame(processFrames);
+  }
+</script>
   </body>
 </html>
