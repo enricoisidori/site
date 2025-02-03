@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Artist" />
+    <meta name="description" content="Art" />
     <meta
       name="keywords"
       content="human movement enrico isidori"
@@ -1316,12 +1316,13 @@
     <p class="information">
       <span class="title">Untitled [702]</span> <br />
       € <span class="price">2.00</span> <br />
-      <a 
+      <span style="color: red;" class="sold">Sold out</span> <br />
+      <!-- <a 
         href="https://payhip.com/b/BsQ1t"
         class="payhip-buy-button"
         data-theme="none"
         data-product="BsQ1t"
-        >Buy now</a
+        >Buy now</a -->
       ><br />
       <span class="description">
       6 x 4 cm<br />Photographic print<br />Sunday<br />2024-10-20<br />09:10:31<br />One human movement in the morning
@@ -1668,7 +1669,7 @@
         const intensity = (r + g + b) / 3;
 
         // Imposta il colore del movimento
-        if (intensity > 20) {
+        if (intensity > 10) {
           // Soglia
           diff.data[i] = 0; // Rosso
           diff.data[i + 1] = 100; // Verde
