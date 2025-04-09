@@ -1,0 +1,31 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dreamy Threshold Effect</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="canvasOutput"></canvas>
+    <script src="pixi.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
+
+/* style.css */ body { margin: 0; overflow: hidden; background: black; } canvas,
+video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit:
+cover; } /* script.js */ const video = document.getElementById("video"); const
+canvasOutput = document.getElementById("canvasOutput"); const app = new
+PIXI.Application({ width: window.innerWidth, height: window.innerHeight,
+transparent: true }); document.body.appendChild(app.view);
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+.then(stream => { video.srcObject = stream; video.play(); }) .catch(error =>
+console.error("Errore webcam:", error)); const texture =
+PIXI.Texture.from(video); const sprite = new PIXI.Sprite(texture); sprite.width
+= app.screen.width; sprite.height = app.screen.height;
+app.stage.addChild(sprite); const blurFilter = new PIXI.filters.BlurFilter(10);
+const thresholdFilter = new PIXI.filters.ColorMatrixFilter();
+thresholdFilter.threshold(0.5); sprite.filters = [blurFilter, thresholdFilter];
