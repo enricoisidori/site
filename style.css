@@ -24,6 +24,9 @@ html {
   width: auto;
   background-color: white;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Aggiunge scroll fluido su iOS */
 }
 
 a:-webkit-any-link {
@@ -67,6 +70,11 @@ body {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .btn.active {
@@ -452,6 +460,19 @@ sup {
     width: 100%;
   }
 
+  .info {
+    position: relative;
+    width: 100%;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .outdent {
+    margin-left: 20px;
+    width: calc(100% - 20px);
+    text-indent: -20px;
+  }
+
   .div50l {
     width: 100%;
   }
@@ -486,10 +507,6 @@ sup {
     line-height: 18pt;
   } */
 
-  .info {
-    position: relative;
-  }
-
   .footer {
     padding-top: 18px;
   }
@@ -504,9 +521,5 @@ sup {
 
   p.thumb {
     margin: -2.5px 0 1.5px 0;
-  }
-
-  .outdent {
-    width: calc(100%-40px) !important;
   }
 }
