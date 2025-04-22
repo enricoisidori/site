@@ -24,9 +24,9 @@ html {
   width: auto;
   background-color: white;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  overflow-x: hidden;
+  /* overflow-x: hidden;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* Aggiunge scroll fluido su iOS */
+  -webkit-overflow-scrolling: touch;  */
 }
 
 a:-webkit-any-link {
