@@ -80,11 +80,19 @@ a:active {
 
 .outdent {
   float: left;
-  margin-left: 40px;
-  width: calc(100% - 40px);
-  text-indent: -40px;
+  margin-left: 20px;
+  width: calc(100% - 20px);
+  text-indent: -20px;
   margin-top: 0;
   margin-bottom: 0;
+}
+
+[class*="col-"] {
+  float: left;
+  padding-left: 2.5px;
+  padding-right: 2.5px;
+  padding-top: 2.5px;
+  padding-bottom: 0px;
 }
 
 @media only screen and (max-width: 768px) {
@@ -102,13 +110,13 @@ a:active {
     min-height: 100vh;
   }
 
-  .col-6 {
+  [class*="col-"] {
     width: 100%;
   }
 
-  .outdent {
+  /* .outdent {
     margin-left: 20px;
     width: calc(100% - 20px);
     text-indent: -20px;
-  }
+  } */
 }
