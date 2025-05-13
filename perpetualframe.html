@@ -3,53 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Cameras</title>
+    <title>Live Snapshot Viewer</title>
     <style>
       html,
       body {
         margin: 0;
         padding: 0;
-        height: 100%;
         overflow: hidden;
+        height: 100%;
         background: black;
       }
-      img {
+      #liveStream {
+        position: absolute;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        position: absolute;
-        top: 0;
-        left: 0;
       }
     </style>
   </head>
   <body>
-    <img id="liveFeed" src="" />
+    <img id="liveStream" src="" alt="Live Stream" />
 
     <script>
       const streams = [
-        "http://162.191.221.9:82/cgi-bin/guestimage.html",
-        "http://24.35.236.132/cgi-bin/guestimage.html",
-        // altri stream se vuoi
+        "http://162.191.221.9:82/cgi-bin/guestimage.jpg",
+        "http://24.35.236.132/cgi-bin/guestimage.jpg",
+        // Puoi aggiungerne altri
       ];
 
       let currentStream = 0;
-      const refreshTime = 12000; // 12 secondi
-      const img = document.getElementById("liveFeed");
+      const streamChangeInterval = 12000; // Cambia telecamera ogni 12 secondi
+      const snapshotRefreshInterval = 1000; // Aggiorna snapshot ogni 1 secondo
 
-      function updateStream() {
-        const url = streams[currentStream] + "?t=" + Date.now(); // forziamo il no-cache
-        img.setAttribute("src", url);
+      const img = document.getElementById("liveStream");
+
+      function updateSnapshot() {
+        // Ricarica l'immagine aggiungendo un timestamp per evitare cache
+        img.src = streams[currentStream] + "?t=" + Date.now();
+      }
+
+      function changeStream() {
         currentStream = (currentStream + 1) % streams.length;
-        scheduleNextStream();
       }
 
-      function scheduleNextStream() {
-        setTimeout(updateStream, refreshTime);
-      }
-
-      // Inizio
-      updateStream();
+      setInterval(updateSnapshot, snapshotRefreshInterval); // aggiorna immagine
+      setInterval(changeStream, streamChangeInterval); // cambia stream
+      updateSnapshot(); // avvia subito
     </script>
   </body>
 </html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>gio ti dà la sua view</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Helvetica, sans-serif;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      img {
+        max-width: 300px;
+        height: auto;
+      }
+
+      h1 {
+        margin-top: 20px;
+        font-size: 2em;
+        transform: scaleX(1.5);
+        text-align: center;
+      }
+
+      input[type="text"] {
+        margin-top: 20px;
+        padding: 10px;
+        font-size: 1em;
+        width: 300px;
+
+        text-align: center;
+      }
+
+      button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 1em;
+
+        cursor: pointer;
+      }
+
+      .risposta {
+        position: fixed;
+        top: 50%;
+
+        text-align: center;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 4em;
+        font-weight: bold;
+        display: none;
+        z-index: 9999;
+        padding: 20px;
+        border-radius: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="gio.png" alt="Gio" />
+    <h1>gio ti dà la sua view</h1>
+    <input type="text" placeholder="chiedi un parere a gio" />
+    <button onclick="rispondi()">?</button>
+
+    <div id="risposta" class="risposta"></div>
+
+    <script>
+      const risposte = ["punk", "ci sta", "ci sta ci sta", "sto male"];
+
+      function rispondi() {
+        const scelta = risposte[Math.floor(Math.random() * risposte.length)];
+        const r = document.getElementById("risposta");
+        r.innerText = scelta;
+        r.style.display = "block";
+        setTimeout(() => {
+          r.style.display = "none";
+        }, 5000);
+      }
+    </script>
+  </body>
+</html>
