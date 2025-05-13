@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>gio ti dà la sua view</title>
+    <link rel="icon" href="/asset/cose/gio.png" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       body {
         margin: 0;
@@ -13,6 +15,8 @@
         align-items: center;
         justify-content: center;
         height: 100vh;
+        padding: 20px;
+        box-sizing: border-box;
       }
 
       img {
@@ -31,8 +35,8 @@
         margin-top: 20px;
         padding: 10px;
         font-size: 1em;
-        width: 300px;
-
+        width: 100%;
+        max-width: 300px;
         text-align: center;
       }
 
@@ -40,46 +44,65 @@
         margin-top: 10px;
         padding: 10px 20px;
         font-size: 1em;
-
         cursor: pointer;
       }
 
       .risposta {
         position: fixed;
         top: 50%;
-
-        text-align: center;
         left: 50%;
         transform: translate(-50%, -50%);
+        text-align: center;
         font-size: 4em;
         font-weight: bold;
         display: none;
         z-index: 9999;
-        padding: 20px;
-        border-radius: 20px;
       }
     </style>
   </head>
   <body>
     <img src="/asset/cose/gio.png" alt="gio" />
     <h1>gio ti dà la sua view</h1>
-    <input type="text" placeholder="chiedi un parere a gio" />
+    <input id="domanda" type="text" placeholder="chiedi un parere a gio" />
     <button onclick="rispondi()">?</button>
 
     <div id="risposta" class="risposta"></div>
 
     <script>
-      const risposte = ["punk", "ci sta", "ci sta ci sta", "sto male"];
+      const risposte = [
+        "punk",
+        "ci sta",
+        "ci sta ci sta",
+        "sto male",
+        "totale",
+        "uguale",
+      ];
+      let ultimaRisposta = "";
 
       function rispondi() {
-        const scelta = risposte[Math.floor(Math.random() * risposte.length)];
+        let scelta;
+        do {
+          scelta = risposte[Math.floor(Math.random() * risposte.length)];
+        } while (scelta === ultimaRisposta);
+
+        ultimaRisposta = scelta;
+
         const r = document.getElementById("risposta");
         r.innerText = scelta;
         r.style.display = "block";
+
         setTimeout(() => {
           r.style.display = "none";
-        }, 5000);
+        }, 4000);
       }
+
+      document
+        .getElementById("domanda")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            rispondi();
+          }
+        });
     </script>
   </body>
 </html>
