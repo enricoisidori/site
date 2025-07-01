@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Type Experiment</title>
+    <style>
+      body {
+        font-family: "Suisse", sans-serif;
+        background: #fff;
+        color: #000;
+      }
+      .dynamic-text {
+        font-size: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .dynamic-text span {
+        display: inline-block;
+        transition: all 0.1s linear;
+        white-space: pre;
+      }
+      .gradient-controls {
+        position: relative;
+        height: 60px;
+        background: #ddd;
+        margin-top: 2rem;
+      }
+      .handle {
+        position: absolute;
+        bottom: 0;
+        width: 10px;
+        height: 60px;
+        background: #000;
+        cursor: pointer;
+      }
+      .handle input {
+        position: absolute;
+        top: -30px;
+        width: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <label
+        ><input type="checkbox" id="justifyToggle" /> Justify Full Width</label
+      >
+    </div>
+    <div class="dynamic-text" id="textContainer"></div>
+    <div class="gradient-controls" id="gradientSlider"></div>
+    <div class="gradient-controls" id="stretchSlider"></div>
+    <script>
+      const text = "Antidisciplinary Communication Design Lab";
+      const container = document.getElementById("textContainer");
+      const gradientSlider = document.getElementById("gradientSlider");
+      const stretchSlider = document.getElementById("stretchSlider");
+      const justifyToggle = document.getElementById("justifyToggle");
+
+      const spans = text.split("").map((char) => {
+        const span = document.createElement("span");
+        span.textContent = char === " " ? "\u00A0" : char;
+        container.appendChild(span);
+        return span;
+      });
+
+      let trackingHandles = [
+        { position: 0, value: 0 },
+        { position: 1, value: 0 },
+      ];
+      let stretchHandles = [
+        { position: 0, value: 1 },
+        { position: 1, value: 1 },
+      ];
+
+      function createHandles(handles, slider, updateFn) {
+        slider.innerHTML = "";
+        handles.sort((a, b) => a.position - b.position);
+        handles.forEach((h, idx) => {
+          const handle = document.createElement("div");
+          handle.className = "handle";
+          handle.style.left = h.position * 100 + "%";
+
+          const numberInput = document.createElement("input");
+          numberInput.type = "number";
+          numberInput.value = h.value;
+          numberInput.step = 0.01;
+          numberInput.addEventListener("input", (e) => {
+            h.value = parseFloat(e.target.value);
+            updateFn();
+          });
+
+          handle.appendChild(numberInput);
+
+          handle.addEventListener("mousedown", (e) => {
+            if (e.target === numberInput) return;
+            e.preventDefault();
+            const onMove = (ev) => {
+              const rect = slider.getBoundingClientRect();
+              h.position = Math.min(
+                1,
+                Math.max(0, (ev.clientX - rect.left) / rect.width)
+              );
+              createHandles(handles, slider, updateFn);
+              updateFn();
+            };
+            const onUp = () => {
+              document.removeEventListener("mousemove", onMove);
+              document.removeEventListener("mouseup", onUp);
+            };
+            document.addEventListener("mousemove", onMove);
+            document.addEventListener("mouseup", onUp);
+          });
+
+          handle.addEventListener("dblclick", () => {
+            handles.splice(idx, 1);
+            createHandles(handles, slider, updateFn);
+            updateFn();
+          });
+
+          slider.appendChild(handle);
+        });
+      }
+
+      function getValue(handles, xNorm) {
+        let left = handles[0];
+        let right = handles[handles.length - 1];
+        for (let i = 0; i < handles.length - 1; i++) {
+          if (
+            xNorm >= handles[i].position &&
+            xNorm <= handles[i + 1].position
+          ) {
+            left = handles[i];
+            right = handles[i + 1];
+            break;
+          }
+        }
+        const range = right.position - left.position;
+        const t = range === 0 ? 0 : (xNorm - left.position) / range;
+        return left.value + t * (right.value - left.value);
+      }
+
+      function update() {
+        const containerWidth = container.offsetWidth;
+        const totalTextWidth = spans.reduce(
+          (sum, span) => sum + span.offsetWidth,
+          0
+        );
+        const extraSpace = containerWidth - totalTextWidth;
+        const adjust =
+          justifyToggle.checked && extraSpace > 0
+            ? extraSpace / (spans.length - 1)
+            : 0;
+
+        spans.forEach((span, i) => {
+          const normX = i / (spans.length - 1);
+          const spacing = getValue(trackingHandles, normX);
+          const stretch = getValue(stretchHandles, normX);
+          span.style.letterSpacing = spacing.toFixed(3) + "em";
+          span.style.transform = `scaleX(${stretch.toFixed(3)})`;
+          if (justifyToggle.checked && i < spans.length - 1) {
+            span.style.marginRight = adjust + "px";
+          } else {
+            span.style.marginRight = "";
+          }
+        });
+      }
+
+      let animating = false;
+      function animateHandles() {
+        animating = !animating;
+        if (animating) loop();
+      }
+
+      function loop() {
+        trackingHandles.forEach((h) => (h.position = (h.position + 0.001) % 1));
+        stretchHandles.forEach((h) => (h.position = (h.position + 0.001) % 1));
+        createHandles(trackingHandles, gradientSlider, update);
+        createHandles(stretchHandles, stretchSlider, update);
+        update();
+        if (animating) requestAnimationFrame(loop);
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "a") animateHandles();
+      });
+
+      gradientSlider.addEventListener("click", (e) => {
+        if (
+          e.target.classList.contains("handle") ||
+          e.target.tagName === "INPUT"
+        )
+          return;
+        const rect = gradientSlider.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        trackingHandles.push({ position: pos, value: 0 });
+        createHandles(trackingHandles, gradientSlider, update);
+        update();
+      });
+
+      stretchSlider.addEventListener("click", (e) => {
+        if (
+          e.target.classList.contains("handle") ||
+          e.target.tagName === "INPUT"
+        )
+          return;
+        const rect = stretchSlider.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        stretchHandles.push({ position: pos, value: 1 });
+        createHandles(stretchHandles, stretchSlider, update);
+        update();
+      });
+
+      justifyToggle.addEventListener("change", update);
+      window.addEventListener("resize", update);
+      createHandles(trackingHandles, gradientSlider, update);
+      createHandles(stretchHandles, stretchSlider, update);
+      update();
+    </script>
+  </body>
+</html>

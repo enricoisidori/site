@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Type Experiment</title>
+
+    <link
+      rel="preload"
+      href="asset/suisse/SuisseIntl-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="asset/suisse/SuisseIntl-Medium.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      @font-face {
+        font-family: "Suisse";
+        src: url("asset/suisse/SuisseIntl-Regular.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Suisse";
+        src: url("asset/suisse/SuisseIntl-Medium.woff2") format("woff2");
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+      body {
+        background-color: #ffffff;
+        color: #000000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        font-weight: 400;
+        font-family: "Suisse", serif;
+        overflow: hidden;
+        padding: 1em;
+      }
+      .dynamic-text {
+        font-size: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        max-width: 90vw;
+        margin-bottom: 2rem;
+      }
+      .dynamic-text span {
+        display: inline-block;
+        transition: letter-spacing 0.1s linear;
+      }
+      .gradient-controls {
+        position: relative;
+        width: 80%;
+        max-width: 600px;
+        height: 60px;
+        margin-top: 2rem;
+        background: linear-gradient(to right, #666 0%, #666 100%);
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      .handle {
+        position: absolute;
+        bottom: 0;
+        width: 10px;
+        height: 60px;
+        background-color: rgb(0, 0, 0);
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        z-index: 2;
+      }
+      .handle input[type="number"] {
+        position: absolute;
+        top: -30px;
+        width: 40px;
+        background: #222;
+        border: 1px solid #555;
+        color: #fff;
+        font-size: 0.7rem;
+        text-align: center;
+        z-index: 3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dynamic-text" id="textContainer"></div>
+    <div class="gradient-controls" id="gradientSlider"></div>
+
+    <script>
+      const text = "Antidisciplinary Communication Design Lab";
+      const container = document.getElementById("textContainer");
+      const gradientSlider = document.getElementById("gradientSlider");
+
+      const spans = [...text].map((char) => {
+        const span = document.createElement("span");
+        span.textContent = char;
+        container.appendChild(span);
+        return span;
+      });
+
+      let handles = [
+        { position: 0.1, value: 0.1 },
+        { position: 0.5, value: -0.1 },
+        { position: 0.9, value: 0.2 },
+      ];
+
+      function createHandles() {
+        gradientSlider.innerHTML = "";
+        handles.forEach((h, idx) => {
+          const handle = document.createElement("div");
+          handle.className = "handle";
+          handle.style.left = h.position * 100 + "%";
+
+          const numberInput = document.createElement("input");
+          numberInput.type = "number";
+          numberInput.min = -1;
+          numberInput.max = 1;
+          numberInput.step = 0.01;
+          numberInput.value = h.value;
+          numberInput.addEventListener("input", (e) => {
+            handles[idx].value = parseFloat(e.target.value);
+            updateTracking();
+          });
+
+          handle.appendChild(numberInput);
+
+          handle.addEventListener("mousedown", (e) => {
+            if (e.target.tagName.toLowerCase() === "input") return;
+            e.preventDefault();
+            const onMouseMove = (moveEvent) => {
+              const rect = gradientSlider.getBoundingClientRect();
+              let newX = (moveEvent.clientX - rect.left) / rect.width;
+              newX = Math.max(0, Math.min(1, newX));
+              handles[idx].position = newX;
+              updateHandles();
+              updateTracking();
+            };
+            const onMouseUp = () => {
+              document.removeEventListener("mousemove", onMouseMove);
+              document.removeEventListener("mouseup", onMouseUp);
+            };
+            document.addEventListener("mousemove", onMouseMove);
+            document.addEventListener("mouseup", onMouseUp);
+          });
+
+          handle.addEventListener("dblclick", () => {
+            handles.splice(idx, 1);
+            updateHandles();
+            updateTracking();
+          });
+
+          gradientSlider.appendChild(handle);
+        });
+      }
+
+      gradientSlider.addEventListener("click", (e) => {
+        // prevent adding handle if click is on an existing one
+        if (
+          e.target.classList.contains("handle") ||
+          e.target.tagName.toLowerCase() === "input"
+        )
+          return;
+
+        const rect = gradientSlider.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        handles.push({ position: pos, value: 0 });
+        updateHandles();
+        updateTracking();
+      });
+
+      function getGradientValue(xNorm) {
+        if (handles.length === 0) return 0;
+        let left = handles[0];
+        let right = handles[handles.length - 1];
+        for (let i = 0; i < handles.length - 1; i++) {
+          if (
+            xNorm >= handles[i].position &&
+            xNorm <= handles[i + 1].position
+          ) {
+            left = handles[i];
+            right = handles[i + 1];
+            break;
+          }
+        }
+        const range = right.position - left.position;
+        const t = range === 0 ? 0 : (xNorm - left.position) / range;
+        return left.value + t * (right.value - left.value);
+      }
+
+      function updateHandles() {
+        createHandles();
+      }
+
+      function updateTracking() {
+        spans.forEach((span) => {
+          const spanRect = span.getBoundingClientRect();
+          const spanCenterX = spanRect.left + spanRect.width / 2;
+          const normX = spanCenterX / window.innerWidth;
+          const spacing = getGradientValue(normX);
+          span.style.letterSpacing = spacing.toFixed(3) + "em";
+        });
+      }
+
+      window.addEventListener("resize", () => {
+        updateTracking();
+      });
+
+      createHandles();
+      updateTracking();
+    </script>
+  </body>
+</html>
