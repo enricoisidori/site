@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Ito</title>
+    <meta name="theme-color" content="#111111" />
+    <style>
+      :root {
+        --bg: #0e0e0f;
+        --fg: #f2f2f2;
+        --muted: #b5b5b5;
+        --accent: #4ade80; /* green */
+        --accent-2: #60a5fa; /* blue */
+        --danger: #ef4444;
+        --surface: #171719;
+        --surface-2: #1f1f23;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+          Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        background: var(--bg);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .app {
+        min-height: 100dvh;
+        padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom) 16px;
+        max-width: 640px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+
+        justify-content: space-between;
+        padding-top: 8px;
+      }
+      .brand {
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        font-size: 18px;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+      }
+      button.icon {
+        background: var(--surface);
+        color: var(--fg);
+        border: 1px solid #2a2a2e;
+        border-radius: 12px;
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        cursor: pointer;
+        transition: transform 0.04s ease;
+      }
+      button.icon:active {
+        transform: scale(0.98);
+      }
+
+      .card {
+        background: linear-gradient(180deg, var(--surface), var(--surface-2));
+        border: 1px solid #2a2a2e;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      }
+
+      /* Setup */
+      .setup h2 {
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .row label {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .stepper {
+        display: inline-flex;
+        border: 1px solid #2a2a2e;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--surface);
+      }
+      .stepper button {
+        width: 40px;
+        height: 40px;
+        background: transparent;
+        border: none;
+        color: var(--fg);
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .stepper input {
+        width: 60px;
+        height: 40px;
+        text-align: center;
+        background: transparent;
+        border: none;
+        color: var(--fg);
+        font-size: 16px;
+      }
+      .names {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      @media (max-width: 460px) {
+        .names {
+          grid-template-columns: 1fr;
+        }
+      }
+      .names input {
+        background: #121214;
+        border: 1px solid #2a2a2e;
+        border-radius: 12px;
+        padding: 12px;
+        color: var(--fg);
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .primary {
+        background: linear-gradient(180deg, #1a2e22, #14331f);
+        color: #d1fae5;
+        border: 1px solid #264f3a;
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        width: 100%;
+        box-shadow: 0 6px 16px rgba(20, 83, 45, 0.35);
+        transition: transform 0.06s ease;
+      }
+      .primary:active {
+        transform: translateY(1px);
+      }
+
+      /* Stage */
+      .stage {
+        display: none;
+        text-align: center;
+      }
+      .stage.active {
+        display: block;
+      }
+      .big-name {
+        font-size: 32px;
+        font-weight: 800;
+        margin: 8px 0 16px;
+        letter-spacing: 0.02em;
+      }
+      .big-number {
+        font-size: clamp(64px, 20vw, 120px);
+        font-weight: 900;
+        line-height: 1;
+        margin: 8px 0 8px;
+        letter-spacing: -0.02em;
+        color: #e5e7eb;
+        text-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .progress {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 6px;
+      }
+
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .toolbar .ghost {
+        flex: 1;
+        background: transparent;
+        color: var(--fg);
+        border: 1px solid #2a2a2e;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .done {
+        text-align: center;
+        padding: 24px 0 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <div class="brand">ITO</div>
+        <div class="controls">
+          <button id="btn-restart" class="icon" title="Riavvia (mantieni nomi)">
+            ⟲
+          </button>
+          <button id="btn-edit" class="icon" title="Modifica nomi">✎</button>
+        </div>
+      </header>
+
+      <section id="setup" class="card setup">
+        <h2>Imposta i giocatori</h2>
+        <div class="row">
+          <label for="playerCount">Numero giocatori</label>
+          <div class="stepper">
+            <button type="button" id="dec">−</button>
+            <input
+              type="number"
+              id="playerCount"
+              min="2"
+              max="100"
+              value="4"
+              inputmode="numeric"
+            />
+            <button type="button" id="inc">+</button>
+          </div>
+        </div>
+        <div class="muted">
+          Suggerimento: i numeri vanno da 1 a 100 e sono tutti diversi.
+        </div>
+        <div id="nameFields" class="names" style="margin-top: 12px"></div>
+        <div style="margin-top: 14px">
+          <button id="start" class="primary">Avvia gioco</button>
+        </div>
+      </section>
+
+      <section id="stage-name" class="card stage">
+        <div class="hint">Passa il telefono a</div>
+        <div id="nameLabel" class="big-name">—</div>
+        <div class="toolbar">
+          <button id="showNumber" class="primary">Mostra numero</button>
+        </div>
+        <div id="progress1" class="progress"></div>
+      </section>
+
+      <section id="stage-number" class="card stage">
+        <div class="hint">Il tuo numero è</div>
+        <div id="numberLabel" class="big-number">0</div>
+        <div
+          id="ownerName"
+          class="big-name"
+          style="font-size: 18px; font-weight: 600; opacity: 0.8"
+        ></div>
+        <div class="toolbar" style="margin-top: 16px">
+          <button id="hideAndNext" class="primary">
+            Nascondi e passa al prossimo
+          </button>
+        </div>
+        <div id="progress2" class="progress"></div>
+      </section>
+
+      <section id="done" class="card stage done">
+        <div class="big-name" style="font-size: 24px; margin-bottom: 6px">
+          Numeri assegnati!
+        </div>
+        <div class="muted">Tutti i giocatori hanno visto il loro numero.</div>
+        <div class="toolbar" style="margin-top: 16px">
+          <button id="restart" class="primary">
+            Ricominica (mantieni nomi)
+          </button>
+        </div>
+        <div class="toolbar">
+          <button id="editNames" class="ghost">Modifica nomi</button>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // Stato applicazione
+      const state = {
+        players: [], // { id, name, number }
+        revealOrder: [],
+        currentIndex: 0,
+        seen: new Set(),
+      };
+
+      // Utilità
+      function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+      function sampleUniqueNumbers(count, min = 1, max = 100) {
+        const size = max - min + 1;
+        if (count > size)
+          throw new Error("Troppi giocatori per l'intervallo di numeri");
+        const all = Array.from({ length: size }, (_, i) => i + min);
+        shuffle(all);
+        return all.slice(0, count);
+      }
+
+      // DOM refs
+      const elSetup = document.getElementById("setup");
+      const elNameFields = document.getElementById("nameFields");
+      const elPlayerCount = document.getElementById("playerCount");
+      const elInc = document.getElementById("inc");
+      const elDec = document.getElementById("dec");
+      const elStart = document.getElementById("start");
+
+      const elStageName = document.getElementById("stage-name");
+      const elStageNumber = document.getElementById("stage-number");
+      const elDone = document.getElementById("done");
+
+      const elNameLabel = document.getElementById("nameLabel");
+      const elNumberLabel = document.getElementById("numberLabel");
+      const elOwnerName = document.getElementById("ownerName");
+      const elProgress1 = document.getElementById("progress1");
+      const elProgress2 = document.getElementById("progress2");
+      const elShowNumber = document.getElementById("showNumber");
+      const elHideAndNext = document.getElementById("hideAndNext");
+
+      const btnRestartTop = document.getElementById("btn-restart");
+      const btnEditTop = document.getElementById("btn-edit");
+      const btnRestartDone = document.getElementById("restart");
+      const btnEditDone = document.getElementById("editNames");
+
+      // LocalStorage helpers
+      const STORAGE_KEY = "ito_player_names_v1";
+      function saveNames(names) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(names));
+        } catch {}
+      }
+      function loadNames() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {}
+        return null;
+      }
+
+      // Setup UI
+      function renderNameFields(count) {
+        const existing = Array.from(elNameFields.querySelectorAll("input")).map(
+          (i) => i.value.trim()
+        );
+        elNameFields.innerHTML = "";
+        for (let i = 0; i < count; i++) {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.placeholder = `Giocatore ${i + 1}`;
+          input.autocomplete = "off";
+          input.maxLength = 32;
+          input.value = existing[i] || "";
+          elNameFields.appendChild(input);
+        }
+      }
+
+      function applyLoadedNames(names) {
+        const count = Math.min(100, Math.max(2, names.length));
+        elPlayerCount.value = String(count);
+        renderNameFields(count);
+        const inputs = elNameFields.querySelectorAll("input");
+        inputs.forEach((inp, idx) => {
+          inp.value = names[idx] || "";
+        });
+      }
+
+      // Game logic
+      function startGame() {
+        const inputs = Array.from(elNameFields.querySelectorAll("input"));
+        let names = inputs.map(
+          (i, idx) => i.value.trim() || `Giocatore ${idx + 1}`
+        );
+        // Normalizza spazi doppi
+        names = names.map((n) => n.replace(/\s+/g, " ").trim());
+        saveNames(names);
+
+        const count = names.length;
+        const numbers = sampleUniqueNumbers(count, 1, 100);
+        state.players = names
+          .map((name, idx) => ({ id: idx, name, number: numbers[idx] }))
+          .sort((a, b) => a.name.localeCompare(b.name, "it")); // ordina solo per estetica nella coda
+        state.revealOrder = shuffle(state.players.map((p) => p.id));
+        state.currentIndex = 0;
+        state.seen = new Set();
+
+        showStage("name");
+        renderNameStage();
+      }
+
+      function reshuffleNumbersKeepNames() {
+        const names =
+          state.players.length > 0
+            ? state.players.map((p) => p.name)
+            : Array.from(elNameFields.querySelectorAll("input")).map(
+                (i, idx) => i.value.trim() || `Giocatore ${idx + 1}`
+              );
+        const count = names.length;
+        const numbers = sampleUniqueNumbers(count, 1, 100);
+        state.players = names.map((name, idx) => ({
+          id: idx,
+          name,
+          number: numbers[idx],
+        }));
+        state.revealOrder = shuffle(state.players.map((p) => p.id));
+        state.currentIndex = 0;
+        state.seen = new Set();
+        showStage("name");
+        renderNameStage();
+      }
+
+      function showStage(which) {
+        elSetup.classList.remove("active");
+        elStageName.classList.remove("active");
+        elStageNumber.classList.remove("active");
+        elDone.classList.remove("active");
+        switch (which) {
+          case "setup":
+            elSetup.classList.add("active");
+            break;
+          case "name":
+            elStageName.classList.add("active");
+            break;
+          case "number":
+            elStageNumber.classList.add("active");
+            break;
+          case "done":
+            elDone.classList.add("active");
+            break;
+        }
+      }
+
+      function currentPlayer() {
+        const id = state.revealOrder[state.currentIndex];
+        return state.players.find((p) => p.id === id);
+      }
+
+      function renderNameStage() {
+        const p = currentPlayer();
+        if (!p) {
+          showStage("done");
+          return;
+        }
+        elNameLabel.textContent = p.name;
+        elProgress1.textContent = `Giocatore ${state.currentIndex + 1} di ${
+          state.players.length
+        }`;
+      }
+
+      function renderNumberStage() {
+        const p = currentPlayer();
+        if (!p) {
+          showStage("done");
+          return;
+        }
+        elNumberLabel.textContent = String(p.number);
+        elOwnerName.textContent = p.name;
+        elProgress2.textContent = `Giocatore ${state.currentIndex + 1} di ${
+          state.players.length
+        }`;
+      }
+
+      function goNextPlayer() {
+        state.seen.add(state.revealOrder[state.currentIndex]);
+        state.currentIndex += 1;
+        if (state.currentIndex >= state.players.length) {
+          showStage("done");
+        } else {
+          showStage("name");
+          renderNameStage();
+        }
+      }
+
+      // Event wiring
+      elInc.addEventListener("click", () => {
+        const v = Math.min(100, Number(elPlayerCount.value || 0) + 1);
+        elPlayerCount.value = String(v);
+        renderNameFields(v);
+      });
+      elDec.addEventListener("click", () => {
+        const v = Math.max(2, Number(elPlayerCount.value || 0) - 1);
+        elPlayerCount.value = String(v);
+        renderNameFields(v);
+      });
+      elPlayerCount.addEventListener("change", () => {
+        let v = Number(elPlayerCount.value || 0);
+        if (!Number.isFinite(v)) v = 2;
+        v = Math.max(2, Math.min(100, v));
+        elPlayerCount.value = String(v);
+        renderNameFields(v);
+      });
+
+      elStart.addEventListener("click", () => {
+        startGame();
+      });
+
+      elShowNumber.addEventListener("click", () => {
+        showStage("number");
+        renderNumberStage();
+      });
+
+      elHideAndNext.addEventListener("click", () => {
+        goNextPlayer();
+      });
+
+      btnRestartTop.addEventListener("click", () => {
+        reshuffleNumbersKeepNames();
+      });
+      btnEditTop.addEventListener("click", () => {
+        const names =
+          state.players.length > 0
+            ? state.players.map((p) => p.name)
+            : loadNames() || [];
+        showStage("setup");
+        if (names && names.length > 0) {
+          applyLoadedNames(names);
+        }
+      });
+      btnRestartDone.addEventListener("click", () => {
+        reshuffleNumbersKeepNames();
+      });
+      btnEditDone.addEventListener("click", () => {
+        const names = state.players.map((p) => p.name);
+        showStage("setup");
+        applyLoadedNames(names);
+      });
+
+      // Init
+      const saved = loadNames();
+      if (saved && saved.length >= 2) {
+        applyLoadedNames(saved);
+      } else {
+        renderNameFields(Number(elPlayerCount.value));
+      }
+      showStage("setup");
+    </script>
+  </body>
+</html>
