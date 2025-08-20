@@ -1,15 +1,30 @@
 <!DOCTYPE html>
+<<<<<<< Updated upstream
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
     <title>Struttura a Nodi – Fluida e Ordinata</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
+=======
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Visual Tree (Left to Right)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+      }
+
+>>>>>>> Stashed changes
       svg {
         width: 100vw;
         height: 100vh;
         background: #f8f8f8;
       }
+<<<<<<< Updated upstream
       .node rect {
         fill: white;
         stroke: #333;
@@ -24,6 +39,25 @@
       .link {
         fill: none;
         stroke: #999;
+=======
+
+      .node rect {
+        fill: white;
+        stroke: black;
+        stroke-width: 1.5;
+        rx: 6;
+        ry: 6;
+      }
+
+      .node text {
+        font-size: 12px;
+        pointer-events: none;
+      }
+
+      .link {
+        fill: none;
+        stroke: black;
+>>>>>>> Stashed changes
         stroke-width: 1.5px;
         marker-end: url(#arrow);
       }
@@ -31,6 +65,7 @@
   </head>
   <body>
     <svg></svg>
+<<<<<<< Updated upstream
     <script>
       // Nodi esattamente come definiti da te
       const nodes = [
@@ -80,6 +115,47 @@
       const svg = d3.select("svg");
 
       // Frecce
+=======
+
+    <script>
+      const rawData = {
+        id: "1",
+        label: "1\nDate: dd/mm/aa\nTitle/Keyword\nBrief\nText text text...",
+        children: [
+          {
+            id: "1.1",
+            label:
+              "1.1\nDate: dd/mm/aa\nTitle/Keyword\nAction: Research\nArea: Networks\nText text text...",
+            children: [
+              {
+                id: "1.1.1",
+                label:
+                  "1.1.1\nDate: dd/mm/aa\nTitle/Keyword\nAction: Research\nArea: Robotics\nText text text...",
+              },
+              {
+                id: "1.1.2",
+                label:
+                  "1.1.2\nDate: dd/mm/aa\nTitle/Keyword\nAction: Research\nArea: Biology\nText text text...",
+              },
+            ],
+          },
+          {
+            id: "1.2",
+            label:
+              "1.2\nDate: dd/mm/aa\nTitle/Keyword\nAction: Research\nArea: Networks\nText text text...",
+          },
+        ],
+      };
+
+      const svg = d3.select("svg");
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const margin = { top: 40, right: 200, bottom: 40, left: 40 };
+      const g = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+>>>>>>> Stashed changes
       svg
         .append("defs")
         .append("marker")
@@ -92,6 +168,7 @@
         .attr("orient", "auto")
         .append("path")
         .attr("d", "M0,-5L10,0L0,5")
+<<<<<<< Updated upstream
         .attr("fill", "#999");
 
       // Simulazione
@@ -160,10 +237,52 @@
         .attr("height", 30)
         .attr("x", (d) => -((d.id.length * 8 + 20) / 2))
         .attr("y", -15);
+=======
+        .attr("fill", "black");
+
+      // Convert to hierarchy
+      const root = d3.hierarchy(rawData);
+
+      // Tree layout: left to right
+      const treeLayout = d3.tree().nodeSize([120, 200]);
+      treeLayout(root);
+
+      // Draw links
+      g.selectAll(".link")
+        .data(root.links())
+        .join("path")
+        .attr("class", "link")
+        .attr(
+          "d",
+          (d) => `
+    M${d.source.y},${d.source.x}
+    C${(d.source.y + d.target.y) / 2},${d.source.x}
+     ${(d.source.y + d.target.y) / 2},${d.target.x}
+     ${d.target.y},${d.target.x}
+  `
+        )
+        .attr("marker-end", "url(#arrow)");
+
+      // Draw nodes
+      const node = g
+        .selectAll(".node")
+        .data(root.descendants())
+        .join("g")
+        .attr("class", "node")
+        .attr("transform", (d) => `translate(${d.y},${d.x})`);
+
+      node
+        .append("rect")
+        .attr("x", -90)
+        .attr("y", -50)
+        .attr("width", 180)
+        .attr("height", 100);
+>>>>>>> Stashed changes
 
       node
         .append("text")
         .attr("text-anchor", "middle")
+<<<<<<< Updated upstream
         .attr("dy", "0.35em")
         .text((d) => d.id);
 
@@ -178,6 +297,14 @@
         );
         node.attr("transform", (d) => `translate(${d.x},${d.y})`);
       });
+=======
+        .selectAll("tspan")
+        .data((d) => d.data.label.split("\n"))
+        .join("tspan")
+        .attr("x", 0)
+        .attr("dy", (d, i) => `${i * 1.2}em`)
+        .text((d) => d);
+>>>>>>> Stashed changes
     </script>
   </body>
 </html>
