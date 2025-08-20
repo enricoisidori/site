@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Node Graph Visualization with Metadata</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+      svg {
+        width: 100vw;
+        height: 100vh;
+        background-color: #f9f9f9;
+      }
+      .node rect {
+        fill: #ffffff;
+        stroke: #000000;
+        stroke-width: 1.5px;
+        rx: 5;
+        ry: 5;
+      }
+      .node text {
+        font-size: 11px;
+        pointer-events: none;
+      }
+      .link {
+        fill: none;
+        stroke: #444;
+        stroke-width: 1.4px;
+        marker-end: url(#arrow);
+      }
+      .sidebar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 250px;
+        height: 100vh;
+        background: #fff;
+        border-left: 1px solid #ccc;
+        padding: 10px;
+        overflow-y: auto;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <svg></svg>
+    <div class="sidebar" id="sidebar">Click a node to see details</div>
+    <script>
+      const rawNodes = [
+        { id: "1", title: "Root", date: "01/01/25", action: "Brief", area: "-" },
+        { id: "1.1", title: "Intro", date: "05/01/25", action: "Exploring", area: "Philosophy" },
+        { id: "1.2", title: "Branch A", date: "10/01/25", action: "Research", area: "Biology" },
+        { id: "1.3", title: "Branch B", date: "15/01/25", action: "Research", area: "Networks" },
+        { id: "1.1.1", title: "Case Study", date: "20/01/25", action: "Making", area: "Design" },
+        { id: "1.1.2", title: "Theory", date: "25/01/25", action: "Writing", area: "Theory" },
+        { id: "1.1.2.1=handle", title: "Alias Handle", date: "28/01/25", action: "Note", area: "Misc" },
+        { id: "handle.1", title: "Handle 1", date: "29/01/25", action: "Research", area: "AI" },
+        { id: "handle.2", title: "Handle 2", date: "30/01/25", action: "Research", area: "AI" },
+        { id: "1.3.1", title: "Prototype A", date: "01/02/25", action: "Making", area: "Robotics" },
+        { id: "1.3.2", title: "Prototype B", date: "02/02/25", action: "Making", area: "Robotics" },
+        { id: "1.3.3", title: "Test A", date: "03/02/25", action: "Testing", area: "Systems" },
+        { id: "1.3.1+1.3.2=ideasperimentale", title: "Idea Merge", date: "04/02/25", action: "Merging", area: "Concept" },
+        { id: "ideasperimentale.1", title: "Iteration", date: "05/02/25", action: "Exploring", area: "Design" },
+        { id: "handle.2+ideasperimentale.1=nuovaidea", title: "New Idea", date: "06/02/25", action: "Designing", area: "Vision" },
+        { id: "1.3.2+1.3.3", title: "Test Merge", date: "07/02/25", action: "Analysis", area: "Robotics" },
+        { id: "(1.3.2+1.3.3)+1.2", title: "Final Merge", date: "08/02/25", action: "Synthesis", area: "Interdisciplinary" }
+      ];
+
+      const aliasMap = {};
+      const nodes = [];
+      const links = [];
+
+      function parseNode(obj) {
+        let name = obj.id;
+        if (name.includes('=')) {
+          const [expr, alias] = name.split('=');
+          const base = parseNode({ ...obj, id: expr });
+          aliasMap[alias] = base.id;
+          return base;
+        } else if (name.startsWith('(')) {
+          const match = name.match(/^\((.*?)\)\+(.*)$/);
+          if (match) {
+            const merged = match[1].split('+');
+            const last = match[2];
+            const id = `(${merged.join('+')})+${last}`;
+            merged.concat([last]).forEach(src => links.push({ source: resolveAlias(src), target: id }));
+            return { ...obj, id };
+          }
+        } else if (name.includes('+')) {
+          const parts = name.split('+');
+          parts.forEach(p => links.push({ source: resolveAlias(p), target: name }));
+          return { ...obj, id: name };
+        } else {
+          return obj;
+        }
+      }
+
+      function resolveAlias(name) {
+        return aliasMap[name] || name;
+      }
+
+      rawNodes.forEach((obj, i) => {
+        const node = parseNode(obj);
+        if (!nodes.find(n => n.id === node.id)) {
+          node.x = 100 + (i % 4) * 220;
+          node.y = 100 + Math.floor(i / 4) * 140;
+          nodes.push(node);
+        }
+      });
+
+      const svg = d3.select("svg");
+      svg.append("defs").append("marker")
+        .attr("id", "arrow")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 10)
+        .attr("refY", 0)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M0,-5L10,0L0,5")
+        .attr("fill", "#444");
+
+      const nodeMap = new Map();
+
+      const linkGroup = svg.append("g")
+        .selectAll("line")
+        .data(links)
+        .join("line")
+        .attr("class", "link");
+
+      const nodeGroup = svg.append("g")
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+        .attr("class", "node")
+        .attr("transform", d => `translate(${d.x},${d.y})`)
+        .each(d => nodeMap.set(d.id, d))
+        .on("click", (event, d) => {
+          const sidebar = document.getElementById("sidebar");
+          sidebar.innerHTML = `<strong>ID:</strong> ${d.id}<br>
+            <strong>Title:</strong> ${d.title}<br>
+            <strong>Date:</strong> ${d.date}<br>
+            <strong>Action:</strong> ${d.action}<br>
+            <strong>Area:</strong> ${d.area}`;
+        })
+        .call(d3.drag()
+          .on("drag", (event, d) => {
+            d.x = event.x;
+            d.y = event.y;
+            d3.select(event.sourceEvent.target.parentNode)
+              .attr("transform", `translate(${d.x},${d.y})`);
+            updateLinks();
+          })
+        );
+
+      nodeGroup.append("rect")
+        .attr("x", -60)
+        .attr("y", -30)
+        .attr("width", 120)
+        .attr("height", 60);
+
+      nodeGroup.append("text")
+        .attr("text-anchor", "middle")
+        .attr("y", -10)
+        .text(d => d.id);
+
+      nodeGroup.append("text")
+        .attr("text-anchor", "middle")
+        .attr("y", 10)
+        .text(d => d.title);
+
+      function updateLinks() {
+        linkGroup
+          .attr("x1", d => nodeMap.get(d.source)?.x || 0)
+          .attr("y1", d => nodeMap.get(d.source)?.y || 0)
+          .attr("x2", d => nodeMap.get(d.target)?.x || 0)
+          .attr("y2", d => nodeMap.get(d.target)?.y || 0);
+      }
+
+      updateLinks();
+    </script>
+  </body>
+</html>
