@@ -390,7 +390,7 @@
         <button id="btnRedo">Redo</button>
         <button id="btnDel">Delete selection</button>
         <button id="btnFit">Fit view (0)</button>
-        <!-- optional test helpers -->
+        <!-- opzionali per testare copy/cut/paste/dup -->
         <button id="btnCopy" title="Ctrl/Cmd+C">Copy</button>
         <button id="btnCut" title="Ctrl/Cmd+X">Cut</button>
         <button id="btnPaste" title="Ctrl/Cmd+V">Paste</button>
@@ -580,27 +580,27 @@
           zoom: 1,
           pan: { x: 0, y: 0 },
 
-          press: null,
-          dragLink: null,
-          activeDrag: null,
+          press: null, // edge handle press
+          dragLink: null, // ghost
+          activeDrag: null, // node drag
           spaceDown: false,
           marquee: null,
           ignoreNextStageClick: false,
 
           // edges rendering
-          edgeGroups: [],
-          edgesByNode: new Map(),
+          edgeGroups: [], // SVG <g> by index
+          edgesByNode: new Map(), // nodeId -> Set(edgeIndex)
           dirtyEdgeIdx: new Set(),
           needFullEdgeRedraw: true,
           rafPending: false,
 
           // spatial index
           spatial: {
-            cellSize: 420,
-            nodes: new Map(),
-            edges: new Map(),
-            nodeCells: new Map(),
-            edgeCells: new Map(),
+            cellSize: 420, // ~larghezza nodo + gap
+            nodes: new Map(), // key -> Set(nodeId)
+            edges: new Map(), // key -> Set(edgeIndex)
+            nodeCells: new Map(), // nodeId -> Set(key)
+            edgeCells: new Map(), // edgeIndex -> Set(key)
           },
         };
 
@@ -612,6 +612,7 @@
         const f = {
           date: $("#fDate"),
           title: $("#fTitle"),
+          object: "#fObject" ? $("#fObject") : null,
           action: $("#fAction"),
           main: $("#fMainArea"),
           areas: $("#fAreas"),
@@ -948,6 +949,7 @@
             state.edgesByNode.get(e.s).add(i);
             state.edgesByNode.get(e.t).add(i);
           });
+          // also keep spatial per-edge updated
           spatialRebuildEdges();
         }
         function invalidateEdgesForNode(nodeId) {
@@ -1298,7 +1300,7 @@
           $("#btnUndo").addEventListener("click", undo);
           $("#btnRedo").addEventListener("click", redo);
 
-          // optional toolbar for quick test
+          // opzionali toolbar per test
           $("#btnCopy").addEventListener("click", copySelection);
           $("#btnCut").addEventListener("click", cutSelection);
           $("#btnPaste").addEventListener("click", () =>
@@ -1383,6 +1385,7 @@
         let panning = false,
           startPan = { x: 0, y: 0 };
 
+        // Click vuoto → sempre deseleziona (tranne subito dopo la marquee)
         stage.addEventListener("click", (e) => {
           if (state.ignoreNextStageClick) {
             state.ignoreNextStageClick = false;
@@ -1394,13 +1397,14 @@
           if (isBackground && !isEdge && !isHandle) {
             clearAllSelection();
           }
+          // se c'è un ghost, click vuoto lo cancella
           if (state.dragLink) {
             cancelGhost();
           }
         });
 
         stage.addEventListener("mousedown", (e) => {
-          if (e.target.closest("g[data-eid]")) return;
+          if (e.target.closest("g[data-eid]")) return; // edge handled
           if (e.target.closest(".handle")) return;
           if (e.target !== stage && e.target !== edgesSVG) return;
           if (state.spaceDown) {
@@ -1796,7 +1800,7 @@
           applyView();
         }
 
-        /* ---------------- Marquee (spatial index) ---------------- */
+        /* ---------------- Marquee (con indice spaziale) ---------------- */
         function startMarquee(e) {
           const rect = document.createElement("div");
           rect.className = "marquee";
@@ -1832,6 +1836,7 @@
             maxX = Math.max(a.x, b.x),
             maxY = Math.max(a.y, b.y);
 
+          // Query indice spaziale per candidati
           const candNodes = spatialQueryAABB(minX, minY, maxX, maxY, "nodes");
           const candEdges = spatialQueryAABB(minX, minY, maxX, maxY, "edges");
 
@@ -1885,7 +1890,7 @@
         function endMarquee() {
           if (!state.marquee) return;
           state.marquee.el.remove();
-          state.marquee = null;
+          state.marquee = null; /* la flag rimane settata per 1 click */
         }
         function drawMarqueeRect() {
           const m = state.marquee;
@@ -2003,7 +2008,7 @@
           scheduleRender();
         }
 
-        /* ---------------- SAVE / OPEN (smart, dedup manifest) ---------------- */
+        /* ---------------- SAVE / OPEN (come prima) ---------------- */
         async function saveProjectSmart() {
           if (projectCtx.mode === "folder" && projectCtx.dirHandle) {
             await saveProjectToDir(projectCtx.dirHandle);
@@ -2012,7 +2017,6 @@
           }
           await saveAs();
         }
-
         async function saveAs() {
           const supportsFS = "showDirectoryPicker" in window;
           if (supportsFS) {
@@ -2036,21 +2040,22 @@
           projectCtx.mode = "embedded";
           projectCtx.dirHandle = null;
         }
-
         async function saveProjectToDir(dir) {
-          // 1) Ensure assets/ and read manifest
           await ensureSubdir(dir, "assets");
-          const manifest = await loadManifest(dir);
-
-          // 2) Count new files (no path) for progress
-          const allFiles = state.nodes.flatMap((n) => n.data.files || []);
-          const newFilesTotal = allFiles.reduce(
-            (acc, f) => acc + (f && !f.path ? 1 : 0),
-            0
-          );
-          let processed = 0;
-
-          // 3) Build project object (without url/dataUrl), writing only new assets
+          const used = new Map();
+          const uniq = (name) => {
+            const clean = sanitizeName(
+              (name || "file").replace(
+                /\.(png|jpg|jpeg|webp|gif|heic|heif|bmp|tiff)$/i,
+                ""
+              )
+            );
+            let n = clean,
+              i = 1;
+            while (used.has(n.toLowerCase())) n = `${clean}_${i++}`;
+            used.set(n.toLowerCase(), true);
+            return n;
+          };
           const project = {
             version: 5,
             nodes: [],
@@ -2060,9 +2065,8 @@
               dashed: !!e.dashed,
             })),
           };
-
           for (const n of state.nodes) {
-            const nodeOut = {
+            const nodeClone = {
               id: n.id,
               x: n.x,
               y: n.y,
@@ -2071,53 +2075,10 @@
               group: n.group || null,
               data: { ...n.data, files: [] },
             };
-
             for (const f of n.data.files || []) {
-              if (f.path) {
-                // Already persisted: do NOT rewrite, just carry metadata (no url)
-                nodeOut.data.files.push({
-                  name: f.name || "",
-                  size: f.size || 0,
-                  type: f.type || "",
-                  isImage: !!f.isImage,
-                  isPDF: !!f.isPDF,
-                  path: f.path,
-                });
-                continue;
-              }
-
-              // New in this session: need to persist
-              if (!f.url) {
-                // Corrupted entry: keep minimal record, skip writing
-                nodeOut.data.files.push({
-                  name: f.name || "",
-                  size: f.size || 0,
-                  type: f.type || "",
-                  isImage: !!f.isImage,
-                  isPDF: !!f.isPDF,
-                });
-                continue;
-              }
-
-              // Fetch blob from objectURL
-              let blob = await fetch(f.url)
-                .then((r) => r.blob())
-                .catch(() => null);
-              if (!blob) {
-                // Skip but keep a trace
-                nodeOut.data.files.push({
-                  name: f.name || "",
-                  size: f.size || 0,
-                  type: f.type || "",
-                  isImage: !!f.isImage,
-                  isPDF: !!f.isPDF,
-                });
-                continue;
-              }
-
-              // Normalize by type
+              let blob = await fetch(f.url).then((r) => r.blob());
               let ext = "";
-              if (f.isImage || /^image\//i.test(f.type)) {
+              if (/^image\//i.test(f.type) || f.isImage) {
                 blob = await resizeImageBlob(
                   blob,
                   IMG_MAX_SIDE,
@@ -2128,71 +2089,27 @@
                 ext = ".pdf";
               } else {
                 const m = (f.name || "").match(/\.[a-z0-9]+$/i);
-                ext = m ? m[0].toLowerCase() : ".bin";
+                ext = m ? m[0] : ".bin";
               }
-
-              // Hash & dedup
-              const hash = await hashBlobSHA256(blob);
-              const rel = manifest[hash] || `assets/${hash}${ext}`;
-
-              if (!manifest[hash]) {
-                // Write only if not present yet
-                await writeFileByPath(dir, rel, blob);
-                manifest[hash] = rel;
-              }
-
-              // Update project entry with relative path
-              nodeOut.data.files.push({
-                name: f.name ? f.name : `${hash}${ext}`,
+              const base = uniq(f.name || "file");
+              const rel = `assets/${base}${ext}`;
+              await writeFileByPath(dir, rel, blob);
+              nodeClone.data.files.push({
+                name: `${base}${ext}`,
                 size: blob.size,
-                type:
-                  blob.type ||
-                  (f.isImage
-                    ? "image/jpeg"
-                    : f.isPDF
-                    ? "application/pdf"
-                    : f.type || "application/octet-stream"),
+                type: blob.type || (f.isImage ? "image/jpeg" : f.type),
                 isImage: !!(f.isImage || /^image\//i.test(f.type)),
                 isPDF: !!f.isPDF,
                 path: rel,
               });
-
-              // Progress update
-              processed++;
-              if (newFilesTotal > 0)
-                setStatus(`Saving assets… ${processed}/${newFilesTotal}`);
             }
-
-            project.nodes.push(nodeOut);
+            project.nodes.push(nodeClone);
           }
-
-          // 4) Write manifest and project.json (project.json.tmp then swap)
-          await saveManifest(dir, manifest);
-
           const jsonBlob = new Blob([JSON.stringify(project, null, 2)], {
             type: "application/json",
           });
-          // Write temp
-          await writeFileByPath(dir, "project.json.tmp", jsonBlob);
-          // Replace final
-          const finalFH = await dir.getFileHandle("project.json", {
-            create: true,
-          });
-          const finalWr = await finalFH.createWritable();
-          await finalWr.write(jsonBlob);
-          await finalWr.close();
-          // Cleanup tmp (best-effort)
-          try {
-            const tmpFH = await dir.getFileHandle("project.json.tmp", {
-              create: false,
-            });
-            const parent = dir; // no direct remove API yet; leave tmp or overwrite next time
-            // Many browsers don't support removeEntry on FileSystemDirectoryHandle yet → we leave .tmp
-          } catch {}
-
-          if (newFilesTotal > 0) setStatus("Project saved");
+          await writeFileByPath(dir, "project.json", jsonBlob);
         }
-
         async function saveCopy() {
           const embedded = {
             version: 5,
@@ -2200,25 +2117,7 @@
               state.nodes.map(async (n) => {
                 const files = await Promise.all(
                   (n.data.files || []).map(async (f) => {
-                    let blob = null;
-                    if (f.url)
-                      blob = await fetch(f.url)
-                        .then((r) => r.blob())
-                        .catch(() => null);
-                    if (!blob && f.path && projectCtx.dirHandle) {
-                      blob = await readFileByPath(
-                        projectCtx.dirHandle,
-                        f.path
-                      ).catch(() => null);
-                    }
-                    if (!blob)
-                      return {
-                        name: f.name,
-                        size: f.size || 0,
-                        type: f.type || "",
-                        isImage: !!f.isImage,
-                        isPDF: !!f.isPDF,
-                      };
+                    let blob = await fetch(f.url).then((r) => r.blob());
                     if (/^image\//i.test(f.type) || f.isImage)
                       blob = await resizeImageBlob(
                         blob,
@@ -2259,7 +2158,6 @@
           downloadBlob("project.json", blob);
           setStatus("Project JSON downloaded (images resized)");
         }
-
         async function openProject() {
           const supportsFS = "showDirectoryPicker" in window;
           if (supportsFS) {
@@ -2302,7 +2200,6 @@
           };
           f.openFile.click();
         }
-
         async function newProject() {
           pushHistory();
           clearAllSelection();
@@ -2316,7 +2213,6 @@
           addNodeAt(80, 80, {});
           setStatus("New project");
         }
-
         async function loadProject(project, dirHandle) {
           clearAllSelection();
           document.querySelectorAll(".node").forEach((n) => n.remove());
@@ -2336,15 +2232,11 @@
             node.data.files = await Promise.all(
               (pn.data?.files || []).map(async (f) => {
                 if (f.dataUrl) {
-                  const blob = await (await fetch(f.dataUrl))
-                    .blob()
-                    .catch(() => null);
-                  return { ...f, url: blob ? URL.createObjectURL(blob) : "" };
+                  const blob = await (await fetch(f.dataUrl)).blob();
+                  return { ...f, url: URL.createObjectURL(blob) };
                 } else if (f.path && dirHandle) {
-                  const blob = await readFileByPath(dirHandle, f.path).catch(
-                    () => null
-                  );
-                  return { ...f, url: blob ? URL.createObjectURL(blob) : "" };
+                  const blob = await readFileByPath(dirHandle, f.path);
+                  return { ...f, url: URL.createObjectURL(blob) };
                 } else {
                   return { ...f, url: "" };
                 }
@@ -2450,7 +2342,7 @@
           addNodeAt(w.x, w.y);
         });
 
-        /* ---------------- FS utils / images / hashes ---------------- */
+        /* ---------------- FS utils / images ---------------- */
         async function ensureSubdir(dirHandle, name) {
           try {
             return await dirHandle.getDirectoryHandle(name, { create: true });
@@ -2547,36 +2439,16 @@
             r.readAsDataURL(blob);
           });
         }
-        async function hashBlobSHA256(blob) {
-          const buf = await blob.arrayBuffer();
-          const digest = await crypto.subtle.digest("SHA-256", buf);
-          const hex = [...new Uint8Array(digest)]
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
-          return hex;
-        }
-        async function loadManifest(dir) {
-          try {
-            const assetsDir = await ensureSubdir(dir, "assets");
-            try {
-              const fh = await assetsDir.getFileHandle("manifest.json", {
-                create: false,
-              });
-              const file = await fh.getFile();
-              const json = JSON.parse(await file.text());
-              return json && typeof json === "object" ? json : {};
-            } catch {
-              return {};
-            }
-          } catch {
-            return {};
-          }
-        }
-        async function saveManifest(dir, manifest) {
-          const blob = new Blob([JSON.stringify(manifest, null, 2)], {
-            type: "application/json",
-          });
-          await writeFileByPath(dir, "assets/manifest.json", blob);
+        function downloadBlob(filename, blob) {
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            URL.revokeObjectURL(a.href);
+            a.remove();
+          }, 0);
         }
 
         /* ---------------- Spatial index ---------------- */
@@ -2623,12 +2495,14 @@
             n.y + (n.h || NODE_H)
           );
           const next = new Set(keys);
+          // remove old
           for (const k of prev) {
             if (!next.has(k)) {
               const set = state.spatial.nodes.get(k);
               set && set.delete(n.id);
             }
           }
+          // add new
           for (const k of next) {
             if (!prev.has(k)) {
               if (!state.spatial.nodes.has(k))
@@ -2673,6 +2547,8 @@
           state.spatial.edgeCells.set(i, next);
         }
         function spatialRebuildEdges() {
+          // Clear all edges cells and rebuild from state.edges
+          // Keep nodes map intact
           state.spatial.edges.clear();
           state.spatial.edgeCells.clear();
           for (let i = 0; i < state.edges.length; i++) spatialInsertEdge(i);

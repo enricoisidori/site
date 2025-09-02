@@ -29,7 +29,6 @@
         display: flex;
         gap: 10px;
         align-items: center;
-        flex-wrap: wrap;
       }
       button {
         background: #111;
@@ -51,7 +50,6 @@
         height: 100vh;
       }
 
-      /* Dynamic grid */
       #stage {
         position: relative;
         overflow: hidden;
@@ -182,7 +180,6 @@
         -webkit-user-drag: none;
         user-drag: none;
       }
-
       .attachments {
         margin-top: 8px;
         font-size: 12px;
@@ -193,7 +190,7 @@
         margin-right: 10px;
       }
 
-      /* Bigger hit-area for handles; visual remains small */
+      /* bigger hit-area for handles; visual remains small */
       .handle {
         position: absolute;
         width: 24px;
@@ -236,7 +233,7 @@
         clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
       }
 
-      /* Edges — no glow ever */
+      /* Edges — no glow */
       .edge-visible {
         cursor: pointer;
         stroke: #9a9a9a;
@@ -272,7 +269,6 @@
         cursor: pointer;
       }
 
-      /* Marquee */
       .marquee {
         position: absolute;
         border: 1px solid #bbb;
@@ -390,11 +386,6 @@
         <button id="btnRedo">Redo</button>
         <button id="btnDel">Delete selection</button>
         <button id="btnFit">Fit view (0)</button>
-        <!-- optional test helpers -->
-        <button id="btnCopy" title="Ctrl/Cmd+C">Copy</button>
-        <button id="btnCut" title="Ctrl/Cmd+X">Cut</button>
-        <button id="btnPaste" title="Ctrl/Cmd+V">Paste</button>
-        <button id="btnDup" title="Ctrl/Cmd+D">Duplicate</button>
         <span id="status" class="muted" style="margin-left: 8px"></span>
       </header>
 
@@ -408,7 +399,6 @@
       <aside>
         <h3 id="panelTitle">Node properties</h3>
 
-        <!-- Node form -->
         <div id="nodeForm">
           <form onsubmit="return false;">
             <label>Date <input id="fDate" type="date" /></label>
@@ -464,7 +454,6 @@
           </form>
         </div>
 
-        <!-- Edge form -->
         <div id="edgeForm" style="display: none">
           <div class="muted" style="font-size: 12px; margin-bottom: 6px">
             From: <span id="eFrom">—</span> → To: <span id="eTo">—</span>
@@ -474,7 +463,6 @@
           </label>
         </div>
 
-        <!-- Fallback open (JSON) hidden input -->
         <input
           id="openFile"
           type="file"
@@ -498,7 +486,6 @@
 
         const projectCtx = { mode: null, dirHandle: null };
 
-        /* ---------------- History ---------------- */
         const history = {
           undo: [],
           redo: [],
@@ -544,7 +531,6 @@
           ensureSVGSize();
           updateGrid();
           rebuildEdgesIndex();
-          spatialRebuildAll();
           requestFullEdgeRedraw();
           scheduleRender();
 
@@ -571,7 +557,6 @@
           setStatus("Redone");
         }
 
-        /* ---------------- State ---------------- */
         const state = {
           nodes: [],
           edges: [],
@@ -580,28 +565,18 @@
           zoom: 1,
           pan: { x: 0, y: 0 },
 
-          press: null,
-          dragLink: null,
-          activeDrag: null,
+          press: null, // handle press (edge) {side,sources,primary,startX,startY,moved}
+          dragLink: null, // ghost {active,from,sources,primary,x,y}
+          activeDrag: null, // node drag {ids:[...], offsets:{id:{dx,dy}} }
           spaceDown: false,
           marquee: null,
           ignoreNextStageClick: false,
 
-          // edges rendering
-          edgeGroups: [],
-          edgesByNode: new Map(),
+          edgeGroups: [], // <g> refs ordered by index
+          edgesByNode: new Map(), // nodeId -> Set(edgeIndex)
           dirtyEdgeIdx: new Set(),
           needFullEdgeRedraw: true,
           rafPending: false,
-
-          // spatial index
-          spatial: {
-            cellSize: 420,
-            nodes: new Map(),
-            edges: new Map(),
-            nodeCells: new Map(),
-            edgeCells: new Map(),
-          },
         };
 
         const stage = $("#stage"),
@@ -612,6 +587,7 @@
         const f = {
           date: $("#fDate"),
           title: $("#fTitle"),
+          object: $("#fObject"),
           action: $("#fAction"),
           main: $("#fMainArea"),
           areas: $("#fAreas"),
@@ -753,7 +729,6 @@
           return state.edges[i] || null;
         }
 
-        /* ---------------- Nodes ---------------- */
         function addNodeAt(x, y, initialData = null) {
           pushHistory();
           const id = uid();
@@ -773,8 +748,6 @@
           positionNode(node);
           populate(node);
           selectOnlyNodes([id]);
-
-          spatialInsertNode(node);
           rebuildEdgesIndex();
           requestFullEdgeRedraw();
           scheduleRender();
@@ -813,13 +786,12 @@
             </div>`;
           stage.appendChild(el);
 
-          // Node drag start
+          // Node drag start (single listener per node)
           el.addEventListener("mousedown", (e) => {
             const role = e.target.getAttribute("data-role");
             if (role) return;
             const nodeId = node.id;
-
-            // selection
+            // selection logic
             if (node.group && !e.shiftKey) {
               const groupNodes = state.nodes
                 .filter((n) => n.group === node.group)
@@ -845,14 +817,14 @@
               const n = getNodeById(id);
               offsets[id] = { dx: n.x - cur.x, dy: n.y - cur.y };
             });
-            state.activeDrag = { ids, offsets };
+            state.activeDrag = { ids, offsets, measured: false };
             el.classList.add("dragging");
             pushHistory();
           });
 
-          // Edge handles: only mousedown; move/up are global
-          const inEl = el.querySelector(".in"),
-            outEl = el.querySelector(".out");
+          // Handle presses (edge gestures) – only mousedown; move/up are global
+          const inEl = el.querySelector(".in");
+          const outEl = el.querySelector(".out");
           const handleDown = (side) => (e) => {
             e.stopPropagation();
             const sources =
@@ -937,7 +909,7 @@
             .join(" ");
         }
 
-        /* ---------------- Edges (dirty + SVG reuse) ---------------- */
+        /* ======== Edge model / drawing (dirty) ======== */
         function rebuildEdgesIndex() {
           state.edgesByNode.clear();
           state.edges.forEach((e, i) => {
@@ -948,7 +920,6 @@
             state.edgesByNode.get(e.s).add(i);
             state.edgesByNode.get(e.t).add(i);
           });
-          spatialRebuildEdges();
         }
         function invalidateEdgesForNode(nodeId) {
           const set = state.edgesByNode.get(nodeId);
@@ -956,10 +927,7 @@
             requestFullEdgeRedraw();
             return;
           }
-          for (const idx of set) {
-            state.dirtyEdgeIdx.add(idx);
-            spatialUpdateEdge(idx);
-          }
+          for (const idx of set) state.dirtyEdgeIdx.add(idx);
           scheduleRender();
         }
         function requestFullEdgeRedraw() {
@@ -1063,6 +1031,7 @@
           });
         }
 
+        // Single delegated click for edges (select / Alt+split)
         edgesSVG.addEventListener("click", (ev) => {
           const g = ev.target.closest("g[data-eid]");
           if (!g) return;
@@ -1074,7 +1043,7 @@
             const e = state.edges[i];
             if (!e) return;
             const s = anchor(e.s, "right"),
-              t = anchor(e.t, "left");
+              t = anchor(e.t, "left"); // midpoint for new node
             const mid = { x: (s.x + t.x) / 2, y: (s.y + t.y) / 2 };
             const nid = addNodeAt(mid.x - NODE_W / 2, mid.y - NODE_H / 2, {});
             const dashed = !!e.dashed;
@@ -1094,7 +1063,7 @@
           else selectOnlyEdges([i]);
         });
 
-        /* ---------------- rAF render loop ---------------- */
+        /* ======== rAF render loop ======== */
         function scheduleRender() {
           if (!state.rafPending) {
             state.rafPending = true;
@@ -1105,7 +1074,10 @@
           state.rafPending = false;
           ensureSVGSize();
           updateGrid();
+
+          // Update node transforms (pan/zoom)
           for (const n of state.nodes) positionNode(n);
+
           if (state.needFullEdgeRedraw) {
             renderEdgesFull();
             state.needFullEdgeRedraw = false;
@@ -1114,16 +1086,17 @@
             updateEdgesPartial(state.dirtyEdgeIdx);
             state.dirtyEdgeIdx.clear();
           } else {
+            // still update ghost if active (cursor moved without node movement)
             drawGhostEdges();
           }
         }
 
-        /* ---------------- Sidebar live ---------------- */
+        /* ======== Sidebar bindings (live) ======== */
         function fillFormForNode(node) {
           const d = node?.data || emptyData();
           f.date.value = d.date || "";
           f.title.value = d.title || "";
-          $("#fObject").value = d.object || "";
+          f.object.value = d.object || "";
           f.action.value = d.action || "";
           f.main.value = d.mainArea || "";
           f.areas.value = (d.areas || []).join(", ");
@@ -1137,7 +1110,7 @@
           for (const el of [
             f.date,
             f.title,
-            $("#fObject"),
+            f.object,
             f.action,
             f.main,
             f.areas,
@@ -1145,7 +1118,7 @@
             f.desc,
             f.links,
           ])
-            el && (el.value = "");
+            el.value = "";
           f.filesList.innerHTML = "";
         }
         function renderFilesList(node) {
@@ -1237,7 +1210,7 @@
           const map = [
             [f.date, (d, v) => (d.date = v || todayYMD())],
             [f.title, (d, v) => (d.title = v)],
-            [$("#fObject"), (d, v) => (d.object = v.trim())],
+            [f.object, (d, v) => (d.object = v.trim())],
             [f.action, (d, v) => (d.action = v.trim())],
             [f.main, (d, v) => (d.mainArea = v.trim())],
             [f.areas, (d, v) => (d.areas = splitList(v))],
@@ -1246,7 +1219,6 @@
             [f.links, (d, v) => (d.links = splitList(v))],
           ];
           for (const [el, apply] of map) {
-            if (!el) continue;
             el.addEventListener("input", () => {
               if (state.selNodes.size !== 1) return;
               const node = getNodeById([...state.selNodes][0]);
@@ -1297,18 +1269,10 @@
           });
           $("#btnUndo").addEventListener("click", undo);
           $("#btnRedo").addEventListener("click", redo);
-
-          // optional toolbar for quick test
-          $("#btnCopy").addEventListener("click", copySelection);
-          $("#btnCut").addEventListener("click", cutSelection);
-          $("#btnPaste").addEventListener("click", () =>
-            pasteClipboard({ x: 40, y: 40 })
-          );
-          $("#btnDup").addEventListener("click", duplicateSelection);
         }
         bindLive();
 
-        /* ---------------- Selection helpers ---------------- */
+        /* ======== Selection helpers ======== */
         function refreshNodeSelectionClasses() {
           document.querySelectorAll(".node").forEach((el) => {
             state.selNodes.has(el.id)
@@ -1371,7 +1335,7 @@
           refreshSidebarForms();
         }
 
-        /* ---------------- Toolbar ---------------- */
+        /* ======== Toolbar ======== */
         $("#btnAdd").addEventListener("click", addNode);
         $("#btnDel").addEventListener("click", doDeleteSelection);
         $("#btnFit").addEventListener("click", fitView);
@@ -1379,29 +1343,11 @@
         $("#btnOpen").addEventListener("click", openProject);
         $("#btnSave").addEventListener("click", saveProjectSmart);
 
-        /* ---------------- Pan / Marquee / Zoom ---------------- */
+        /* ======== Pan / Marquee / Zoom (global) ======== */
         let panning = false,
           startPan = { x: 0, y: 0 };
-
-        stage.addEventListener("click", (e) => {
-          if (state.ignoreNextStageClick) {
-            state.ignoreNextStageClick = false;
-            return;
-          }
-          const isBackground = e.target === stage || e.target === edgesSVG;
-          const isEdge = !!e.target.closest("g[data-eid]");
-          const isHandle = !!e.target.closest(".handle");
-          if (isBackground && !isEdge && !isHandle) {
-            clearAllSelection();
-          }
-          if (state.dragLink) {
-            cancelGhost();
-          }
-        });
-
         stage.addEventListener("mousedown", (e) => {
-          if (e.target.closest("g[data-eid]")) return;
-          if (e.target.closest(".handle")) return;
+          if (e.target.closest("g[data-eid]")) return; // edges handled by SVG
           if (e.target !== stage && e.target !== edgesSVG) return;
           if (state.spaceDown) {
             panning = true;
@@ -1415,7 +1361,6 @@
             startMarquee(e);
           }
         });
-
         document.addEventListener("mousemove", onDocMove);
         document.addEventListener("mouseup", onDocUp);
 
@@ -1460,7 +1405,6 @@
               n.y = cur.y + off.dy;
               positionNode(n);
               invalidateEdgesForNode(n.id);
-              spatialUpdateNode(n);
             }
             scheduleRender();
           }
@@ -1504,11 +1448,14 @@
               .forEach((el) => el.classList.remove("dragging"));
             state.activeDrag = null;
           }
-          // Marquee end
+          // Handle ghost click/drag resolution uses handle-up on target handles:
+          // If user simply released in empty canvas with ghost active → keep ghost until click on compatible handle;
+          // If click (no move) on handles resolves edges, that logic is in handleUp (below via stage click)
           if (state.marquee?.active) {
             endMarquee();
           }
-          // Reset cursor if not ghosting
+
+          // Reset cursors if not ghosting
           if (!(state.dragLink && state.dragLink.active)) {
             document.body.style.cursor = "";
             stage.style.cursor = "";
@@ -1538,7 +1485,7 @@
           scheduleRender();
         }
 
-        // Handle-up on handles (connect or create child)
+        // Handle-up logic on handles (click vs ghost connect) via capturing mouseup on the document target
         stage.addEventListener("mouseup", (e) => {
           const handle = e.target.closest(".handle");
           if (!handle) return;
@@ -1546,6 +1493,7 @@
           const nodeId = handle.closest(".node")?.id;
           if (!nodeId) return;
 
+          // Ghost connect if compatible
           if (state.dragLink && state.dragLink.active) {
             const from = state.dragLink.from;
             if (
@@ -1570,6 +1518,7 @@
               return;
             }
           }
+          // Click (no ghost) on OUT → create child(ren)
           if (state.press && !state.press.moved && state.press.side === side) {
             if (side === "out" && !state.dragLink) {
               pushHistory();
@@ -1601,6 +1550,21 @@
           state.press = null;
         });
 
+        // Stage click: cancel ghost OR deselect (ignore click right after marquee)
+        stage.addEventListener("click", (e) => {
+          if (state.ignoreNextStageClick) {
+            state.ignoreNextStageClick = false;
+            return;
+          }
+          if (e.target === stage || e.target === edgesSVG) {
+            if (state.dragLink) {
+              cancelGhost();
+            } else {
+              clearAllSelection();
+            }
+          }
+        });
+
         // ESC
         document.addEventListener("keydown", (e) => {
           if (e.key === "Escape") {
@@ -1612,7 +1576,7 @@
           }
         });
 
-        /* ---------------- Shortcuts ---------------- */
+        /* ======== Keyboard shortcuts ======== */
         document.addEventListener("keydown", (e) => {
           const tag = document.activeElement?.tagName;
           const inText =
@@ -1679,21 +1643,6 @@
               duplicateSelection();
               return;
             }
-            if (k === "c") {
-              e.preventDefault();
-              copySelection();
-              return;
-            }
-            if (k === "x") {
-              e.preventDefault();
-              cutSelection();
-              return;
-            }
-            if (k === "v") {
-              e.preventDefault();
-              pasteClipboard({ x: 40, y: 40 });
-              return;
-            }
           }
           if ((e.key === "Delete" || e.key === "Backspace") && !inText) {
             e.preventDefault();
@@ -1756,7 +1705,7 @@
           clearForm();
         }
 
-        /* ---------------- View & layout ---------------- */
+        /* ======== View / layout ======== */
         function applyView() {
           ensureSVGSize();
           updateGrid();
@@ -1796,7 +1745,6 @@
           applyView();
         }
 
-        /* ---------------- Marquee (spatial index) ---------------- */
         function startMarquee(e) {
           const rect = document.createElement("div");
           rect.className = "marquee";
@@ -1831,42 +1779,39 @@
             minY = Math.min(a.y, b.y),
             maxX = Math.max(a.x, b.x),
             maxY = Math.max(a.y, b.y);
-
-          const candNodes = spatialQueryAABB(minX, minY, maxX, maxY, "nodes");
-          const candEdges = spatialQueryAABB(minX, minY, maxX, maxY, "edges");
-
           const hitsNodes = new Set(
-            candNodes.filter((nid) => {
-              const n = getNodeById(nid);
-              if (!n) return false;
-              return rectsIntersect(
-                minX,
-                minY,
-                maxX,
-                maxY,
-                n.x,
-                n.y,
-                n.x + (n.w || NODE_W),
-                n.y + (n.h || NODE_H)
-              );
-            })
+            state.nodes
+              .filter((n) =>
+                rectsIntersect(
+                  minX,
+                  minY,
+                  maxX,
+                  maxY,
+                  n.x,
+                  n.y,
+                  n.x + (n.w || NODE_W),
+                  n.y + (n.h || NODE_H)
+                )
+              )
+              .map((n) => n.id)
           );
           const hitsEdges = new Set(
-            candEdges.filter((i) => {
-              const bb = edgeBBox(state.edges[i]);
-              return rectsIntersect(
-                minX,
-                minY,
-                maxX,
-                maxY,
-                bb.minX,
-                bb.minY,
-                bb.maxX,
-                bb.maxY
-              );
-            })
+            state.edges
+              .map((e, i) => ({ bb: edgeBBox(e), i }))
+              .filter((o) =>
+                rectsIntersect(
+                  minX,
+                  minY,
+                  maxX,
+                  maxY,
+                  o.bb.minX,
+                  o.bb.minY,
+                  o.bb.maxX,
+                  o.bb.maxY
+                )
+              )
+              .map((o) => o.i)
           );
-
           if (state.marquee.additive) {
             hitsNodes.forEach((id) => state.selNodes.add(id));
             hitsEdges.forEach((i) => state.selEdges.add(i));
@@ -1883,7 +1828,6 @@
           else clearForm();
         }
         function endMarquee() {
-          if (!state.marquee) return;
           state.marquee.el.remove();
           state.marquee = null;
         }
@@ -1923,7 +1867,7 @@
           return { minX, minY, maxX, maxY };
         }
 
-        /* ---------------- Auto layout ---------------- */
+        /* ======== Auto layout ======== */
         function autoLayoutLeftToRight() {
           pushHistory();
           state.nodes.forEach((n) => measure(n));
@@ -1971,10 +1915,7 @@
             }
             x += NODE_W + HGAP;
           });
-          state.nodes.forEach((n) => {
-            positionNode(n);
-            spatialUpdateNode(n);
-          });
+          state.nodes.forEach((n) => positionNode(n));
           rebuildEdgesIndex();
           requestFullEdgeRedraw();
           scheduleRender();
@@ -2003,7 +1944,7 @@
           scheduleRender();
         }
 
-        /* ---------------- SAVE / OPEN (smart, dedup manifest) ---------------- */
+        /* ======== SAVE / OPEN (unchanged behavior) ======== */
         async function saveProjectSmart() {
           if (projectCtx.mode === "folder" && projectCtx.dirHandle) {
             await saveProjectToDir(projectCtx.dirHandle);
@@ -2012,7 +1953,6 @@
           }
           await saveAs();
         }
-
         async function saveAs() {
           const supportsFS = "showDirectoryPicker" in window;
           if (supportsFS) {
@@ -2036,21 +1976,22 @@
           projectCtx.mode = "embedded";
           projectCtx.dirHandle = null;
         }
-
         async function saveProjectToDir(dir) {
-          // 1) Ensure assets/ and read manifest
           await ensureSubdir(dir, "assets");
-          const manifest = await loadManifest(dir);
-
-          // 2) Count new files (no path) for progress
-          const allFiles = state.nodes.flatMap((n) => n.data.files || []);
-          const newFilesTotal = allFiles.reduce(
-            (acc, f) => acc + (f && !f.path ? 1 : 0),
-            0
-          );
-          let processed = 0;
-
-          // 3) Build project object (without url/dataUrl), writing only new assets
+          const used = new Map();
+          const uniq = (name) => {
+            const clean = sanitizeName(
+              (name || "file").replace(
+                /\.(png|jpg|jpeg|webp|gif|heic|heif|bmp|tiff)$/i,
+                ""
+              )
+            );
+            let n = clean,
+              i = 1;
+            while (used.has(n.toLowerCase())) n = `${clean}_${i++}`;
+            used.set(n.toLowerCase(), true);
+            return n;
+          };
           const project = {
             version: 5,
             nodes: [],
@@ -2060,9 +2001,8 @@
               dashed: !!e.dashed,
             })),
           };
-
           for (const n of state.nodes) {
-            const nodeOut = {
+            const nodeClone = {
               id: n.id,
               x: n.x,
               y: n.y,
@@ -2071,53 +2011,10 @@
               group: n.group || null,
               data: { ...n.data, files: [] },
             };
-
             for (const f of n.data.files || []) {
-              if (f.path) {
-                // Already persisted: do NOT rewrite, just carry metadata (no url)
-                nodeOut.data.files.push({
-                  name: f.name || "",
-                  size: f.size || 0,
-                  type: f.type || "",
-                  isImage: !!f.isImage,
-                  isPDF: !!f.isPDF,
-                  path: f.path,
-                });
-                continue;
-              }
-
-              // New in this session: need to persist
-              if (!f.url) {
-                // Corrupted entry: keep minimal record, skip writing
-                nodeOut.data.files.push({
-                  name: f.name || "",
-                  size: f.size || 0,
-                  type: f.type || "",
-                  isImage: !!f.isImage,
-                  isPDF: !!f.isPDF,
-                });
-                continue;
-              }
-
-              // Fetch blob from objectURL
-              let blob = await fetch(f.url)
-                .then((r) => r.blob())
-                .catch(() => null);
-              if (!blob) {
-                // Skip but keep a trace
-                nodeOut.data.files.push({
-                  name: f.name || "",
-                  size: f.size || 0,
-                  type: f.type || "",
-                  isImage: !!f.isImage,
-                  isPDF: !!f.isPDF,
-                });
-                continue;
-              }
-
-              // Normalize by type
+              let blob = await fetch(f.url).then((r) => r.blob());
               let ext = "";
-              if (f.isImage || /^image\//i.test(f.type)) {
+              if (/^image\//i.test(f.type) || f.isImage) {
                 blob = await resizeImageBlob(
                   blob,
                   IMG_MAX_SIDE,
@@ -2128,71 +2025,27 @@
                 ext = ".pdf";
               } else {
                 const m = (f.name || "").match(/\.[a-z0-9]+$/i);
-                ext = m ? m[0].toLowerCase() : ".bin";
+                ext = m ? m[0] : ".bin";
               }
-
-              // Hash & dedup
-              const hash = await hashBlobSHA256(blob);
-              const rel = manifest[hash] || `assets/${hash}${ext}`;
-
-              if (!manifest[hash]) {
-                // Write only if not present yet
-                await writeFileByPath(dir, rel, blob);
-                manifest[hash] = rel;
-              }
-
-              // Update project entry with relative path
-              nodeOut.data.files.push({
-                name: f.name ? f.name : `${hash}${ext}`,
+              const base = uniq(f.name || "file");
+              const rel = `assets/${base}${ext}`;
+              await writeFileByPath(dir, rel, blob);
+              nodeClone.data.files.push({
+                name: `${base}${ext}`,
                 size: blob.size,
-                type:
-                  blob.type ||
-                  (f.isImage
-                    ? "image/jpeg"
-                    : f.isPDF
-                    ? "application/pdf"
-                    : f.type || "application/octet-stream"),
+                type: blob.type || (f.isImage ? "image/jpeg" : f.type),
                 isImage: !!(f.isImage || /^image\//i.test(f.type)),
                 isPDF: !!f.isPDF,
                 path: rel,
               });
-
-              // Progress update
-              processed++;
-              if (newFilesTotal > 0)
-                setStatus(`Saving assets… ${processed}/${newFilesTotal}`);
             }
-
-            project.nodes.push(nodeOut);
+            project.nodes.push(nodeClone);
           }
-
-          // 4) Write manifest and project.json (project.json.tmp then swap)
-          await saveManifest(dir, manifest);
-
           const jsonBlob = new Blob([JSON.stringify(project, null, 2)], {
             type: "application/json",
           });
-          // Write temp
-          await writeFileByPath(dir, "project.json.tmp", jsonBlob);
-          // Replace final
-          const finalFH = await dir.getFileHandle("project.json", {
-            create: true,
-          });
-          const finalWr = await finalFH.createWritable();
-          await finalWr.write(jsonBlob);
-          await finalWr.close();
-          // Cleanup tmp (best-effort)
-          try {
-            const tmpFH = await dir.getFileHandle("project.json.tmp", {
-              create: false,
-            });
-            const parent = dir; // no direct remove API yet; leave tmp or overwrite next time
-            // Many browsers don't support removeEntry on FileSystemDirectoryHandle yet → we leave .tmp
-          } catch {}
-
-          if (newFilesTotal > 0) setStatus("Project saved");
+          await writeFileByPath(dir, "project.json", jsonBlob);
         }
-
         async function saveCopy() {
           const embedded = {
             version: 5,
@@ -2200,25 +2053,7 @@
               state.nodes.map(async (n) => {
                 const files = await Promise.all(
                   (n.data.files || []).map(async (f) => {
-                    let blob = null;
-                    if (f.url)
-                      blob = await fetch(f.url)
-                        .then((r) => r.blob())
-                        .catch(() => null);
-                    if (!blob && f.path && projectCtx.dirHandle) {
-                      blob = await readFileByPath(
-                        projectCtx.dirHandle,
-                        f.path
-                      ).catch(() => null);
-                    }
-                    if (!blob)
-                      return {
-                        name: f.name,
-                        size: f.size || 0,
-                        type: f.type || "",
-                        isImage: !!f.isImage,
-                        isPDF: !!f.isPDF,
-                      };
+                    let blob = await fetch(f.url).then((r) => r.blob());
                     if (/^image\//i.test(f.type) || f.isImage)
                       blob = await resizeImageBlob(
                         blob,
@@ -2259,7 +2094,6 @@
           downloadBlob("project.json", blob);
           setStatus("Project JSON downloaded (images resized)");
         }
-
         async function openProject() {
           const supportsFS = "showDirectoryPicker" in window;
           if (supportsFS) {
@@ -2302,7 +2136,6 @@
           };
           f.openFile.click();
         }
-
         async function newProject() {
           pushHistory();
           clearAllSelection();
@@ -2316,7 +2149,6 @@
           addNodeAt(80, 80, {});
           setStatus("New project");
         }
-
         async function loadProject(project, dirHandle) {
           clearAllSelection();
           document.querySelectorAll(".node").forEach((n) => n.remove());
@@ -2336,15 +2168,11 @@
             node.data.files = await Promise.all(
               (pn.data?.files || []).map(async (f) => {
                 if (f.dataUrl) {
-                  const blob = await (await fetch(f.dataUrl))
-                    .blob()
-                    .catch(() => null);
-                  return { ...f, url: blob ? URL.createObjectURL(blob) : "" };
+                  const blob = await (await fetch(f.dataUrl)).blob();
+                  return { ...f, url: URL.createObjectURL(blob) };
                 } else if (f.path && dirHandle) {
-                  const blob = await readFileByPath(dirHandle, f.path).catch(
-                    () => null
-                  );
-                  return { ...f, url: blob ? URL.createObjectURL(blob) : "" };
+                  const blob = await readFileByPath(dirHandle, f.path);
+                  return { ...f, url: URL.createObjectURL(blob) };
                 } else {
                   return { ...f, url: "" };
                 }
@@ -2364,12 +2192,11 @@
           ensureSVGSize();
           updateGrid();
           rebuildEdgesIndex();
-          spatialRebuildAll();
           requestFullEdgeRedraw();
           scheduleRender();
         }
 
-        /* ---------------- Clipboard / group ---------------- */
+        /* ======== Clipboard / group (unchanged) ======== */
         function copySelection() {
           if (!state.selNodes.size) return;
           const ids = [...state.selNodes];
@@ -2405,7 +2232,6 @@
             positionNode(clone);
             populate(clone);
             pastedIds.push(id);
-            spatialInsertNode(clone);
           }
           const newEdges = state.clip.edges.map((e) => ({
             s: idMap.get(e.s),
@@ -2450,7 +2276,7 @@
           addNodeAt(w.x, w.y);
         });
 
-        /* ---------------- FS utils / images / hashes ---------------- */
+        /* ======== FS utils / images ======== */
         async function ensureSubdir(dirHandle, name) {
           try {
             return await dirHandle.getDirectoryHandle(name, { create: true });
@@ -2547,158 +2373,26 @@
             r.readAsDataURL(blob);
           });
         }
-        async function hashBlobSHA256(blob) {
-          const buf = await blob.arrayBuffer();
-          const digest = await crypto.subtle.digest("SHA-256", buf);
-          const hex = [...new Uint8Array(digest)]
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join("");
-          return hex;
-        }
-        async function loadManifest(dir) {
-          try {
-            const assetsDir = await ensureSubdir(dir, "assets");
-            try {
-              const fh = await assetsDir.getFileHandle("manifest.json", {
-                create: false,
-              });
-              const file = await fh.getFile();
-              const json = JSON.parse(await file.text());
-              return json && typeof json === "object" ? json : {};
-            } catch {
-              return {};
-            }
-          } catch {
-            return {};
-          }
-        }
-        async function saveManifest(dir, manifest) {
-          const blob = new Blob([JSON.stringify(manifest, null, 2)], {
-            type: "application/json",
-          });
-          await writeFileByPath(dir, "assets/manifest.json", blob);
+        function downloadBlob(filename, blob) {
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            URL.revokeObjectURL(a.href);
+            a.remove();
+          }, 0);
         }
 
-        /* ---------------- Spatial index ---------------- */
-        function spatialKey(ix, iy) {
-          return `${ix},${iy}`;
-        }
-        function spatialAABBCells(minX, minY, maxX, maxY) {
-          const cs = state.spatial.cellSize;
-          const ix0 = Math.floor(minX / cs),
-            iy0 = Math.floor(minY / cs);
-          const ix1 = Math.floor(maxX / cs),
-            iy1 = Math.floor(maxY / cs);
-          const out = [];
-          for (let ix = ix0; ix <= ix1; ix++)
-            for (let iy = iy0; iy <= iy1; iy++) out.push(spatialKey(ix, iy));
-          return out;
-        }
-        function spatialClear() {
-          state.spatial.nodes.clear();
-          state.spatial.edges.clear();
-          state.spatial.nodeCells.clear();
-          state.spatial.edgeCells.clear();
-        }
-        function spatialInsertNode(n) {
-          const keys = spatialAABBCells(
-            n.x,
-            n.y,
-            n.x + (n.w || NODE_W),
-            n.y + (n.h || NODE_H)
-          );
-          state.spatial.nodeCells.set(n.id, new Set(keys));
-          for (const k of keys) {
-            if (!state.spatial.nodes.has(k))
-              state.spatial.nodes.set(k, new Set());
-            state.spatial.nodes.get(k).add(n.id);
-          }
-        }
-        function spatialUpdateNode(n) {
-          const prev = state.spatial.nodeCells.get(n.id) || new Set();
-          const keys = spatialAABBCells(
-            n.x,
-            n.y,
-            n.x + (n.w || NODE_W),
-            n.y + (n.h || NODE_H)
-          );
-          const next = new Set(keys);
-          for (const k of prev) {
-            if (!next.has(k)) {
-              const set = state.spatial.nodes.get(k);
-              set && set.delete(n.id);
-            }
-          }
-          for (const k of next) {
-            if (!prev.has(k)) {
-              if (!state.spatial.nodes.has(k))
-                state.spatial.nodes.set(k, new Set());
-              state.spatial.nodes.get(k).add(n.id);
-            }
-          }
-          state.spatial.nodeCells.set(n.id, next);
-        }
-        function spatialInsertEdge(i) {
-          const e = state.edges[i];
-          if (!e) return;
-          const bb = edgeBBox(e);
-          const keys = spatialAABBCells(bb.minX, bb.minY, bb.maxX, bb.maxY);
-          state.spatial.edgeCells.set(i, new Set(keys));
-          for (const k of keys) {
-            if (!state.spatial.edges.has(k))
-              state.spatial.edges.set(k, new Set());
-            state.spatial.edges.get(k).add(i);
-          }
-        }
-        function spatialUpdateEdge(i) {
-          const e = state.edges[i];
-          if (!e) return;
-          const prev = state.spatial.edgeCells.get(i) || new Set();
-          const bb = edgeBBox(e);
-          const keys = spatialAABBCells(bb.minX, bb.minY, bb.maxX, bb.maxY);
-          const next = new Set(keys);
-          for (const k of prev) {
-            if (!next.has(k)) {
-              const set = state.spatial.edges.get(k);
-              set && set.delete(i);
-            }
-          }
-          for (const k of next) {
-            if (!prev.has(k)) {
-              if (!state.spatial.edges.has(k))
-                state.spatial.edges.set(k, new Set());
-              state.spatial.edges.get(k).add(i);
-            }
-          }
-          state.spatial.edgeCells.set(i, next);
-        }
-        function spatialRebuildEdges() {
-          state.spatial.edges.clear();
-          state.spatial.edgeCells.clear();
-          for (let i = 0; i < state.edges.length; i++) spatialInsertEdge(i);
-        }
-        function spatialRebuildAll() {
-          spatialClear();
-          for (const n of state.nodes) spatialInsertNode(n);
-          spatialRebuildEdges();
-        }
-        function spatialQueryAABB(minX, minY, maxX, maxY, kind) {
-          const keys = spatialAABBCells(minX, minY, maxX, maxY);
-          const map =
-            kind === "nodes" ? state.spatial.nodes : state.spatial.edges;
-          const out = new Set();
-          for (const k of keys) {
-            const set = map.get(k);
-            if (set) for (const id of set) out.add(id);
-          }
-          return [...out];
-        }
-
-        /* ---------------- Init ---------------- */
+        /* ======== Init ======== */
         pushHistory();
         if (state.nodes.length === 0) {
           addNodeAt(80, 80, {});
         }
+
+        // Edge handle mouseup connection by click (when ghost started from IN → click OUT, etc.)
+        // Already handled via stage mouseup above.
       })();
     </script>
   </body>
