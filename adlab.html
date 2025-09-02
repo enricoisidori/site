@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Antidisciplinary Communication Design Lab</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 5px;
+        font-family: sans-serif;
+        background: #fff;
+        color: #000;
+      }
+      h1 {
+        text-align: justify;
+        text-align-last: justify;
+        font-weight: normal;
+        font-size: 1.2em;
+        margin: 5px;
+        word-spacing: 0.3em;
+        line-height: 1.5;
+      }
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .box {
+        position: relative;
+        flex: 1 1 calc(50% - 5px);
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #ccc;
+      }
+      .overlay {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+        right: 5px;
+        padding: 5px;
+        font-size: 1.2em;
+        text-align: justify;
+        text-align-last: justify;
+        word-spacing: 0.3em;
+        line-height: 1.5;
+        color: white;
+        background: none;
+        mix-blend-mode: difference;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+        z-index: 2;
+      }
+      .box:hover .overlay {
+        opacity: 1;
+      }
+      @media (max-width: 600px) {
+        .box {
+          flex: 1 1 100%;
+          aspect-ratio: 4 / 5; /* tra 9:16 e 4:5 */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      A n t i d i s c i p l i n a r y &nbsp; C o m m u n i c a t i o n &nbsp; D
+      e s i g n &nbsp; L a b
+    </h1>
+
+    <div class="grid">
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/believeitornot"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/believeitornot', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/rawscenarios/"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/rawscenarios/', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/anthropogenicnarratives/"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/anthropogenicnarratives/', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/fattididati"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/fattididati', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/retuals/"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/retuals/', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/morte13/"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/morte13/', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/humans/"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/humans/', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/wordsworks/"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/wordsworks/', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+      <div class="box">
+        <iframe
+          src="https://www.antidisciplinarylab.it/whatif/"
+          loading="lazy"
+        ></iframe>
+        <div
+          class="overlay"
+          onclick="window.open('https://www.antidisciplinarylab.it/whatif/', '_blank')"
+        >
+          Expand
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
