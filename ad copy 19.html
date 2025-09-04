@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,7 +22,6 @@
         font: 14px/1.4 system-ui;
         -webkit-tap-highlight-color: transparent;
       }
-
       header {
         padding: 8px;
         border-bottom: 1px solid #333;
@@ -50,7 +49,6 @@
         height: 100vh;
       }
 
-      /* Dynamic grid */
       #stage {
         position: relative;
         overflow: hidden;
@@ -106,7 +104,6 @@
         color: #fff;
         min-height: 1em;
       }
-
       .body {
         padding: 8px;
       }
@@ -133,7 +130,7 @@
       .desc {
         margin-top: 6px;
         font-size: 12px;
-        white-space: pre-wrap;
+        white-space: normal;
         font-family: inherit;
       }
       .descTitle {
@@ -181,7 +178,6 @@
         -webkit-user-drag: none;
         user-drag: none;
       }
-
       .attachments {
         margin-top: 8px;
         font-size: 12px;
@@ -192,7 +188,6 @@
         margin-right: 10px;
       }
 
-      /* Bigger hit-area for handles; visual remains small */
       .handle {
         position: absolute;
         width: 24px;
@@ -235,7 +230,6 @@
         clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
       }
 
-      /* Edges — no glow ever */
       .edge-visible {
         cursor: pointer;
         stroke: #9a9a9a;
@@ -247,9 +241,7 @@
       .edge-visible.selected {
         stroke: #ffffff;
         stroke-width: 3;
-        filter: none;
       }
-      /* Weak: dashed, round caps, thinner; 40% gray when unselected */
       .edge-visible.weak {
         stroke: #ffffff;
         stroke-opacity: 0.4;
@@ -272,7 +264,6 @@
         cursor: pointer;
       }
 
-      /* Marquee */
       .marquee {
         position: absolute;
         border: 1px solid #bbb;
@@ -362,21 +353,35 @@
         text-decoration: underline;
       }
 
-      /* Edge toggle styled */
-      .checkboxRow {
+      .chipRow {
         display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 10px;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 6px;
       }
-      .checkboxRow input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        accent-color: #e6e6e6;
-        transform: scale(1.1);
-        background: #0d0d0d;
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 8px;
         border: 1px solid #444;
-        border-radius: 4px;
+        border-radius: 999px;
+        font-size: 12px;
+        cursor: pointer;
+        user-select: none;
+        background: #0f0f0f;
+      }
+      .chip.active {
+        background: #1c1c1c;
+        border-color: #666;
+      }
+      .chip:hover {
+        border-color: #777;
+      }
+      .chip.radio:not(.active) {
+        background: #0d0d0d;
+        border-color: #3a3a3a;
+        opacity: 0.85;
       }
     </style>
   </head>
@@ -398,48 +403,81 @@
 
       <aside>
         <h3 id="panelTitle">Node properties</h3>
-
-        <!-- Node form -->
         <div id="nodeForm">
           <form onsubmit="return false;">
             <label>Date <input id="fDate" type="date" /></label>
+
             <label
               >Title
               <input
                 id="fTitle"
                 type="text"
                 placeholder="(optional, spaces allowed)"
-            /></label>
-            <label>Object <input id="fObject" type="text" /></label>
-            <label>Action <input id="fAction" type="text" /></label>
-            <label>Main area <input id="fMainArea" type="text" /></label>
+              />
+            </label>
+
+            <label
+              >Type
+              <input
+                id="fType"
+                type="text"
+                placeholder="e.g. Brief, Prototype (no spaces while typing)"
+              />
+              <div id="typeChips" class="chipRow"></div>
+            </label>
+
+            <label
+              >Action
+              <div id="actionChips" class="chipRow">
+                <div class="chip radio" data-val="Exploring">Exploring</div>
+                <div class="chip radio" data-val="Making">Making</div>
+              </div>
+            </label>
+
+            <label
+              >Main area
+              <div id="mainAreaChips" class="chipRow">
+                <div class="chip radio" data-val="Speculation">Speculation</div>
+                <div class="chip radio" data-val="Interaction">Interaction</div>
+                <div class="chip radio" data-val="Communication">
+                  Communication
+                </div>
+              </div>
+            </label>
+
             <label
               >Areas
               <input
                 id="fAreas"
                 type="text"
-                placeholder="comma or newline separated"
-            /></label>
+                placeholder="Comma separated (you can type freely)"
+              />
+              <div id="areasChips" class="chipRow"></div>
+            </label>
+
             <label
               >Description
-              <textarea id="fDesc" placeholder="free text"></textarea>
+              <textarea
+                id="fDesc"
+                placeholder="Paragraphs and - bullet lists supported"
+              ></textarea>
             </label>
+
             <label
               >Tags
               <input
                 id="fTags"
                 type="text"
-                placeholder="comma or newline separated"
-            /></label>
-            <label
-              >Links
-              <textarea
-                id="fLinks"
-                placeholder="one per line or comma separated"
-              ></textarea>
+                placeholder="Comma separated (you can type freely)"
+              />
+              <div id="tagsChips" class="chipRow"></div>
             </label>
 
-            <!-- Hidden file input + styled button -->
+            <label
+              >Links
+              <textarea id="fLinks" placeholder="One URL per line"></textarea>
+            </label>
+
             <input id="fFiles" type="file" multiple style="display: none" />
             <div
               style="
@@ -456,17 +494,15 @@
           </form>
         </div>
 
-        <!-- Edge form -->
         <div id="edgeForm" style="display: none">
           <div class="muted" style="font-size: 12px; margin-bottom: 6px">
             From: <span id="eFrom">—</span> → To: <span id="eTo">—</span>
           </div>
-          <label class="checkboxRow">
-            <input id="eDashed" type="checkbox" /> Weak (dashed)
-          </label>
+          <label class="checkboxRow"
+            ><input id="eDashed" type="checkbox" /> Weak (dashed)</label
+          >
         </div>
 
-        <!-- Fallback open (JSON) hidden input -->
         <input
           id="openFile"
           type="file"
@@ -486,18 +522,14 @@
           MIN_LAYER_GAP = 24;
         const IMG_MAX_SIDE = 1500,
           IMG_TARGET_BYTES = 500 * 1024;
-        const CLICK_THRESHOLD = 5; // px
+        const CLICK_THRESHOLD = 10;
 
-        // -------- Project context (Save vs Save As) --------
-        const projectCtx = {
-          mode: null, // 'folder' | 'embedded' | null
-          dirHandle: null, // FileSystemDirectoryHandle when mode==='folder'
-        };
+        const projectCtx = { mode: null, dirHandle: null };
 
-        // -------- History (undo/redo) --------
         const history = {
           undo: [],
           redo: [],
+          
           limit: 80,
           lock: false,
           debounce: null,
@@ -520,88 +552,50 @@
           clearTimeout(history.debounce);
           history.debounce = setTimeout(pushHistory, 400);
         };
-        function applySnapshot(s) {
-          history.lock = true;
-
-          // Wipe DOM nodes
-          document.querySelectorAll(".node").forEach((n) => n.remove());
-
-          // Apply model
-          state.nodes = structuredClone(s.nodes || []);
-          state.edges = structuredClone(s.edges || []);
-          state.selNodes = new Set(s.selNodes || []);
-          state.selEdges = new Set(s.selEdges || []);
-          state.pan = s.pan ? { ...s.pan } : { x: 0, y: 0 };
-          state.zoom = s.zoom ?? 1;
-
-          // Mount + measure + position BEFORE rendering edges
-          state.nodes.forEach((n) => {
-            mountNode(n);
-            measure(n);
-            positionNode(n);
-            populate(n);
-          });
-
-          ensureSVGSize();
-          updateGrid();
-          renderEdges();
-
-          refreshNodeSelectionClasses();
-          applyEdgeSelection();
-          updateSidebarSelectionLabel();
-          refreshSidebarForms();
-
-          history.lock = false;
-        }
-        function undo() {
-          if (!history.undo.length) return;
-          const cur = snap();
-          const prev = history.undo.pop();
-          history.redo.push(cur);
-          applySnapshot(prev);
-          setStatus("Undone");
-        }
-        function redo() {
-          if (!history.redo.length) return;
-          const cur = snap();
-          const next = history.redo.pop();
-          history.undo.push(cur);
-          applySnapshot(next);
-          setStatus("Redone");
-        }
 
         const state = {
-          nodes: [], // {id,x,y,w,h,data, group?}
-          edges: [], // {s,t,dashed?:boolean}
+          nodes: [],
+          edges: [],
           selNodes: new Set(),
           selEdges: new Set(),
           zoom: 1,
           pan: { x: 0, y: 0 },
-
-          // unified edge gestures
-          press: null, // {side:'out'|'in', sources:[ids], primary, startX,startY, moved:false}
-          dragLink: null, // {active:true, from:'out'|'in', sources:[ids], primary, x,y}
+          press: null,
+          dragLink: null,
           spaceDown: false,
           marquee: null,
-          ignoreNextStageClick: false, // prevents accidental deselect after marquee
-
-          // clipboard for copy/cut/paste/duplicate
+          ignoreNextStageClick: false,
           clip: null,
-          // group management
           groupSeq: 1,
         };
 
+        function $(s) {
+          return document.querySelector(s);
+        }
         const stage = $("#stage"),
           edgesSVG = $("#edges"),
           status = $("#status");
+
+        // === UX: hit-test del vuoto & flag gesto ===
+        function isBlankAtPoint(clientX, clientY) {
+          const el = document.elementFromPoint(clientX, clientY);
+          return el === stage || el === edgesSVG;
+        }
+        // mousedown nato sul vuoto?
+        let bgPointerDown = false;
+        // durante questo gesto si è mosso (pan o marquee)?
+        let gestureMoved = false;
+
         const f = {
           date: $("#fDate"),
           title: $("#fTitle"),
-          object: $("#fObject"),
-          action: $("#fAction"),
-          main: $("#fMainArea"),
+          type: $("#fType"),
+          actionChips: $("#actionChips"),
+          mainAreaChips: $("#mainAreaChips"),
           areas: $("#fAreas"),
+          areasChips: $("#areasChips"),
           tags: $("#fTags"),
+          tagsChips: $("#tagsChips"),
           desc: $("#fDesc"),
           links: $("#fLinks"),
           files: $("#fFiles"),
@@ -615,11 +609,9 @@
           eTo: $("#eTo"),
           eDashed: $("#eDashed"),
           panelTitle: $("#panelTitle"),
+          typeChips: $("#typeChips"),
         };
 
-        function $(s) {
-          return document.querySelector(s);
-        }
         const uid = () => "n" + Math.random().toString(36).slice(2, 9);
         const setStatus = (m) => (status.textContent = m || "");
         const esc = (s) =>
@@ -634,11 +626,31 @@
                 "'": "&#39;",
               }[c])
           );
-        function splitList(str) {
+
+        function splitListComma(str) {
           return (str || "")
-            .split(/[\n,;]+|,\s*/)
+            .split(/,\s*/)
             .map((s) => s.trim())
             .filter(Boolean);
+        }
+        function normalizeToken(s) {
+          if (!s) return "";
+          const t = s.trim().replace(/\s+/g, " ");
+          if (!t) return "";
+          return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+        }
+        function normalizeArray(arr) {
+          const seen = new Set(),
+            out = [];
+          for (const raw of arr) {
+            const n = normalizeToken(raw);
+            if (!n) continue;
+            const key = n.toLowerCase();
+            if (seen.has(key)) continue;
+            seen.add(key);
+            out.push(n);
+          }
+          return out;
         }
         function normalizeURL(s) {
           if (!s) return null;
@@ -706,7 +718,6 @@
           updateGrid();
         });
         ensureSVGSize();
-
         function updateGrid() {
           const sizeX = GRID * state.zoom,
             sizeY = GRID * state.zoom;
@@ -720,17 +731,16 @@
           return {
             date: todayYMD(),
             title: "",
-            object: "",
-            action: "",
-            mainArea: "",
+            type: "",
+            action: null,
+            mainArea: null,
             areas: [],
             tags: [],
             desc: "",
             links: [],
-            files: [], // {name,size,type,url,isImage,isPDF,path?,dataUrl?}
+            files: [],
           };
         }
-
         function getNodeById(id) {
           return state.nodes.find((n) => n.id === id) || null;
         }
@@ -752,6 +762,7 @@
               : emptyData(),
           };
           state.nodes.push(node);
+          vocabInitNodeSnapshot(node);
           mountNode(node);
           measure(node);
           positionNode(node);
@@ -770,34 +781,34 @@
           el.className = "node";
           el.id = node.id;
           el.innerHTML = `
-      <div class="handle in" data-role="in" title="Input"></div>
-      <div class="handle out" data-role="out" title="Output / Create child"></div>
-      <div class="titlebar"><div class="title"></div></div>
-      <div class="body">
-        <div class="meta"><span class="date"></span></div>
-        <div class="divider"></div>
-        <div class="kv">
-          <div>Object</div><div class="object"></div>
-          <div>Action</div><div class="action"></div>
-          <div>Main area</div><div class="mainArea"></div>
-          <div>Areas</div><div class="areas"></div>
-        </div>
-        <div class="descBlock">
-          <div class="descTitle" style="display:none">Description</div>
-          <div class="desc"></div>
-        </div>
-        <div class="tags"></div>
-        <div class="links"></div>
-        <div class="images"></div>
-        <div class="attachments"></div>
-      </div>`;
+            <div class="handle in" data-role="in" title="Input"></div>
+            <div class="handle out" data-role="out" title="Output / Create child"></div>
+            <div class="titlebar"><div class="title"></div></div>
+            <div class="body">
+              <div class="meta"><span class="date"></span></div>
+              <div class="divider"></div>
+              <div class="kv">
+                <div>Type</div><div class="object typeField"></div>
+                <div>Action</div><div class="action"></div>
+                <div>Main area</div><div class="mainArea"></div>
+                <div>Areas</div><div class="areas"></div>
+              </div>
+              <div class="descBlock">
+                <div class="descTitle" style="display:none">Description</div>
+                <div class="desc"></div>
+              </div>
+              <div class="tags"></div>
+              <div class="links"></div>
+              <div class="images"></div>
+              <div class="attachments"></div>
+            </div>`;
           stage.appendChild(el);
 
-          // Node drag (multi-select moves together)
+          // Drag nodo (multi)
           let dragging = false,
             off = { x: 0, y: 0 },
-            pushed = false;
-          let multiOffsets = null; // [{id, dx,dy}]
+            pushed = false,
+            multiOffsets = null;
           el.addEventListener("mousedown", (e) => {
             const role = e.target.getAttribute("data-role");
             if (role) return;
@@ -817,17 +828,13 @@
                 .map((n) => n.id);
               selectOnlyNodes(groupNodes);
             } else {
-              if (e.shiftKey) {
-                toggleNodeSelection(node.id);
-              } else if (!state.selNodes.has(node.id)) {
-                selectOnlyNodes([node.id]);
-              }
+              if (e.shiftKey) toggleNodeSelection(node.id);
+              else if (!state.selNodes.has(node.id)) selectOnlyNodes([node.id]);
             }
             clearEdgeSelection();
             updateSidebarSelectionLabel();
             refreshSidebarForms();
 
-            // prepare multi drag
             if (state.selNodes.size > 1) {
               const cur = toWorld(e.clientX, e.clientY);
               multiOffsets = [...state.selNodes].map((id) => {
@@ -871,10 +878,9 @@
             }
           });
 
-          // Unified edge gestures on handles
-          const inEl = el.querySelector(".in");
-          const outEl = el.querySelector(".out");
-
+          // Handles
+          const inEl = el.querySelector(".in"),
+            outEl = el.querySelector(".out");
           const handleDown = (side) => (e) => {
             e.stopPropagation();
             const sources =
@@ -892,8 +898,6 @@
           };
           const handleUp = (side) => (e) => {
             e.stopPropagation();
-
-            // If dragging ghost and released on compatible handle → create edges
             if (state.dragLink && state.dragLink.active) {
               const from = state.dragLink.from;
               if (
@@ -917,7 +921,6 @@
                 return;
               }
             }
-            // Click (no movement) behavior
             if (
               state.press &&
               !state.press.moved &&
@@ -925,7 +928,6 @@
             ) {
               if (side === "out") {
                 if (!state.dragLink) {
-                  // click OUT with no ghost → create child(ren)
                   pushHistory();
                   const srcs = state.press.sources;
                   for (const sid of srcs) {
@@ -934,10 +936,10 @@
                     const pos = nextChildPosition(parent);
                     const p = parent.data;
                     const init = {
-                      object: p.object,
-                      action: p.action,
-                      mainArea: p.mainArea,
-                      areas: [...p.areas],
+                      type: p.type || "",
+                      action: p.action ?? null,
+                      mainArea: p.mainArea ?? null,
+                      areas: [...(p.areas || [])],
                     };
                     const childId = addNodeAt(pos.x, pos.y, init);
                     addEdge(parent.id, childId);
@@ -949,7 +951,6 @@
                       : "Child created and connected"
                   );
                 } else {
-                  // ghost started from IN → click on OUT connects
                   if (state.dragLink.from === "in") {
                     pushHistory();
                     const targetNodeId = node.id;
@@ -962,7 +963,6 @@
                   }
                 }
               } else {
-                // side==='in'
                 if (state.dragLink && state.dragLink.from === "out") {
                   pushHistory();
                   const targetNodeId = node.id;
@@ -972,18 +972,16 @@
                   cancelGhost();
                   renderEdges();
                   setStatus("Edge created");
-                } // else click IN no-op
+                }
               }
             }
             state.press = null;
           };
-
           const handleMove = () => (e) => {
             if (!state.press) return;
             const dx = e.clientX - state.press.startX,
               dy = e.clientY - state.press.startY;
             if (!state.press.moved && Math.hypot(dx, dy) > CLICK_THRESHOLD) {
-              // Start ghost
               state.press.moved = true;
               startGhost(
                 state.press.side,
@@ -998,15 +996,13 @@
               renderEdges();
             }
           };
-
           outEl.addEventListener("mousedown", handleDown("out"));
           inEl.addEventListener("mousedown", handleDown("in"));
           outEl.addEventListener("mouseup", handleUp("out"));
           inEl.addEventListener("mouseup", handleUp("in"));
-          document.addEventListener("mousemove", handleMove()); // uses state.press
+          document.addEventListener("mousemove", handleMove());
         }
 
-        /* ---------- Ghost management ---------- */
         function startGhost(from, sources, primary) {
           state.dragLink = {
             active: true,
@@ -1027,46 +1023,53 @@
           stage.style.cursor = "";
           setStatus("");
         }
-
         document.addEventListener("mouseup", () => {
-          if (state.press) {
-            state.press = null;
-          }
+          if (state.press) state.press = null;
           if (!(state.dragLink && state.dragLink.active)) {
             document.body.style.cursor = "";
             stage.style.cursor = "";
           }
         });
 
-        // Stage click: cancel ghost OR deselect — but ignore the click right after marquee end
+        // Click su canvas: deseleziona SOLO su sfondo vuoto (stage o edgesSVG “nudo”)
         stage.addEventListener("click", (e) => {
           if (state.ignoreNextStageClick) {
             state.ignoreNextStageClick = false;
             return;
           }
-          if (e.target === stage || e.target === edgesSVG) {
-            if (state.dragLink) {
-              cancelGhost();
-              renderEdges();
-            } else {
-              clearAllSelection();
-            }
+          // se stavo trascinando un ghost-link, annulla ma NON deselezionare
+          if (state.dragLink && state.dragLink.active) {
+            cancelGhost();
+            renderEdges();
+            return;
           }
+          // Desel. SOLO se: mousedown su vuoto, nessun movimento, e il punto è ancora vuoto
+          if (
+            bgPointerDown &&
+            !gestureMoved &&
+            isBlankAtPoint(e.clientX, e.clientY)
+          ) {
+            finalizeEditsCurrentNode();
+            clearAllSelection();
+          }
+          // reset flags gesto
+          bgPointerDown = false;
+          gestureMoved = false;
         });
 
-        // ESC: cancella ghost o deseleziona tutto
         document.addEventListener("keydown", (e) => {
           if (e.key === "Escape") {
             if (state.dragLink) {
               cancelGhost();
               renderEdges();
             } else {
+              finalizeEditsCurrentNode();
               clearAllSelection();
             }
           }
         });
 
-        /* ---------- Keyboard shortcuts ---------- */
+        // === Keyboard (Space non “ruba” negli input)
         document.addEventListener("keydown", (e) => {
           const tag = document.activeElement?.tagName;
           const inText =
@@ -1074,15 +1077,13 @@
             tag === "TEXTAREA" ||
             document.activeElement?.isContentEditable;
 
-          // Space for pan mode
-          if (e.code === "Space") {
+          if (e.code === "Space" && !inText) {
             state.spaceDown = true;
             e.preventDefault();
             stage.style.cursor = "move";
             return;
           }
 
-          // Global combos (not while typing)
           if ((e.metaKey || e.ctrlKey) && !inText) {
             const k = e.key.toLowerCase();
             if (k === "z" && !e.shiftKey) {
@@ -1095,89 +1096,84 @@
               redo();
               return;
             }
-
             if (k === "o") {
               e.preventDefault();
               openProject();
               return;
-            } // Open
+            }
             if (k === "s" && !e.shiftKey) {
               e.preventDefault();
               saveProjectSmart();
               return;
-            } // Save (smart)
+            }
             if (k === "s" && e.shiftKey) {
               e.preventDefault();
               saveAs();
               return;
-            } // Save As
+            }
             if (k === "p") {
               e.preventDefault();
               exportJSON();
               return;
-            } // Export JSON
+            }
             if (k === "n") {
               e.preventDefault();
               newProject();
               return;
-            } // New
+            }
             if (k === "a" && !e.shiftKey) {
               e.preventDefault();
               selectAll();
               return;
-            } // Select all
+            }
             if (k === "a" && e.shiftKey) {
               e.preventDefault();
+              finalizeEditsCurrentNode();
               clearAllSelection();
               return;
-            } // Deselect all
+            }
             if (k === "d" && !e.shiftKey) {
               e.preventDefault();
               duplicateSelection();
               return;
-            } // Duplicate
+            }
             if (k === "g" && !e.shiftKey) {
               e.preventDefault();
               groupSelection();
               return;
-            } // Group
+            }
             if (k === "g" && e.shiftKey) {
               e.preventDefault();
               ungroupSelection();
               return;
-            } // Ungroup
+            }
             if (k === "c") {
               e.preventDefault();
               copySelection();
               return;
-            } // Copy
+            }
             if (k === "x") {
               e.preventDefault();
               cutSelection();
               return;
-            } // Cut
+            }
             if (k === "v") {
               e.preventDefault();
               pasteClipboard();
               return;
-            } // Paste
+            }
           }
 
-          // Delete selection with Delete/Canc/Backspace — but not while typing
           if ((e.key === "Delete" || e.key === "Backspace") && !inText) {
             e.preventDefault();
             doDeleteSelection();
             return;
           }
-
-          // Fit view with "0"
           if (e.key === "0") {
             e.preventDefault();
             fitView();
             return;
           }
-
-          // Connect two selected nodes with "L"
           if ((e.key === "l" || e.key === "L") && !inText) {
             if (state.selNodes.size === 2) {
               pushHistory();
@@ -1210,12 +1206,22 @@
           }
           if (state.selNodes.size) {
             const ids = [...state.selNodes];
+            for (const id of ids) {
+              const n = getNodeById(id);
+              n && vocabRemoveNode(n);
+            }
             state.edges = state.edges.filter(
               (e) => !state.selNodes.has(e.s) && !state.selNodes.has(e.t)
             );
             ids.forEach((id) => document.getElementById(id)?.remove());
             state.nodes = state.nodes.filter((n) => !state.selNodes.has(n.id));
             state.selNodes.clear();
+
+            // ripulisci MRU type “vuoti”
+            vocab.typeMRU.removeIf((x) => {
+              const k = normalizeToken(x || "");
+              return !k || (counts.type.get(k) || 0) <= 0;
+            });
           }
           renderEdges();
           refreshNodeSelectionClasses();
@@ -1236,6 +1242,41 @@
           node.h = el.offsetHeight;
         }
 
+        function renderDescription(htmlEl, text) {
+          if (!text) {
+            htmlEl.innerHTML = "";
+            return;
+          }
+          const lines = text.replace(/\r\n/g, "\n").split("\n");
+          let out = "",
+            inList = false;
+          const flush = () => {
+            if (inList) {
+              out += "</ul>";
+              inList = false;
+            }
+          };
+          for (const raw of lines) {
+            const line = raw.trimEnd();
+            if (/^[-*]\s+/.test(line)) {
+              if (!inList) {
+                out += "<ul>";
+                inList = true;
+              }
+              const item = esc(line.replace(/^[-*]\s+/, ""));
+              out += `<li>${item}</li>`;
+            } else if (line === "") {
+              flush();
+              out += "<p></p>";
+            } else {
+              flush();
+              out += `<p>${esc(line)}</p>`;
+            }
+          }
+          flush();
+          htmlEl.innerHTML = out;
+        }
+
         function populate(node) {
           const el = $("#" + node.id);
           if (!el) return;
@@ -1244,16 +1285,15 @@
           const hasTitle = !!(d.title && d.title.trim());
           tb.style.display = hasTitle ? "flex" : "none";
           el.querySelector(".title").textContent = hasTitle ? d.title : "";
-
           el.querySelector(".date").textContent = formatDateIT(d.date) || "";
-          el.querySelector(".object").textContent = d.object || "";
+          el.querySelector(".typeField").textContent = d.type || "";
           el.querySelector(".action").textContent = d.action || "";
           el.querySelector(".mainArea").textContent = d.mainArea || "";
           el.querySelector(".areas").textContent = (d.areas || []).join(", ");
 
           const descTitle = el.querySelector(".descTitle");
           descTitle.style.display = d.desc ? "block" : "none";
-          el.querySelector(".desc").textContent = d.desc || "";
+          renderDescription(el.querySelector(".desc"), d.desc || "");
 
           const tagsEl = el.querySelector(".tags");
           tagsEl.innerHTML = (d.tags || [])
@@ -1296,28 +1336,27 @@
             .join(" ");
         }
 
-        // Sidebar bindings (Node)
+        // ==== Forms ====
         function fillFormForNode(node) {
           const d = node?.data || emptyData();
           f.date.value = d.date || "";
           f.title.value = d.title || "";
-          f.object.value = d.object || "";
-          f.action.value = d.action || "";
-          f.main.value = d.mainArea || "";
+          f.type.value = d.type || "";
+          renderRadioChips(f.actionChips, d.action);
+          renderRadioChips(f.mainAreaChips, d.mainArea);
           f.areas.value = (d.areas || []).join(", ");
           f.tags.value = (d.tags || []).join(", ");
           f.desc.value = d.desc || "";
           f.links.value = (d.links || []).join("\n");
           renderFilesList(node);
           f.files.value = "";
+          renderSuggestionsForNode(node);
         }
         function clearForm() {
           for (const el of [
             f.date,
             f.title,
-            f.object,
-            f.action,
-            f.main,
+            f.type,
             f.areas,
             f.tags,
             f.desc,
@@ -1325,7 +1364,13 @@
           ])
             el.value = "";
           f.filesList.innerHTML = "";
+          f.areasChips.innerHTML = "";
+          f.tagsChips.innerHTML = "";
+          f.typeChips.innerHTML = "";
+          renderRadioChips(f.actionChips, null);
+          renderRadioChips(f.mainAreaChips, null);
         }
+
         function renderFilesList(node) {
           const files = node?.data?.files || [];
           if (!files.length) {
@@ -1336,36 +1381,16 @@
             .map((file, i) => {
               const name = esc(file.name || "file");
               const size = bytes(file.size || 0);
-              const isImg = !!file.isImage;
-              const thumb = isImg
+              const thumb = file.isImage
                 ? `<img class="thumb" src="${esc(file.url)}" alt="">`
                 : "";
-              return `<div class="file-row">
-                <div class="file-left">${thumb}<div class="name">• ${name}${
+              return `<div class="file-row"><div class="file-left">${thumb}<div class="name">• ${name}${
                 size ? " — " + esc(size) : ""
-              }</div></div>
-                <div class="remove" data-idx="${i}">Remove</div>
-              </div>`;
+              }</div></div><div class="remove" data-idx="${i}">Remove</div></div>`;
             })
             .join("");
         }
-        function fileListToEntries(fileList) {
-          const arr = Array.from(fileList || []);
-          return arr.map((fl) => {
-            const isImage = /^image\//i.test(fl.type);
-            const isPDF =
-              /pdf$/i.test(fl.type) || /\.pdf$/i.test(fl.name || "");
-            const url = URL.createObjectURL(fl);
-            return {
-              name: fl.name,
-              size: fl.size,
-              type: fl.type,
-              url,
-              isImage,
-              isPDF,
-            };
-          });
-        }
+
         function updateSidebarSelectionLabel() {
           const n = state.selNodes.size,
             e = state.selEdges.size;
@@ -1399,7 +1424,6 @@
           f.panelTitle.textContent = showEdge
             ? "Edge properties"
             : "Node properties";
-
           if (showNode) {
             fillFormForNode(getNodeById([...state.selNodes][0]));
           } else if (!showEdge) {
@@ -1414,30 +1438,249 @@
           }
         }
 
-        function bindLive() {
-          const map = [
-            [f.date, (d, v) => (d.date = v || todayYMD())],
-            [f.title, (d, v) => (d.title = v)],
-            [f.object, (d, v) => (d.object = v.trim())],
-            [f.action, (d, v) => (d.action = v.trim())],
-            [f.main, (d, v) => (d.mainArea = v.trim())],
-            [f.areas, (d, v) => (d.areas = splitList(v))],
-            [f.tags, (d, v) => (d.tags = splitList(v))],
-            [f.desc, (d, v) => (d.desc = v)],
-            [f.links, (d, v) => (d.links = splitList(v))],
-          ];
-          for (const [el, apply] of map) {
-            el.addEventListener("input", () => {
-              if (state.selNodes.size !== 1) return;
-              const node = getNodeById([...state.selNodes][0]);
-              if (!node) return;
-              apply(node.data, el.value);
-              populate(node);
-              measure(node);
-              scheduleHistory();
-            });
+        // Radio chips
+        function renderRadioChips(container, activeVal) {
+          container.querySelectorAll(".chip").forEach((c) => {
+            c.classList.toggle(
+              "active",
+              c.getAttribute("data-val") === activeVal
+            );
+          });
+        }
+        function attachRadioChips() {
+          f.actionChips.addEventListener("click", (e) => {
+            const chip = e.target.closest(".chip");
+            if (!chip) return;
+            if (state.selNodes.size !== 1) return;
+            const node = getNodeById([...state.selNodes][0]);
+            const val = chip.getAttribute("data-val");
+            const newVal = node.data.action === val ? null : val;
+            node.data.action = newVal;
+            renderRadioChips(f.actionChips, newVal);
+            populate(node);
+            measure(node);
+            scheduleHistory();
+          });
+          f.mainAreaChips.addEventListener("click", (e) => {
+            const chip = e.target.closest(".chip");
+            if (!chip) return;
+            if (state.selNodes.size !== 1) return;
+            const node = getNodeById([...state.selNodes][0]);
+            const val = chip.getAttribute("data-val");
+            const newVal = node.data.mainArea === val ? null : val;
+            node.data.mainArea = newVal;
+            renderRadioChips(f.mainAreaChips, newVal);
+            populate(node);
+            measure(node);
+            scheduleHistory();
+          });
+        }
+        attachRadioChips();
+
+        // ==== Vocabulary / MRU ====
+        const MRU_CAP = Infinity;
+        const vocab = {
+          areasMRU: makeMRU(MRU_CAP),
+          tagsMRU: makeMRU(MRU_CAP),
+          typeMRU: makeMRU(MRU_CAP),
+        };
+        const counts = { areas: new Map(), tags: new Map(), type: new Map() };
+        const nodeLast = new Map(); // { id -> { type, areas:Set, tags:Set } }
+
+        // nuova funzione globale
+        function recomputeTypeCountsAndMRU() {
+          // azzera solo i conti Type (non tocchiamo areas/tags)
+          counts.type.clear();
+          // riconta dai nodi attuali usando gli snapshot normalizzati
+          for (const [id, snap] of nodeLast.entries()) {
+            const t = snap?.type || "";
+            if (t) counts.type.set(t, (counts.type.get(t) || 0) + 1);
           }
-          // Edge dashed toggle
+          // pota l'MRU Type: tieni solo le voci vive (count>0)
+          vocab.typeMRU.removeIf((x) => (counts.type.get(x) || 0) <= 0);
+        }
+
+        function makeMRU(cap) {
+          const arr = [],
+            set = new Set();
+          return {
+            put(x) {
+              if (!x) return;
+              const k = (x || "").toLowerCase();
+              if (set.has(k)) {
+                const i = arr.findIndex((v) => v.toLowerCase() === k);
+                if (i > -1) arr.splice(i, 1);
+              } else set.add(k);
+              arr.unshift(x);
+              while (arr.length > cap) {
+                const rem = arr.pop();
+                set.delete((rem || "").toLowerCase());
+              }
+            },
+            removeIf(pred) {
+              for (let i = arr.length - 1; i >= 0; i--) {
+                if (pred(arr[i])) {
+                  set.delete((arr[i] || "").toLowerCase());
+                  arr.splice(i, 1);
+                }
+              }
+            },
+            list() {
+              return arr.slice();
+            },
+            clear() {
+              arr.length = 0;
+              set.clear();
+            },
+          };
+        }
+        function pruneTypeMRUOnce() {
+          vocab.typeMRU.removeIf((x) => {
+            const k = normalizeToken(x || "");
+            return !k || (counts.type.get(k) || 0) <= 0;
+          });
+        }
+
+        function vocabResetNodeSnapshots() {
+          nodeLast.clear();
+        }
+        function vocabInitNodeSnapshot(node) {
+          nodeLast.set(node.id, {
+            type: normalizeToken(node.data.type || ""),
+            areas: new Set(normalizeArray(node.data.areas || [])),
+            tags: new Set(normalizeArray(node.data.tags || [])),
+          });
+        }
+        function countsResetAll() {
+          counts.areas.clear();
+          counts.tags.clear();
+          counts.type.clear();
+        }
+        function vocabIngestNode(node) {
+          const snap = nodeLast.get(node.id);
+          if (!snap) return;
+          if (snap.type) {
+            counts.type.set(snap.type, (counts.type.get(snap.type) || 0) + 1);
+          }
+          for (const a of snap.areas) {
+            counts.areas.set(a, (counts.areas.get(a) || 0) + 1);
+          }
+          for (const t of snap.tags) {
+            counts.tags.set(t, (counts.tags.get(t) || 0) + 1);
+          }
+        }
+        function vocabRemoveNode(node) {
+          const snap = nodeLast.get(node.id);
+          if (!snap) return;
+          if (snap.type) {
+            const v = (counts.type.get(snap.type) || 0) - 1;
+            if (v <= 0) {
+              counts.type.delete(snap.type);
+              vocab.typeMRU.removeIf(
+                (x) => x.toLowerCase() === snap.type.toLowerCase()
+              );
+            } else counts.type.set(snap.type, v);
+          }
+          for (const a of snap.areas) {
+            const v = (counts.areas.get(a) || 0) - 1;
+            if (v <= 0) counts.areas.delete(a);
+            else counts.areas.set(a, v);
+          }
+          for (const t of snap.tags) {
+            const v = (counts.tags.get(t) || 0) - 1;
+            if (v <= 0) counts.tags.delete(t);
+            else counts.tags.set(t, v);
+          }
+          nodeLast.delete(node.id);
+        }
+
+        // ==== Input bindings ====
+        function bindLive() {
+          f.date.addEventListener("input", () => {
+            if (state.selNodes.size !== 1) return;
+            const n = getNodeById([...state.selNodes][0]);
+            n.data.date = f.date.value || todayYMD();
+            populate(n);
+            measure(n);
+            scheduleHistory();
+          });
+          f.title.addEventListener("input", () => {
+            if (state.selNodes.size !== 1) return;
+            const n = getNodeById([...state.selNodes][0]);
+            n.data.title = f.title.value;
+            populate(n);
+            measure(n);
+            scheduleHistory();
+          });
+
+          /* TYPE: identico a Areas/Tags → testo libero; commit su blur/Enter */
+          f.type.addEventListener("input", () => {
+            if (state.selNodes.size !== 1) return;
+            // Nessuna normalizzazione live: solo history debounce (come Areas/Tags)
+            scheduleHistory();
+          });
+          f.type.addEventListener("blur", () => {
+            commitTypeForSelected();
+          });
+          f.type.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commitTypeForSelected();
+            }
+          });
+
+          // AREAS/TAGS: libero; commit su blur/Enter
+          f.areas.addEventListener("input", () => {
+            if (state.selNodes.size !== 1) return;
+            scheduleHistory();
+          });
+          f.areas.addEventListener("blur", () => {
+            commitAreasForSelected();
+          });
+          f.areas.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commitAreasForSelected();
+            }
+          });
+
+          f.tags.addEventListener("input", () => {
+            if (state.selNodes.size !== 1) return;
+            scheduleHistory();
+          });
+          f.tags.addEventListener("blur", () => {
+            commitTagsForSelected();
+          });
+          f.tags.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commitTagsForSelected();
+            }
+          });
+
+          f.desc.addEventListener("input", () => {
+            if (state.selNodes.size !== 1) return;
+            const n = getNodeById([...state.selNodes][0]);
+            n.data.desc = f.desc.value;
+            populate(n);
+            measure(n);
+            scheduleHistory();
+          });
+
+          f.links.addEventListener("input", () => {
+            if (state.selNodes.size !== 1) return;
+            const n = getNodeById([...state.selNodes][0]);
+            const list = (f.links.value || "")
+              .split(/\n+/)
+              .map((s) => s.trim())
+              .filter(Boolean);
+            n.data.links = list;
+            populate(n);
+            measure(n);
+            scheduleHistory();
+          });
+
+          // Edge dashed
           f.eDashed.addEventListener("change", () => {
             if (!(state.selEdges.size === 1 && state.selNodes.size === 0))
               return;
@@ -1450,17 +1693,24 @@
           });
 
           // Files
-          f.btnChoose.addEventListener("click", () => f.files.click());
+          f.btnChoose.addEventListener("click", () => {
+            // apri il picker solo se ho esattamente 1 nodo selezionato
+            if (state.selNodes.size !== 1) {
+              setStatus("Select a node to attach files");
+              return;
+            }
+            f.files.click();
+          });
           f.files.addEventListener("change", () => {
             if (state.selNodes.size !== 1) return;
             pushHistory();
-            const node = getNodeById([...state.selNodes][0]);
+            const n = getNodeById([...state.selNodes][0]);
             const newEntries = fileListToEntries(f.files.files);
-            node.data.files = (node.data.files || []).concat(newEntries);
+            n.data.files = (n.data.files || []).concat(newEntries);
             f.files.value = "";
-            renderFilesList(node);
-            populate(node);
-            measure(node);
+            renderFilesList(n);
+            populate(n);
+            measure(n);
           });
           f.filesList.addEventListener("click", (e) => {
             const rm = e.target.closest(".remove");
@@ -1468,21 +1718,201 @@
             const idx = Number(rm.getAttribute("data-idx"));
             if (state.selNodes.size !== 1) return;
             pushHistory();
-            const node = getNodeById([...state.selNodes][0]);
-            // NON revokeObjectURL per mantenere undo immagini funzionante
-            node.data.files.splice(idx, 1);
-            renderFilesList(node);
-            populate(node);
-            measure(node);
+            const n = getNodeById([...state.selNodes][0]);
+            n.data.files.splice(idx, 1);
+            renderFilesList(n);
+            populate(n);
+            measure(n);
           });
 
-          // Undo/Redo buttons
           $("#btnUndo").addEventListener("click", undo);
           $("#btnRedo").addEventListener("click", redo);
         }
         bindLive();
 
-        // Selection helpers
+        // === Commit (Type/Areas/Tags) ===
+        function commitTypeForSelected() {
+          if (state.selNodes.size !== 1) return;
+          const node = getNodeById([...state.selNodes][0]);
+          if (!node) return;
+
+          const raw = normalizeToken(f.type.value || "");
+          const last = nodeLast.get(node.id);
+          const prev = last?.type || "";
+
+          if (prev && prev !== raw) {
+            const v = (counts.type.get(prev) || 0) - 1;
+            if (v <= 0) {
+              counts.type.delete(prev);
+              vocab.typeMRU.removeIf(x => x.toLowerCase() === prev.toLowerCase());
+            } else {
+              counts.type.set(prev, v);
+            }
+          }
+
+          if (raw) {
+            counts.type.set(raw, (counts.type.get(raw) || 0) + 1);
+            vocab.typeMRU.put(raw);
+          }
+
+          if (last) last.type = raw;
+          node.data.type = raw;
+          f.type.value = raw;
+
+          vocab.typeMRU.removeIf(x => (counts.type.get(x) || 0) <= 0);
+
+          populate(node);
+          measure(node);
+          renderTypeSuggestions(node);
+        }
+        function commitAreasForSelected() {
+          if (state.selNodes.size !== 1) return;
+          const node = getNodeById([...state.selNodes][0]);
+          if (!node) return;
+          const arr = normalizeArray(splitListComma(f.areas.value || ""));
+          const last = nodeLast.get(node.id);
+          const prev = last ? new Set(last.areas) : new Set();
+          const cur = new Set(arr);
+          for (const x of prev) {
+            if (!cur.has(x)) {
+              const v = (counts.areas.get(x) || 0) - 1;
+              if (v <= 0) counts.areas.delete(x);
+              else counts.areas.set(x, v);
+            }
+          }
+          for (const x of cur) {
+            if (!prev.has(x)) {
+              counts.areas.set(x, (counts.areas.get(x) || 0) + 1);
+              vocab.areasMRU.put(x);
+            }
+          }
+          if (last) last.areas = cur;
+          node.data.areas = [...cur];
+          f.areas.value = [...cur].join(", ");
+          populate(node);
+          measure(node);
+          renderSuggestionsForNode(node);
+        }
+        function commitTagsForSelected() {
+          if (state.selNodes.size !== 1) return;
+          const node = getNodeById([...state.selNodes][0]);
+          if (!node) return;
+          const arr = normalizeArray(splitListComma(f.tags.value || ""));
+          const last = nodeLast.get(node.id);
+          const prev = last ? new Set(last.tags) : new Set();
+          const cur = new Set(arr);
+          for (const x of prev) {
+            if (!cur.has(x)) {
+              const v = (counts.tags.get(x) || 0) - 1;
+              if (v <= 0) counts.tags.delete(x);
+              else counts.tags.set(x, v);
+            }
+          }
+          for (const x of cur) {
+            if (!prev.has(x)) {
+              counts.tags.set(x, (counts.tags.get(x) || 0) + 1);
+              vocab.tagsMRU.put(x);
+            }
+          }
+          if (last) last.tags = cur;
+          node.data.tags = [...cur];
+          f.tags.value = [...cur].join(", ");
+          populate(node);
+          measure(node);
+          renderSuggestionsForNode(node);
+        }
+
+        // Finalizza il nodo corrente su deselect
+        function finalizeEditsCurrentNode() {
+          if (state.selNodes.size !== 1) return;
+          commitTypeForSelected();
+          commitAreasForSelected();
+          commitTagsForSelected();
+        }
+
+        // Suggerimenti
+        function renderTypeSuggestions(node) {
+          const cur = normalizeToken(node?.data?.type || "");
+          const uniq = new Set();
+          // Raccogli i type attuali dal grafo
+          for (const n of state.nodes) {
+            const t = normalizeToken(n?.data?.type || "");
+            if (t && t !== cur) uniq.add(t);
+          }
+          // Ordine stabile e leggibile
+          const live = Array.from(uniq).sort((a, b) =>
+            a.localeCompare(b, undefined, { sensitivity: "base" })
+          );
+          // Render chip
+          f.typeChips.innerHTML = live
+            .map((x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`)
+            .join("");
+        }
+        function renderSuggestionsForNode(node) {
+          const curAreas = new Set(normalizeArray(node?.data?.areas || []));
+          const areasList = vocab.areasMRU
+            .list()
+            .filter((x) => (counts.areas.get(x) || 0) > 0 && !curAreas.has(x));
+          f.areasChips.innerHTML = areasList
+            .map(
+              (x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`
+            )
+            .join("");
+
+          const curTags = new Set(normalizeArray(node?.data?.tags || []));
+          const tagsList = vocab.tagsMRU
+            .list()
+            .filter((x) => (counts.tags.get(x) || 0) > 0 && !curTags.has(x));
+          f.tagsChips.innerHTML = tagsList
+            .map(
+              (x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`
+            )
+            .join("");
+
+          renderTypeSuggestions(node);
+        }
+        f.areasChips.addEventListener("click", (e) => {
+          const chip = e.target.closest(".chip");
+          if (!chip) return;
+          if (state.selNodes.size !== 1) return;
+          const node = getNodeById([...state.selNodes][0]);
+          const val = chip.getAttribute("data-val");
+          if (!val) return;
+          const tokens = new Set(
+            normalizeArray(splitListComma(f.areas.value || ""))
+          );
+          if (!tokens.has(val)) {
+            tokens.add(val);
+            f.areas.value = [...tokens].join(", ");
+            commitAreasForSelected();
+          }
+        });
+        f.tagsChips.addEventListener("click", (e) => {
+          const chip = e.target.closest(".chip");
+          if (!chip) return;
+          if (state.selNodes.size !== 1) return;
+          const node = getNodeById([...state.selNodes][0]);
+          const val = chip.getAttribute("data-val");
+          if (!val) return;
+          const tokens = new Set(
+            normalizeArray(splitListComma(f.tags.value || ""))
+          );
+          if (!tokens.has(val)) {
+            tokens.add(val);
+            f.tags.value = [...tokens].join(", ");
+            commitTagsForSelected();
+          }
+        });
+        f.typeChips.addEventListener("click", (e) => {
+          const chip = e.target.closest(".chip");
+          if (!chip) return;
+          if (state.selNodes.size !== 1) return;
+          f.type.value = chip.getAttribute("data-val") || "";
+          commitTypeForSelected();
+          f.type.blur();
+        });
+
+        // Selezione helpers
         function refreshNodeSelectionClasses() {
           document.querySelectorAll(".node").forEach((el) => {
             state.selNodes.has(el.id)
@@ -1496,6 +1926,7 @@
           });
         }
         function selectOnlyNodes(ids) {
+          finalizeEditsCurrentNode();
           state.selNodes = new Set(ids);
           state.selEdges.clear();
           refreshNodeSelectionClasses();
@@ -1506,6 +1937,7 @@
           else clearForm();
         }
         function toggleNodeSelection(id) {
+          finalizeEditsCurrentNode();
           if (state.selNodes.has(id)) state.selNodes.delete(id);
           else state.selNodes.add(id);
           refreshNodeSelectionClasses();
@@ -1513,6 +1945,7 @@
           refreshSidebarForms();
         }
         function selectOnlyEdges(indexes) {
+          finalizeEditsCurrentNode();
           state.selEdges = new Set(indexes);
           state.selNodes.clear();
           refreshNodeSelectionClasses();
@@ -1522,8 +1955,9 @@
           clearForm();
         }
         function toggleEdgeSelection(index) {
-          if (state.selEdges.has(index)) state.selEdges.delete(index);
-          else state.selEdges.add(index);
+          state.selEdges.has(index)
+            ? state.selEdges.delete(index)
+            : state.selEdges.add(index);
           applyEdgeSelection();
           updateSidebarSelectionLabel();
           refreshSidebarForms();
@@ -1533,6 +1967,7 @@
           applyEdgeSelection();
         }
         function clearAllSelection() {
+          finalizeEditsCurrentNode();
           state.selNodes.clear();
           state.selEdges.clear();
           refreshNodeSelectionClasses();
@@ -1541,8 +1976,8 @@
           refreshSidebarForms();
           clearForm();
         }
-
         function selectAll() {
+          finalizeEditsCurrentNode();
           state.selNodes = new Set(state.nodes.map((n) => n.id));
           state.selEdges = new Set(state.edges.map((_, i) => i));
           refreshNodeSelectionClasses();
@@ -1551,7 +1986,7 @@
           refreshSidebarForms();
         }
 
-        /* ---------- Toolbar ---------- */
+        // Toolbar
         $("#btnAdd").addEventListener("click", addNode);
         $("#btnDel").addEventListener("click", doDeleteSelection);
         $("#btnFit").addEventListener("click", fitView);
@@ -1559,35 +1994,88 @@
         $("#btnOpen").addEventListener("click", openProject);
         $("#btnSave").addEventListener("click", saveProjectSmart);
 
-        /* ---------- Pan / Marquee / Zoom ---------- */
+        // Pan / Marquee / Zoom
         let panning = false,
           startPan = { x: 0, y: 0 };
         stage.addEventListener("mousedown", (e) => {
-          if (e.target.tagName === "path") return; // edges handled
-          if (e.target === stage || e.target === edgesSVG) {
-            if (state.spaceDown) {
-              panning = true;
-              stage.style.cursor = "move";
-              const r = stage.getBoundingClientRect();
-              startPan = {
-                x: e.clientX - r.left - state.pan.x,
-                y: e.clientY - r.top - state.pan.y,
-              };
-            } else {
-              startMarquee(e);
+          // i <path> degli edge hanno la loro gestione
+          if (e.target.tagName === "path") return;
+
+          // Registra se il down nasce davvero sul vuoto
+          bgPointerDown = isBlankAtPoint(e.clientX, e.clientY);
+          gestureMoved = false;
+
+          // memorizza origine e stato tasti per la soglia
+          stage._downX = e.clientX;
+          stage._downY = e.clientY;
+          stage._downShift = !!e.shiftKey;
+
+          if (!bgPointerDown) return; // non è vuoto → niente pan/marquee immediato
+          // NON avviare nulla qui: aspetta la soglia nel mousemove
+        });
+
+        document.addEventListener("mousemove", (e) => {
+          // Failsafe: se un gesto è "attivo" ma il bottone non è più premuto, chiudi
+          if ((panning || state.marquee?.active) && e.buttons === 0) {
+            if (panning) {
+              panning = false;
+              stage.style.cursor = "";
+            }
+            if (state.marquee?.active) {
+              endMarquee();
+            }
+            bgPointerDown = false;
+            gestureMoved = false;
+            stage._downX = stage._downY = null;
+            return;
+          }
+
+          // Se il down è nato sul vuoto e nessun gesto è ancora attivo → valuta soglia
+          if (bgPointerDown && !panning && !state.marquee?.active) {
+            const ox = stage._downX,
+              oy = stage._downY;
+            const dist =
+              Number.isFinite(ox) && Number.isFinite(oy)
+                ? Math.hypot(e.clientX - ox, e.clientY - oy)
+                : 0;
+
+            if (dist > CLICK_THRESHOLD) {
+              if (stage._downShift) {
+                // Avvia marquee solo ora (oltre soglia)
+                startMarquee({
+                  clientX: ox,
+                  clientY: oy,
+                  shiftKey: true,
+                });
+              } else {
+                // Avvia pan solo ora (oltre soglia)
+                panning = true;
+                stage.style.cursor = "all-scroll";
+                const r = stage.getBoundingClientRect();
+                startPan = {
+                  x: ox - r.left - state.pan.x,
+                  y: oy - r.top - state.pan.y,
+                };
+              }
+              gestureMoved = true;
+              return;
             }
           }
-        });
-        document.addEventListener("mousemove", (e) => {
+
+          // Pan attivo
           if (panning) {
             const r = stage.getBoundingClientRect();
             state.pan.x = e.clientX - r.left - startPan.x;
             state.pan.y = e.clientY - r.top - startPan.y;
             applyView();
+            gestureMoved = true;
             return;
           }
+
+          // Marquee attiva
           if (state.marquee?.active) {
             updateMarquee(e);
+            gestureMoved = true;
             return;
           }
         });
@@ -1599,16 +2087,15 @@
           if (state.marquee?.active) {
             endMarquee();
           }
+          stage._downX = stage._downY = null;
         });
-
-        // Zoom
         stage.addEventListener(
           "wheel",
           (e) => {
             e.preventDefault();
-            const sensitivity = 0.012;
-            const d = -e.deltaY * sensitivity;
-            const old = state.zoom;
+            const sensitivity = 0.012,
+              d = -e.deltaY * sensitivity,
+              old = state.zoom;
             const z = Math.min(3, Math.max(0.25, old * (1 + d)));
             const r = stage.getBoundingClientRect();
             const mx = e.clientX - r.left,
@@ -1626,12 +2113,9 @@
         function applyView() {
           ensureSVGSize();
           updateGrid();
-          state.nodes.forEach((n) => {
-            positionNode(n);
-          });
+          state.nodes.forEach((n) => positionNode(n));
           renderEdges();
         }
-
         function fitView() {
           if (!state.nodes.length) {
             state.zoom = 1;
@@ -1665,7 +2149,6 @@
           applyView();
         }
 
-        /* ---------- Marquee ---------- */
         function startMarquee(e) {
           const rect = document.createElement("div");
           rect.className = "marquee";
@@ -1682,7 +2165,7 @@
             prevNodes: new Set(state.selNodes),
             prevEdges: new Set(state.selEdges),
           };
-          state.ignoreNextStageClick = true; // evita deselect immediatamente dopo
+          state.ignoreNextStageClick = true;
           drawMarqueeRect();
         }
         function updateMarquee(e) {
@@ -1703,6 +2186,7 @@
             maxX = Math.max(a.x, b.x),
             maxY = Math.max(a.y, b.y);
 
+          // SOLO NODI (niente edge nella marquee)
           const hitsNodes = new Set(
             state.nodes
               .filter((n) =>
@@ -1719,42 +2203,21 @@
               )
               .map((n) => n.id)
           );
-          const hitsEdges = new Set(
-            state.edges
-              .map((e, i) => ({ bb: edgeBBox(e), idx: i }))
-              .filter((o) =>
-                rectsIntersect(
-                  minX,
-                  minY,
-                  maxX,
-                  maxY,
-                  o.bb.minX,
-                  o.bb.minY,
-                  o.bb.maxX,
-                  o.bb.maxY
-                )
-              )
-              .map((o) => o.idx)
-          );
 
           if (state.marquee.additive) {
             state.selNodes = new Set([
               ...state.marquee.prevNodes,
               ...hitsNodes,
             ]);
-            state.selEdges = new Set([
-              ...state.marquee.prevEdges,
-              ...hitsEdges,
-            ]);
+            state.selEdges = new Set(state.marquee.prevEdges); // preserva
           } else {
             state.selNodes = hitsNodes;
-            state.selEdges = hitsEdges;
+            state.selEdges = new Set(); // none
           }
           refreshNodeSelectionClasses();
           applyEdgeSelection();
           updateSidebarSelectionLabel();
           refreshSidebarForms();
-
           if (state.selNodes.size === 1 && state.selEdges.size === 0)
             fillFormForNode(getNodeById([...state.selNodes][0]));
           else clearForm();
@@ -1789,17 +2252,8 @@
             aMinX <= bMaxX && aMaxX >= bMinX && aMinY <= bMaxY && aMaxY >= bMinY
           );
         }
-        function edgeBBox(e) {
-          const s = anchor(e.s, "right"),
-            t = anchor(e.t, "left");
-          const minX = Math.min(s.x, t.x),
-            maxX = Math.max(s.x, t.x),
-            minY = Math.min(s.y, t.y),
-            maxY = Math.max(s.y, t.y);
-          return { minX, minY, maxX, maxY };
-        }
 
-        /* ---------- Auto layout (left→right, no overlaps) ---------- */
+        // Auto layout
         function autoLayoutLeftToRight() {
           pushHistory();
           state.nodes.forEach((n) => measure(n));
@@ -1808,7 +2262,6 @@
           const roots = state.nodes
             .filter((n) => (indeg.get(n.id) || 0) === 0)
             .map((n) => n.id);
-
           const depth = new Map();
           const q = [...roots];
           roots.forEach((id) => depth.set(id, 0));
@@ -1827,13 +2280,11 @@
           state.nodes.forEach((n) => {
             if (!depth.has(n.id)) depth.set(n.id, 0);
           });
-
           const layers = {};
           state.nodes.forEach((n) => {
             const d = depth.get(n.id) || 0;
             (layers[d] ||= []).push(n);
           });
-
           const layerKeys = Object.keys(layers)
             .map(Number)
             .sort((a, b) => a - b);
@@ -1850,12 +2301,10 @@
             }
             x += NODE_W + HGAP;
           });
-
           state.nodes.forEach((n) => positionNode(n));
           renderEdges();
           setStatus("Auto layout applied");
         }
-
         function nextChildPosition(parent) {
           const children = state.edges
             .filter((e) => e.s === parent.id)
@@ -1888,19 +2337,27 @@
             b.x
           } ${b.y}`;
         }
+        function edgeBBox(e) {
+          const s = anchor(e.s, "right"),
+            t = anchor(e.t, "left");
+          const minX = Math.min(s.x, t.x),
+            maxX = Math.max(s.x, t.x),
+            minY = Math.min(s.y, t.y),
+            maxY = Math.max(s.y, t.y);
+          return { minX, minY, maxX, maxY };
+        }
 
         function renderEdges() {
           ensureSVGSize();
           edgesSVG.innerHTML = "";
           state.edges.forEach((e, i) => {
-            const s = anchor(e.s, "right");
-            const t = anchor(e.t, "left");
+            const s = anchor(e.s, "right"),
+              t = anchor(e.t, "left");
             if (!s || !t) return;
             const g = document.createElementNS(
               "http://www.w3.org/2000/svg",
               "g"
             );
-
             const pv = document.createElementNS(
               "http://www.w3.org/2000/svg",
               "path"
@@ -1911,7 +2368,6 @@
               "edge-visible" + (e.dashed ? " weak" : "")
             );
             if (state.selEdges.has(i)) pv.classList.add("selected");
-
             const ph = document.createElementNS(
               "http://www.w3.org/2000/svg",
               "path"
@@ -1919,7 +2375,6 @@
             ph.setAttribute("d", pathCubic(s, t));
             ph.setAttribute("class", "edge-hit");
 
-            // Alt+click → insert intermediate node
             g.addEventListener("click", (ev) => {
               ev.stopPropagation();
               if (ev.altKey) {
@@ -1929,7 +2384,7 @@
                   mid.x - NODE_W / 2,
                   mid.y - NODE_H / 2,
                   {}
-                ); // empty node
+                );
                 const dashed = !!e.dashed;
                 state.edges.splice(i, 1);
                 state.edges.push(
@@ -1948,7 +2403,6 @@
             edgesSVG.appendChild(g);
           });
 
-          // Ghost edges
           if (state.dragLink && state.dragLink.active) {
             const t = { x: state.dragLink.x, y: state.dragLink.y };
             for (const sid of state.dragLink.sources) {
@@ -1971,18 +2425,33 @@
           }
         }
 
-        /* ---------- SAVE / OPEN ---------- */
-        async function saveProjectSmart() {
-          // If we already have a folder context, save directly there (no prompt).
-          if (projectCtx.mode === "folder" && projectCtx.dirHandle) {
-            await saveProjectToDir(projectCtx.dirHandle);
-            setStatus("Project saved");
-            return;
+        /* ---------- FAST SAVE HELPERS ---------- */
+        async function asyncPool(limit, tasks, worker) {
+          const ret = [],
+            executing = new Set();
+          for (const t of tasks) {
+            const p = Promise.resolve().then(() => worker(t));
+            ret.push(p);
+            executing.add(p);
+            p.finally(() => executing.delete(p));
+            if (executing.size >= limit) await Promise.race(executing);
           }
-          // Otherwise, behave as Save As (first save or embedded mode)
-          await saveAs();
+          return Promise.all(ret);
+        }
+        function extFromName(name) {
+          const m = (name || "").match(/\.[a-z0-9]+$/i);
+          return m ? m[0].toLowerCase() : "";
         }
 
+        /* ---------- SAVE / OPEN (veloce per grafi grandi) ---------- */
+        async function saveProjectSmart() {
+          if (projectCtx.mode === "folder" && projectCtx.dirHandle) {
+            await saveProjectToDir(projectCtx.dirHandle);
+            setStatus("Project saved (fast)");
+            return;
+          }
+          await saveAs();
+        }
         async function saveAs() {
           const supportsFS = "showDirectoryPicker" in window;
           if (supportsFS) {
@@ -1993,144 +2462,136 @@
               await saveProjectToDir(dir);
               projectCtx.mode = "folder";
               projectCtx.dirHandle = dir;
-              setStatus("Project saved (new location)");
+              setStatus("Project saved (new fast folder)");
               return;
             } catch (err) {
               console.warn(
-                "Save As cancelled or failed, falling back to download",
+                "Save As cancelled or failed, falling back to light JSON",
                 err
               );
             }
           }
-          // Fallback: download JSON (embedded data URLs)
-          await saveCopy();
+          await exportJSONLight(); // fallback leggero (senza file)
           projectCtx.mode = "embedded";
           projectCtx.dirHandle = null;
         }
 
-        async function saveProjectToDir(dir) {
-          await ensureSubdir(dir, "assets");
-          const used = new Map();
-          const uniq = (name) => {
-            const clean = sanitizeName(
-              (name || "file").replace(
-                /\.(png|jpg|jpeg|webp|gif|heic|heif|bmp|tiff)$/i,
-                ""
-              )
-            );
-            let n = clean,
-              i = 1;
-            while (used.has(n.toLowerCase())) {
-              n = `${clean}_${i++}`;
-            }
-            used.set(n.toLowerCase(), true);
-            return n;
-          };
+        // filesMode: "none" | "paths" | "embedded" (noi usiamo "paths" o "none")
+        function buildProjectObject(baseVersion = 6, filesMode = "paths") {
+          const nodesOut = state.nodes.map((n) => {
+            const src = n.data || {};
+            const outFiles = (() => {
+              if (filesMode === "none") return [];
+              if (filesMode === "paths") {
+                return (src.files || []).map((f) => ({
+                  name: f.name,
+                  size: f.size,
+                  type: f.type,
+                  isImage: !!f.isImage,
+                  isPDF: !!f.isPDF,
+                  path: f.path || null,
+                }));
+              }
+              return (src.files || []).map((f) => ({
+                name: f.name,
+                size: f.size,
+                type: f.type,
+                isImage: !!f.isImage,
+                isPDF: !!f.isPDF,
+                dataUrl: f.dataUrl || null,
+              }));
+            })();
 
-          const project = {
-            version: 5,
-            nodes: [],
-            edges: structuredClone(state.edges).map((e) => ({
-              s: e.s,
-              t: e.t,
-              dashed: !!e.dashed,
-            })),
-          };
-
-          for (const n of state.nodes) {
-            const nodeClone = {
+            return {
               id: n.id,
               x: n.x,
               y: n.y,
               w: n.w,
               h: n.h,
               group: n.group || null,
-              data: { ...n.data, files: [] },
+              data: {
+                date: src.date || todayYMD(),
+                title: src.title || "",
+                type: src.type || "",
+                action: src.action ?? null,
+                mainArea: src.mainArea ?? null,
+                areas: [...(src.areas || [])],
+                tags: [...(src.tags || [])],
+                desc: src.desc || "",
+                links: [...(src.links || [])],
+                files: outFiles,
+              },
             };
-            for (const f of n.data.files || []) {
-              let blob = await fetch(f.url).then((r) => r.blob());
-              let ext = "";
-              if (/^image\//i.test(f.type) || f.isImage) {
-                blob = await resizeImageBlob(
-                  blob,
-                  IMG_MAX_SIDE,
-                  IMG_TARGET_BYTES
-                );
-                ext = ".jpg";
-              } else if (f.isPDF) {
-                ext = ".pdf";
-              } else {
-                const m = (f.name || "").match(/\.[a-z0-9]+$/i);
-                ext = m ? m[0] : ".bin";
-              }
-              const base = uniq(f.name || "file");
-              const rel = `assets/${base}${ext}`;
-              await writeFileByPath(dir, rel, blob);
+          });
 
-              nodeClone.data.files.push({
-                name: `${base}${ext}`,
-                size: blob.size,
-                type: blob.type || (f.isImage ? "image/jpeg" : f.type),
-                isImage: !!(f.isImage || /^image\//i.test(f.type)),
-                isPDF: !!f.isPDF,
-                path: rel,
-              });
+          const vocabOut = {
+            areas: vocab.areasMRU.list(),
+            tags: vocab.tagsMRU.list(),
+            type: vocab.typeMRU.list(),
+          };
+          return {
+            version: baseVersion,
+            nodes: nodesOut,
+            edges: state.edges.map((e) => ({
+              s: e.s,
+              t: e.t,
+              dashed: !!e.dashed,
+            })),
+            vocab: vocabOut,
+          };
+        }
+
+        async function saveProjectToDir(dir) {
+          await ensureSubdir(dir, "assets");
+          // 1) Copia solo i NUOVI file (quelli già con path si saltano)
+          const toCopy = [];
+          for (const n of state.nodes) {
+            for (const f of n.data.files || []) {
+              if (f.path) {
+                continue;
+              } // già su disco
+              toCopy.push({ node: n, file: f });
             }
-            project.nodes.push(nodeClone);
           }
+
+          // Copia con concorrenza limitata (no ricompressione)
+          await asyncPool(2, toCopy, async ({ file }) => {
+            try {
+              const blob = await fetch(file.url).then((r) => r.blob());
+              const base = sanitizeName(
+                (file.name || "file").replace(/\s+/g, "_")
+              );
+              const ext =
+                extFromName(base) ||
+                (file.isPDF ? ".pdf" : file.isImage ? ".jpg" : ".bin");
+              const name = extFromName(base) ? base : base + ext;
+              const rel = `assets/${name}`;
+              await writeFileByPath(dir, rel, blob);
+              file.path = rel; // marca come salvato
+              delete file.dataUrl; // nessun embed
+            } catch (e) {
+              console.warn("Copy failed:", file?.name, e);
+            }
+          });
+
+          // 2) Scrivi JSON con soli path (niente dataUrl)
+          const project = buildProjectObject(6, "paths");
           const jsonBlob = new Blob([JSON.stringify(project, null, 2)], {
             type: "application/json",
           });
           await writeFileByPath(dir, "project.json", jsonBlob);
         }
 
-        async function saveCopy() {
-          const embedded = {
-            version: 5,
-            nodes: await Promise.all(
-              state.nodes.map(async (n) => {
-                const files = await Promise.all(
-                  (n.data.files || []).map(async (f) => {
-                    let blob = await fetch(f.url).then((r) => r.blob());
-                    if (/^image\//i.test(f.type) || f.isImage)
-                      blob = await resizeImageBlob(
-                        blob,
-                        IMG_MAX_SIDE,
-                        IMG_TARGET_BYTES
-                      );
-                    const dataUrl = await blobToDataURL(blob);
-                    return {
-                      name: f.name,
-                      size: blob.size,
-                      type: blob.type,
-                      isImage: !!(f.isImage || /^image\//i.test(f.type)),
-                      isPDF: !!f.isPDF,
-                      dataUrl,
-                    };
-                  })
-                );
-                return {
-                  id: n.id,
-                  x: n.x,
-                  y: n.y,
-                  w: n.w,
-                  h: n.h,
-                  group: n.group || null,
-                  data: { ...n.data, files },
-                };
-              })
-            ),
-            edges: state.edges.map((e) => ({
-              s: e.s,
-              t: e.t,
-              dashed: !!e.dashed,
-            })),
-          };
-          const blob = new Blob([JSON.stringify(embedded, null, 2)], {
+        async function exportJSONLight() {
+          const light = buildProjectObject(6, "none"); // nessun file
+          const blob = new Blob([JSON.stringify(light, null, 2)], {
             type: "application/json",
           });
-          downloadBlob("project.json", blob);
-          setStatus("Project JSON downloaded (images resized)");
+          downloadBlob("project_light.json", blob);
+          setStatus("Light JSON exported (no images)");
+        }
+        async function exportJSON() {
+          await exportJSONLight();
         }
 
         async function openProject() {
@@ -2178,6 +2639,7 @@
 
         async function newProject() {
           pushHistory();
+          finalizeEditsCurrentNode();
           clearAllSelection();
           document.querySelectorAll(".node").forEach((n) => n.remove());
           state.nodes = [];
@@ -2186,22 +2648,32 @@
           state.zoom = 1;
           projectCtx.mode = null;
           projectCtx.dirHandle = null;
-          // default initial node
+          vocab.areasMRU.clear();
+          vocab.tagsMRU.clear();
+          vocab.typeMRU.clear();
+          countsResetAll();
+          vocabResetNodeSnapshots();
+
+          // sync MRU type
+          vocab.typeMRU.removeIf((x) => {
+            const k = normalizeToken(x || "");
+            return !k || (counts.type.get(k) || 0) <= 0;
+          });
+
           addNodeAt(80, 80, {});
           setStatus("New project");
         }
 
-        async function exportJSON() {
-          await saveCopy();
-        }
-
         async function loadProject(project, dirHandle) {
+          finalizeEditsCurrentNode();
           clearAllSelection();
           document.querySelectorAll(".node").forEach((n) => n.remove());
           state.nodes = [];
           state.edges = [];
+          vocabResetNodeSnapshots();
+          countsResetAll();
 
-          for (const pn of project.nodes) {
+          for (const pn of project.nodes || []) {
             const node = {
               id: pn.id || uid(),
               x: pn.x || 0,
@@ -2211,21 +2683,36 @@
               group: pn.group || null,
               data: emptyData(),
             };
-            Object.assign(node.data, pn.data || {});
+            const d = pn.data || {};
+            node.data.type = normalizeToken(d.type || d.object || "");
+            if (Array.isArray(d.action)) node.data.action = d.action[0] || null;
+            else node.data.action = d.action ?? null;
+            if (Array.isArray(d.mainAreas))
+              node.data.mainArea = d.mainAreas[0] || null;
+            else node.data.mainArea = d.mainArea ?? d.mainarea ?? null;
+            node.data.date = d.date || todayYMD();
+            node.data.title = d.title || "";
+            node.data.areas = normalizeArray(d.areas || []);
+            node.data.tags = normalizeArray(d.tags || []);
+            node.data.desc = d.desc || "";
+            node.data.links = (d.links || []).slice();
             node.data.files = await Promise.all(
-              (pn.data?.files || []).map(async (f) => {
+              (d.files || []).map(async (f) => {
                 if (f.dataUrl) {
                   const blob = await (await fetch(f.dataUrl)).blob();
                   return { ...f, url: URL.createObjectURL(blob) };
                 } else if (f.path && dirHandle) {
-                  const blob = await readFileByPath(dirHandle, f.path);
-                  return { ...f, url: URL.createObjectURL(blob) };
+                  const file = await readFileByPath(dirHandle, f.path);
+                  return { ...f, url: URL.createObjectURL(file) };
                 } else {
                   return { ...f, url: "" };
                 }
               })
             );
+
             state.nodes.push(node);
+            vocabInitNodeSnapshot(node);
+            vocabIngestNode(node);
             mountNode(node);
             measure(node);
             positionNode(node);
@@ -2236,12 +2723,87 @@
             t: e.t,
             dashed: !!e.dashed,
           }));
+
+          if (project.vocab) {
+            vocab.areasMRU.clear();
+            vocab.tagsMRU.clear();
+            vocab.typeMRU.clear();
+            for (const a of project.vocab.areas || [])
+              if (a) vocab.areasMRU.put(normalizeToken(a));
+            for (const t of project.vocab.tags || [])
+              if (t) vocab.tagsMRU.put(normalizeToken(t));
+            for (const ty of project.vocab.type || [])
+              if (ty) vocab.typeMRU.put(normalizeToken(ty));
+            vocab.areasMRU.removeIf((x) => (counts.areas.get(x) || 0) <= 0);
+            vocab.tagsMRU.removeIf((x) => (counts.tags.get(x) || 0) <= 0);
+          }
+
+          // sync MRU type
+          vocab.typeMRU.removeIf((x) => {
+            const k = normalizeToken(x || "");
+            return !k || (counts.type.get(k) || 0) <= 0;
+          });
+
           ensureSVGSize();
           updateGrid();
           renderEdges();
         }
 
-        /* ---------- Clipboard (copy / cut / paste / duplicate) ---------- */
+        function undo() {
+          if (!history.undo.length) return;
+          const cur = snap();
+          const prev = history.undo.pop();
+          history.redo.push(cur);
+          applySnapshot(prev);
+          setStatus("Undone");
+        }
+        function redo() {
+          if (!history.redo.length) return;
+          const cur = snap();
+          const next = history.redo.pop();
+          history.undo.push(cur);
+          applySnapshot(next);
+          setStatus("Redone");
+        }
+        function applySnapshot(s) {
+          history.lock = true;
+          document.querySelectorAll(".node").forEach((n) => n.remove());
+          state.nodes = structuredClone(s.nodes || []);
+          state.edges = structuredClone(s.edges || []);
+          state.selNodes = new Set(s.selNodes || []);
+          state.selEdges = new Set(s.selEdges || []);
+          state.pan = s.pan ? { ...s.pan } : { x: 0, y: 0 };
+          state.zoom = s.zoom ?? 1;
+
+          vocabResetNodeSnapshots();
+          countsResetAll();
+
+          state.nodes.forEach((n) => {
+            mountNode(n);
+            measure(n);
+            positionNode(n);
+            populate(n);
+            vocabInitNodeSnapshot(n);
+            vocabIngestNode(n);
+          });
+
+          // Sync MRU Type con i count vivi
+          vocab.typeMRU.removeIf((x) => {
+            const k = normalizeToken(x || "");
+            return !k || (counts.type.get(k) || 0) <= 0;
+          });
+
+          ensureSVGSize();
+          updateGrid();
+          renderEdges();
+          refreshNodeSelectionClasses();
+          applyEdgeSelection();
+          updateSidebarSelectionLabel();
+          refreshSidebarForms();
+          history.lock = false;
+        }
+
+        // Clipboard/group
         function copySelection() {
           if (!state.selNodes.size) return;
           const ids = [...state.selNodes];
@@ -2272,6 +2834,8 @@
             clone.x = clone.x - state.clip.dx + offset.x;
             clone.y = clone.y - state.clip.dy + offset.y;
             state.nodes.push(clone);
+            vocabInitNodeSnapshot(clone);
+            vocabIngestNode(clone);
             mountNode(clone);
             measure(clone);
             positionNode(clone);
@@ -2284,6 +2848,13 @@
             dashed: !!e.dashed,
           }));
           state.edges.push(...newEdges);
+
+          // sync MRU type
+          vocab.typeMRU.removeIf((x) => {
+            const k = normalizeToken(x || "");
+            return !k || (counts.type.get(k) || 0) <= 0;
+          });
+
           renderEdges();
           selectOnlyNodes(pastedIds);
           setStatus("Pasted");
@@ -2291,8 +2862,6 @@
         function duplicateSelection() {
           if (!state.selNodes.size) return pasteClipboard({ x: 40, y: 40 });
         }
-
-        /* ---------- Group / Ungroup ---------- */
         function groupSelection() {
           if (!state.selNodes.size) return;
           pushHistory();
@@ -2313,25 +2882,12 @@
           setStatus("Ungrouped");
         }
 
-        /* ---------- Background dblclick → new node ---------- */
         stage.addEventListener("dblclick", (e) => {
-          if (e.target !== stage && e.target !== edgesSVG) return;
+          if (!isBlankAtPoint(e.clientX, e.clientY)) return;
           const w = toWorld(e.clientX, e.clientY);
           addNodeAt(w.x, w.y);
         });
 
-        /* ---------- Geometry helpers ---------- */
-        function edgeBBox(e) {
-          const s = anchor(e.s, "right"),
-            t = anchor(e.t, "left");
-          const minX = Math.min(s.x, t.x),
-            maxX = Math.max(s.x, t.x),
-            minY = Math.min(s.y, t.y),
-            maxY = Math.max(s.y, t.y);
-          return { minX, minY, maxX, maxY };
-        }
-
-        /* ---------- FS helpers & images ---------- */
         async function ensureSubdir(dirHandle, name) {
           try {
             return await dirHandle.getDirectoryHandle(name, { create: true });
@@ -2394,11 +2950,11 @@
         }
         function fitWithin(w, h, maxSide) {
           if (w >= h) {
-            const scale = maxSide / w;
-            return { w: Math.round(w * scale), h: Math.round(h * scale) };
+            const s = maxSide / w;
+            return { w: Math.round(w * s), h: Math.round(h * s) };
           } else {
-            const scale = maxSide / h;
-            return { w: Math.round(w * scale), h: Math.round(h * scale) };
+            const s = maxSide / h;
+            return { w: Math.round(w * s), h: Math.round(h * s) };
           }
         }
         function blobToImage(blob) {
@@ -2440,8 +2996,34 @@
             a.remove();
           }, 0);
         }
+        function fileListToEntries(fileList) {
+          const arr = Array.from(fileList || []);
+          return arr.map((fl) => {
+            const isImage = /^image\//i.test(fl.type);
+            const isPDF =
+              /pdf$/i.test(fl.type) || /\.pdf$/i.test(fl.name || "");
+            const url = URL.createObjectURL(fl);
+            return {
+              name: fl.name,
+              size: fl.size,
+              type: fl.type,
+              url,
+              isImage,
+              isPDF,
+            };
+          });
+        }
 
-        /* ---------- Initial defaults ---------- */
+        pushHistory();
+        if (state.nodes.length === 0) {
+          addNodeAt(80, 80, {});
+        }
+      })();
+    </script>
+  </body>
+</html>
+        }
+
         pushHistory();
         if (state.nodes.length === 0) {
           addNodeAt(80, 80, {});
