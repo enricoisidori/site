@@ -4,107 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Threadscape</title>
-    <!-- Favicons / Icons -->
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="1024x1024"
-      href="./asset/threadscape/icon.png"
-    />
-
-    <!-- HEAD: import Material Symbols -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-    />
-    <style>
-      /* Base per Material Symbols */
-      .material-symbols-outlined {
-        font-variation-settings: "FILL" 0, "wght" 200, "opsz" 24;
-        font-size: 24px;
-        line-height: 1;
-        display: inline-block;
-        vertical-align: middle;
-      }
-      /* Simple icon header buttons */
-      header button {
-        position: relative;
-        background: #111;
-        color: #eee;
-        border: 1px solid #444;
-        padding: 6px;
-        border-radius: 6px;
-        cursor: pointer;
-      }
-      header button:hover {
-        border-color: #fff;
-      }
-      header button.active {
-        border-color: #fff;
-      }
-      /* Tooltip */
-      header button::after {
-        content: attr(data-tip);
-        position: absolute;
-        bottom: -28px;
-        left: 0;
-        transform: none;
-        background: #222;
-        color: #fff;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 11px;
-        white-space: nowrap;
-        display: none;
-        pointer-events: none;
-      }
-      header button:hover::after {
-        display: block;
-      }
-      /* Connect button: simple pulsating border opacity (no size/glow) */
-      button.connect.active {
-        animation: connectPulse 1.4s ease-in-out infinite;
-      }
-      @keyframes connectPulse {
-        0% {
-          border-color: rgba(255, 255, 255, 1);
-        }
-        50% {
-          border-color: rgba(255, 255, 255, 0.35);
-        }
-        100% {
-          border-color: rgba(255, 255, 255, 1);
-        }
-      }
-      /* pulsazione sullo status */
-      #status.pulsing {
-        animation: statusPulse 3s ease-in-out infinite;
-      }
-      @keyframes statusPulse {
-        0% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.4;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
-      /* Bottoni icon-only: compatti ma cliccabili */
-      .icon-btn {
-        padding: 6px 8px; /* più stretto rispetto a testo */
-        min-width: 32px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-      }
-      header button {
-        position: relative;
-      }
-      /* Tooltip nativo via title: già gestito dal browser, nessun JS extra */
-    </style>
     <style>
       :root {
         --bg: #0e0e0e;
@@ -112,19 +11,9 @@
         --ink: #ffffff;
         --muted: #bdbdbd;
         --line: #2a2a2a;
-        --hover-light: #e6e6e6;
       }
       * {
         box-sizing: border-box;
-      }
-      /* Monochrome selection highlight */
-      ::selection {
-        background: rgba(255, 255, 255, 0.18);
-        color: #fff;
-      }
-      ::-moz-selection {
-        background: rgba(255, 255, 255, 0.18);
-        color: #fff;
       }
       body {
         margin: 0;
@@ -139,10 +28,6 @@
         display: flex;
         gap: 10px;
         align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 5;
-        background: var(--bg);
       }
       button {
         background: #111;
@@ -152,40 +37,16 @@
         border-radius: 6px;
         cursor: pointer;
       }
-      /* Hover feedback: bordo bianco puro; icona invariata */
-      .icon-btn {
-        border: 1px solid #444;
-        transition: border-color 120ms ease, opacity 120ms ease;
-      }
-      .icon-btn:hover {
-        opacity: 1;
-        border-color: var(--hover-light);
-      }
-      .icon-btn:active {
-        opacity: 0.9;
-      }
       button:focus,
       button:focus-visible {
         outline: none;
         box-shadow: none;
       }
-      /* Layout base */
       .app {
         display: grid;
         grid-template-columns: 1fr 380px;
         grid-template-rows: 50px 1fr;
         height: 100vh;
-      }
-      /* Sidebar nascosta: niente seconda colonna, canvas a tutta larghezza */
-      .app.no-panel {
-        grid-template-columns: 1fr !important;
-      }
-      .app.no-panel aside {
-        display: none !important;
-      }
-      /* Header: copre tutte le colonne presenti (1 o 2) */
-      .app header {
-        grid-column: 1 / -1;
       }
 
       #stage {
@@ -327,37 +188,29 @@
         margin-right: 10px;
       }
 
-      /* Area cliccabile più grande, aspetto identico */
       .handle {
         position: absolute;
-        width: 40px;
-        height: 40px;
+        width: 24px;
+        height: 24px;
         pointer-events: auto;
-      }
-      /* cursori coerenti con le tue regole attuali */
-      .handle.out {
         cursor: pointer;
       }
-      .handle.in {
-        cursor: grab;
-      }
       .out {
-        right: -22px;
+        right: -15px;
         top: 50%;
         transform: translateY(-50%);
       }
       .in {
-        left: -22px;
+        left: -15px;
         top: 50%;
         transform: translateY(-50%);
       }
-      /* Indicatori interni invariati (14x14), ma ricentrati nel 40px */
       .out::after {
         content: "";
         position: absolute;
         width: 14px;
         height: 14px;
-        right: 13px;
+        right: 5px;
         top: 50%;
         transform: translateY(-50%);
         background: #fff;
@@ -369,7 +222,7 @@
         position: absolute;
         width: 14px;
         height: 14px;
-        left: 13px;
+        left: 5px;
         top: 50%;
         transform: translateY(-50%);
         background: #fff;
@@ -396,28 +249,24 @@
       }
       .edge-visible.weak {
         stroke: #ffffff;
-        stroke-opacity: 0.2;
+        stroke-opacity: 0.4;
         stroke-dasharray: 10 6;
         stroke-linecap: round;
-        stroke-width: 1;
+        stroke-width: 1.5;
       }
       .edge-visible.weak.selected {
         stroke: #ffffff;
         stroke-opacity: 1;
         stroke-dasharray: 10 6;
         stroke-linecap: round;
-        stroke-width: 2;
+        stroke-width: 2.5;
       }
       .edge-hit {
         stroke: #000;
-        /* Evita edge-case con opacity 0 su alcuni browser */
-        stroke-opacity: 0.001;
-        /* Hit largo costante a qualsiasi zoom */
-        vector-effect: non-scaling-stroke;
+        stroke-opacity: 0;
         stroke-width: 16;
         fill: none;
         cursor: pointer;
-        pointer-events: stroke;
       }
 
       .marquee {
@@ -459,35 +308,17 @@
         font-family: inherit;
         margin-top: 6px;
       }
-      /* unify focus ring and selection feel */
       input:focus,
       input:focus-visible,
       textarea:focus,
       textarea:focus-visible {
         outline: none;
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18) inset;
+        box-shadow: none;
         border-color: #555;
       }
       textarea {
         min-height: 140px;
         resize: vertical;
-      }
-      /* Date input: neutralize blue highlight/look */
-      input[type="date"] {
-        caret-color: #eee;
-      }
-      input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-        color: #eee;
-      }
-      input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: grayscale(100%);
-        opacity: 0.9;
-      }
-      input[type="date"]::-moz-focus-inner {
-        border: 0;
-      }
-      input[type="date"] {
-        -moz-appearance: none;
       }
       .muted {
         color: #bbb;
@@ -526,10 +357,6 @@
         cursor: pointer;
         text-decoration: underline;
       }
-      .file-row .remove:hover {
-        color: var(--hover-light);
-        text-decoration-color: var(--hover-light);
-      }
 
       .chipRow {
         display: flex;
@@ -548,133 +375,32 @@
         cursor: pointer;
         user-select: none;
         background: #0f0f0f;
-        transition: border-color 120ms ease, background-color 120ms ease;
-      }
-      .chip:hover {
-        border-color: #ffffff;
       }
       .chip.active {
         background: #1c1c1c;
         border-color: #666;
       }
-      /* Tooltip custom (usa data-tip) — senza freccia */
-      .icon-btn[data-tip] {
-        position: relative;
-      }
-
-      .icon-btn[data-tip]::after {
-        content: attr(data-tip);
-        position: absolute;
-        left: 0; /* allinea al bordo sinistro del bottone */
-        top: calc(100% + 8px);
-        transform: none; /* nessuna traslazione orizzontale */
-        background: #1b1b1b;
-        color: #fff;
-        border: 1px solid #333;
-        border-radius: 6px;
-        padding: 6px 8px;
-        font-size: 12px;
-        line-height: 1.2;
-        white-space: nowrap;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 120ms ease;
-        z-index: 10;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-      }
-      .icon-btn[data-tip]:hover::after,
-      .icon-btn[data-tip]:focus-visible::after {
-        opacity: 1;
-      }
       .chip:hover {
-        border-color: var(--hover-light);
+        border-color: #777;
       }
       .chip.radio:not(.active) {
         background: #0d0d0d;
         border-color: #3a3a3a;
         opacity: 0.85;
       }
-      .chip.radio:hover {
-        border-color: var(--hover-light);
-      }
-
-      /* Space-pan: cursore multidirezionale ovunque (stage, nodi, handle) */
-      .space-pan #stage,
-      .space-pan .node,
-      .space-pan .handle {
-        cursor: all-scroll !important;
-      }
-
-      /* Checkbox weak coerente con lo stile */
-      #edgeForm .checkboxRow {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-      }
-      #edgeForm input[type="checkbox"]#eDashed {
-        appearance: none;
-        -webkit-appearance: none;
-        width: 16px;
-        height: 16px;
-        border: 1px solid #444;
-        border-radius: 3px;
-        background: #000;
-        display: inline-block;
-        position: relative;
-        vertical-align: middle;
-      }
-      #edgeForm input[type="checkbox"]#eDashed:focus {
-        outline: none;
-        box-shadow: none;
-        border-color: #666;
-      }
-      #edgeForm input[type="checkbox"]#eDashed:checked::after {
-        content: "";
-        position: absolute;
-        inset: 3px;
-        background: #fff;
-        border-radius: 1px;
-      }
-      /* Ensure radio chips (Action/Main area) get the same white hover border */
-      .chip.radio:hover {
-        border-color: #ffffff;
-      }
     </style>
   </head>
   <body>
     <div class="app">
       <header style="grid-column: 1/3">
-        <button id="btnNew" data-tip="New project (Cmd/Ctrl+N)">
-          <span class="material-symbols-outlined">note_add</span>
-        </button>
-        <button id="btnOpen" data-tip="Open (Cmd/Ctrl+O)">
-          <span class="material-symbols-outlined">file_open</span>
-        </button>
-        <button id="btnSave" data-tip="Save (Cmd/Ctrl+S)">
-          <span class="material-symbols-outlined">file_save</span>
-        </button>
-        <button id="btnAdd" data-tip="New node (N)">
-          <span class="material-symbols-outlined">add_box</span>
-        </button>
-        <button id="btnConnect" data-tip="Connect nodes (C)">
-          <span class="material-symbols-outlined">conversion_path</span>
-        </button>
-        <button id="btnAuto" data-tip="Auto layout (Alt+A)">
-          <span class="material-symbols-outlined">account_tree</span>
-        </button>
-        <button id="btnUndo" data-tip="Undo (Cmd/Ctrl+Z)">
-          <span class="material-symbols-outlined">undo</span>
-        </button>
-        <button id="btnRedo" data-tip="Redo (Cmd/Ctrl+Shift+Z)">
-          <span class="material-symbols-outlined">redo</span>
-        </button>
-        <button id="btnDel" data-tip="Delete (Del)">
-          <span class="material-symbols-outlined">delete</span>
-        </button>
-        <button id="btnFit" data-tip="Fit view (0)">
-          <span class="material-symbols-outlined">fullscreen</span>
-        </button>
+        <button id="btnAdd">+ New node</button>
+        <button id="btnAuto">Auto layout</button>
+        <button id="btnOpen">Open</button>
+        <button id="btnSave">Save</button>
+        <button id="btnUndo">Undo</button>
+        <button id="btnRedo">Redo</button>
+        <button id="btnDel">Delete selection</button>
+        <button id="btnFit">Fit view (0)</button>
         <span id="status" class="muted" style="margin-left: 8px"></span>
       </header>
 
@@ -766,19 +492,7 @@
                 margin-top: 10px;
               "
             >
-              <button
-                id="btnChoose"
-                type="button"
-                title="Choose files"
-                class="icon-btn"
-              >
-                <span
-                  class="material-symbols-outlined"
-                  style="margin-right: 6px"
-                  >upload</span
-                >
-                Choose files
-              </button>
+              <button id="btnChoose" type="button">Choose files</button>
               <span id="selInfo" class="muted">No selection</span>
             </div>
             <div id="filesList" class="muted" style="margin-top: 6px"></div>
@@ -866,9 +580,6 @@
         const stage = $("#stage"),
           edgesSVG = $("#edges"),
           status = $("#status");
-        const btnConnect = document.getElementById("btnConnect");
-        window.connectMode = false;
-        window.connectSources = [];
 
         // === EDGE CANVAS (disegno) + SCHEDULER ===
         const edgeCanvas = document.createElement("canvas");
@@ -922,39 +633,23 @@
             const t = anchor(e.t, "left");
             if (!s || !t) continue;
 
-            const isWeak = !!e.dashed;
-            const isSel = state.selEdges.has(i);
+            const dashed = !!e.dashed;
+            // stile base
+            ctx.lineWidth = 2;
+            ctx.setLineDash(dashed ? [10, 6] : []);
+            ctx.lineCap = dashed ? "round" : "butt";
+            ctx.strokeStyle = "#9a9a9a";
 
-            // Impostazioni comuni
-            ctx.lineCap = "butt"; // cap rettangolare per coerenza
-
-            if (isWeak) {
-              // WEAK: più fini, grigio scuro, gap breve
-              const dash = [8, 3]; // gap più corto
-              ctx.setLineDash(dash);
-
-              if (isSel) {
-                // WEAK selezionati: più spessi e bianchi (restano tratteggiati)
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "#eeeeee";
-              } else {
-                ctx.lineWidth = 2; // più fini
-                ctx.strokeStyle = "#444444"; // grigio scu
-              }
+            // highlight selezione
+            if (state.selEdges.has(i)) {
+              ctx.save();
+              ctx.lineWidth = dashed ? 2.5 : 3;
+              ctx.strokeStyle = "#ffffff";
+              drawCubic(ctx, s, t);
+              ctx.restore();
             } else {
-              // NORMAL
-              ctx.setLineDash([]);
-              if (isSel) {
-                // Selezionati: più spessi e bianchi
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = "#ffffff";
-              } else {
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "#9a9a9a";
-              }
+              drawCubic(ctx, s, t);
             }
-
-            drawCubic(ctx, s, t);
           }
 
           // 2) ghost durante drag edge (disegno “provvisorio” sul canvas)
@@ -1201,9 +896,8 @@
           return id;
         }
         function addNode() {
-          const r = stage.getBoundingClientRect();
-          const world = toWorld(r.left + 80, r.top + 80);
-          return addNodeAt(world.x, world.y);
+          const i = state.nodes.length;
+          return addNodeAt(80 + i * 40, 80 + i * 30);
         }
 
         function mountNode(node) {
@@ -1347,18 +1041,11 @@
                   }
                 }
                 cancelGhost();
-                renderEdges();
+                scheduleEdgeCanvasDraw();
                 setStatus("Edge created");
                 return;
               }
-
-              // 👇 patch: rilascio sopra un nodo ma non su handle → annulla ghost
-              cancelGhost();
-              renderEdges();
-              setStatus("");
-              return;
             }
-
             if (
               state.press &&
               !state.press.moved &&
@@ -1382,7 +1069,7 @@
                     const childId = addNodeAt(pos.x, pos.y, init);
                     addEdge(parent.id, childId);
                   }
-                  renderEdges();
+                  scheduleEdgeCanvasDraw();
                   setStatus(
                     srcs.length > 1
                       ? "Children created and connected"
@@ -1396,7 +1083,7 @@
                       if (t !== targetNodeId) addEdge(targetNodeId, t);
                     }
                     cancelGhost();
-                    renderEdges();
+                    scheduleEdgeCanvasDraw();
                     setStatus("Edge created");
                   }
                 }
@@ -1408,7 +1095,7 @@
                     if (s !== targetNodeId) addEdge(s, targetNodeId);
                   }
                   cancelGhost();
-                  renderEdges();
+                  scheduleEdgeCanvasDraw();
                   setStatus("Edge created");
                 }
               }
@@ -1431,18 +1118,6 @@
               const w = toWorld(e.clientX, e.clientY);
               state.dragLink.x = w.x;
               state.dragLink.y = w.y;
-
-              // Aggancia a handle/nodo sotto il puntatore (senza scan globale)
-              const pick = pickDropTargetFromPointer(
-                e.clientX,
-                e.clientY,
-                state.dragLink.from
-              );
-              state.dragLink.snap = pick || null;
-
-              // Feedback cursore
-              stage.style.cursor = pick ? "grab" : "grabbing";
-
               scheduleEdgeCanvasDraw();
             }
           };
@@ -1450,17 +1125,6 @@
           inEl.addEventListener("mousedown", handleDown("in"));
           outEl.addEventListener("mouseup", handleUp("out"));
           inEl.addEventListener("mouseup", handleUp("in"));
-          // 👇 patch: se rilascio su un nodo ma NON sulla handle → annulla ghost
-          el.addEventListener("mouseup", (e) => {
-            if (state.dragLink && state.dragLink.active) {
-              cancelGhost();
-              if (typeof renderEdges === "function") renderEdges();
-              if (typeof scheduleEdgeCanvasDraw === "function")
-                scheduleEdgeCanvasDraw();
-              setStatus("");
-              e.stopPropagation();
-            }
-          });
           document.addEventListener("mousemove", handleMove());
         }
 
@@ -1472,7 +1136,6 @@
             primary,
             x: 0,
             y: 0,
-            snap: null,
           };
           document.body.style.cursor = "grabbing";
           stage.style.cursor = "grabbing";
@@ -1542,24 +1205,11 @@
           if (e.code === "Space" && !inText) {
             state.spaceDown = true;
             e.preventDefault();
-            document.body.classList.add("space-pan");
-            stage.style.cursor = "all-scroll";
+            stage.style.cursor = "move";
             return;
           }
 
-          // Cmd/Ctrl + L → Auto layout
-          if (
-            !inText &&
-            (e.metaKey || e.ctrlKey) &&
-            e.key.toLowerCase() === "l"
-          ) {
-            e.preventDefault();
-            autoLayoutLeftToRight();
-            setStatus("Auto layout");
-            return;
-          }
-
-          if ((e.metaKey || e.ctrlKey || e.altKey) && !inText) {
+          if ((e.metaKey || e.ctrlKey) && !inText) {
             const k = e.key.toLowerCase();
             if (k === "z" && !e.shiftKey) {
               e.preventDefault();
@@ -1569,11 +1219,6 @@
             if ((k === "z" && e.shiftKey) || k === "y") {
               e.preventDefault();
               redo();
-              return;
-            }
-            if ((e.metaKey || e.ctrlKey) && k === "n") {
-              e.preventDefault();
-              saveProjectSmart().then(() => newProject());
               return;
             }
             if (k === "o") {
@@ -1669,58 +1314,10 @@
               }
             }
           }
-
-          // W = toggle weak dashed su edge selezionati
-          if (e.key.toLowerCase() === "w" && state.selEdges.size) {
-            e.preventDefault();
-            pushHistory();
-            for (const idx of state.selEdges) {
-              const edge = getEdgeByIndex(idx);
-              if (edge) edge.dashed = !edge.dashed;
-            }
-            renderEdges();
-            return;
-          }
-
-          // Scorciatoia L per Connect (press/hold)
-          if (e.key.toLowerCase() === "l" && !inText) {
-            e.preventDefault();
-            if (!window.connectMode) {
-              window.connectSources = [...state.selNodes];
-              window.connectMode = true;
-              const btn = document.getElementById("btnConnect");
-              btn && btn.classList.add("active");
-              setStatus("Select target node(s), release L to confirm");
-            }
-          }
-        });
-        document.addEventListener("keyup", (e) => {
-          if (e.key.toLowerCase() === "l" && window.connectMode) {
-            const targets = [...state.selNodes].filter(
-              (id) => !window.connectSources.includes(id)
-            );
-            pushHistory();
-            if (window.connectSources.length > 1 && targets.length > 1) {
-              setStatus("Multiple sources can connect only to one target");
-            } else {
-              for (const s of window.connectSources) {
-                for (const t of targets) {
-                  if (s !== t) addEdge(s, t);
-                }
-              }
-              renderEdges();
-              setStatus("Nodes connected");
-            }
-            window.connectMode = false;
-            window.connectSources = [];
-            const btn = document.getElementById("btnConnect");
-            btn && btn.classList.remove("active");
-          }
         });
         document.addEventListener("keyup", (e) => {
           if (e.code === "Space") {
             state.spaceDown = false;
-            document.body.classList.remove("space-pan");
             stage.style.cursor = "";
           }
         });
@@ -1794,32 +1391,33 @@
             htmlEl.innerHTML = "";
             return;
           }
-          // Support paragraphs (blank line) and soft breaks (single \n)
-          const normalized = text.replace(/\r\n/g, "\n");
-          const blocks = normalized.split(/\n\n+/); // paragraphs
-          let out = "";
-          for (const block of blocks) {
-            const trimmed = block.trimEnd();
-            if (!trimmed) {
-              out += "<p></p>";
-              continue;
-            }
-
-            // handle list items inside a block, preserving soft breaks
-            const lines = trimmed.split("\n");
-            if (lines.every((ln) => /^[-*]\s+/.test(ln.trim()))) {
-              out += "<ul>";
-              for (const raw of lines) {
-                const item = esc(raw.trim().replace(/^[-*]\s+/, ""));
-                out += `<li>${item}</li>`;
-              }
+          const lines = text.replace(/\r\n/g, "\n").split("\n");
+          let out = "",
+            inList = false;
+          const flush = () => {
+            if (inList) {
               out += "</ul>";
+              inList = false;
+            }
+          };
+          for (const raw of lines) {
+            const line = raw.trimEnd();
+            if (/^[-*]\s+/.test(line)) {
+              if (!inList) {
+                out += "<ul>";
+                inList = true;
+              }
+              const item = esc(line.replace(/^[-*]\s+/, ""));
+              out += `<li>${item}</li>`;
+            } else if (line === "") {
+              flush();
+              out += "<p></p>";
             } else {
-              // paragraph with soft line breaks as <br>
-              const withBr = lines.map((ln) => esc(ln)).join("<br>");
-              out += `<p>${withBr}</p>`;
+              flush();
+              out += `<p>${esc(line)}</p>`;
             }
           }
+          flush();
           htmlEl.innerHTML = out;
         }
 
@@ -1983,21 +1581,18 @@
             state.selNodes.size === 1 && state.selEdges.size === 0;
           const showEdge =
             state.selEdges.size === 1 && state.selNodes.size === 0;
-
           f.nodeForm.style.display = showNode ? "block" : "none";
           f.edgeForm.style.display = showEdge ? "block" : "none";
-          if (showNode) f.panelTitle.textContent = "Node properties";
-          else if (showEdge) f.panelTitle.textContent = "Edge properties";
-          else f.panelTitle.textContent = "";
-
-          // Toggle layout 1-colonna e forza ridisegno stage/SVG
-          const appEl = document.querySelector(".app");
-          const hidePanel = !(showNode || showEdge);
-          if (appEl) appEl.classList.toggle("no-panel", hidePanel);
-          if (typeof ensureSVGSize === "function") ensureSVGSize();
-          if (typeof updateGrid === "function") updateGrid();
-          if (typeof applyView === "function") applyView();
-
+          f.panelTitle.textContent = showEdge
+            ? "Edge properties"
+            : "Node properties";
+          // Nascondi l'intero aside se non c'è selezione
+          const asideEl = document.querySelector("aside");
+          if (!showNode && !showEdge) {
+            asideEl.style.display = "none";
+          } else {
+            asideEl.style.display = "block";
+          }
           if (showNode) {
             fillFormForNode(getNodeById([...state.selNodes][0]));
           } else if (!showEdge) {
@@ -2264,10 +1859,7 @@
             const edge = getEdgeByIndex(idx);
             if (!edge) return;
             edge.dashed = !!f.eDashed.checked;
-            // aggiorna subito sia l'SVG di hit che il canvas visivo
-            if (typeof renderEdges === "function") renderEdges();
-            if (typeof scheduleEdgeCanvasDraw === "function")
-              scheduleEdgeCanvasDraw();
+            renderEdges();
           });
 
           // Files
@@ -2517,8 +2109,6 @@
           refreshSidebarForms();
           if (ids.length === 1) fillFormForNode(getNodeById(ids[0]));
           else clearForm();
-          if (typeof scheduleEdgeCanvasDraw === "function")
-            scheduleEdgeCanvasDraw();
         }
         function toggleNodeSelection(id) {
           finalizeEditsCurrentNode();
@@ -2537,8 +2127,6 @@
           updateSidebarSelectionLabel();
           refreshSidebarForms();
           clearForm();
-          if (typeof scheduleEdgeCanvasDraw === "function")
-            scheduleEdgeCanvasDraw();
         }
         function toggleEdgeSelection(index) {
           state.selEdges.has(index)
@@ -2547,14 +2135,10 @@
           applyEdgeSelection();
           updateSidebarSelectionLabel();
           refreshSidebarForms();
-          if (typeof scheduleEdgeCanvasDraw === "function")
-            scheduleEdgeCanvasDraw();
         }
         function clearEdgeSelection() {
           state.selEdges.clear();
           applyEdgeSelection();
-          if (typeof scheduleEdgeCanvasDraw === "function")
-            scheduleEdgeCanvasDraw();
         }
         function clearAllSelection() {
           finalizeEditsCurrentNode();
@@ -2565,15 +2149,6 @@
           updateSidebarSelectionLabel();
           refreshSidebarForms();
           clearForm();
-          if (typeof scheduleEdgeCanvasDraw === "function")
-            scheduleEdgeCanvasDraw();
-          {
-            const appEl = document.querySelector(".app");
-            if (appEl) appEl.classList.add("no-panel");
-          }
-          if (typeof ensureSVGSize === "function") ensureSVGSize();
-          if (typeof updateGrid === "function") updateGrid();
-          if (typeof applyView === "function") applyView();
         }
         function selectAll() {
           finalizeEditsCurrentNode();
@@ -2592,42 +2167,6 @@
         $("#btnAuto").addEventListener("click", autoLayoutLeftToRight);
         $("#btnOpen").addEventListener("click", openProject);
         $("#btnSave").addEventListener("click", saveProjectSmart);
-        document.getElementById("btnNew")?.addEventListener("click", () => {
-          saveProjectSmart().then(() => newProject());
-        });
-        btnConnect?.addEventListener("click", () => {
-          if (!window.connectMode) {
-            if (!state.selNodes.size) {
-              setStatus("Select source node(s) first");
-              return;
-            }
-            window.connectSources = [...state.selNodes];
-            window.connectMode = true;
-            btnConnect.classList.add("active");
-            setStatus("Connect mode: select target…");
-            status.classList.add("pulsing");
-          } else {
-            const targets = [...state.selNodes].filter(
-              (id) => !window.connectSources.includes(id)
-            );
-            if (window.connectSources.length > 1 && targets.length > 1) {
-              setStatus("Multiple sources can connect only to one target");
-            } else {
-              pushHistory();
-              for (const s of window.connectSources) {
-                for (const t of targets) {
-                  if (s !== t) addEdge(s, t);
-                }
-              }
-              renderEdges();
-              setStatus("Nodes connected");
-            }
-            window.connectMode = false;
-            window.connectSources = [];
-            btnConnect.classList.remove("active");
-            status.classList.remove("pulsing");
-          }
-        });
 
         // Pan / Marquee / Zoom
         let panning = false,
@@ -2636,27 +2175,17 @@
           // i <path> degli edge hanno la loro gestione
           if (e.target.tagName === "path") return;
 
-          // Se ho space premuto → pan diretto, anche sopra nodi
-          if (state.spaceDown) {
-            panning = true;
-            stage.style.cursor = "all-scroll";
-            const r = stage.getBoundingClientRect();
-            startPan = {
-              x: e.clientX - r.left - state.pan.x,
-              y: e.clientY - r.top - state.pan.y,
-            };
-            return;
-          }
-
-          // Altrimenti: drag in vuoto = marquee
+          // Registra se il down nasce davvero sul vuoto
           bgPointerDown = isBlankAtPoint(e.clientX, e.clientY);
           gestureMoved = false;
 
-          if (bgPointerDown) {
-            stage._downX = e.clientX;
-            stage._downY = e.clientY;
-            // niente più _downShift: la modalità si decide in startMarquee() su evento reale
-          }
+          // memorizza origine e stato tasti per la soglia
+          stage._downX = e.clientX;
+          stage._downY = e.clientY;
+          stage._downShift = !!e.shiftKey;
+
+          if (!bgPointerDown) return; // non è vuoto → niente pan/marquee immediato
+          // NON avviare nulla qui: aspetta la soglia nel mousemove
         });
 
         document.addEventListener("mousemove", (e) => {
@@ -2685,18 +2214,29 @@
                 : 0;
 
             if (dist > CLICK_THRESHOLD) {
-              // Default: marquee senza Shift; se l'utente tiene Shift, startMarquee leggerà shiftKey
-              startMarquee({
-                clientX: ox,
-                clientY: oy,
-                shiftKey: e.shiftKey,
-              });
+              if (stage._downShift) {
+                // Avvia marquee solo ora (oltre soglia)
+                startMarquee({
+                  clientX: ox,
+                  clientY: oy,
+                  shiftKey: true,
+                });
+              } else {
+                // Avvia pan solo ora (oltre soglia)
+                panning = true;
+                stage.style.cursor = "all-scroll";
+                const r = stage.getBoundingClientRect();
+                startPan = {
+                  x: ox - r.left - state.pan.x,
+                  y: oy - r.top - state.pan.y,
+                };
+              }
               gestureMoved = true;
               return;
             }
           }
 
-          // Pan attivo (space o trackpad)
+          // Pan attivo
           if (panning) {
             const r = stage.getBoundingClientRect();
             state.pan.x = e.clientX - r.left - startPan.x;
@@ -2727,28 +2267,18 @@
           "wheel",
           (e) => {
             e.preventDefault();
-
-            // Se pinch/zoom (ctrlKey attivo) → zoom
-            if (e.ctrlKey) {
-              const sensitivity = 0.012,
-                d = -e.deltaY * sensitivity,
-                old = state.zoom;
-              const z = Math.min(3, Math.max(0.25, old * (1 + d)));
-              const r = stage.getBoundingClientRect();
-              const mx = e.clientX - r.left,
-                my = e.clientY - r.top;
-              const wx = (mx - state.pan.x) / old,
-                wy = (my - state.pan.y) / old;
-              state.zoom = z;
-              state.pan.x = mx - wx * z;
-              state.pan.y = my - wy * z;
-              applyView();
-              return;
-            }
-
-            // Altrimenti → pan con due dita trackpad
-            state.pan.x -= e.deltaX;
-            state.pan.y -= e.deltaY;
+            const sensitivity = 0.012,
+              d = -e.deltaY * sensitivity,
+              old = state.zoom;
+            const z = Math.min(3, Math.max(0.25, old * (1 + d)));
+            const r = stage.getBoundingClientRect();
+            const mx = e.clientX - r.left,
+              my = e.clientY - r.top;
+            const wx = (mx - state.pan.x) / old,
+              wy = (my - state.pan.y) / old;
+            state.zoom = z;
+            state.pan.x = mx - wx * z;
+            state.pan.y = my - wy * z;
             applyView();
           },
           { passive: false }
@@ -2806,8 +2336,7 @@
             curX: e.clientX - r.left,
             curY: e.clientY - r.top,
             el: rect,
-            // Modalità: di default "replace"; con Shift → "toggle"
-            mode: e.shiftKey ? "toggle" : "replace",
+            additive: e.shiftKey,
             prevNodes: new Set(state.selNodes),
             prevEdges: new Set(state.selEdges),
           };
@@ -2850,20 +2379,15 @@
               .map((n) => n.id)
           );
 
-          if (state.marquee.mode === "toggle") {
-            // XOR tra selezione precedente e nodi “colpiti”
-            const next = new Set(state.marquee.prevNodes);
-            for (const id of hitsNodes) {
-              if (next.has(id)) next.delete(id);
-              else next.add(id);
-            }
-            state.selNodes = next;
-            // mantieni gli edge com’erano (non tocchiamo gli edge in marquee)
-            state.selEdges = new Set(state.marquee.prevEdges);
+          if (state.marquee.additive) {
+            state.selNodes = new Set([
+              ...state.marquee.prevNodes,
+              ...hitsNodes,
+            ]);
+            state.selEdges = new Set(state.marquee.prevEdges); // preserva
           } else {
-            // replace (default): seleziona solo i nodi colpiti, nessun edge
             state.selNodes = hitsNodes;
-            state.selEdges = new Set();
+            state.selEdges = new Set(); // none
           }
           refreshNodeSelectionClasses();
           applyEdgeSelection();
@@ -2975,11 +2499,7 @@
           if (!s || !t || s === t) return;
           if (state.edges.some((e) => e.s === s && e.t === t)) return;
           state.edges.push({ s, t, dashed: false });
-          // Ricostruisci l’SVG dei path-hit per abilitare click/selection
-          if (typeof renderEdges === "function") renderEdges();
-          // Ridisegna il canvas (vista)
-          if (typeof scheduleEdgeCanvasDraw === "function")
-            scheduleEdgeCanvasDraw();
+          scheduleEdgeCanvasDraw();
         }
         function anchor(id, side) {
           const n = getNodeById(id);
@@ -2987,79 +2507,6 @@
           const x = side === "right" ? n.x + (n.w || NODE_W) : n.x;
           const y = n.y + (n.h || NODE_H) / 2;
           return { x, y };
-        }
-        // Ritorna target dal puntatore: handle o nodo compatibile, altrimenti null
-        // fromSide: "out" cerca target lato "left"; "in" cerca target lato "right"
-        function pickDropTargetFromPointer(clientX, clientY, fromSide) {
-          const el = document.elementFromPoint(clientX, clientY);
-          if (!el) return null;
-
-          const handle = el.classList?.contains?.("handle")
-            ? el
-            : el.closest?.(".handle");
-          const wantAnchorSide = fromSide === "out" ? "left" : "right";
-
-          if (handle) {
-            const nodeEl = handle.closest(".node");
-            if (nodeEl?.id) {
-              const a = anchor(nodeEl.id, wantAnchorSide);
-              return {
-                nodeId: nodeEl.id,
-                side: wantAnchorSide,
-                wx: a.x,
-                wy: a.y,
-              };
-            }
-          }
-
-          const nodeEl = el.classList?.contains?.("node")
-            ? el
-            : el.closest?.(".node");
-          if (nodeEl?.id) {
-            const a = anchor(nodeEl.id, wantAnchorSide);
-            return {
-              nodeId: nodeEl.id,
-              side: wantAnchorSide,
-              wx: a.x,
-              wy: a.y,
-            };
-          }
-
-          return null;
-        }
-        // Raggio di snap in pixel schermo (indipendente dallo zoom)
-        const SNAP_PX = 18;
-        // Trova handle compatibile più vicino a worldX/worldY
-        function findNearestCompatibleHandle(
-          worldX,
-          worldY,
-          fromSide,
-          excludeNodeIds = []
-        ) {
-          const wantSide = fromSide === "out" ? "left" : "right";
-          const excl = new Set(excludeNodeIds || []);
-          let best = null;
-          let bestDist = Infinity;
-          const p = fromWorld(worldX, worldY);
-          for (const n of state.nodes) {
-            if (!n) continue;
-            if (excl.has(n.id)) continue;
-            const a = anchor(n.id, wantSide);
-            const s = fromWorld(a.x, a.y);
-            const dist = Math.hypot(s.x - p.x, s.y - p.y);
-            if (dist <= SNAP_PX && dist < bestDist) {
-              bestDist = dist;
-              best = {
-                nodeId: n.id,
-                side: wantSide,
-                wx: a.x,
-                wy: a.y,
-                sx: s.x,
-                sy: s.y,
-              };
-            }
-          }
-          return best;
         }
         function pathCubic(a, b) {
           const dx = Math.max(40, Math.abs(b.x - a.x) * 0.5);
@@ -3115,52 +2562,9 @@
             );
             ph.setAttribute("d", pathCubic(s, t));
             ph.setAttribute("class", "edge-hit");
-            ph.setAttribute("pointer-events", "stroke");
-            ph.setAttribute("vector-effect", "non-scaling-stroke");
-            ph.setAttribute("stroke", "#000");
-            ph.setAttribute("stroke-opacity", "0.001");
-            ph.setAttribute("stroke-width", "16");
-            ph.setAttribute("fill", "none");
 
-            ph.addEventListener("click", (ev) => {
+            g.addEventListener("click", (ev) => {
               ev.stopPropagation();
-
-              // SHIFT → split con nodo copia (tutto tranne desc e files)
-              if (ev.shiftKey) {
-                pushHistory();
-                const mid = { x: (s.x + t.x) / 2, y: (s.y + t.y) / 2 };
-                const srcNode = getNodeById(e.s);
-                const d = srcNode?.data || {};
-                const init = {
-                  date: d.date || todayYMD(),
-                  title: d.title || "",
-                  type: d.type || "",
-                  action: d.action ?? null,
-                  mainArea: d.mainArea ?? null,
-                  areas: [...(d.areas || [])],
-                  tags: [...(d.tags || [])],
-                  desc: "",
-                  links: [...(d.links || [])],
-                  files: [],
-                };
-                const nid = addNodeAt(
-                  mid.x - NODE_W / 2,
-                  mid.y - NODE_H / 2,
-                  init
-                );
-                const dashed = !!e.dashed;
-                state.edges.splice(i, 1);
-                state.edges.push(
-                  { s: e.s, t: nid, dashed },
-                  { s: nid, t: e.t, dashed }
-                );
-                if (typeof renderEdges === "function") renderEdges();
-                if (typeof scheduleEdgeCanvasDraw === "function")
-                  scheduleEdgeCanvasDraw();
-                return;
-              }
-
-              // ALT → split con nodo vuoto (comportamento precedente)
               if (ev.altKey) {
                 pushHistory();
                 const mid = { x: (s.x + t.x) / 2, y: (s.y + t.y) / 2 };
@@ -3175,32 +2579,20 @@
                   { s: e.s, t: nid, dashed },
                   { s: nid, t: e.t, dashed }
                 );
-                if (typeof renderEdges === "function") renderEdges();
-                if (typeof scheduleEdgeCanvasDraw === "function")
-                  scheduleEdgeCanvasDraw();
+                renderEdges();
                 return;
               }
-
-              // Click normale → selezione
-              if (ev.shiftKey) {
-                toggleEdgeSelection(i);
-              } else {
-                selectOnlyEdges([i]);
-              }
-              if (typeof scheduleEdgeCanvasDraw === "function")
-                scheduleEdgeCanvasDraw();
+              if (ev.shiftKey) toggleEdgeSelection(i);
+              else selectOnlyEdges([i]);
             });
 
-            /* Metti il path di hit SOPRA a quello visibile per priorità al click */
-            g.appendChild(pv);
             g.appendChild(ph);
+            g.appendChild(pv);
             edgesSVG.appendChild(g);
           });
 
           if (state.dragLink && state.dragLink.active) {
-            const t = state.dragLink.snap
-              ? { x: state.dragLink.snap.wx, y: state.dragLink.snap.wy }
-              : { x: state.dragLink.x, y: state.dragLink.y };
+            const t = { x: state.dragLink.x, y: state.dragLink.y };
             for (const sid of state.dragLink.sources) {
               const fromAnchor =
                 state.dragLink.from === "out"
@@ -3546,10 +2938,10 @@
 
           ensureSVGSize();
           updateGrid();
-          // Prima costruisci i path di hit nello SVG, poi ridisegna il canvas
-          if (typeof renderEdges === "function") renderEdges();
+          // ridisegna edge con posizioni corrette
           if (typeof scheduleEdgeCanvasDraw === "function")
             scheduleEdgeCanvasDraw();
+          else renderEdges();
         }
 
         function undo() {
@@ -3602,10 +2994,7 @@
 
           ensureSVGSize();
           updateGrid();
-          // Ricostruisci l'SVG dei path di hit e aggiorna il canvas
-          if (typeof renderEdges === "function") renderEdges();
-          if (typeof scheduleEdgeCanvasDraw === "function")
-            scheduleEdgeCanvasDraw();
+          renderEdges();
           refreshNodeSelectionClasses();
           applyEdgeSelection();
           updateSidebarSelectionLabel();
@@ -3614,10 +3003,8 @@
         }
 
         // Clipboard/group
-        let pasteCount = 0;
         function copySelection() {
           if (!state.selNodes.size) return;
-          pasteCount = 0;
           const ids = [...state.selNodes];
           const nodes = ids.map((id) => structuredClone(getNodeById(id)));
           const edges = state.edges
@@ -3633,14 +3020,9 @@
           doDeleteSelection();
           setStatus("Cut selection");
         }
-        function pasteClipboard(offsetBase = { x: 40, y: 40 }) {
+        function pasteClipboard(offset = { x: 40, y: 40 }) {
           if (!state.clip) return;
           pushHistory();
-          const offset = {
-            x: offsetBase.x * (pasteCount + 1),
-            y: offsetBase.y * (pasteCount + 1),
-          };
-          pasteCount++;
           const idMap = new Map();
           const pastedIds = [];
           for (const src of state.clip.nodes) {
