@@ -1068,7 +1068,7 @@
   <body>
     <div class="app">
       <header style="grid-column: 1/3">
-        <button id="btnNew" data-tip="New project">
+        <button id="btnNew" data-tip="New project (Cmd/Ctrl+N)">
           <span class="material-symbols-outlined">note_add</span>
         </button>
         <button id="btnOpen" data-tip="Open (Cmd/Ctrl+O)">
@@ -1080,11 +1080,7 @@
         <button id="btnAdd" data-tip="New node (N)">
           <span class="material-symbols-outlined">add_box</span>
         </button>
-        <button
-          id="btnConnect"
-          class="connect"
-          data-tip="Connect nodes (Shift+C)"
-        >
+        <button id="btnConnect" class="connect" data-tip="Connect nodes (C)">
           <span class="material-symbols-outlined">conversion_path</span>
         </button>
         <button id="btnAuto" data-tip="Auto layout (Alt+A)">
@@ -1379,41 +1375,10 @@
             tag === "TEXTAREA" ||
             document.activeElement?.isContentEditable;
           if (inText) return;
-          // Shift + C → comporta come pressione del pulsante Connect
-          if (e.key.toLowerCase() === "c" && e.shiftKey) {
+          if (e.key.toLowerCase() === "c") {
             e.preventDefault();
-            btnConnect?.click();
-            return;
-          }
-          // C semplice → collega esattamente 2 nodi selezionati (senza toccare il pulsante)
-          if (
-            e.key.toLowerCase() === "c" &&
-            !e.shiftKey &&
-            !e.metaKey &&
-            !e.ctrlKey &&
-            !e.altKey
-          ) {
-            e.preventDefault();
-            const ids = [...state.selNodes];
-            if (ids.length === 2) {
-              const a = getNodeById(ids[0]);
-              const b = getNodeById(ids[1]);
-              if (a && b && a.id !== b.id) {
-                // Direzione: sinistra → destra; se X uguali, alto → basso
-                let s = a.id,
-                  t = b.id;
-                if (a.x > b.x || (a.x === b.x && a.y > b.y)) {
-                  s = b.id;
-                  t = a.id;
-                }
-                if (!state.edges.some((e) => e.s === s && e.t === t)) {
-                  pushHistory();
-                  addEdge(s, t);
-                  renderEdges();
-                  setStatus("Created 1 connection.");
-                }
-              }
-            }
+            if (!connectMode) enterConnectMode();
+            else btnConnect?.click();
             return;
           }
           if (e.key === "Escape" && connectMode) {
@@ -2147,7 +2112,11 @@
               redo();
               return;
             }
-            // RIMOSSO: Cmd/Ctrl+N (nessuna scorciatoia per New Project)
+            if ((e.metaKey || e.ctrlKey) && k === "n") {
+              e.preventDefault();
+              saveProjectSmart().then(() => newProject());
+              return;
+            }
             if (k === "o") {
               e.preventDefault();
               openProject();
@@ -2168,7 +2137,11 @@
               exportJSON();
               return;
             }
-            // RIMOSSO: N con modificatori (nessuna scorciatoia per New Project)
+            if (k === "n") {
+              e.preventDefault();
+              newProject();
+              return;
+            }
             if (k === "a" && !e.shiftKey) {
               e.preventDefault();
               selectAll();
@@ -3985,47 +3958,23 @@
             }
           }
 
-          /* Dentro a saveProjectToDir(dir): nuova copia con compressione immagini + stato */
-          const total = toCopy.length;
-          let done = 0;
-
-          if (total > 0) {
-            setStatus("Saving assets (0/" + total + ")");
-          }
-
+          // Copia con concorrenza limitata (no ricompressione)
           await asyncPool(2, toCopy, async ({ file }) => {
             try {
-              let blob = await fetch(file.url).then((r) => r.blob());
-
-              const baseName = sanitizeName(
+              const blob = await fetch(file.url).then((r) => r.blob());
+              const base = sanitizeName(
                 (file.name || "file").replace(/\s+/g, "_")
               );
-              const noExt = baseName.replace(/\.[a-z0-9]+$/i, "");
-              let finalName, rel;
-
-              if (file.isImage) {
-                // Ricompressione a JPG 1500px lato lungo
-                const jpg = await resizeImageBlob(blob, 1500, 512 * 1024);
-                finalName = `${noExt}.jpg`;
-                rel = `assets/${finalName}`;
-                await writeFileByPath(dir, rel, jpg);
-              } else {
-                const ext =
-                  extFromName(baseName) || (file.isPDF ? ".pdf" : ".bin");
-                finalName = extFromName(baseName)
-                  ? baseName
-                  : `${baseName}${ext}`;
-                rel = `assets/${finalName}`;
-                await writeFileByPath(dir, rel, blob);
-              }
-
-              file.path = rel;
-              delete file.dataUrl;
+              const ext =
+                extFromName(base) ||
+                (file.isPDF ? ".pdf" : file.isImage ? ".jpg" : ".bin");
+              const name = extFromName(base) ? base : base + ext;
+              const rel = `assets/${name}`;
+              await writeFileByPath(dir, rel, blob);
+              file.path = rel; // marca come salvato
+              delete file.dataUrl; // nessun embed
             } catch (e) {
               console.warn("Copy failed:", file?.name, e);
-            } finally {
-              done++;
-              setStatus(`Saving assets (${done}/${total})`);
             }
           });
 
@@ -4834,8 +4783,8 @@
         { id: "btnAuto", label: "Auto layout (⇧A)" },
         { id: "btnOpen", label: "Open project (⌘O)" },
         { id: "btnSave", label: "Save project (⌘S)" },
-        { id: "btnNew", label: "New project" },
-        { id: "btnConnect", label: "Connect nodes" },
+        { id: "btnNew", label: "New project (⌘N)" },
+        { id: "btnConnect", label: "Connect nodes (⇧C)" },
         { id: "btnUndo", label: "Undo (⌘Z)" },
         { id: "btnRedo", label: "Redo (⌘⇧Z)" },
       ];
