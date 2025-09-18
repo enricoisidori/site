@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Threadscape 3D Visualizer — Polar (ESM + Import Map)</title>
+    <!-- Favicon inline per evitare 404 su /favicon.ico -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23000'/%3E%3C/svg%3E"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
+          Cantarell, "Helvetica Neue", Arial;
+      }
+      #ui {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 8px 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      #drop {
+        position: fixed;
+        inset: 0;
+        border: 2px dashed #ddd;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #777;
+        background: rgba(255, 255, 255, 0.85);
+        z-index: 9;
+      }
+      #credits {
+        position: fixed;
+        left: 10px;
+        bottom: 10px;
+        font-size: 12px;
+        color: #444;
+        background: rgba(255, 255, 255, 0.85);
+        padding: 4px 8px;
+        border-radius: 8px;
+        border: 1px solid #e6e6e6;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+    <!-- Polyfill per import maps in browser non aggiornati (necessario su file:// in alcuni ambienti) -->
+    <script
+      async
+      src="https://ga.jspm.io/npm:es-module-shims@1.10.0/dist/es-module-shims.js"
+    ></script>
+    <!-- Import Map: risolve i bare specifiers "three" e "three/addons/.." -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="ui">
+      <input type="file" id="file" accept="application/json" />
+      <button id="btnDemo" title="Carica demo minima">Demo</button>
+    </div>
+    <div id="drop">Rilascia qui un project.json</div>
+    <div id="credits">Orbit: drag • Zoom: wheel • Pan: Shift+drag</div>
+
+    <script type="module">
+      // Nota: Se apri via file:// e vedi ancora "Failed to resolve module specifier 'three'",
+      // il tuo browser non supporta import maps senza polyfill. Questo file carica es-module-shims
+      // che abilita i bare specifiers anche in ambienti sandbox. In alternativa, servi via http.
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      // --- Self-tests (non toccare): aiutano a diagnosticare import/compat ---
+      console.assert(
+        typeof THREE.WebGLRenderer === "function",
+        "[TEST] THREE import fallito"
+      );
+      console.assert(
+        typeof OrbitControls === "function",
+        "[TEST] OrbitControls import fallito"
+      );
+
+      let renderer, scene, camera, controls, nodesGroup, edgesGroup;
+
+      init();
+      animate();
+
+      function init() {
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+        renderer.setSize(innerWidth, innerHeight);
+        renderer.setClearColor(0xffffff, 1);
+        document.body.appendChild(renderer.domElement);
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(
+          60,
+          innerWidth / innerHeight,
+          0.1,
+          5000
+        );
+        camera.position.set(0, 400, 800);
+
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.screenSpacePanning = false;
+
+        nodesGroup = new THREE.Group();
+        edgesGroup = new THREE.Group();
+        scene.add(nodesGroup);
+        scene.add(edgesGroup);
+        scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+        window.addEventListener("resize", () => {
+          camera.aspect = innerWidth / innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(innerWidth, innerHeight);
+        });
+
+        // Drag & Drop overlay
+        const drop = document.getElementById("drop");
+        ["dragenter", "dragover"].forEach((ev) =>
+          window.addEventListener(ev, (e) => {
+            e.preventDefault();
+            drop.style.display = "flex";
+          })
+        );
+        ["dragleave", "drop"].forEach((ev) =>
+          window.addEventListener(ev, (e) => {
+            e.preventDefault();
+            drop.style.display = "none";
+          })
+        );
+        window.addEventListener("drop", async (e) => {
+          const f = e.dataTransfer?.files?.[0];
+          if (!f) return;
+          const project = JSON.parse(await f.text());
+          buildScene(project);
+        });
+
+        document
+          .getElementById("file")
+          .addEventListener("change", async (e) => {
+            const f = e.target.files[0];
+            if (!f) return;
+            const project = JSON.parse(await f.text());
+            buildScene(project);
+          });
+
+        document.getElementById("btnDemo").addEventListener("click", () => {
+          buildScene(makeDemoProject());
+        });
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+
+      function buildScene(project) {
+        nodesGroup.clear();
+        edgesGroup.clear();
+
+        const nodes = project.nodes || [];
+        const edges = project.edges || [];
+
+        // Ricava l'ordine delle aree (polar) da vocab, altrimenti fallback.
+        const areas =
+          project.vocab?.areas && project.vocab.areas.length
+            ? project.vocab.areas
+            : ["Doctrine", "Influence", "Alteration"];
+        const angleMap = new Map(
+          areas.map((a, i) => [
+            a,
+            (i / Math.max(areas.length, 1)) * Math.PI * 2,
+          ])
+        );
+
+        const pos = new Map();
+        nodes.forEach((n, idx) => {
+          const area = n.data?.mainArea || n.data?.areas?.[0] || areas[0];
+          const theta = angleMap.get(area) ?? 0;
+          const radius = 320;
+          const zVal = -idx * 100; // profondità DAG (ordine nel paper)
+          const x = Math.cos(theta) * radius;
+          const y = Math.sin(theta) * radius;
+          pos.set(n.id, new THREE.Vector3(x, y, zVal));
+
+          const g = new THREE.Group();
+          g.position.set(x, y, zVal);
+          g.add(makeLabel(n.data?.title || n.id, 24));
+          if (n.data?.desc) {
+            const d = makeLabel(n.data.desc, 14, 900, 2);
+            d.position.set(0, -22, 0);
+            g.add(d);
+          }
+          if ((n.data?.tags || []).length) {
+            const t = makeLabel(
+              "[" +
+                n.data.tags.slice(0, 6).join(", ") +
+                (n.data.tags.length > 6 ? "…" : "") +
+                "]",
+              12,
+              900,
+              1
+            );
+            t.position.set(0, -38, 0);
+            g.add(t);
+          }
+          nodesGroup.add(g);
+        });
+
+        // Archi non direzionali (linee grigie)
+        const pts = [];
+        const cols = [];
+        const col = new THREE.Color(0x999999);
+        edges.forEach((e) => {
+          const a = pos.get(e.s),
+            b = pos.get(e.t);
+          if (!a || !b) return;
+          pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
+          for (let i = 0; i < 2; i++) cols.push(col.r, col.g, col.b);
+        });
+        if (pts.length) {
+          const lineGeom = new THREE.BufferGeometry();
+          lineGeom.setAttribute(
+            "position",
+            new THREE.Float32BufferAttribute(new Float32Array(pts), 3)
+          );
+          lineGeom.setAttribute(
+            "color",
+            new THREE.Float32BufferAttribute(new Float32Array(cols), 3)
+          );
+          const lines = new THREE.LineSegments(
+            lineGeom,
+            new THREE.LineBasicMaterial({
+              vertexColors: true,
+              transparent: true,
+              opacity: 0.9,
+            })
+          );
+          edgesGroup.add(lines);
+        }
+
+        frameAll(pos);
+      }
+
+      function frameAll(posMap) {
+        if (posMap.size === 0) return;
+        let minX = +Infinity,
+          minY = +Infinity,
+          minZ = +Infinity,
+          maxX = -Infinity,
+          maxY = -Infinity,
+          maxZ = -Infinity;
+        for (const p of posMap.values()) {
+          if (p.x < minX) minX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.z < minZ) minZ = p.z;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y > maxY) maxY = p.y;
+          if (p.z > maxZ) maxZ = p.z;
+        }
+        const cx = (minX + maxX) / 2,
+          cy = (minY + maxY) / 2,
+          cz = (minZ + maxZ) / 2;
+        const span = Math.max(maxX - minX, maxY - minY, maxZ - minZ);
+        controls.target.set(cx, cy, cz);
+        camera.position.set(
+          cx + span * 0.6 + 400,
+          cy + span * 0.4 + 200,
+          cz + span * 0.8 + 400
+        );
+        camera.near = 0.1;
+        camera.far = Math.max(3000, span * 5 + 1000);
+        camera.updateProjectionMatrix();
+      }
+
+      // Etichetta canvas -> Sprite (testo nero, senza bordo). Con wrapping opzionale.
+      function makeLabel(text, size = 16, maxWidth = 800, maxLines = 3) {
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const font = `${
+          size * dpr
+        }px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial`;
+        ctx.font = font;
+        ctx.fillStyle = "#000";
+        ctx.textBaseline = "top";
+        const lines = wrapText(
+          ctx,
+          String(text || ""),
+          maxWidth * dpr,
+          maxLines
+        );
+        const lh = Math.round(size * 1.25 * dpr);
+        const w = Math.min(
+          maxWidth * dpr,
+          Math.max(2, ...lines.map((l) => ctx.measureText(l).width))
+        );
+        const h = Math.max(lh * lines.length, lh);
+        canvas.width = Math.ceil(w + 10 * dpr);
+        canvas.height = Math.ceil(h + 6 * dpr);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = font;
+        ctx.fillStyle = "#000";
+        let y = 0;
+        for (const line of lines) {
+          const tw = ctx.measureText(line).width;
+          const x = (canvas.width - tw) / 2;
+          ctx.fillText(line, Math.round(x), Math.round(y));
+          y += lh;
+        }
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.anisotropy = 2;
+        const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+        const sprite = new THREE.Sprite(mat);
+        const scale = 0.5 / dpr;
+        sprite.scale.set(canvas.width * scale, canvas.height * scale, 1);
+        return sprite;
+      }
+      function wrapText(ctx, text, maxW, maxLines = Infinity) {
+        const words = String(text || "").split(/\s+/);
+        const lines = [];
+        let line = "";
+        for (const w of words) {
+          const test = line ? line + " " + w : w;
+          if (ctx.measureText(test).width > maxW) {
+            if (line) lines.push(line);
+            line = w;
+            if (lines.length >= maxLines - 1) {
+              while (
+                ctx.measureText(line + "…").width > maxW &&
+                line.length > 1
+              ) {
+                line = line.slice(0, -1);
+              }
+              lines.push(line + "…");
+              return lines;
+            }
+          } else line = test;
+        }
+        if (line) lines.push(line);
+        return lines;
+      }
+
+      function makeDemoProject() {
+        return {
+          version: 6,
+          nodes: [
+            N("Intro", "Section", ["Doctrine"], ["overview"], "Primo nodo"),
+            N(
+              "Influence",
+              "Framework",
+              ["Influence"],
+              ["PSYOP"],
+              "Manipolazione"
+            ),
+            N(
+              "Alteration",
+              "Framework",
+              ["Alteration"],
+              ["BCI"],
+              "Ibridazione"
+            ),
+          ],
+          edges: [
+            { s: "n1", t: "n2" },
+            { s: "n2", t: "n3" },
+          ],
+          vocab: {
+            areas: ["Doctrine", "Influence", "Alteration"],
+            tags: [],
+            type: [],
+          },
+        };
+        function N(title, type, areas, tags, desc) {
+          const seq = (N.__i = (N.__i || 0) + 1);
+          return {
+            id: "n" + seq,
+            x: 0,
+            y: 0,
+            w: 320,
+            h: 180,
+            group: null,
+            data: {
+              date: "",
+              title,
+              type,
+              mainArea: areas[0],
+              areas,
+              tags,
+              desc,
+              links: [],
+              files: [],
+            },
+          };
+        }
+      }
+    </script>
+  </body>
+</html>

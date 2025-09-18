@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>3D Visualizer – Text Nodes</title>
+    <style>
+      html,
+      body,
+      #scene {
+        height: 100%;
+        margin: 0;
+        background: #0c0c0c;
+        color: #eee;
+        font: 14px/1.4 system-ui;
+      }
+      .toolbar {
+        position: fixed;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+      }
+      .toolbar button,
+      .toolbar label {
+        background: #141414;
+        border: 1px solid #333;
+        color: #eee;
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .panel {
+        position: fixed;
+        left: 8px;
+        top: 8px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid #333;
+        padding: 8px;
+        border-radius: 8px;
+        max-width: 360px;
+        backdrop-filter: blur(2px);
+      }
+      .panel h3 {
+        margin: 0 0 6px 0;
+        font-size: 13px;
+        color: #bbb;
+      }
+      .muted {
+        color: #aaa;
+        font-size: 12px;
+      }
+      .tooltip {
+        position: fixed;
+        pointer-events: none;
+        background: #111;
+        border: 1px solid #333;
+        color: #eee;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        max-width: 420px;
+        display: none;
+      }
+    </style>
+    <!-- Three prima di TUTTO -->
+    <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+    <!-- 3d-force-graph -->
+    <script src="https://unpkg.com/3d-force-graph"></script>
+    <!-- three-spritetext, ORA dopo THREE -->
+    <script src="https://unpkg.com/three-spritetext"></script>
+    <script>
+      // Fail-safe: se per CDN o cache SpriteText fosse namespaced, prendilo da window
+      const SpriteText = window.SpriteText || window['three-spritetext'] || null;
+      if (!SpriteText) {
+        console.warn(
+          'SpriteText non disponibile; userò le label standard come fallback.'
+        );
+      }
+    </script>
+  </head>
+  <body>
+    <div id="scene"></div>
+
+    <div class="toolbar">
+      <label>
+        <input
+          id="file"
+          type="file"
+          accept="application/json"
+          style="display: none"
+        />
+        Carica JSON…
+      </label>
+      <button id="btnLoadExample">Apri graphdata.json</button>
+      <button id="btnFit">Fit</button>
+      <button id="btnToggleSize">Text ±</button>
+    </div>
+
+    <div class="panel">
+      <h3>Legenda / Note</h3>
+      <div class="muted">
+        I nodi sono testo (niente palline). Colore = <em>group</em> (tipicamente
+        l’area).
+      </div>
+      <div class="muted">Hover per dettagli; click per centrare/zoomare.</div>
+    </div>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+      const el = document.getElementById("scene");
+      const Graph = ForceGraph3D()(el)
+        .backgroundColor("#0c0c0c")
+        .nodeRelSize(1) // irrilevante: non usiamo le palline
+        .nodeLabel(() => "") // niente balloon label, usiamo sprite+tooltip
+        .linkOpacity(0.35)
+        .linkWidth((l) => (l.dashed ? 0.6 : 1.4))
+        .linkColor((l) =>
+          l.dashed ? "rgba(200,200,200,0.25)" : "rgba(220,220,220,0.45)"
+        )
+        .enableNodeDrag(true)
+        .onNodeHover((node) => showTip(node))
+        .onNodeClick((node) => {
+          Graph.centerAt(node.x, node.y, 500);
+          Graph.zoom(3, 800);
+          lastPinned = node;
+        });
+
+      let lastPinned = null;
+      let textScale = 1.0; // scala globale del testo
+
+      // ————— TEXT NODES: use three-spritetext —————
+      Graph.nodeThreeObject((node) => {
+        if (!SpriteText) {
+          // Fallback se lo script non è pronto: oggetto vuoto (niente sfere)
+          return new THREE.Object3D();
+        }
+        const label = new SpriteText(node.name || node.id || "");
+        label.color = groupColor(node.group);
+        // textHeight: unità in world space; la percezione cambierà con zoom/distanza.
+        label.textHeight = 6 * textScale; // tweakabile con il bottone
+        // sfondo leggero per contrasto (three-spritetext supporta backgroundColor)
+        label.backgroundColor = "rgba(0,0,0,0.5)";
+        // NOTA: padding/border non sono standardizzati; manteniamo semplice.
+        return label;
+      }).nodeThreeObjectExtend(true); // usa SOLO il nostro oggetto (no sfere)
+
+      // —— Palette colore deterministica (by group) ——
+      const PALETTE = [
+        "#7aa2f7",
+        "#9ece6a",
+        "#f7768e",
+        "#bb9af7",
+        "#e0af68",
+        "#2ac3de",
+        "#c0caf5",
+        "#73daca",
+        "#7dcfff",
+        "#f6bd60",
+        "#ee6c4d",
+        "#84a59d",
+        "#f28482",
+        "#82aaff",
+        "#ffd166",
+      ];
+      function groupColor(g) {
+        if (!g) return "#cbd5e1";
+        let h = 0;
+        for (let i = 0; i < g.length; i++) h = (h * 31 + g.charCodeAt(i)) >>> 0;
+        return PALETTE[h % PALETTE.length];
+      }
+
+      // —— Tooltip ricco su hover ——
+      function showTip(node) {
+        const tip = document.getElementById("tooltip");
+        if (!node) {
+          tip.style.display = "none";
+          window.onmousemove = null;
+          return;
+        }
+        const tags = (node.tags || []).join(", ");
+        const areas = (node.areas || []).join(", ");
+        tip.innerHTML = `<b>${escapeHtml(node.name || node.id || "")}</b><br>
+        <span class="muted">${escapeHtml(
+          node.type || ""
+        )} &middot; group=${escapeHtml(node.group || "")}</span><br>
+        Areas: ${escapeHtml(areas)}<br>
+        Tags: ${escapeHtml(tags)}<br>
+        ${
+          node.desc
+            ? `<div style="margin-top:6px">${escapeHtml(node.desc)}</div>`
+            : ""
+        }`;
+        tip.style.display = "block";
+        window.onmousemove = (e) => {
+          tip.style.left = e.clientX + 12 + "px";
+          tip.style.top = e.clientY + 12 + "px";
+        };
+      }
+      function escapeHtml(s) {
+        if (!s) return "";
+        return ("" + s).replace(
+          /[&<>\"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+      }
+
+      // —— Toolbar actions ——
+      document.getElementById("btnFit").onclick = () => {
+        Graph.zoomToFit(600, 60);
+      };
+      document.getElementById("btnToggleSize").onclick = () => {
+        textScale = textScale >= 1.6 ? 0.8 : textScale + 0.2;
+        // riapplica nodeThreeObject per aggiornare textHeight
+        Graph.nodeThreeObject((node) => {
+          if (!SpriteText) return new THREE.Object3D();
+          const label = new SpriteText(node.name || node.id || "");
+          label.color = groupColor(node.group);
+          label.textHeight = 6 * textScale;
+          label.backgroundColor = "rgba(0,0,0,0.5)";
+          return label;
+        }).nodeThreeObjectExtend(true);
+      };
+
+      document.getElementById("btnLoadExample").onclick = async () => {
+        try {
+          const res = await fetch("graphdata.json", { cache: "no-cache" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          Graph.graphData(data);
+          setTimeout(() => Graph.zoomToFit(600, 60), 300);
+        } catch (err) {
+          alert(
+            'Impossibile caricare graphdata.json: assicurati che sia nella stessa cartella dell’HTML o usa "Carica JSON…".\nDettagli: ' +
+              err.message
+          );
+        }
+      };
+
+      document.querySelector("label").onclick = () =>
+        document.getElementById("file").click();
+      document.getElementById("file").onchange = async (e) => {
+        const fl = e.target.files[0];
+        if (!fl) return;
+        const text = await fl.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          return alert("JSON non valido");
+        }
+        // Accetta sia graphData diretto, sia Threadscape project.json (converte al volo)
+        if (isGraphData(data)) {
+          Graph.graphData(data);
+        } else if (isThreadscape(data)) {
+          Graph.graphData(convertProjectToGraphData(data));
+        } else {
+          return alert("Formato non riconosciuto");
+        }
+        setTimeout(() => Graph.zoomToFit(600, 60), 300);
+      };
+
+      function isGraphData(d) {
+        return (
+          d &&
+          Array.isArray(d.nodes) &&
+          Array.isArray(d.links) &&
+          (d.nodes.length === 0 || d.nodes[0].id !== undefined) &&
+          (d.links.length === 0 ||
+            ("source" in d.links[0] && "target" in d.links[0]))
+        );
+      }
+      function isThreadscape(d) {
+        return (
+          d && d.version && Array.isArray(d.nodes) && Array.isArray(d.edges)
+        );
+      }
+      function convertProjectToGraphData(project) {
+        const nodes = (project.nodes || []).map((n) => {
+          const d = n.data || {};
+          return {
+            id: n.id,
+            name: d.title || n.id,
+            group: d.mainArea || (d.areas && d.areas[0]) || "Other",
+            type: d.type || "",
+            areas: d.areas || [],
+            tags: d.tags || [],
+            desc: d.desc || "",
+          };
+        });
+        const seen = new Set();
+        const links = (project.edges || [])
+          .map((e) => {
+            const s = e.s,
+              t = e.t;
+            const key = [s, t].sort().join("||"); // de-dup indiretto (nondirezionale)
+            if (seen.has(key)) return null;
+            seen.add(key);
+            return { source: s, target: t, dashed: !!e.dashed };
+          })
+          .filter(Boolean);
+        return { nodes, links };
+      }
+    </script>
+  </body>
+</html>
