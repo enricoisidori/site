@@ -210,11 +210,11 @@
       }
 
       /* Description: campi testuali più leggibili */
-      /* supporta accapo e linee vuote nei nodi */
       .desc {
-        margin-top: 2px;
+        margin-top: 4px;
         font-size: 12px;
-        white-space: pre-wrap;
+        line-height: 1.4;
+        white-space: normal;
       }
 
       .node .title,
@@ -591,13 +591,9 @@
       }
       /* In fondo al SECONDO <style>, per eliminare il doppio disegno degli edge:
          manteniamo SOLO il canvas per la resa visiva; lo SVG resta solo per l'hit. */
-      .edge-visible {
-        display: none !important;
-      }
+      .edge-visible { display: none !important; }
 
-      /* === CSS (aggiungere in fondo al SECONDO <style>) ===================== */
-
-      /* Help panel layout */
+      /* === CSS: mettere in fondo al SECONDO <style> ====================== */
       #helpPanel {
         display: none;
         height: 100%;
@@ -613,13 +609,8 @@
         color: #fff;
         font-weight: 600;
       }
-      #helpPanel .doc-section {
-        border-top: 1px solid #333;
-        padding: 8px 0;
-      }
-      #helpPanel .doc-section:first-of-type {
-        border-top: none;
-      }
+      #helpPanel .doc-section { border-top: 1px solid #333; padding: 8px 0; }
+      #helpPanel .doc-section:first-of-type { border-top: none; }
       #helpPanel .doc-section h3 {
         margin: 0;
         font-size: 13px;
@@ -629,9 +620,7 @@
         align-items: center;
         gap: 6px;
       }
-      #helpPanel .doc-section h3 .material-symbols-outlined {
-        font-size: 18px;
-      }
+      #helpPanel .doc-section h3 .material-symbols-outlined { font-size: 18px; }
       #helpPanel .doc-section h3::after {
         content: "expand_more";
         font-family: "Material Symbols Outlined";
@@ -640,52 +629,41 @@
         opacity: 0.8;
         margin-left: auto;
       }
-      #helpPanel .doc-section.open h3::after {
-        content: "expand_less";
+      #helpPanel .doc-section.open h3::after { content: "expand_less"; }
+      #helpPanel .doc-body { display: none; margin-top: 6px; }
+      #helpPanel .doc-section.open .doc-body { display: block; }
+
+      /* Chip per shortcut nella doc (senza hover) */
+      #helpPanel .chip.kbd {
+        padding: 2px 8px;
+        border: 1px solid #444 !important;
+        border-radius: 6px;
+        background: #0f0f0f !important;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        pointer-events: none;           /* niente hover/click */
       }
-      #helpPanel .doc-body {
-        display: none;
-        margin-top: 6px;
+      #helpPanel .chip.kbd .material-symbols-outlined { font-size: 16px; }
+      #helpPanel .chip.kbd:hover { border-color: #444 !important; }
+
+      /* Badge IN/OUT nella doc */
+      .badge.io {
+        display: inline-block;
+        border: 1px solid #444;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+        margin: 0 4px;
       }
-      #helpPanel .doc-section.open .doc-body {
-        display: block;
-      }
+      .badge.io.out::before { content: "▸ "; }
+      .badge.io.in::before  { content: "◯ "; }
 
       /* Icon bullet per liste nella doc */
-      #helpPanel ul {
-        margin: 6px 0 0 0;
-        padding-left: 0;
-        list-style: none;
-      }
-      #helpPanel li {
-        margin: 4px 0;
-        display: flex;
-        gap: 6px;
-        align-items: flex-start;
-      }
-      #helpPanel li .material-symbols-outlined {
-        font-size: 16px;
-        line-height: 1.2;
-        opacity: 0.9;
-      }
-
-      /* Chip "type" solo per la prima lista di Node Structure */
-      #helpPanel .chip.type {
-        background: #222 !important;
-        border: none !important;
-        border-radius: 999px;
-        padding: 2px 10px;
-        color: #eee;
-        font-size: 12px;
-        display: inline-block;
-        margin: 2px 4px 4px 0;
-        pointer-events: none;
-      }
-
-      /* Nasconde sempre il vecchio titolo pannello proprietà */
-      #panelTitle {
-        display: none !important;
-      }
+      #helpPanel ul { margin: 6px 0 0 0; padding-left: 0; list-style: none; }
+      #helpPanel li { margin: 4px 0; display: flex; gap: 6px; align-items: flex-start; }
+      #helpPanel li .material-symbols-outlined { font-size: 16px; line-height: 1.2; opacity: 0.9; }
 
       /* Help button stile “figma-like” (senza bordo) */
       #btnHelp.icon-btn {
@@ -694,84 +672,11 @@
         padding: 6px 8px;
         border-radius: 8px;
       }
-      #btnHelp.icon-btn:hover {
-        background: var(--btn-hover) !important;
-      }
-      #btnHelp.icon-btn:active {
-        background: var(--btn-active) !important;
-      }
+      #btnHelp.icon-btn:hover { background: var(--btn-hover) !important; }
+      #btnHelp.icon-btn:active { background: var(--btn-active) !important; }
 
-      /* Overlay Help: full-screen, fuori da <aside> */
-      #helpOverlay {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        background: rgba(14, 14, 14, 0.86);
-        display: none;
-        padding: 32px;
-        overflow: auto;
-        -webkit-user-select: text;
-        user-select: text;
-      }
-      /* Pannello interno */
-      #helpOverlay .doc-box {
-        max-width: 920px;
-        margin: 0 auto;
-        background: var(--panel);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        overflow: hidden;
-      }
-      /* Header pannello */
-      #helpOverlay .doc-box-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        background: #1a1a1a;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      }
-      #helpOverlay .doc-title {
-        font-weight: 600;
-        font-size: 14px;
-        margin-right: auto;
-      }
-      #helpOverlay .doc-box-body {
-        padding: 16px;
-      }
-      /* Le sezioni doc esistenti si adattano dentro il box */
-      #helpOverlay .doc-section {
-        margin-bottom: 18px;
-      }
-      #helpOverlay .doc-section h3 {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 0 0 8px 0;
-      }
-      #helpOverlay .doc-section ul {
-        margin: 8px 0 0 18px;
-      }
-      #helpOverlay .doc-section li {
-        margin: 6px 0;
-      }
-      /* Bottoni stile toolbar, no bordo */
-      #helpOverlay .icon-btn {
-        appearance: none;
-        border: none;
-        background: transparent;
-        color: #eee;
-        padding: 6px 8px;
-        border-radius: 8px;
-        cursor: pointer;
-      }
-      #helpOverlay .icon-btn:hover {
-        background: var(--btn-hover);
-      }
-      #helpOverlay .icon-btn:active {
-        background: var(--btn-active);
-      }
+      /* Nasconde sempre l’header vecchio del pannello proprietà */
+      #panelTitle { display: none !important; }
     </style>
     <style>
       :root {
@@ -1289,6 +1194,7 @@
       <div id="stage"><svg id="edges" preserveAspectRatio="none"></svg></div>
 
       <aside>
+        
         <div id="nodeForm">
           <form onsubmit="return false;">
             <label>Date <input id="fDate" type="date" /></label>
@@ -1393,276 +1299,110 @@
           style="display: none"
         />
 
-        <!-- HTML: aggiungi il pannello help in fondo a <aside>, dopo i form -->
         <div id="helpPanel">
           <h2>Threadscape — Documentation</h2>
 
           <div class="doc-section open">
-            <h3>
-              <span class="material-symbols-outlined">lightbulb</span> Concept
-              and Purpose
-            </h3>
+            <h3><span class="material-symbols-outlined">lightbulb</span> Concept and Purpose</h3>
             <div class="doc-body">
-              <p>
-                Threadscape is a tool to map and reflect on design processes. It
-                is designed to capture the often nonlinear flow of ideas and
-                materials that emerge while working on a project.
-              </p>
-              <p>
-                Each node represents a design atom — not simply a chronological
-                step, but any meaningful element that shapes the project: a
-                concept, an artefact, a reference, an insight, and more. The map
-                shows how these elements branch and merge, making visible the
-                structure and logic of the process.
-              </p>
+              <p>Threadscape è uno strumento per mappare e riflettere sui processi di design. Serve a catturare il flusso non lineare di idee e materiali che emergono durante un progetto.</p>
+              <p>Ogni nodo rappresenta un “atomo di design” — non solo un passo cronologico, ma qualunque elemento che dà forma al progetto: <em>concept</em>, <em>artefact</em>, riferimento, insight, ecc. La mappa mostra come questi elementi si diramano e si ricompongono, rendendo visibile la struttura e la logica del processo.</p>
               <ul>
-                <li>
-                  <span class="material-symbols-outlined">flowchart</span>
-                  <strong>During a project:</strong><br />to clarify what is
-                  happening, explore alternatives, and make sense of complex
-                  progressions.
-                </li>
-                <li>
-                  <span class="material-symbols-outlined">door_open</span>
-                  <strong>After a project:</strong><br />to analyse its
-                  structure, conduct research on design processes, and
-                  communicate the underlying decisions and sources.
-                </li>
+                <li><span class="chip key">Durante</span> un progetto: chiarire cosa sta succedendo, esplorare alternative, dare senso a progressioni complesse.</li>
+                <li><span class="chip key">Dopo</span> un progetto: analizzare la struttura, fare ricerca sui processi, comunicare decisioni e fonti.</li>
               </ul>
-              <p>
-                It promotes open documentation and shared understanding of
-                design work. All data is stored locally and can be freely
-                modified or shared.
-              </p>
+              <p>I dati sono locali e modificabili/condivisibili liberamente.</p>
             </div>
           </div>
 
           <div class="doc-section">
-            <h3>
-              <span class="material-symbols-outlined">schema</span> Node
-              Structure
-            </h3>
+            <h3><span class="material-symbols-outlined">schema</span> Node Structure</h3>
             <div class="doc-body">
-              <p>
-                Un nodo può rappresentare: <span class="chip key">Brief</span>,
-                <span class="chip key">Source</span>,
-                <span class="chip key">Collection</span>,
-                <span class="chip key">Concept</span>,
-                <span class="chip key">Sketch</span>,
-                <span class="chip key">Artefact</span>,
-                <span class="chip key">Observation</span>,
-                <span class="chip key">Feedback</span>,
-                <span class="chip key">Decision</span>,
-                <span class="chip key">Output</span>.
-              </p>
+              <p>Un nodo può rappresentare: <span class="chip key">Brief</span>, <span class="chip key">Source</span>, <span class="chip key">Collection</span>, <span class="chip key">Concept</span>, <span class="chip key">Sketch</span>, <span class="chip key">Artefact</span>, <span class="chip key">Observation</span>, <span class="chip key">Feedback</span>, <span class="chip key">Decision</span>, <span class="chip key">Output</span>.</p>
               <p><strong>Campi (tutti opzionali):</strong></p>
               <ul>
-                <li>
-                  <span class="chip key">Title</span> — nome dell’elemento
-                </li>
-                <li>
-                  <span class="chip key">Date</span> — data chiave (precompilata
-                  ma editabile)
-                </li>
-                <li>
-                  <span class="chip key">Type</span> — categoria (es. Concept,
-                  Artefact…)
-                </li>
-                <li>
-                  <span class="chip key">Action</span> — atteggiamento (es.
-                  Exploring / Making)
-                </li>
-                <li>
-                  <span class="chip key">Main Area</span> — dominio primario
-                  (es. Speculation)
-                </li>
-                <li>
-                  <span class="chip key">Areas</span> — parole chiave secondarie
-                </li>
-                <li>
-                  <span class="chip key">Tags</span> — parole chiave libere per
-                  filtri
-                </li>
-                <li>
-                  <span class="chip key">Description</span> — testo (200–1000
-                  caratteri)
-                </li>
+                <li><span class="chip key">Title</span> — nome dell’elemento</li>
+                <li><span class="chip key">Date</span> — data chiave (precompilata ma editabile)</li>
+                <li><span class="chip key">Type</span> — categoria (es. Concept, Artefact…)</li>
+                <li><span class="chip key">Action</span> — atteggiamento (es. Exploring / Making)</li>
+                <li><span class="chip key">Main Area</span> — dominio primario (es. Speculation)</li>
+                <li><span class="chip key">Areas</span> — parole chiave secondarie</li>
+                <li><span class="chip key">Tags</span> — parole chiave libere per filtri</li>
+                <li><span class="chip key">Description</span> — testo (200–1000 caratteri)</li>
                 <li><span class="chip key">Links</span> — un link per riga</li>
-                <li>
-                  <span class="chip key">Files</span> — immagini/PDF (compressi
-                  in <code>assets/</code>)
-                </li>
+                <li><span class="chip key">Files</span> — immagini/PDF (compressi in <code>assets/</code>)</li>
               </ul>
-              <p>
-                <strong>Main Area vs Areas</strong><br />
-                <span class="chip key">Main Area</span> è un’etichetta unica per
-                il dominio primario.<br />
-                <span class="chip key">Areas</span> sono keyword multiple
-                (temi/contesti secondari).
+              <p><strong>Main Area vs Areas</strong><br>
+                <span class="chip key">Main Area</span> è un’etichetta unica per il dominio primario.<br>
+                <span class="chip key">Areas</span> sono keyword multiple (temi/contesti secondari).
               </p>
-              <p>
-                Il pannello suggerisce <span class="chip key">Type</span>,
-                <span class="chip key">Areas</span> e
-                <span class="chip key">Tags</span> già usati.
-              </p>
+              <p>Il pannello suggerisce <span class="chip key">Type</span>, <span class="chip key">Areas</span> e <span class="chip key">Tags</span> già usati.</p>
             </div>
           </div>
 
           <div class="doc-section">
-            <h3>
-              <span class="material-symbols-outlined">fork_right</span>
-              Connections and Interaction
-            </h3>
+            <h3><span class="material-symbols-outlined">fork_right</span> Connections and Interaction</h3>
             <div class="doc-body">
               <p>Le connessioni mostrano le relazioni tra nodi:</p>
               <ul>
-                <li>
-                  <span class="chip key">Dirette</span> — linea piena (relazione
-                  forte/esplicita)
-                </li>
-                <li>
-                  <span class="chip key">Weak</span> — linea tratteggiata
-                  (relazione indiretta/ipotetica)
-                </li>
+                <li><span class="chip key">Dirette</span> — linea piena (relazione forte/esplicita)</li>
+                <li><span class="chip key">Weak</span> — linea tratteggiata (relazione indiretta/ipotetica)</li>
               </ul>
               <p><strong>Interazioni base:</strong></p>
               <ul>
-                <li>
-                  Pan: <span class="chip kbd">Space</span> + trascina / trackpad
-                </li>
+                <li>Pan: <span class="chip kbd">Space</span> + trascina / trackpad</li>
                 <li>Zoom: rotella/trackpad</li>
                 <li>Selezione multipla: trascina per creare un rettangolo</li>
                 <li>Muovi nodi: trascina i nodi selezionati</li>
-                <li>
-                  Crea connessione: trascina da
-                  <span class="badge io out">OUT</span> a
-                  <span class="badge io in">IN</span>
-                </li>
-                <li>
-                  <span class="chip key">Alt/⌥</span> trascina nodi → duplica
-                  &amp; sposta
-                </li>
+                <li>Crea connessione: trascina da <span class="badge io out">OUT</span> a <span class="badge io in">IN</span></li>
+                <li><span class="chip key">Alt/⌥</span> trascina nodi → duplica &amp; sposta</li>
               </ul>
             </div>
           </div>
 
           <div class="doc-section">
-            <h3>
-              <span class="material-symbols-outlined">conversion_path</span>
-              Connect Tool
-            </h3>
+            <h3><span class="material-symbols-outlined">conversion_path</span> Connect Tool</h3>
             <div class="doc-body">
               <ol>
                 <li>Seleziona una o più sorgenti</li>
-                <li>
-                  Clicca
-                  <span
-                    class="material-symbols-outlined"
-                    style="vertical-align: middle"
-                    >conversion_path</span
-                  >
-                  <span class="chip key">Connect</span>
-                </li>
+                <li>Clicca <span class="material-symbols-outlined" style="vertical-align:middle;">conversion_path</span> <span class="chip key">Connect</span></li>
                 <li>Clicca i target da connettere</li>
-                <li>
-                  Riclicca <span class="chip key">Connect</span> per confermare
-                </li>
+                <li>Riclicca <span class="chip key">Connect</span> per confermare</li>
               </ol>
-              <p>
-                <span class="chip kbd">C</span> con esattamente 2 nodi
-                selezionati collega direttamente da sinistra a destra.
-              </p>
+              <p><span class="chip kbd">C</span> con esattamente 2 nodi selezionati collega direttamente da sinistra a destra.</p>
             </div>
           </div>
 
           <div class="doc-section">
-            <h3>
-              <span class="material-symbols-outlined">save</span> Saving and
-              Opening Projects
-            </h3>
+            <h3><span class="material-symbols-outlined">save</span> Saving and Opening Projects</h3>
             <div class="doc-body">
               <ul>
-                <li>
-                  Salvataggio crea: <code>project.json</code> + cartella
-                  <code>assets/</code>
-                </li>
-                <li>
-                  Le immagini nuove vengono convertite in
-                  <span class="chip key">JPEG</span>, lato lungo max
-                  <span class="chip key">1500px</span>, compresse
-                  automaticamente
-                </li>
-                <li>
-                  Per aprire: seleziona la cartella del progetto (carica
-                  <code>project.json</code>)
-                </li>
+                <li>Salvataggio crea: <code>project.json</code> + cartella <code>assets/</code></li>
+                <li>Le immagini nuove vengono convertite in <span class="chip key">JPEG</span>, lato lungo max <span class="chip key">1500px</span>, compresse automaticamente</li>
+                <li>Per aprire: seleziona la cartella del progetto (carica <code>project.json</code>)</li>
                 <li>Disponibile export leggero JSON (senza file)</li>
               </ul>
             </div>
           </div>
 
           <div class="doc-section">
-            <h3>
-              <span class="material-symbols-outlined">keyboard</span> Toolbar &
-              Shortcuts
-            </h3>
+            <h3><span class="material-symbols-outlined">keyboard</span> Toolbar & Shortcuts</h3>
             <div class="doc-body">
               <ul>
-                <li>
-                  <span class="chip key">New Project</span> —
-                  <span class="chip kbd">⌘/Ctrl + N</span>
-                </li>
-                <li>
-                  <span class="chip key">Open Project</span> —
-                  <span class="chip kbd">⌘/Ctrl + O</span>
-                </li>
-                <li>
-                  <span class="chip key">Save Project</span> —
-                  <span class="chip kbd">⌘/Ctrl + S</span>
-                </li>
-                <li>
-                  <span class="chip key">New Node</span> —
-                  <span class="chip kbd">N</span>
-                </li>
-                <li>
-                  <span class="chip key">Direct Connect</span> (2 selezionati) —
-                  <span class="chip kbd">C</span>
-                </li>
-                <li>
-                  <span class="chip key">Auto Layout</span> —
-                  <span class="chip kbd">⇧ + A</span>
-                </li>
-                <li>
-                  <span class="chip key">Undo</span> —
-                  <span class="chip kbd">⌘/Ctrl + Z</span>
-                </li>
-                <li>
-                  <span class="chip key">Redo</span> —
-                  <span class="chip kbd">⌘/Ctrl + ⇧ + Z</span>
-                </li>
-                <li>
-                  <span class="chip key">Fit View</span> —
-                  <span class="chip kbd">0</span>
-                </li>
-                <li>
-                  <span class="chip key">Upload Files</span> (nodo selezionato)
-                  — <span class="chip kbd">U</span>
-                </li>
-                <li>
-                  <span class="chip key">Group</span> —
-                  <span class="chip kbd">⌘/Ctrl + G</span>
-                </li>
-                <li>
-                  <span class="chip key">Ungroup</span> —
-                  <span class="chip kbd">⌘/Ctrl + ⇧ + G</span>
-                </li>
+                <li><span class="chip key">New Project</span> — <span class="chip kbd">⌘/Ctrl + N</span></li>
+                <li><span class="chip key">Open Project</span> — <span class="chip kbd">⌘/Ctrl + O</span></li>
+                <li><span class="chip key">Save Project</span> — <span class="chip kbd">⌘/Ctrl + S</span></li>
+                <li><span class="chip key">New Node</span> — <span class="chip kbd">N</span></li>
+                <li><span class="chip key">Direct Connect</span> (2 selezionati) — <span class="chip kbd">C</span></li>
+                <li><span class="chip key">Auto Layout</span> — <span class="chip kbd">⇧ + A</span></li>
+                <li><span class="chip key">Undo</span> — <span class="chip kbd">⌘/Ctrl + Z</span></li>
+                <li><span class="chip key">Redo</span> — <span class="chip kbd">⌘/Ctrl + ⇧ + Z</span></li>
+                <li><span class="chip key">Fit View</span> — <span class="chip kbd">0</span></li>
+                <li><span class="chip key">Upload Files</span> (nodo selezionato) — <span class="chip kbd">U</span></li>
+                <li><span class="chip key">Group</span> — <span class="chip kbd">⌘/Ctrl + G</span></li>
+                <li><span class="chip key">Ungroup</span> — <span class="chip kbd">⌘/Ctrl + ⇧ + G</span></li>
               </ul>
-              <p>
-                <strong>Selezione rapida:</strong>
-                <span class="chip key">⇧ + click</span> su nodi/edge per
-                multiselezione. <span class="chip key">⌥ + click</span> su edge
-                per inserire un nodo intermedio.
-              </p>
+              <p><strong>Selezione rapida:</strong> <span class="chip key">⇧ + click</span> su nodi/edge per multiselezione. <span class="chip key">⌥ + click</span> su edge per inserire un nodo intermedio.</p>
             </div>
           </div>
         </div>
@@ -1677,7 +1417,6 @@
           HGAP = 160,
           VGAP = 40,
           MIN_LAYER_GAP = 24;
-
         // JS: toggle pannello help + accordion (aggiungere nel blocco script principale)
         const btnHelp = document.getElementById("btnHelp");
         const helpPanel = document.getElementById("helpPanel");
@@ -1686,124 +1425,126 @@
         if (helpPanel) {
           helpPanel.innerHTML = `
           <h2>Threadscape — Documentation</h2>
-          <div class="doc-section open">
-            <h3><span class="material-symbols-outlined">lightbulb</span> Concept and Purpose</h3>
-            <div class="doc-body">
+          <div class=\"doc-section open\">
+            <h3><span class=\"material-symbols-outlined\">lightbulb</span> Concept and Purpose</h3>
+            <div class=\"doc-body\">
               <ul>
-                <li><span class="material-symbols-outlined">info</span>
+                <li><span class=\"material-symbols-outlined\">info</span>
                   <span>Threadscape is a tool to map and reflect on design processes. It is designed to capture the often nonlinear flow of ideas and materials that emerge while working on a project.</span>
                 </li>
-                <li><span class="material-symbols-outlined">account_tree</span>
+                <li><span class=\"material-symbols-outlined\">account_tree</span>
                   <span>Each node represents a design atom — not simply a chronological step, but any meaningful element that shapes the project: a concept, an artefact, a reference, an insight, and more. The map shows how these elements branch and merge, making visible the structure and logic of the process.</span>
                 </li>
-                <li><span class="material-symbols-outlined">schedule</span>
+                <li><span class=\"material-symbols-outlined\">schedule</span>
                   <span><strong>During a project</strong>, to clarify what is happening, explore alternatives, and make sense of complex progressions.</span>
                 </li>
-                <li><span class="material-symbols-outlined">history_edu</span>
+                <li><span class=\"material-symbols-outlined\">history_edu</span>
                   <span><strong>After a project</strong>, to analyse its structure, conduct research on design processes, and communicate the underlying decisions and sources.</span>
                 </li>
-                <li><span class="material-symbols-outlined">lock_open_right</span>
+                <li><span class=\"material-symbols-outlined\">lock_open_right</span>
                   <span>It promotes open documentation and shared understanding of design work. All data is stored locally and can be freely modified or shared.</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div class="doc-section">
-            <h3><span class="material-symbols-outlined">schema</span> Node Structure</h3>
-            <div class="doc-body">
-              <p>Each node can represent any meaningful element of a design process, such as:</p>
+          <div class=\"doc-section\">
+            <h3><span class=\"material-symbols-outlined\">schema</span> Node Structure</h3>
+            <div class=\"doc-body\">
               <ul>
-                <li><span class="chip type">Brief</span><br>the initial framing of the project, the question or design challenge that triggers it (project goal, starting hypothesis, constraint)</li>
-                <li><span class="chip type">Source</span><br>external material used as input and inspiration (case study, reference, article, artwork, dataset, book, website)</li>
-                <li><span class="chip type">Collection</span><br>curated group of references organised around a theme, showing a first layer of interpretation (moodboard, image set, text set)</li>
-                <li><span class="chip type">Concept</span><br>the core idea or proposition that drives exploration</li>
-                <li><span class="chip type">Sketch</span><br>embryonic design attempt, rough and provisional, not yet fully articulated (drawing, wireframe, doodle, draft)</li>
-                <li><span class="chip type">Artefact</span><br>tangible outcome produced during the process, with a degree of autonomy or completeness (prototype, installation, poster, website, editorial, app, gadget)</li>
-                <li><span class="chip type">Observation</span><br>reflection, analysis, and learning from the process, including when things don’t work (note, failure, discovery, insight)</li>
-                <li><span class="chip type">Feedback</span><br>external response and evaluation from others (peer comment, critique, review)</li>
-                <li><span class="chip type">Decision</span><br>moment where something is defined or chosen, shaping the direction (design choice, milestone, strategic shift)</li>
-                <li><span class="chip type">Output</span><br>the final, consolidated result</li>
+                <li><span class=\"material-symbols-outlined\">description</span><span><strong>Brief</strong> — initial framing of the project (goal, hypothesis, constraint)</span></li>
+                <li><span class=\"material-symbols-outlined\">import_contacts</span><span><strong>Source</strong> — external material (case study, article, artwork, dataset, book, website)</span></li>
+                <li><span class=\"material-symbols-outlined\">collections_bookmark</span><span><strong>Collection</strong> — curated references (moodboard, image/text set)</span></li>
+                <li><span class=\"material-symbols-outlined\">bolt</span><span><strong>Concept</strong> — core idea driving exploration</span></li>
+                <li><span class=\"material-symbols-outlined\">gesture</span><span><strong>Sketch</strong> — embryonic attempt (drawing, wireframe, draft)</span></li>
+                <li><span class=\"material-symbols-outlined\">deployed_code</span><span><strong>Artefact</strong> — tangible outcome (prototype, installation, poster, website, editorial, app)</span></li>
+                <li><span class=\"material-symbols-outlined\">insights</span><span><strong>Observation</strong> — reflection, analysis, learning (including failures)</span></li>
+                <li><span class=\"material-symbols-outlined\">reviews</span><span><strong>Feedback</strong> — external response (comment, critique, review)</span></li>
+                <li><span class=\"material-symbols-outlined\">task_alt</span><span><strong>Decision</strong> — definition that shapes direction (choice, milestone)</span></li>
+                <li><span class=\"material-symbols-outlined\">flag</span><span><strong>Output</strong> — final, consolidated result</span></li>
               </ul>
-
-              <h4 style="margin-top:18px; color:#bbb; font-size:12px; font-weight:600;">Node fields</h4>
-              <p>These fields describe the content of each node (all optional):</p>
-
               <ul>
-                <li><strong>Title</strong><br>name of the element, summarising the node content</li>
-                <li><strong>Date</strong><br>key date for the element (automatically set to the current date but editable and backdatable)</li>
-                <li><strong>Type</strong><br>choose or write a category (e.g. Concept, Artefact, Feedback...)</li>
-                <li><strong>Action</strong><br>the attitude involved, e.g. Exploring or Making</li>
-                <li><strong>Main Area</strong><br>the main disciplinary area (select only if it includes the node)</li>
-                <li><strong>Areas</strong><br>specific areas explored (comma-separated keywords)</li>
-                <li><strong>Tags</strong><br>free keywords for filtering; useful for recurring typologies, transversal, thematic, structural or methodological elements</li>
-                <li><strong>Description</strong><br>explanatory text (200–1000 characters including spaces)</li>
-                <li><strong>Links</strong><br>one link per line</li>
-                <li><strong>Files</strong><br>upload images or PDFs (they are stored and compressed automatically in the assets folder)</li>
+                <li><span class=\"material-symbols-outlined\">title</span><span><strong>Title</strong> — name of the element</span></li>
+                <li><span class=\"material-symbols-outlined\">event</span><span><strong>Date</strong> — key date (auto-set but editable/backdatable)</span></li>
+                <li><span class=\"material-symbols-outlined\">label</span><span><strong>Type</strong> — category (e.g. Concept, Artefact, Feedback…)</span></li>
+                <li><span class=\"material-symbols-outlined\">explore</span><span><strong>Action</strong> — e.g. Exploring or Making</span></li>
+                <li><span class=\"material-symbols-outlined\">category</span><span><strong>Main Area</strong> — primary domain (select only if it includes the node)</span></li>
+                <li><span class=\"material-symbols-outlined\">interests</span><span><strong>Areas</strong> — comma-separated keywords</span></li>
+                <li><span class=\"material-symbols-outlined\">sell</span><span><strong>Tags</strong> — free keywords for filtering</span></li>
+                <li><span class=\"material-symbols-outlined\">subject</span><span><strong>Description</strong> — explanatory text (200–1000 chars)</span></li>
+                <li><span class=\"material-symbols-outlined\">link</span><span><strong>Links</strong> — one URL per line</span></li>
+                <li><span class=\"material-symbols-outlined\">attach_file</span><span><strong>Files</strong> — upload images or PDFs (stored and compressed automatically in <code>assets</code>)</span></li>
               </ul>
-
-              <ul style="margin-top:10px;">
-                <li><strong>Main Area</strong> is a single label defining the primary domain (e.g., “Speculation”).</li>
-                <li><strong>Areas</strong> are multiple free-form keywords describing secondary themes or contexts (e.g., “biology, interaction design, performance”).</li>
-                <li><strong>Suggestions</strong> reuse previously used Types, Areas, and Tags to speed up data entry.</li>
+              <ul>
+                <li><span class=\"material-symbols-outlined\">looks_one</span><span><strong>Main Area</strong> is a single label defining the primary domain (e.g., “Speculation”).</span></li>
+                <li><span class=\"material-symbols-outlined\">tag</span><span><strong>Areas</strong> are multiple free-form keywords describing secondary themes/contexts (e.g., “biology, interaction design, performance”).</span></li>
+                <li><span class=\"material-symbols-outlined\">auto_awesome_motion</span><span>Suggestions reuse previously used <em>Types</em>, <em>Areas</em>, and <em>Tags</em> to speed up data entry.</span></li>
               </ul>
             </div>
           </div>
 
-          <div class="doc-section">
-            <h3><span class="material-symbols-outlined">gesture_select</span> Interaction</h3>
-            <div class="doc-body">
+          <div class=\"doc-section\">
+            <h3><span class=\"material-symbols-outlined\">stadia_controller</span> Interaction</h3>
+            <div class=\"doc-body\">
               <ul>
-                <li><span class="material-symbols-outlined">pan_tool</span><strong>Pan the canvas:</strong><br>trackpad or hold Space and drag</li>
-                <li><span class="material-symbols-outlined">zoom_in</span><strong>Zoom:</strong><br>trackpad or mouse wheel</li>
-                <li><span class="material-symbols-outlined">select_all</span><strong>Select multiple nodes:</strong><br>drag to create a selection rectangle</li>
-                <li><span class="material-symbols-outlined">open_with</span><strong>Move nodes:</strong><br>drag them (groups move together)</li>
-                <li><span class="material-symbols-outlined">automation</span><strong>Create a connection:</strong><br>drag from ● IN to ► OUT</li>
-                <li><span class="material-symbols-outlined">graph_1</span><strong>Click a ● IN handle:</strong><br>creates a connected duplicate node (inheriting Action and Main Area)</li>
-                <li><span class="material-symbols-outlined">conversion_path</span><strong>Connect mode:</strong><br>select one or more sources, click on the toolbar, click one or more targets, click again to exit</li>
-                <li><span class="material-symbols-outlined">diagonal_line</span><strong>Direct connect:</strong><br>with exactly two nodes selected, press C to connect left → right</li>
-                <li><span class="material-symbols-outlined">commit</span><strong>Alt/Option + click edge:</strong><br>split an edge and insert a node in the middle</li>
-                <li><span class="material-symbols-outlined">power_input</span><strong>Weak connections:</strong><br>click an edge and enable “Weak”</li>
+                <li><span class=\"material-symbols-outlined\">pan_tool_alt</span><span><strong>Pan the canvas:</strong> trackpad or hold <span class=\"chip kbd\">Space</span> and drag</span></li>
+                <li><span class=\"material-symbols-outlined\">zoom_in</span><span><strong>Zoom:</strong> trackpad or mouse wheel</span></li>
+                <li><span class=\"material-symbols-outlined\">select_all</span><span><strong>Select multiple nodes:</strong> drag to create a selection rectangle</span></li>
+                <li><span class=\"material-symbols-outlined\">open_with</span><span><strong>Move nodes:</strong> drag them (groups move together)</span></li>
+                <li><span class=\"material-symbols-outlined\">conversion_path</span>
+                  <span><strong>Create a connection:</strong> drag from <span class=\"badge io out\">OUT</span> to <span class=\"badge io in\">IN</span></span>
+                </li>
+                <li><span class=\"material-symbols-outlined\">content_copy</span>
+                  <span><strong>Click an <span class=\"badge io out\">OUT</span> handle:</strong> creates a connected duplicate node (inheriting Action and Main Area)</span>
+                </li>
+              </ul>
+              <ul>
+                <li><span class=\"material-symbols-outlined\">multiple_stop</span><span><strong>Connect mode:</strong> select one or more sources, click <span class=\"material-symbols-outlined\" style=\"vertical-align:middle;\">conversion_path</span> on the toolbar, click one or more targets, click again to exit.</span></li>
+                <li><span class=\"material-symbols-outlined\">bolt</span><span><strong>Direct connect:</strong> with exactly two nodes selected, press <span class=\"chip kbd\">C</span> to connect left → right.</span></li>
+              </ul>
+              <ul>
+                <li><span class=\"material-symbols-outlined\">hub</span><span><strong>Direct connections:</strong> solid lines (explicit/strong)</span></li>
+                <li><span class=\"material-symbols-outlined\">scatter_plot</span><span><strong>Weak connections:</strong> dashed lines (indirect/hypothetical). Enable by clicking the edge and toggling <em>Weak</em>.</span></li>
               </ul>
             </div>
           </div>
 
-          <div class="doc-section">
-            <h3><span class="material-symbols-outlined">save</span> Saving and Opening Projects</h3>
-            <div class="doc-body">
+          <div class=\"doc-section\">
+            <h3><span class=\"material-symbols-outlined\">save</span> Saving and Opening Projects</h3>
+            <div class=\"doc-body\">
               <ul>
-                <li><span class="material-symbols-outlined">folder</span><span><strong>Saving</strong> creates a folder with:</span></li>
-                <li style="margin-left:22px;"><span class="material-symbols-outlined">description</span><span><code>project.json</code> — nodes, connections, positions, text</span></li>
-                <li style="margin-left:22px;"><span class="material-symbols-outlined">folder_copy</span><span><code>assets/</code> — attached files</span></li>
-                <li><span class="material-symbols-outlined">image</span><span>New images are converted to <strong>JPEG</strong>, resized to a max of <strong>1500px</strong> (longest side), and compressed.</span></li>
-                <li><span class="material-symbols-outlined">download_done</span><span>No need to place files manually into <code>assets</code>.</span></li>
-                <li><span class="material-symbols-outlined">folder_open</span><span><strong>Open</strong>: select the project folder — Threadscape loads <code>project.json</code>.</span></li>
-                <li><span class="material-symbols-outlined">data_object</span><span>Lightweight JSON export (without files) is available for quick sharing.</span></li>
+                <li><span class=\"material-symbols-outlined\">folder</span><span><strong>Saving</strong> creates a folder with:</span></li>
+                <li style=\"margin-left:22px;\"><span class=\"material-symbols-outlined\">description</span><span><code>project.json</code> — nodes, connections, positions, text</span></li>
+                <li style=\"margin-left:22px;\"><span class=\"material-symbols-outlined\">folder_copy</span><span><code>assets/</code> — attached files</span></li>
+                <li><span class=\"material-symbols-outlined\">image</span><span>New images are converted to <strong>JPEG</strong>, resized to a max of <strong>1500px</strong> (longest side), and compressed.</span></li>
+                <li><span class=\"material-symbols-outlined\">download_done</span><span>No need to place files manually into <code>assets</code>.</span></li>
+                <li><span class=\"material-symbols-outlined\">folder_open</span><span><strong>Open</strong>: select the project folder — Threadscape loads <code>project.json</code>.</span></li>
+                <li><span class=\"material-symbols-outlined\">data_object</span><span>Lightweight JSON export (without files) is available for quick sharing.</span></li>
               </ul>
             </div>
           </div>
 
-          <div class="doc-section">
-            <h3><span class="material-symbols-outlined">keyboard</span> Toolbar and Shortcuts</h3>
-            <div class="doc-body">
+          <div class=\"doc-section\">
+            <h3><span class=\"material-symbols-outlined\">keyboard</span> Toolbar and Shortcuts</h3>
+            <div class=\"doc-body\">
               <ul>
-                <li><span class="material-symbols-outlined">note_add</span><span>New Project — ⌘/Ctrl + N</span></li>
-                <li><span class="material-symbols-outlined">file_open</span><span>Open Project — ⌘/Ctrl + O</span></li>
-                <li><span class="material-symbols-outlined">file_save</span><span>Save Project — ⌘/Ctrl + S</span></li>
-                <li><span class="material-symbols-outlined">add_box</span><span>New Node — N</span></li>
-                <li><span class="material-symbols-outlined">bolt</span><span>Direct Connect (2 selected) — C</span></li>
-                <li><span class="material-symbols-outlined">account_tree</span><span>Auto Layout — ⇧ + A</span></li>
-                <li><span class="material-symbols-outlined">undo</span><span>Undo — ⌘/Ctrl + Z</span></li>
-                <li><span class="material-symbols-outlined">redo</span><span>Redo — ⌘/Ctrl + ⇧ + Z</span></li>
-                <li><span class="material-symbols-outlined">fullscreen</span><span>Fit View — 0</span></li>
-                <li><span class="material-symbols-outlined">upload</span><span>Upload Files (selected node) — U</span></li>
-                <li><span class="material-symbols-outlined">group</span><span>Group — ⌘/Ctrl + G</span></li>
-                <li><span class="material-symbols-outlined">group_off</span><span>Ungroup — ⌘/Ctrl + ⇧ + G</span></li>
+                <li><span class=\"material-symbols-outlined\">note_add</span><span>New Project — <span class=\"chip kbd\">⌘/Ctrl + N</span></span></li>
+                <li><span class=\"material-symbols-outlined\">file_open</span><span>Open Project — <span class=\"chip kbd\">⌘/Ctrl + O</span></span></li>
+                <li><span class=\"material-symbols-outlined\">file_save</span><span>Save Project — <span class=\"chip kbd\">⌘/Ctrl + S</span></span></li>
+                <li><span class=\"material-symbols-outlined\">add_box</span><span>New Node — <span class=\"chip kbd\">N</span></span></li>
+                <li><span class=\"material-symbols-outlined\">bolt</span><span>Direct Connect (2 selected) — <span class=\"chip kbd\">C</span></span></li>
+                <li><span class=\"material-symbols-outlined\">account_tree</span><span>Auto Layout — <span class=\"chip kbd\">⇧ + A</span></span></li>
+                <li><span class=\"material-symbols-outlined\">undo</span><span>Undo — <span class=\"chip kbd\">⌘/Ctrl + Z</span></span></li>
+                <li><span class=\"material-symbols-outlined\">redo</span><span>Redo — <span class=\"chip kbd\">⌘/Ctrl + ⇧ + Z</span></span></li>
+                <li><span class=\"material-symbols-outlined\">fullscreen</span><span>Fit View — <span class=\"chip kbd\">0</span></span></li>
+                <li><span class=\"material-symbols-outlined\">upload</span><span>Upload Files (selected node) — <span class=\"chip kbd\">U</span></span></li>
+                <li><span class=\"material-symbols-outlined\">group</span><span>Group — <span class=\"chip kbd\">⌘/Ctrl + G</span></span></li>
+                <li><span class=\"material-symbols-outlined\">group_off</span><span>Ungroup — <span class=\"chip kbd\">⌘/Ctrl + ⇧ + G</span></span></li>
               </ul>
               <ul>
-                <li><span class="material-symbols-outlined">select_check_box</span><span>⇧ + click edges — multi-select edges</span></li>
-                <li><span class="material-symbols-outlined">select_check_box</span><span>⇧ + click nodes — multi-select nodes</span></li>
-                <li><span class="material-symbols-outlined">call_split</span><span>⌥ + click edge — split an edge and insert a node in the middle</span></li>
+                <li><span class=\"material-symbols-outlined\">select_check_box</span><span>⇧ + click edges — multi-select edges</span></li>
+                <li><span class=\"material-symbols-outlined\">select_check_box</span><span>⇧ + click nodes — multi-select nodes</span></li>
+                <li><span class=\"material-symbols-outlined\">call_split</span><span>⌥ + click edge — split an edge and insert a node in the middle</span></li>
               </ul>
             </div>
           </div>
@@ -1818,7 +1559,6 @@
           if (nf) nf.style.display = show ? "none" : "";
           if (ef) ef.style.display = "none";
         });
-
         // accordion
         helpPanel?.querySelectorAll(".doc-section h3").forEach((h) => {
           h.addEventListener("click", () => {
@@ -5450,100 +5190,10 @@
         const def = toolbarTooltips.find((t) => t.id === btn.id);
         if (def) btn.setAttribute("data-tip", def.label);
       });
-
-      // Help overlay (clone .doc-section → modal)
-      (function setupHelpOverlay() {
-        function init() {
-          const overlay = document.getElementById("helpOverlay");
-          const content = document.getElementById("helpContent");
-          const btnHelp = document.getElementById("btnHelp");
-          const btnClose = document.getElementById("helpClose");
-          const toolbarBtns = Array.from(
-            document.querySelectorAll("header button")
-          );
-
-          if (!overlay || !content || !btnHelp) return;
-
-          function collectDocSections() {
-            return Array.from(document.querySelectorAll(".doc-section"));
-          }
-
-          function openHelp() {
-            if (!content.dataset.filled) {
-              const sections = collectDocSections();
-              if (sections.length) {
-                sections.forEach((sec) => {
-                  const clone = sec.cloneNode(true);
-                  content.appendChild(clone);
-                  sec.style.display = "none";
-                });
-                content.dataset.filled = "1";
-              } else {
-                content.innerHTML =
-                  '<p style="margin:0">Documentation not found in DOM.</p>';
-                content.dataset.filled = "1";
-              }
-            }
-            overlay.style.display = "block";
-          }
-
-          function closeHelp() {
-            overlay.style.display = "none";
-          }
-
-          btnHelp.addEventListener(
-            "click",
-            (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              openHelp();
-            },
-            { capture: true }
-          );
-
-          btnClose?.addEventListener("click", (e) => {
-            e.preventDefault();
-            closeHelp();
-          });
-
-          overlay.addEventListener("click", () => closeHelp());
-          overlay
-            .querySelector(".doc-box")
-            ?.addEventListener("click", (e) => e.stopPropagation());
-
-          toolbarBtns.forEach((btn) => {
-            if (btn && btn !== btnHelp) {
-              btn.addEventListener("click", () => closeHelp(), {
-                capture: true,
-              });
-            }
-          });
-
-          document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && overlay.style.display === "block")
-              closeHelp();
-          });
-        }
-
-        if (document.getElementById("helpOverlay")) init();
-        else document.addEventListener("DOMContentLoaded", init);
-      })();
     </script>
     <script>
       /* No tooltip su Upload files */
       document.getElementById("btnChoose")?.removeAttribute("title");
     </script>
-    <div id="helpOverlay" style="display: none">
-      <div class="doc-box">
-        <div class="doc-box-header">
-          <span class="material-symbols-outlined">help</span>
-          <div class="doc-title">Threadscape — Documentation</div>
-          <button id="helpClose" class="icon-btn" aria-label="Close">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-        <div class="doc-box-body" id="helpContent"></div>
-      </div>
-    </div>
   </body>
 </html>
