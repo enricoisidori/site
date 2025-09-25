@@ -189,8 +189,7 @@
         .linkHoverPrecision(4)
         .enableNodeDrag(true)
         .onNodeHover((node) => {
-          // Priorità ai nodi: quando sono sopra un nodo, disabilita il pick dei link
-          Graph.linkHoverPrecision(node ? 0 : 4);
+          // tooltip disattivato: si usa il pannello laterale su click
         })
         .onNodeClick((node, event) => {
           if (!node) return;
@@ -298,7 +297,6 @@
       // ————— TEXT + THUMBNAIL NODES —————
       const TEXT_H = 6; // altezza del testo (world units)
       const IMG_H = 14; // altezza thumbnail (world units)
-      const HIT_R = 12; // raggio sfera invisibile per click facile
       let colorMode = "none"; // none | area | cluster
 
       function getNodeColor(node) {
@@ -366,23 +364,16 @@
           }
         }
 
-        // 3) Hitbox invisibile per facilitare la selezione (bounding box) + sfera
+        // 3) Hitbox invisibile per facilitare la selezione (bounding box)
         const name = String(node.name || node.id || "");
-        const w = Math.max(140, Math.min(360, name.length * (TEXT_H * 2.0)));
-        const h = TEXT_H * 2.4 + (urls.length ? IMG_H * 1.8 : 0);
+        const w = Math.max(60, Math.min(260, name.length * (TEXT_H * 1.6)));
+        const h = TEXT_H * 2.0 + (urls.length ? IMG_H * 1.6 : 0);
         const plane = new THREE.Mesh(
           new THREE.PlaneGeometry(w, h),
           new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false })
         );
         plane.position.set(0, (urls.length ? -IMG_H * 0.3 : 0), -0.01);
         group.add(plane);
-
-        const hit = new THREE.Mesh(
-          new THREE.SphereGeometry(HIT_R, 16, 12),
-          new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false })
-        );
-        hit.position.set(0, 0, 0.01);
-        group.add(hit);
 
         return group;
       }
@@ -929,24 +920,11 @@
       async function attachObjectURLsFromDir(dir, data) {
         for (const n of data.nodes || []) {
           for (const f of n.files || []) {
-            if (!f.path) continue;
-            // prova percorso così com'è, poi fallback a assets/<basename>
-            const base = String(f.path).replace(/^\.\/?/, '');
-            const cand = [base];
-            const bn = base.split(/[\\\/]*/).pop() || base;
-            if (!/^assets\//i.test(base)) cand.push('assets/' + bn);
-            let file = null;
-            for (const p of cand) {
-              try { file = await readFileByPath(dir, p); if (file) { f.path = p; break; } } catch {}
-            }
-            if (file) {
-              try { if (f.url && String(f.url).startsWith('blob:')) URL.revokeObjectURL(f.url); } catch {}
-              f.url = URL.createObjectURL(file);
-              f.size = file.size;
+            if (f.path && !f.url) {
+              try { const file = await readFileByPath(dir, f.path); if (file) f.url = URL.createObjectURL(file); } catch {}
             }
           }
-          // aggiorna thumbnail 3D con la prima immagine disponibile
-          const firstImg = (n.files || []).find(x => x && x.isImage && x.url);
+          const firstImg = (n.files || []).find(x=>x.isImage);
           if (firstImg && firstImg.url) n.image = firstImg.url;
         }
       }
@@ -991,79 +969,15 @@
         for (const n of currentData.nodes || []) {
           for (const f of n.files || []) {
             if (f.__file) {
-              const name = sanitizeFileName(f.__file.name || 'file');
-              const rel = f.path || ('assets/' + name);
-              let blob = f.__file;
-              if (f.isImage) {
-                try { blob = await resizeImageFile(f.__file, 1700); } catch {}
-              }
-              await writeFileByPath(dir, rel, blob);
+              const rel = f.path || ('assets/' + f.__file.name);
+              await writeFileByPath(dir, rel, f.__file);
               f.path = rel;
-              f.size = blob.size;
-              // aggiorna subito l'Object URL dalla copia su disco
-              try { const of = await readFileByPath(dir, rel); if (of) { if (f.url) try { URL.revokeObjectURL(f.url); } catch {} f.url = URL.createObjectURL(of); } } catch {}
-            } else if (f.path && !f.url) {
-              // se esiste già su disco ma manca url, crealo ora
-              try { const of = await readFileByPath(dir, f.path); if (of) f.url = URL.createObjectURL(of); } catch {}
             }
           }
         }
         const project = buildProjectObject();
         const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
         await writeFileByPath(dir, 'project.json', blob);
-        // riallinea anteprime e thumbnail dal disco appena scritto
-        try {
-          await attachObjectURLsFromDir(dir, currentData);
-          const sid = getSingleSelectedId();
-          if (sid) {
-            const n = currentData.nodes.find(x=>x.id===sid);
-            if (n) renderFilesListFor(n);
-          }
-          refreshNodeRenderer();
-        } catch {}
-      }
-
-      function sanitizeFileName(name) {
-        return String(name).replace(/[^a-zA-Z0-9._-]+/g, '_');
-      }
-
-      function resizeImageFile(file, maxSide = 1700) {
-        return new Promise((resolve) => {
-          try {
-            const url = URL.createObjectURL(file);
-            const img = new Image();
-            img.onload = () => {
-              const iw = img.naturalWidth || img.width;
-              const ih = img.naturalHeight || img.height;
-              let tw = iw, th = ih;
-              const longSide = Math.max(iw, ih);
-              if (longSide > maxSide) {
-                const scale = maxSide / longSide;
-                tw = Math.round(iw * scale);
-                th = Math.round(ih * scale);
-              }
-              if (tw === iw && th === ih) {
-                URL.revokeObjectURL(url);
-                resolve(file);
-                return;
-              }
-              const canvas = document.createElement('canvas');
-              canvas.width = tw; canvas.height = th;
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, tw, th);
-              const outType = (/^image\//i.test(file.type) ? file.type : 'image/jpeg');
-              const quality = outType === 'image/jpeg' ? 0.85 : 0.92;
-              canvas.toBlob((blob) => {
-                URL.revokeObjectURL(url);
-                resolve(blob || file);
-              }, outType, quality);
-            };
-            img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
-            img.src = url;
-          } catch {
-            resolve(file);
-          }
-        });
       }
 
       // Shortcut da tastiera (con guardie per i campi di testo)

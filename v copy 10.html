@@ -189,8 +189,7 @@
         .linkHoverPrecision(4)
         .enableNodeDrag(true)
         .onNodeHover((node) => {
-          // Priorità ai nodi: quando sono sopra un nodo, disabilita il pick dei link
-          Graph.linkHoverPrecision(node ? 0 : 4);
+          // tooltip disattivato: si usa il pannello laterale su click
         })
         .onNodeClick((node, event) => {
           if (!node) return;
@@ -298,7 +297,6 @@
       // ————— TEXT + THUMBNAIL NODES —————
       const TEXT_H = 6; // altezza del testo (world units)
       const IMG_H = 14; // altezza thumbnail (world units)
-      const HIT_R = 12; // raggio sfera invisibile per click facile
       let colorMode = "none"; // none | area | cluster
 
       function getNodeColor(node) {
@@ -366,23 +364,16 @@
           }
         }
 
-        // 3) Hitbox invisibile per facilitare la selezione (bounding box) + sfera
+        // 3) Hitbox invisibile per facilitare la selezione (bounding box)
         const name = String(node.name || node.id || "");
-        const w = Math.max(140, Math.min(360, name.length * (TEXT_H * 2.0)));
-        const h = TEXT_H * 2.4 + (urls.length ? IMG_H * 1.8 : 0);
+        const w = Math.max(60, Math.min(260, name.length * (TEXT_H * 1.6)));
+        const h = TEXT_H * 2.0 + (urls.length ? IMG_H * 1.6 : 0);
         const plane = new THREE.Mesh(
           new THREE.PlaneGeometry(w, h),
           new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false })
         );
         plane.position.set(0, (urls.length ? -IMG_H * 0.3 : 0), -0.01);
         group.add(plane);
-
-        const hit = new THREE.Mesh(
-          new THREE.SphereGeometry(HIT_R, 16, 12),
-          new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false })
-        );
-        hit.position.set(0, 0, 0.01);
-        group.add(hit);
 
         return group;
       }
