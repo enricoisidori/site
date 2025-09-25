@@ -276,6 +276,13 @@
         <input id="chkPOV" type="checkbox" style="accent-color: #888" />
         POV
       </label>
+      <label
+        style="display: inline-flex; align-items: center; gap: 6px"
+        data-tip="Toggle 3D/2D (3D di default)"
+      >
+        <input id="chk2D" type="checkbox" style="accent-color: #888" />
+        2D
+      </label>
     </div>
 
     <div id="tooltip" class="tooltip"></div>
@@ -302,6 +309,9 @@
     <script>
       const el = document.getElementById("scene");
       let selectedEdge = null; // edge selezionato (s,t)
+      // Modalità vista: 3D di default
+      let is2D = false;
+      const TWO_D_Z = 400; // distanza camera z in modalità 2D
       const Graph = ForceGraph3D()(el)
         .backgroundColor("#0c0c0c")
         .nodeRelSize(1) // irrilevante: non usiamo le palline
@@ -329,18 +339,26 @@
           selectedEdge = null;
           ensureLinkStyleRefresh();
           if (camOnSelect) {
-            // camera verso il nodo (3D: usa cameraPosition), movimento morbido
+            // Camera verso il nodo; 3D default, 2D mantiene z fisso
             const distance = 120;
             const nx = node.x || 0,
               ny = node.y || 0,
               nz = node.z || 0;
-            const len = Math.max(1, Math.hypot(nx, ny, nz));
-            const ratio = 1 + distance / len;
-            Graph.cameraPosition(
-              { x: nx * ratio, y: ny * ratio, z: nz * ratio },
-              { x: nx, y: ny, z: nz },
-              700
-            );
+            if (is2D) {
+              Graph.cameraPosition(
+                { x: nx, y: ny, z: TWO_D_Z },
+                { x: nx, y: ny, z: 0 },
+                700
+              );
+            } else {
+              const len = Math.max(1, Math.hypot(nx, ny, nz));
+              const ratio = 1 + distance / len;
+              Graph.cameraPosition(
+                { x: nx * ratio, y: ny * ratio, z: nz * ratio },
+                { x: nx, y: ny, z: nz },
+                700
+              );
+            }
           }
           lastPinned = node;
         })
@@ -737,24 +755,26 @@
         const imgHtml =
           node.image || node.img
             ? `<div style="margin-top:6px">
-               <img src="${escapeHtml(resolveImageURL(node.image || node.img))}"
-                    style="max-width:240px;max-height:160px;display:block;border:1px solid rgba(255,255,255,.2)"/>
-             </div>`
+                     <img src="${escapeHtml(
+                       resolveImageURL(node.image || node.img)
+                     )}"
+                          style="max-width:240px;max-height:160px;display:block;border:1px solid rgba(255,255,255,.2)"/>
+                   </div>`
             : "";
         tip.innerHTML = `
-          <div style="font-weight:700">${escapeHtml(
-            node.name || node.id || ""
-          )}</div>
-          ${fields}
-          ${
-            node.desc
-              ? `<div style="margin-top:8px; white-space:pre-wrap">${escapeHtml(
+                <div style="font-weight:700">${escapeHtml(
+                  node.name || node.id || ""
+                )}</div>
+                ${fields}
+                ${
                   node.desc
-                )}</div>`
-              : ""
-          }
-          ${imgHtml}
-        `;
+                    ? `<div style="margin-top:8px; white-space:pre-wrap">${escapeHtml(
+                        node.desc
+                      )}</div>`
+                    : ""
+                }
+                ${imgHtml}
+              `;
         tip.style.display = "block";
         window.onmousemove = (e) => {
           tip.style.left = e.clientX + 12 + "px";
@@ -789,6 +809,60 @@
         colorMode = e.target.value;
         refreshNodeRenderer();
       };
+
+      // Toggle 3D/2D
+      (function init2DToggle() {
+        const chk2D = document.getElementById("chk2D");
+        if (!chk2D) return;
+        chk2D.checked = false; // 3D di default
+        chk2D.addEventListener("change", () => setView2D(!!chk2D.checked));
+      })();
+
+      function setView2D(on) {
+        is2D = !!on;
+        // Prova a portare la simulazione a 2 dimensioni (se supportato)
+        try {
+          Graph.numDimensions(is2D ? 2 : 3);
+        } catch (e) {}
+
+        const controls = Graph.controls ? Graph.controls() : null;
+        if (controls) {
+          controls.enableRotate = !is2D;
+          controls.enablePan = true;
+          controls.enableZoom = true;
+          if (typeof THREE !== "undefined" && controls.mouseButtons) {
+            try {
+              controls.mouseButtons.LEFT = is2D
+                ? THREE.MOUSE.PAN
+                : THREE.MOUSE.ROTATE;
+            } catch {}
+          }
+          controls.update && controls.update();
+        }
+
+        if (is2D) {
+          // Appiattisci z e imposta una vista dall'alto con z costante
+          const gd = Graph.graphData && Graph.graphData();
+          if (gd && Array.isArray(gd.nodes)) {
+            gd.nodes.forEach((n) => {
+              n.z = 0;
+            });
+            Graph.graphData(gd);
+          }
+          try {
+            const cam = Graph.camera && Graph.camera();
+            if (cam) {
+              cam.position.set(0, 0, TWO_D_Z);
+              cam.up.set(0, 1, 0);
+              if (cam.lookAt) cam.lookAt(0, 0, 0);
+            }
+          } catch {}
+          setTimeout(() => Graph.zoomToFit(600, 60), 50);
+        } else {
+          // Torna alla vista 3D; mantieni controlli predefiniti
+          setTimeout(() => Graph.zoomToFit(600, 60), 50);
+        }
+      }
 
       // Toolbar extra
       document.getElementById("btnNewNode").onclick = () => addNewNode();
