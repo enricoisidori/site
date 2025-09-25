@@ -6,9 +6,18 @@
     <title>3D Visualizer – Text Nodes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
     <link rel="icon" type="image/png" href="./asset/threadscape/icon.png" />
     <style>
       :root {
@@ -33,11 +42,19 @@
         color: var(--ink);
         font: 14px/1.4 system-ui;
       }
-      .toolbar { position: fixed; top: 8px; left: 8px; display: flex; gap: 6px; z-index: 10; }
+      .toolbar {
+        position: fixed;
+        top: 8px;
+        left: 8px;
+        display: flex;
+        gap: 6px;
+        z-index: 10;
+      }
       .toolbar button,
       .toolbar label,
       .toolbar select {
-        appearance: none; -webkit-appearance: none;
+        appearance: none;
+        -webkit-appearance: none;
         background: transparent;
         border: 1px solid var(--line);
         color: var(--ink);
@@ -45,18 +62,31 @@
         border-radius: 8px;
         cursor: pointer;
       }
-      .toolbar button:hover, .toolbar label:hover, .toolbar select:hover { background: var(--btn-hover); }
-      .toolbar button:active { background: var(--btn-active); transform: translateY(0.5px); }
+      .toolbar button:hover,
+      .toolbar label:hover,
+      .toolbar select:hover {
+        background: var(--btn-hover);
+      }
+      .toolbar button:active {
+        background: var(--btn-active);
+        transform: translateY(0.5px);
+      }
       .material-symbols-outlined {
-        font-family: "Material Symbols Outlined", "Material Icons Outlined", "Material Icons", sans-serif;
+        font-family: "Material Symbols Outlined", "Material Icons Outlined",
+          "Material Icons", sans-serif;
         font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
         font-feature-settings: "liga";
         -webkit-font-feature-settings: "liga";
         -moz-font-feature-settings: "liga";
-        font-size: 18px; line-height: 1; vertical-align: middle; display: inline-block;
+        font-size: 18px;
+        line-height: 1;
+        vertical-align: middle;
+        display: inline-block;
         user-select: none;
       }
-      .toolbar .spacer { width: 8px; }
+      .toolbar .spacer {
+        width: 8px;
+      }
       .panel {
         position: fixed;
         left: 8px;
@@ -77,7 +107,19 @@
         color: #aaa;
         font-size: 12px;
       }
-      .tooltip { position: fixed; pointer-events: none; background: #111; border: 1px solid #333; color: #eee; padding: 6px 8px; border-radius: 8px; font-size: 12px; max-width: 420px; display: none; box-shadow: 0 10px 24px rgba(0,0,0,0.45); }
+      .tooltip {
+        position: fixed;
+        pointer-events: none;
+        background: #111;
+        border: 1px solid #333;
+        color: #eee;
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-size: 12px;
+        max-width: 420px;
+        display: none;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+      }
       /* Editor laterale */
       .edit-panel {
         position: fixed;
@@ -93,21 +135,82 @@
         display: none;
         backdrop-filter: blur(2px);
       }
-      .edit-panel h3 { margin: 0 0 8px 0; font-size: 13px; color: #bbb; }
-      .edit-panel label { display:block; font-size:12px; color:#ddd; margin:10px 0 4px 0; }
-      .edit-panel input[type="text"], .edit-panel textarea {
-        width: 100%; background: #0f0f0f; color: #eee; border: 1px solid #333;
-        border-radius: 6px; padding: 8px 10px; font: inherit;
+      .edit-panel h3 {
+        margin: 0 0 8px 0;
+        font-size: 13px;
+        color: #bbb;
       }
-      .edit-panel textarea { min-height: 220px; resize: vertical; }
-      .edit-panel { overflow: auto; overflow-wrap: anywhere; }
-      .file-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; padding:6px 0; border-bottom:1px solid #333; }
-      .file-left { display:flex; align-items:center; gap:8px; min-width:0; }
-      .thumb { width:16px; height:16px; border-radius:3px; border:1px solid #333; object-fit:cover; display:block; }
-      .file-row .name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px; }
-      .file-row .remove { cursor:pointer; text-decoration:underline; }
-      .file-row .remove:hover { color:#fff; }
-      .status { position: fixed; left: 8px; bottom: 8px; color: var(--muted); font-size: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); padding: 6px 8px; border-radius: 8px; }
+      .edit-panel label {
+        display: block;
+        font-size: 12px;
+        color: #ddd;
+        margin: 10px 0 4px 0;
+      }
+      .edit-panel input[type="text"],
+      .edit-panel textarea {
+        width: 100%;
+        background: #0f0f0f;
+        color: #eee;
+        border: 1px solid #333;
+        border-radius: 6px;
+        padding: 8px 10px;
+        font: inherit;
+      }
+      .edit-panel textarea {
+        min-height: 220px;
+        resize: vertical;
+      }
+      .edit-panel {
+        overflow: auto;
+        overflow-wrap: anywhere;
+      }
+      .file-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        padding: 6px 0;
+        border-bottom: 1px solid #333;
+      }
+      .file-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1px solid #333;
+        object-fit: cover;
+        display: block;
+      }
+      .file-row .name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
+      }
+      .file-row .remove {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      .file-row .remove:hover {
+        color: #fff;
+      }
+      .status {
+        position: fixed;
+        left: 8px;
+        bottom: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 6px 8px;
+        border-radius: 8px;
+      }
     </style>
     <!-- Three prima di TUTTO -->
     <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
@@ -130,32 +233,53 @@
     <div id="scene"></div>
 
     <div class="toolbar">
-      <button id="btnOpenFolder" title="Apri cartella" data-tip="Apri cartella"><span class="material-symbols-outlined">folder_open</span></button>
-      <button id="btnSave" title="Salva" data-tip="Salva"><span class="material-symbols-outlined">save</span></button>
-      <button id="btnUndo" title="Undo" data-tip="Undo (⌘/Ctrl+Z)"><span class="material-symbols-outlined">undo</span></button>
-      <button id="btnRedo" title="Redo" data-tip="Redo (⇧⌘/Ctrl+Z)"><span class="material-symbols-outlined">redo</span></button>
-      <button id="btnConnect" title="Collega (C)" data-tip="Collega (C)"><span class="material-symbols-outlined">link</span></button>
-      <button id="btnNewNode" title="Nuovo nodo" data-tip="Nuovo nodo"><span class="material-symbols-outlined">add_circle</span></button>
-      <button id="btnSpawn" title="Nuovo collegato" data-tip="Nuovo collegato"><span class="material-symbols-outlined">call_split</span></button>
-      <button id="btnDelete" title="Elimina" data-tip="Elimina"><span class="material-symbols-outlined">delete</span></button>
+      <button id="btnOpenFolder" title="Apri cartella" data-tip="Apri cartella">
+        <span class="material-symbols-outlined">folder_open</span>
+      </button>
+      <button id="btnSave" title="Salva" data-tip="Salva">
+        <span class="material-symbols-outlined">save</span>
+      </button>
+      <button id="btnUndo" title="Undo" data-tip="Undo (⌘/Ctrl+Z)">
+        <span class="material-symbols-outlined">undo</span>
+      </button>
+      <button id="btnRedo" title="Redo" data-tip="Redo (⇧⌘/Ctrl+Z)">
+        <span class="material-symbols-outlined">redo</span>
+      </button>
+      <button id="btnConnect" title="Collega (C)" data-tip="Collega (C)">
+        <span class="material-symbols-outlined">link</span>
+      </button>
+      <button id="btnNewNode" title="Nuovo nodo" data-tip="Nuovo nodo">
+        <span class="material-symbols-outlined">add_circle</span>
+      </button>
+      <button id="btnSpawn" title="Nuovo collegato" data-tip="Nuovo collegato">
+        <span class="material-symbols-outlined">call_split</span>
+      </button>
+      <button id="btnDelete" title="Elimina" data-tip="Elimina">
+        <span class="material-symbols-outlined">delete</span>
+      </button>
       <span class="spacer"></span>
-      <button id="btnFit" data-tip="Fit"><span class="material-symbols-outlined">fit_screen</span></button>
-      <button id="btnToggleSize" data-tip="Dimensione testo"><span class="material-symbols-outlined">format_size</span></button>
+      <button id="btnFit" data-tip="Fit">
+        <span class="material-symbols-outlined">fit_screen</span>
+      </button>
+      <button id="btnToggleSize" data-tip="Dimensione testo">
+        <span class="material-symbols-outlined">format_size</span>
+      </button>
       <select id="colorBy" title="Colora per…" data-tip="Colori per…">
         <option value="none" selected>Colori: Nessuno</option>
         <option value="area">Colori: per Area</option>
         <option value="cluster">Colori: per Cluster</option>
       </select>
-      <label style="display:inline-flex;align-items:center;gap:6px" data-tip="Selezione camera (POV)">
-        <input id="chkPOV" type="checkbox" style="accent-color:#888" />
+      <label
+        style="display: inline-flex; align-items: center; gap: 6px"
+        data-tip="Selezione camera (POV)"
+      >
+        <input id="chkPOV" type="checkbox" style="accent-color: #888" />
         POV
       </label>
     </div>
 
-    
-
     <div id="tooltip" class="tooltip"></div>
-    <div id="status" class="status" style="display:none"></div>
+    <div id="status" class="status" style="display: none"></div>
 
     <aside id="editor" class="edit-panel">
       <h3>Proprietà nodo</h3>
@@ -168,11 +292,11 @@
       <input id="fTags" type="text" placeholder="Tag1, Tag2" />
       <label for="fDesc">Descrizione</label>
       <textarea id="fDesc" placeholder="Descrizione"></textarea>
-      <div style="margin-top:10px">
+      <div style="margin-top: 10px">
         <button id="btnAddFiles">Aggiungi file…</button>
-        <input id="fFiles" type="file" multiple style="display:none" />
+        <input id="fFiles" type="file" multiple style="display: none" />
       </div>
-      <div id="filesList" style="margin-top:6px"></div>
+      <div id="filesList" style="margin-top: 6px"></div>
     </aside>
 
     <script>
@@ -183,14 +307,19 @@
         .nodeRelSize(1) // irrilevante: non usiamo le palline
         .nodeLabel(() => "") // niente balloon label, usiamo sprite+tooltip
         .linkOpacity(0.45)
-        .linkWidth((l) => (isEdgeSelected(l) ? 3 : (l.dashed ? 0.6 : 1.4)))
-        .linkColor((l) => (isEdgeSelected(l) ? "rgba(255,255,255,0.95)" : (l.dashed ? "rgba(200,200,200,0.35)" : "rgba(220,220,220,0.65)")))
+        .linkWidth((l) => (isEdgeSelected(l) ? 3 : l.dashed ? 0.6 : 1.4))
+        .linkColor((l) =>
+          isEdgeSelected(l)
+            ? "rgba(255,255,255,0.95)"
+            : l.dashed
+            ? "rgba(200,200,200,0.35)"
+            : "rgba(220,220,220,0.65)"
+        )
         .nodeColor(() => "#ffffff")
         .linkHoverPrecision(4)
         .enableNodeDrag(true)
         .onNodeHover((node) => {
-          // Priorità ai nodi: quando sono sopra un nodo, disabilita il pick dei link
-          Graph.linkHoverPrecision(node ? 0 : 4);
+          // tooltip disattivato: si usa il pannello laterale su click
         })
         .onNodeClick((node, event) => {
           if (!node) return;
@@ -202,10 +331,16 @@
           if (camOnSelect) {
             // camera verso il nodo (3D: usa cameraPosition), movimento morbido
             const distance = 120;
-            const nx = node.x || 0, ny = node.y || 0, nz = node.z || 0;
+            const nx = node.x || 0,
+              ny = node.y || 0,
+              nz = node.z || 0;
             const len = Math.max(1, Math.hypot(nx, ny, nz));
             const ratio = 1 + distance / len;
-            Graph.cameraPosition({ x: nx * ratio, y: ny * ratio, z: nz * ratio }, { x: nx, y: ny, z: nz }, 700);
+            Graph.cameraPosition(
+              { x: nx * ratio, y: ny * ratio, z: nz * ratio },
+              { x: nx, y: ny, z: nz },
+              700
+            );
           }
           lastPinned = node;
         })
@@ -298,14 +433,14 @@
       // ————— TEXT + THUMBNAIL NODES —————
       const TEXT_H = 6; // altezza del testo (world units)
       const IMG_H = 14; // altezza thumbnail (world units)
-      const HIT_R = 12; // raggio sfera invisibile per click facile
       let colorMode = "none"; // none | area | cluster
 
       function getNodeColor(node) {
         if (colorMode === "none") return "#ffffff";
         let key = "";
-        if (colorMode === "area") key = (Array.isArray(node.areas) && node.areas[0]) || "";
-        else if (colorMode === "cluster") key = (node.__cluster ?? "");
+        if (colorMode === "area")
+          key = (Array.isArray(node.areas) && node.areas[0]) || "";
+        else if (colorMode === "cluster") key = node.__cluster ?? "";
         key = String(key || "");
         return key ? groupColor(key) : "#cbd5e1";
       }
@@ -320,7 +455,9 @@
           const baseColor = getNodeColor(node);
           label.color = isSel ? "#000000" : baseColor;
           label.textHeight = TEXT_H * textScale;
-          label.backgroundColor = isSel ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.5)";
+          label.backgroundColor = isSel
+            ? "rgba(255,255,255,0.95)"
+            : "rgba(0,0,0,0.5)";
           group.add(label);
         } else {
           // Fallback minimale se SpriteText non c'è
@@ -366,23 +503,20 @@
           }
         }
 
-        // 3) Hitbox invisibile per facilitare la selezione (bounding box) + sfera
+        // 3) Hitbox invisibile per facilitare la selezione (bounding box)
         const name = String(node.name || node.id || "");
-        const w = Math.max(140, Math.min(360, name.length * (TEXT_H * 2.0)));
-        const h = TEXT_H * 2.4 + (urls.length ? IMG_H * 1.8 : 0);
+        const w = Math.max(60, Math.min(260, name.length * (TEXT_H * 1.6)));
+        const h = TEXT_H * 2.0 + (urls.length ? IMG_H * 1.6 : 0);
         const plane = new THREE.Mesh(
           new THREE.PlaneGeometry(w, h),
-          new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false })
+          new THREE.MeshBasicMaterial({
+            transparent: true,
+            opacity: 0,
+            depthTest: false,
+          })
         );
-        plane.position.set(0, (urls.length ? -IMG_H * 0.3 : 0), -0.01);
+        plane.position.set(0, urls.length ? -IMG_H * 0.3 : 0, -0.01);
         group.add(plane);
-
-        const hit = new THREE.Mesh(
-          new THREE.SphereGeometry(HIT_R, 16, 12),
-          new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false })
-        );
-        hit.position.set(0, 0, 0.01);
-        group.add(hit);
 
         return group;
       }
@@ -395,7 +529,9 @@
       refreshNodeRenderer();
 
       // === Selezione e pannello ===
-      function $(sel) { return document.querySelector(sel); }
+      function $(sel) {
+        return document.querySelector(sel);
+      }
       function selectOnly(id) {
         selectedIds = new Set(id ? [id] : []);
         updateEditor();
@@ -416,7 +552,9 @@
         const selInfo = document.getElementById("selInfo");
         if (selectedIds.size !== 1) {
           panel.style.display = "none";
-          selInfo.textContent = selectedIds.size ? `${selectedIds.size} nodi selezionati` : "";
+          selInfo.textContent = selectedIds.size
+            ? `${selectedIds.size} nodi selezionati`
+            : "";
           return;
         }
         const sid = getSingleSelectedId();
@@ -437,13 +575,23 @@
       function renderFilesListFor(n) {
         const list = $("#filesList");
         const files = n.files || [];
-        if (!files.length) { list.innerHTML = ""; return; }
-        list.innerHTML = files.map((file, i) => {
-          const name = escapeHtml(file.name || "file");
-          const size = file.size ? ` — ${Math.round(file.size/1024)} KB` : "";
-          const thumb = file.isImage && file.url ? `<img class=\"thumb\" src=\"${escapeHtml(file.url)}\">` : "";
-          return `<div class=\"file-row\"><div class=\"file-left\">${thumb}<div class=\"name\">• ${name}${size}</div></div><div class=\"remove\" data-idx=\"${i}\">Remove</div></div>`;
-        }).join("");
+        if (!files.length) {
+          list.innerHTML = "";
+          return;
+        }
+        list.innerHTML = files
+          .map((file, i) => {
+            const name = escapeHtml(file.name || "file");
+            const size = file.size
+              ? ` — ${Math.round(file.size / 1024)} KB`
+              : "";
+            const thumb =
+              file.isImage && file.url
+                ? `<img class=\"thumb\" src=\"${escapeHtml(file.url)}\">`
+                : "";
+            return `<div class=\"file-row\"><div class=\"file-left\">${thumb}<div class=\"name\">• ${name}${size}</div></div><div class=\"remove\" data-idx=\"${i}\">Remove</div></div>`;
+          })
+          .join("");
       }
 
       // Calcolo cluster (grappoli) come componenti connesse
@@ -452,8 +600,8 @@
         const adj = new Map();
         for (const id of idSet) adj.set(id, new Set());
         for (const l of links || []) {
-          const s = typeof l.source === 'object' ? l.source?.id : l.source;
-          const t = typeof l.target === 'object' ? l.target?.id : l.target;
+          const s = typeof l.source === "object" ? l.source?.id : l.source;
+          const t = typeof l.target === "object" ? l.target?.id : l.target;
           if (s == null || t == null) continue;
           if (!adj.has(s)) adj.set(s, new Set());
           if (!adj.has(t)) adj.set(t, new Set());
@@ -530,8 +678,15 @@
       }
 
       function ensureLinkStyleRefresh() {
-        Graph.linkWidth((l) => (isEdgeSelected(l) ? 3 : (l.dashed ? 0.6 : 1.4)))
-             .linkColor((l) => (isEdgeSelected(l) ? "rgba(255,255,255,0.95)" : (l.dashed ? "rgba(200,200,200,0.25)" : "rgba(220,220,220,0.45)")));
+        Graph.linkWidth((l) =>
+          isEdgeSelected(l) ? 3 : l.dashed ? 0.6 : 1.4
+        ).linkColor((l) =>
+          isEdgeSelected(l)
+            ? "rgba(255,255,255,0.95)"
+            : l.dashed
+            ? "rgba(200,200,200,0.25)"
+            : "rgba(220,220,220,0.45)"
+        );
       }
 
       // —— Palette colore deterministica (by group) ——
@@ -637,38 +792,68 @@
 
       // Toolbar extra
       document.getElementById("btnNewNode").onclick = () => addNewNode();
-      document.getElementById("btnConnect").onclick = () => connectSelectedNodes();
-      document.getElementById("btnSpawn").onclick = () => spawnChildFromSelected();
+      document.getElementById("btnConnect").onclick = () =>
+        connectSelectedNodes();
+      document.getElementById("btnSpawn").onclick = () =>
+        spawnChildFromSelected();
       document.getElementById("btnDelete").onclick = () => deleteSelected();
       document.getElementById("btnUndo").onclick = () => undo();
       document.getElementById("btnRedo").onclick = () => redo();
       document.getElementById("btnOpenFolder").onclick = async () => {
-        try { await openProjectFromFolder(); } catch (e) { alert(e.message || e); }
+        try {
+          await openProjectFromFolder();
+        } catch (e) {
+          alert(e.message || e);
+        }
       };
       document.getElementById("btnSave").onclick = async () => {
-        try { await saveProjectSmart(); } catch (e) { alert(e.message || e); }
+        try {
+          await saveProjectSmart();
+        } catch (e) {
+          alert(e.message || e);
+        }
       };
       // POV toggle (default off)
       let camOnSelect = false;
-      const chkPOV = document.getElementById('chkPOV');
-      if (chkPOV) chkPOV.addEventListener('change', () => { camOnSelect = !!chkPOV.checked; });
+      const chkPOV = document.getElementById("chkPOV");
+      if (chkPOV)
+        chkPOV.addEventListener("change", () => {
+          camOnSelect = !!chkPOV.checked;
+        });
 
       // Rimosso il caricamento rapido di graphdata.json
 
       // Tooltip su hover per la toolbar
-      (function attachToolbarTooltips(){
-        const tip = document.getElementById('tooltip');
-        const bar = document.querySelector('.toolbar');
+      (function attachToolbarTooltips() {
+        const tip = document.getElementById("tooltip");
+        const bar = document.querySelector(".toolbar");
         if (!tip || !bar) return;
-        function show(text, x, y){ tip.textContent = text; tip.style.display = 'block'; tip.style.left = (x+12)+ 'px'; tip.style.top = (y+12)+'px'; }
-        function hide(){ tip.style.display = 'none'; }
-        bar.addEventListener('mouseover', (e)=>{
-          const el = e.target.closest('button, select, label'); if (!el) return;
-          const t = el.getAttribute('data-tip') || el.title || el.textContent.trim(); if (!t) return;
+        function show(text, x, y) {
+          tip.textContent = text;
+          tip.style.display = "block";
+          tip.style.left = x + 12 + "px";
+          tip.style.top = y + 12 + "px";
+        }
+        function hide() {
+          tip.style.display = "none";
+        }
+        bar.addEventListener("mouseover", (e) => {
+          const el = e.target.closest("button, select, label");
+          if (!el) return;
+          const t =
+            el.getAttribute("data-tip") || el.title || el.textContent.trim();
+          if (!t) return;
           show(t, e.clientX, e.clientY);
         });
-        bar.addEventListener('mousemove', (e)=>{ if (tip.style.display==='block') { tip.style.left=(e.clientX+12)+'px'; tip.style.top=(e.clientY+12)+'px'; } });
-        bar.addEventListener('mouseout', (e)=>{ if (!bar.contains(e.relatedTarget)) hide(); });
+        bar.addEventListener("mousemove", (e) => {
+          if (tip.style.display === "block") {
+            tip.style.left = e.clientX + 12 + "px";
+            tip.style.top = e.clientY + 12 + "px";
+          }
+        });
+        bar.addEventListener("mouseout", (e) => {
+          if (!bar.contains(e.relatedTarget)) hide();
+        });
       })();
 
       // Rimosso il picker JSON: usa Apri cartella per caricare/salvare
@@ -730,8 +915,12 @@
       }
 
       // === Undo/redo helper ===
-      function uid() { return "n" + Math.random().toString(36).slice(2, 9); }
-      function deepClone(x) { return JSON.parse(JSON.stringify(x)); }
+      function uid() {
+        return "n" + Math.random().toString(36).slice(2, 9);
+      }
+      function deepClone(x) {
+        return JSON.parse(JSON.stringify(x));
+      }
       function pushHistory() {
         history.undo.push(deepClone(normalizeData(currentData)));
         if (history.undo.length > history.limit) history.undo.shift();
@@ -779,8 +968,8 @@
         const del = new Set(selectedIds);
         currentData.nodes = currentData.nodes.filter((n) => !del.has(n.id));
         currentData.links = currentData.links.filter((l) => {
-          const s = typeof l.source === 'object' ? l.source?.id : l.source;
-          const t = typeof l.target === 'object' ? l.target?.id : l.target;
+          const s = typeof l.source === "object" ? l.source?.id : l.source;
+          const t = typeof l.target === "object" ? l.target?.id : l.target;
           return !del.has(s) && !del.has(t);
         });
         setGraphData(currentData);
@@ -789,85 +978,132 @@
 
       function connectSelectedNodes() {
         if (selectedIds.size !== 2) {
-          setStatus('Seleziona 2 nodi');
+          setStatus("Seleziona 2 nodi");
           return;
         }
         const [a, b] = [...selectedIds];
         if (a === b) return;
         // evita duplicati (nondirezionale)
-        const key = (x, y) => [x, y].sort().join('||');
-        const existing = new Set((currentData.links || []).map(l => key(
-          typeof l.source === 'object' ? l.source?.id : l.source,
-          typeof l.target === 'object' ? l.target?.id : l.target
-        )));
+        const key = (x, y) => [x, y].sort().join("||");
+        const existing = new Set(
+          (currentData.links || []).map((l) =>
+            key(
+              typeof l.source === "object" ? l.source?.id : l.source,
+              typeof l.target === "object" ? l.target?.id : l.target
+            )
+          )
+        );
         const k = key(a, b);
-        if (existing.has(k)) { setStatus('Già collegati'); return; }
+        if (existing.has(k)) {
+          setStatus("Già collegati");
+          return;
+        }
         pushHistory();
         currentData.links.push({ source: a, target: b });
         setGraphData(currentData);
-        setStatus('Nodi collegati');
+        setStatus("Nodi collegati");
       }
 
       function addNewNode() {
         pushHistory();
         const id = uid();
-        currentData.nodes.push({ id, name: 'Nuovo nodo', areas: [], tags: [], desc: '', files: [] });
+        currentData.nodes.push({
+          id,
+          name: "Nuovo nodo",
+          areas: [],
+          tags: [],
+          desc: "",
+          files: [],
+        });
         setGraphData(currentData);
         selectOnly(id);
-        setStatus('Nuovo nodo creato');
+        setStatus("Nuovo nodo creato");
       }
 
       // === Editor bindings ===
-      document.getElementById('fTitle').addEventListener('input', () => {
-        const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
-        n.name = document.getElementById('fTitle').value.trim();
+      document.getElementById("fTitle").addEventListener("input", () => {
+        const sid = getSingleSelectedId();
+        if (!sid) return;
+        const n = currentData.nodes.find((x) => x.id === sid);
+        if (!n) return;
+        n.name = document.getElementById("fTitle").value.trim();
         syncGraphNodeById(sid);
         refreshNodeRenderer();
       });
-      document.getElementById('fAreas').addEventListener('change', () => {
-        const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
-        const raw = document.getElementById('fAreas').value || '';
+      document.getElementById("fAreas").addEventListener("change", () => {
+        const sid = getSingleSelectedId();
+        if (!sid) return;
+        const n = currentData.nodes.find((x) => x.id === sid);
+        if (!n) return;
+        const raw = document.getElementById("fAreas").value || "";
         n.areas = raw.split(/,\s*/).filter(Boolean);
         syncGraphNodeById(sid);
         refreshNodeRenderer();
       });
-      document.getElementById('fTags').addEventListener('change', () => {
-        const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
-        const raw = document.getElementById('fTags').value || '';
+      document.getElementById("fTags").addEventListener("change", () => {
+        const sid = getSingleSelectedId();
+        if (!sid) return;
+        const n = currentData.nodes.find((x) => x.id === sid);
+        if (!n) return;
+        const raw = document.getElementById("fTags").value || "";
         n.tags = raw.split(/,\s*/).filter(Boolean);
         syncGraphNodeById(sid);
       });
-      document.getElementById('fDesc').addEventListener('change', () => {
-        const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
-        n.desc = document.getElementById('fDesc').value;
+      document.getElementById("fDesc").addEventListener("change", () => {
+        const sid = getSingleSelectedId();
+        if (!sid) return;
+        const n = currentData.nodes.find((x) => x.id === sid);
+        if (!n) return;
+        n.desc = document.getElementById("fDesc").value;
         syncGraphNodeById(sid);
       });
 
-      document.getElementById('btnAddFiles').addEventListener('click', () => document.getElementById('fFiles').click());
-      document.getElementById('fFiles').addEventListener('change', () => {
-        const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
-        const inp = document.getElementById('fFiles');
+      document
+        .getElementById("btnAddFiles")
+        .addEventListener("click", () =>
+          document.getElementById("fFiles").click()
+        );
+      document.getElementById("fFiles").addEventListener("change", () => {
+        const sid = getSingleSelectedId();
+        if (!sid) return;
+        const n = currentData.nodes.find((x) => x.id === sid);
+        if (!n) return;
+        const inp = document.getElementById("fFiles");
         const fls = Array.from(inp.files || []);
         n.files = n.files || [];
         for (const f of fls) {
-          const entry = { name: f.name, size: f.size, isImage: /^image\//i.test(f.type), isPDF: /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name), path: 'assets/' + f.name, url: URL.createObjectURL(f), __file: f };
+          const entry = {
+            name: f.name,
+            size: f.size,
+            isImage: /^image\//i.test(f.type),
+            isPDF: /pdf$/i.test(f.type) || /\.pdf$/i.test(f.name),
+            path: "assets/" + f.name,
+            url: URL.createObjectURL(f),
+            __file: f,
+          };
           n.files.push(entry);
         }
-        const firstImg = (n.files || []).find(x=>x.isImage);
+        const firstImg = (n.files || []).find((x) => x.isImage);
         n.image = firstImg ? firstImg.url : n.image;
         syncGraphNodeById(sid);
         renderFilesListFor(n);
         refreshNodeRenderer();
-        inp.value = '';
+        inp.value = "";
       });
-      document.getElementById('filesList').addEventListener('click', (e) => {
-        const rm = e.target.closest('.remove'); if (!rm) return;
-        const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
-        const idx = Number(rm.getAttribute('data-idx'));
+      document.getElementById("filesList").addEventListener("click", (e) => {
+        const rm = e.target.closest(".remove");
+        if (!rm) return;
+        const sid = getSingleSelectedId();
+        if (!sid) return;
+        const n = currentData.nodes.find((x) => x.id === sid);
+        if (!n) return;
+        const idx = Number(rm.getAttribute("data-idx"));
         if (!Number.isFinite(idx)) return;
         n.files.splice(idx, 1);
-        const firstImg = (n.files || []).find(x=>x.isImage);
-        n.image = firstImg ? (firstImg.url || resolveImageURL(firstImg.path)) : null;
+        const firstImg = (n.files || []).find((x) => x.isImage);
+        n.image = firstImg
+          ? firstImg.url || resolveImageURL(firstImg.path)
+          : null;
         syncGraphNodeById(sid);
         renderFilesListFor(n);
         refreshNodeRenderer();
@@ -875,36 +1111,46 @@
 
       // sincronizza i cambi di currentData sul grafo vivo
       function syncGraphNodeById(id) {
-        const gd = Graph.graphData(); if (!gd) return;
-        const gn = (gd.nodes || []).find(x => x.id === id); if (!gn) return;
-        const src = (currentData.nodes || []).find(x => x.id === id); if (!src) return;
-        gn.name = src.name || '';
+        const gd = Graph.graphData();
+        if (!gd) return;
+        const gn = (gd.nodes || []).find((x) => x.id === id);
+        if (!gn) return;
+        const src = (currentData.nodes || []).find((x) => x.id === id);
+        if (!src) return;
+        gn.name = src.name || "";
         gn.areas = Array.isArray(src.areas) ? [...src.areas] : [];
         gn.tags = Array.isArray(src.tags) ? [...src.tags] : [];
-        gn.desc = src.desc || '';
+        gn.desc = src.desc || "";
         gn.image = src.image || null;
-        gn.files = Array.isArray(src.files) ? src.files.map(f => ({...f})) : [];
+        gn.files = Array.isArray(src.files)
+          ? src.files.map((f) => ({ ...f }))
+          : [];
       }
 
       // === File System Access: open/save ===
       const projectCtx = { dirHandle: null };
       async function openProjectFromFolder() {
-        if (!('showDirectoryPicker' in window)) throw new Error('Il browser non supporta l\'apertura cartelle');
-        const dir = await window.showDirectoryPicker({ mode: 'readwrite' });
+        if (!("showDirectoryPicker" in window))
+          throw new Error("Il browser non supporta l'apertura cartelle");
+        const dir = await window.showDirectoryPicker({ mode: "readwrite" });
         const found = await findProjectJson(dir);
-        if (!found) throw new Error('project.json non trovato nella cartella selezionata');
+        if (!found)
+          throw new Error(
+            "project.json non trovato nella cartella selezionata"
+          );
         const { root, fileHandle } = found;
         const file = await fileHandle.getFile();
         const text = await file.text();
         const project = JSON.parse(text);
-        if (!isThreadscape(project)) throw new Error('project.json non è nel formato Threadscape');
+        if (!isThreadscape(project))
+          throw new Error("project.json non è nel formato Threadscape");
         projectCtx.dirHandle = root;
         pushHistory();
         currentData = normalizeData(convertProjectToGraphData(project));
         await attachObjectURLsFromDir(root, currentData);
         setGraphData(currentData);
         selectOnly(null);
-        setStatus('Nodo/i eliminati');
+        setStatus("Nodo/i eliminati");
       }
 
       // Cerca ricorsivamente project.json partendo dalla cartella scelta
@@ -912,13 +1158,15 @@
         if (!root || depth > maxDepth) return null;
         // prova nella root corrente
         try {
-          const fh = await root.getFileHandle('project.json', { create: false });
+          const fh = await root.getFileHandle("project.json", {
+            create: false,
+          });
           if (fh) return { root, fileHandle: fh };
         } catch {}
         // altrimenti scansiona sottocartelle
         try {
           for await (const [name, handle] of root.entries()) {
-            if (handle.kind === 'directory') {
+            if (handle.kind === "directory") {
               const found = await findProjectJson(handle, depth + 1, maxDepth);
               if (found) return found;
             }
@@ -931,92 +1179,154 @@
           for (const f of n.files || []) {
             if (!f.path) continue;
             // prova percorso così com'è, poi fallback a assets/<basename>
-            const base = String(f.path).replace(/^\.\/?/, '');
+            const base = String(f.path).replace(/^\.\/?/, "");
             const cand = [base];
             const bn = base.split(/[\\\/]*/).pop() || base;
-            if (!/^assets\//i.test(base)) cand.push('assets/' + bn);
+            if (!/^assets\//i.test(base)) cand.push("assets/" + bn);
             let file = null;
             for (const p of cand) {
-              try { file = await readFileByPath(dir, p); if (file) { f.path = p; break; } } catch {}
+              try {
+                file = await readFileByPath(dir, p);
+                if (file) {
+                  f.path = p;
+                  break;
+                }
+              } catch {}
             }
             if (file) {
-              try { if (f.url && String(f.url).startsWith('blob:')) URL.revokeObjectURL(f.url); } catch {}
+              try {
+                if (f.url && String(f.url).startsWith("blob:"))
+                  URL.revokeObjectURL(f.url);
+              } catch {}
               f.url = URL.createObjectURL(file);
               f.size = file.size;
             }
           }
           // aggiorna thumbnail 3D con la prima immagine disponibile
-          const firstImg = (n.files || []).find(x => x && x.isImage && x.url);
+          const firstImg = (n.files || []).find((x) => x && x.isImage && x.url);
           if (firstImg && firstImg.url) n.image = firstImg.url;
         }
       }
       async function saveProjectSmart() {
         if (projectCtx.dirHandle) {
           await saveProjectToDir(projectCtx.dirHandle);
-          alert('Salvato');
-        } else if ('showDirectoryPicker' in window) {
-          const dir = await window.showDirectoryPicker({ mode: 'readwrite' });
+          alert("Salvato");
+        } else if ("showDirectoryPicker" in window) {
+          const dir = await window.showDirectoryPicker({ mode: "readwrite" });
           projectCtx.dirHandle = dir;
           await saveProjectToDir(dir);
-          alert('Salvato in nuova cartella');
+          alert("Salvato in nuova cartella");
         } else {
-          const blob = new Blob([JSON.stringify(buildProjectObject(), null, 2)], { type: 'application/json' });
-          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'project.json'; a.click();
+          const blob = new Blob(
+            [JSON.stringify(buildProjectObject(), null, 2)],
+            { type: "application/json" }
+          );
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "project.json";
+          a.click();
         }
       }
       function buildProjectObject() {
         const nodes = (currentData.nodes || []).map((n) => {
-          const files = (n.files || []).map((f) => ({ name: f.name, size: f.size, isImage: !!f.isImage, isPDF: !!f.isPDF, path: f.path || null }));
+          const files = (n.files || []).map((f) => ({
+            name: f.name,
+            size: f.size,
+            isImage: !!f.isImage,
+            isPDF: !!f.isPDF,
+            path: f.path || null,
+          }));
           // Esporta senza type e mainArea
-          return { id: n.id, data: { title: n.name || n.id, type: '', mainArea: null, areas: n.areas || [], tags: n.tags || [], desc: n.desc || '', files } };
+          return {
+            id: n.id,
+            data: {
+              title: n.name || n.id,
+              type: "",
+              mainArea: null,
+              areas: n.areas || [],
+              tags: n.tags || [],
+              desc: n.desc || "",
+              files,
+            },
+          };
         });
-        const edges = (currentData.links || []).map((l) => ({ s: (typeof l.source==='object'?l.source?.id:l.source), t: (typeof l.target==='object'?l.target?.id:l.target), dashed: !!l.dashed }));
+        const edges = (currentData.links || []).map((l) => ({
+          s: typeof l.source === "object" ? l.source?.id : l.source,
+          t: typeof l.target === "object" ? l.target?.id : l.target,
+          dashed: !!l.dashed,
+        }));
         return { version: 6, nodes, edges };
       }
       async function writeFileByPath(root, relPath, blob) {
-        const parts = relPath.split('/').filter(Boolean);
+        const parts = relPath.split("/").filter(Boolean);
         let dir = root;
-        for (let i = 0; i < parts.length - 1; i++) { dir = await dir.getDirectoryHandle(parts[i], { create: true }); }
-        const fileHandle = await dir.getFileHandle(parts[parts.length - 1], { create: true });
-        const w = await fileHandle.createWritable(); await w.write(blob); await w.close();
+        for (let i = 0; i < parts.length - 1; i++) {
+          dir = await dir.getDirectoryHandle(parts[i], { create: true });
+        }
+        const fileHandle = await dir.getFileHandle(parts[parts.length - 1], {
+          create: true,
+        });
+        const w = await fileHandle.createWritable();
+        await w.write(blob);
+        await w.close();
       }
       async function readFileByPath(root, relPath) {
-        const parts = relPath.split('/').filter(Boolean);
+        const parts = relPath.split("/").filter(Boolean);
         let dir = root;
-        for (let i = 0; i < parts.length - 1; i++) { dir = await dir.getDirectoryHandle(parts[i], { create: false }); }
-        const fileHandle = await dir.getFileHandle(parts[parts.length - 1], { create: false });
+        for (let i = 0; i < parts.length - 1; i++) {
+          dir = await dir.getDirectoryHandle(parts[i], { create: false });
+        }
+        const fileHandle = await dir.getFileHandle(parts[parts.length - 1], {
+          create: false,
+        });
         return await fileHandle.getFile();
       }
       async function saveProjectToDir(dir) {
         for (const n of currentData.nodes || []) {
           for (const f of n.files || []) {
             if (f.__file) {
-              const name = sanitizeFileName(f.__file.name || 'file');
-              const rel = f.path || ('assets/' + name);
+              const name = sanitizeFileName(f.__file.name || "file");
+              const rel = f.path || "assets/" + name;
               let blob = f.__file;
               if (f.isImage) {
-                try { blob = await resizeImageFile(f.__file, 1700); } catch {}
+                try {
+                  blob = await resizeImageFile(f.__file, 1700);
+                } catch {}
               }
               await writeFileByPath(dir, rel, blob);
               f.path = rel;
               f.size = blob.size;
               // aggiorna subito l'Object URL dalla copia su disco
-              try { const of = await readFileByPath(dir, rel); if (of) { if (f.url) try { URL.revokeObjectURL(f.url); } catch {} f.url = URL.createObjectURL(of); } } catch {}
+              try {
+                const of = await readFileByPath(dir, rel);
+                if (of) {
+                  if (f.url)
+                    try {
+                      URL.revokeObjectURL(f.url);
+                    } catch {}
+                  f.url = URL.createObjectURL(of);
+                }
+              } catch {}
             } else if (f.path && !f.url) {
               // se esiste già su disco ma manca url, crealo ora
-              try { const of = await readFileByPath(dir, f.path); if (of) f.url = URL.createObjectURL(of); } catch {}
+              try {
+                const of = await readFileByPath(dir, f.path);
+                if (of) f.url = URL.createObjectURL(of);
+              } catch {}
             }
           }
         }
         const project = buildProjectObject();
-        const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
-        await writeFileByPath(dir, 'project.json', blob);
+        const blob = new Blob([JSON.stringify(project, null, 2)], {
+          type: "application/json",
+        });
+        await writeFileByPath(dir, "project.json", blob);
         // riallinea anteprime e thumbnail dal disco appena scritto
         try {
           await attachObjectURLsFromDir(dir, currentData);
           const sid = getSingleSelectedId();
           if (sid) {
-            const n = currentData.nodes.find(x=>x.id===sid);
+            const n = currentData.nodes.find((x) => x.id === sid);
             if (n) renderFilesListFor(n);
           }
           refreshNodeRenderer();
@@ -1024,7 +1334,7 @@
       }
 
       function sanitizeFileName(name) {
-        return String(name).replace(/[^a-zA-Z0-9._-]+/g, '_');
+        return String(name).replace(/[^a-zA-Z0-9._-]+/g, "_");
       }
 
       function resizeImageFile(file, maxSide = 1700) {
@@ -1035,7 +1345,8 @@
             img.onload = () => {
               const iw = img.naturalWidth || img.width;
               const ih = img.naturalHeight || img.height;
-              let tw = iw, th = ih;
+              let tw = iw,
+                th = ih;
               const longSide = Math.max(iw, ih);
               if (longSide > maxSide) {
                 const scale = maxSide / longSide;
@@ -1047,18 +1358,28 @@
                 resolve(file);
                 return;
               }
-              const canvas = document.createElement('canvas');
-              canvas.width = tw; canvas.height = th;
-              const ctx = canvas.getContext('2d');
+              const canvas = document.createElement("canvas");
+              canvas.width = tw;
+              canvas.height = th;
+              const ctx = canvas.getContext("2d");
               ctx.drawImage(img, 0, 0, tw, th);
-              const outType = (/^image\//i.test(file.type) ? file.type : 'image/jpeg');
-              const quality = outType === 'image/jpeg' ? 0.85 : 0.92;
-              canvas.toBlob((blob) => {
-                URL.revokeObjectURL(url);
-                resolve(blob || file);
-              }, outType, quality);
+              const outType = /^image\//i.test(file.type)
+                ? file.type
+                : "image/jpeg";
+              const quality = outType === "image/jpeg" ? 0.85 : 0.92;
+              canvas.toBlob(
+                (blob) => {
+                  URL.revokeObjectURL(url);
+                  resolve(blob || file);
+                },
+                outType,
+                quality
+              );
             };
-            img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+            img.onerror = () => {
+              URL.revokeObjectURL(url);
+              resolve(file);
+            };
             img.src = url;
           } catch {
             resolve(file);
@@ -1067,41 +1388,61 @@
       }
 
       // Shortcut da tastiera (con guardie per i campi di testo)
-      window.addEventListener('keydown', (e) => {
-        const isMac = navigator.platform.toUpperCase().includes('MAC');
+      window.addEventListener("keydown", (e) => {
+        const isMac = navigator.platform.toUpperCase().includes("MAC");
         const mod = isMac ? e.metaKey : e.ctrlKey;
         const t = e.target;
-        const tag = (t && t.tagName ? t.tagName : '').toLowerCase();
-        const type = (t && t.type ? String(t.type).toLowerCase() : '');
-        const isEditable = (t && t.isContentEditable) || tag === 'textarea' || tag === 'input';
-        const isTyping = isEditable && !['button','checkbox','radio','file','submit','reset'].includes(type);
+        const tag = (t && t.tagName ? t.tagName : "").toLowerCase();
+        const type = t && t.type ? String(t.type).toLowerCase() : "";
+        const isEditable =
+          (t && t.isContentEditable) || tag === "textarea" || tag === "input";
+        const isTyping =
+          isEditable &&
+          !["button", "checkbox", "radio", "file", "submit", "reset"].includes(
+            type
+          );
 
         // Lascia all'input i tasti Undo/Redo e Canc/Backspace
         if (isTyping) {
-          if (mod && e.key.toLowerCase() === 'z') return; // undo/redo nativo del campo
-          if (!mod && (e.key === 'Delete' || e.key === 'Backspace')) return; // non eliminare nodi se sto scrivendo
-          if (!mod && e.key.toLowerCase() === 'c') return; // non catturare 'c' mentre scrivo
+          if (mod && e.key.toLowerCase() === "z") return; // undo/redo nativo del campo
+          if (!mod && (e.key === "Delete" || e.key === "Backspace")) return; // non eliminare nodi se sto scrivendo
+          if (!mod && e.key.toLowerCase() === "c") return; // non catturare 'c' mentre scrivo
         }
 
-        if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
-        else if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); saveProjectSmart(); }
-        else if (mod && e.key.toLowerCase() === 'o') { e.preventDefault(); openProjectFromFolder(); }
-        else if (e.key === 'Delete' || e.key === 'Backspace') {
-          if (selectedIds.size) { e.preventDefault(); deleteSelected(); }
-          else if (selectedEdge) { e.preventDefault(); deleteSelectedEdge(); }
-        }
-        else if (!mod && e.key.toLowerCase() === 'c') { e.preventDefault(); connectSelectedNodes(); }
-        else if (e.key === 'Escape') {
+        if (mod && e.key.toLowerCase() === "z") {
+          e.preventDefault();
+          if (e.shiftKey) redo();
+          else undo();
+        } else if (mod && e.key.toLowerCase() === "s") {
+          e.preventDefault();
+          saveProjectSmart();
+        } else if (mod && e.key.toLowerCase() === "o") {
+          e.preventDefault();
+          openProjectFromFolder();
+        } else if (e.key === "Delete" || e.key === "Backspace") {
+          if (selectedIds.size) {
+            e.preventDefault();
+            deleteSelected();
+          } else if (selectedEdge) {
+            e.preventDefault();
+            deleteSelectedEdge();
+          }
+        } else if (!mod && e.key.toLowerCase() === "c") {
+          e.preventDefault();
+          connectSelectedNodes();
+        } else if (e.key === "Escape") {
           if (!isTyping) {
-            selectOnly(null); selectedEdge = null; ensureLinkStyleRefresh();
+            selectOnly(null);
+            selectedEdge = null;
+            ensureLinkStyleRefresh();
           }
         }
       });
 
       // === Edge helper ===
       function linkIds(l) {
-        const s = typeof l.source === 'object' ? l.source?.id : l.source;
-        const t = typeof l.target === 'object' ? l.target?.id : l.target;
+        const s = typeof l.source === "object" ? l.source?.id : l.source;
+        const t = typeof l.target === "object" ? l.target?.id : l.target;
         return { s, t };
       }
       function sameUndirected(a, b) {
@@ -1114,21 +1455,29 @@
       function deleteSelectedEdge() {
         if (!selectedEdge) return;
         pushHistory();
-        currentData.links = (currentData.links || []).filter((l) => !sameUndirected(linkIds(l), selectedEdge));
+        currentData.links = (currentData.links || []).filter(
+          (l) => !sameUndirected(linkIds(l), selectedEdge)
+        );
         selectedEdge = null;
         setGraphData(currentData);
-        setStatus('Edge eliminato');
+        setStatus("Edge eliminato");
       }
 
       // === Status helper ===
       function setStatus(msg) {
-        const el = document.getElementById('status');
+        const el = document.getElementById("status");
         if (!el) return;
-        if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
+        if (!msg) {
+          el.style.display = "none";
+          el.textContent = "";
+          return;
+        }
         el.textContent = msg;
-        el.style.display = 'block';
+        el.style.display = "block";
         clearTimeout(setStatus._t);
-        setStatus._t = setTimeout(() => { el.style.display = 'none'; }, 1800);
+        setStatus._t = setTimeout(() => {
+          el.style.display = "none";
+        }, 1800);
       }
     </script>
   </body>
