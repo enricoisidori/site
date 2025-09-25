@@ -4,65 +4,41 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>3D Visualizer – Text Nodes</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-    <link rel="icon" type="image/png" href="./asset/threadscape/icon.png" />
     <style>
-      :root {
-        --bg: #0e0e0e;
-        --panel: #151515;
-        --panel-soft: #161616;
-        --ink: #ffffff;
-        --muted: #bdbdbd;
-        --line: #2a2a2a;
-        --btn-hover: rgba(255, 255, 255, 0.08);
-        --btn-active: rgba(255, 255, 255, 0.12);
-        --field: #1e1e1e;
-        --field-hover: #222222;
-        --field-focus-ring: rgba(255, 255, 255, 0.18);
-      }
       html,
       body,
       #scene {
         height: 100%;
         margin: 0;
-        background: var(--bg);
-        color: var(--ink);
+        background: #0c0c0c;
+        color: #eee;
         font: 14px/1.4 system-ui;
       }
-      .toolbar { position: fixed; top: 8px; left: 8px; display: flex; gap: 6px; z-index: 10; }
+      .toolbar {
+        position: fixed;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+      }
       .toolbar button,
       .toolbar label,
       .toolbar select {
-        appearance: none; -webkit-appearance: none;
-        background: transparent;
-        border: 1px solid var(--line);
-        color: var(--ink);
+        background: #141414;
+        border: 1px solid #333;
+        color: #eee;
         padding: 6px 10px;
         border-radius: 8px;
         cursor: pointer;
-      }
-      .toolbar button:hover, .toolbar label:hover, .toolbar select:hover { background: var(--btn-hover); }
-      .toolbar button:active { background: var(--btn-active); transform: translateY(0.5px); }
-      .material-symbols-outlined {
-        font-family: "Material Symbols Outlined", "Material Icons Outlined", "Material Icons", sans-serif;
-        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
-        font-feature-settings: "liga";
-        -webkit-font-feature-settings: "liga";
-        -moz-font-feature-settings: "liga";
-        font-size: 18px; line-height: 1; vertical-align: middle; display: inline-block;
-        user-select: none;
       }
       .toolbar .spacer { width: 8px; }
       .panel {
         position: fixed;
         left: 8px;
         top: 8px;
-        background: var(--panel-soft);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid #333;
         padding: 8px;
         border-radius: 8px;
         max-width: 360px;
@@ -77,7 +53,18 @@
         color: #aaa;
         font-size: 12px;
       }
-      .tooltip { position: fixed; pointer-events: none; background: #111; border: 1px solid #333; color: #eee; padding: 6px 8px; border-radius: 8px; font-size: 12px; max-width: 420px; display: none; box-shadow: 0 10px 24px rgba(0,0,0,0.45); }
+      .tooltip {
+        position: fixed;
+        pointer-events: none;
+        background: #111;
+        border: 1px solid #333;
+        color: #eee;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        max-width: 420px;
+        display: none;
+      }
       /* Editor laterale */
       .edit-panel {
         position: fixed;
@@ -86,8 +73,8 @@
         width: 360px;
         max-height: calc(100% - 16px);
         overflow: auto;
-        background: var(--panel);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid #333;
         border-radius: 8px;
         padding: 10px;
         display: none;
@@ -99,15 +86,13 @@
         width: 100%; background: #0f0f0f; color: #eee; border: 1px solid #333;
         border-radius: 6px; padding: 8px 10px; font: inherit;
       }
-      .edit-panel textarea { min-height: 220px; resize: vertical; }
-      .edit-panel { overflow: auto; overflow-wrap: anywhere; }
+      .edit-panel textarea { min-height: 120px; resize: vertical; }
       .file-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; padding:6px 0; border-bottom:1px solid #333; }
       .file-left { display:flex; align-items:center; gap:8px; min-width:0; }
       .thumb { width:16px; height:16px; border-radius:3px; border:1px solid #333; object-fit:cover; display:block; }
       .file-row .name { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px; }
       .file-row .remove { cursor:pointer; text-decoration:underline; }
       .file-row .remove:hover { color:#fff; }
-      .status { position: fixed; left: 8px; bottom: 8px; color: var(--muted); font-size: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); padding: 6px 8px; border-radius: 8px; }
     </style>
     <!-- Three prima di TUTTO -->
     <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
@@ -130,32 +115,39 @@
     <div id="scene"></div>
 
     <div class="toolbar">
-      <button id="btnOpenFolder" title="Apri cartella" data-tip="Apri cartella"><span class="material-symbols-outlined">folder_open</span></button>
-      <button id="btnSave" title="Salva" data-tip="Salva"><span class="material-symbols-outlined">save</span></button>
-      <button id="btnUndo" title="Undo" data-tip="Undo (⌘/Ctrl+Z)"><span class="material-symbols-outlined">undo</span></button>
-      <button id="btnRedo" title="Redo" data-tip="Redo (⇧⌘/Ctrl+Z)"><span class="material-symbols-outlined">redo</span></button>
-      <button id="btnConnect" title="Collega (C)" data-tip="Collega (C)"><span class="material-symbols-outlined">link</span></button>
-      <button id="btnNewNode" title="Nuovo nodo" data-tip="Nuovo nodo"><span class="material-symbols-outlined">add_circle</span></button>
-      <button id="btnSpawn" title="Nuovo collegato" data-tip="Nuovo collegato"><span class="material-symbols-outlined">call_split</span></button>
-      <button id="btnDelete" title="Elimina" data-tip="Elimina"><span class="material-symbols-outlined">delete</span></button>
-      <span class="spacer"></span>
-      <button id="btnFit" data-tip="Fit"><span class="material-symbols-outlined">fit_screen</span></button>
-      <button id="btnToggleSize" data-tip="Dimensione testo"><span class="material-symbols-outlined">format_size</span></button>
-      <select id="colorBy" title="Colora per…" data-tip="Colori per…">
+      <label>
+        <input
+          id="file"
+          type="file"
+          accept="application/json"
+          style="display: none"
+        />
+        Carica JSON…
+      </label>
+      <button id="btnFit">Fit</button>
+      <button id="btnToggleSize">Text ±</button>
+      <select id="colorBy" title="Colora per…">
         <option value="none" selected>Colori: Nessuno</option>
         <option value="area">Colori: per Area</option>
         <option value="cluster">Colori: per Cluster</option>
       </select>
-      <label style="display:inline-flex;align-items:center;gap:6px" data-tip="Selezione camera (POV)">
-        <input id="chkPOV" type="checkbox" style="accent-color:#888" />
-        POV
-      </label>
+      <span class="spacer"></span>
+      <button id="btnOpenFolder">Apri cartella</button>
+      <button id="btnSave">Salva</button>
+      <button id="btnUndo">Undo</button>
+      <button id="btnRedo">Redo</button>
+      <button id="btnConnect">Collega (C)</button>
+      <button id="btnSpawn">Nuovo collegato</button>
+      <button id="btnDelete">Elimina</button>
     </div>
 
-    
+    <div class="panel">
+      <h3>Legenda / Note</h3>
+      <div class="muted">I nodi sono testo (niente palline). Colore per <em>Area</em> o <em>Cluster</em>.</div>
+      <div class="muted">Click seleziona e centra; Shift+Click selezione multipla.</div>
+    </div>
 
     <div id="tooltip" class="tooltip"></div>
-    <div id="status" class="status" style="display:none"></div>
 
     <aside id="editor" class="edit-panel">
       <h3>Proprietà nodo</h3>
@@ -177,16 +169,15 @@
 
     <script>
       const el = document.getElementById("scene");
-      let selectedEdge = null; // edge selezionato (s,t)
       const Graph = ForceGraph3D()(el)
         .backgroundColor("#0c0c0c")
         .nodeRelSize(1) // irrilevante: non usiamo le palline
         .nodeLabel(() => "") // niente balloon label, usiamo sprite+tooltip
-        .linkOpacity(0.45)
-        .linkWidth((l) => (isEdgeSelected(l) ? 3 : (l.dashed ? 0.6 : 1.4)))
-        .linkColor((l) => (isEdgeSelected(l) ? "rgba(255,255,255,0.95)" : (l.dashed ? "rgba(200,200,200,0.35)" : "rgba(220,220,220,0.65)")))
-        .nodeColor(() => "#ffffff")
-        .linkHoverPrecision(4)
+        .linkOpacity(0.35)
+        .linkWidth((l) => (l.dashed ? 0.6 : 1.4))
+        .linkColor((l) =>
+          l.dashed ? "rgba(200,200,200,0.25)" : "rgba(220,220,220,0.45)"
+        )
         .enableNodeDrag(true)
         .onNodeHover((node) => {
           // tooltip disattivato: si usa il pannello laterale su click
@@ -195,31 +186,9 @@
           if (!node) return;
           if (event && event.shiftKey) toggleSelection(node.id);
           else selectOnly(node.id);
-          // click sul nodo cancella selezione edge
-          selectedEdge = null;
-          ensureLinkStyleRefresh();
-          if (camOnSelect) {
-            // camera verso il nodo (3D: usa cameraPosition), movimento morbido
-            const distance = 120;
-            const nx = node.x || 0, ny = node.y || 0, nz = node.z || 0;
-            const len = Math.max(1, Math.hypot(nx, ny, nz));
-            const ratio = 1 + distance / len;
-            Graph.cameraPosition({ x: nx * ratio, y: ny * ratio, z: nz * ratio }, { x: nx, y: ny, z: nz }, 700);
-          }
+          Graph.centerAt(node.x, node.y, 500);
+          Graph.zoom(3, 800);
           lastPinned = node;
-        })
-        .onLinkClick((link) => {
-          if (!link) return;
-          const ids = linkIds(link);
-          selectedEdge = ids;
-          // clear node selection
-          selectOnly(null);
-          ensureLinkStyleRefresh();
-        })
-        .onBackgroundClick(() => {
-          selectOnly(null);
-          selectedEdge = null;
-          ensureLinkStyleRefresh();
         });
 
       let lastPinned = null;
@@ -237,8 +206,8 @@
       // Risolvi una URL immagine a partire dal campo files.path / dataUrl / url
       function resolveImageURL(raw) {
         if (!raw) return null;
-        // data URL, blob URL o http(s)
-        if (/^data:|^blob:|^https?:\/\//i.test(raw)) return raw;
+        // data URL o http(s)
+        if (/^data:|^https?:\/\//i.test(raw)) return raw;
         // path relativo (es. "assets/xxx.jpg")
         return ASSET_BASE + String(raw).replace(/^\.?\//, "");
       }
@@ -255,24 +224,6 @@
           }
         }
         return null;
-      }
-
-      // Raccogli tutte le immagini disponibili per un nodo (files + fallback image)
-      function imageUrlsForNode(node) {
-        const out = [];
-        const files = Array.isArray(node.files) ? node.files : [];
-        for (const f of files) {
-          if (f && f.isImage) {
-            const candidate = f.url || f.path || f.dataUrl;
-            const u = resolveImageURL(candidate);
-            if (u) out.push(u);
-          }
-        }
-        if (!out.length) {
-          const single = resolveImageURL(node.image || node.img);
-          if (single) out.push(single);
-        }
-        return out;
       }
 
       // Texture loader con cache
@@ -318,7 +269,7 @@
           const baseColor = getNodeColor(node);
           label.color = isSel ? "#000000" : baseColor;
           label.textHeight = TEXT_H * textScale;
-          label.backgroundColor = isSel ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.5)";
+          label.backgroundColor = isSel ? "rgba(255,255,160,0.9)" : "rgba(0,0,0,0.5)";
           group.add(label);
         } else {
           // Fallback minimale se SpriteText non c'è
@@ -326,54 +277,34 @@
           group.add(dummy);
         }
 
-        // 2) Immagini (se presenti): una riga di sprite sotto il titolo
-        const urls = imageUrlsForNode(node);
-        if (urls.length) {
-          const GAP = 2.0;
-          const count = Math.min(urls.length, 4); // limita per performance
-          const totalW = count * IMG_H + (count - 1) * GAP;
-          const startX = -totalW / 2 + IMG_H / 2;
-          const rowY = -(TEXT_H * textScale * 1.3);
-          const sprites = [];
-          for (let i = 0; i < count; i++) {
-            const sprite = new THREE.Sprite(
-              new THREE.SpriteMaterial({ transparent: true })
-            );
-            sprite.scale.set(IMG_H, IMG_H, 1);
-            sprite.position.set(startX + i * (IMG_H + GAP), rowY, 0);
-            sprite.material.depthTest = false;
-            sprite.renderOrder = 1;
-            group.add(sprite);
-            sprites.push(sprite);
+        // 2) Immagine (se presente): node.image o node.img
+        const imgUrl = resolveImageURL(node.image || node.img);
+        if (imgUrl) {
+          const sprite = new THREE.Sprite(
+            new THREE.SpriteMaterial({ transparent: true })
+          );
+          // dimensioni provvisorie finché la texture non è pronta
+          sprite.scale.set(IMG_H, IMG_H, 1);
+          // posiziona l’immagine sopra il testo
+          sprite.position.set(0, IMG_H * 0.6, 0);
+          group.add(sprite);
 
-            const url = urls[i];
-            loadTextureCached(
-              url,
-              (tex) => {
-                sprite.material.map = tex;
-                sprite.material.needsUpdate = true;
-                const w = tex.image?.width || 1;
-                const h = tex.image?.height || 1;
-                const r = h / w;
-                sprite.scale.set(IMG_H, IMG_H * r, 1);
-              },
-              () => {
-                group.remove(sprite);
-              }
-            );
-          }
+          loadTextureCached(
+            imgUrl,
+            (tex) => {
+              sprite.material.map = tex;
+              sprite.material.needsUpdate = true;
+              const w = tex.image?.width || 1;
+              const h = tex.image?.height || 1;
+              const r = h / w;
+              sprite.scale.set(IMG_H, IMG_H * r, 1);
+            },
+            () => {
+              // se fallisce il load, togli lo sprite e lascia solo il testo
+              group.remove(sprite);
+            }
+          );
         }
-
-        // 3) Hitbox invisibile per facilitare la selezione (bounding box)
-        const name = String(node.name || node.id || "");
-        const w = Math.max(60, Math.min(260, name.length * (TEXT_H * 1.6)));
-        const h = TEXT_H * 2.0 + (urls.length ? IMG_H * 1.6 : 0);
-        const plane = new THREE.Mesh(
-          new THREE.PlaneGeometry(w, h),
-          new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthTest: false })
-        );
-        plane.position.set(0, (urls.length ? -IMG_H * 0.3 : 0), -0.01);
-        group.add(plane);
 
         return group;
       }
@@ -516,13 +447,6 @@
         Graph.graphData(clean);
         refreshNodeRenderer();
         setTimeout(() => Graph.zoomToFit(600, 60), 300);
-        selectedEdge = null;
-        ensureLinkStyleRefresh();
-      }
-
-      function ensureLinkStyleRefresh() {
-        Graph.linkWidth((l) => (isEdgeSelected(l) ? 3 : (l.dashed ? 0.6 : 1.4)))
-             .linkColor((l) => (isEdgeSelected(l) ? "rgba(255,255,255,0.95)" : (l.dashed ? "rgba(200,200,200,0.25)" : "rgba(220,220,220,0.45)")));
       }
 
       // —— Palette colore deterministica (by group) ——
@@ -627,7 +551,6 @@
       };
 
       // Toolbar extra
-      document.getElementById("btnNewNode").onclick = () => addNewNode();
       document.getElementById("btnConnect").onclick = () => connectSelectedNodes();
       document.getElementById("btnSpawn").onclick = () => spawnChildFromSelected();
       document.getElementById("btnDelete").onclick = () => deleteSelected();
@@ -639,30 +562,34 @@
       document.getElementById("btnSave").onclick = async () => {
         try { await saveProjectSmart(); } catch (e) { alert(e.message || e); }
       };
-      // POV toggle (default off)
-      let camOnSelect = false;
-      const chkPOV = document.getElementById('chkPOV');
-      if (chkPOV) chkPOV.addEventListener('change', () => { camOnSelect = !!chkPOV.checked; });
 
       // Rimosso il caricamento rapido di graphdata.json
 
-      // Tooltip su hover per la toolbar
-      (function attachToolbarTooltips(){
-        const tip = document.getElementById('tooltip');
-        const bar = document.querySelector('.toolbar');
-        if (!tip || !bar) return;
-        function show(text, x, y){ tip.textContent = text; tip.style.display = 'block'; tip.style.left = (x+12)+ 'px'; tip.style.top = (y+12)+'px'; }
-        function hide(){ tip.style.display = 'none'; }
-        bar.addEventListener('mouseover', (e)=>{
-          const el = e.target.closest('button, select, label'); if (!el) return;
-          const t = el.getAttribute('data-tip') || el.title || el.textContent.trim(); if (!t) return;
-          show(t, e.clientX, e.clientY);
-        });
-        bar.addEventListener('mousemove', (e)=>{ if (tip.style.display==='block') { tip.style.left=(e.clientX+12)+'px'; tip.style.top=(e.clientY+12)+'px'; } });
-        bar.addEventListener('mouseout', (e)=>{ if (!bar.contains(e.relatedTarget)) hide(); });
-      })();
-
-      // Rimosso il picker JSON: usa Apri cartella per caricare/salvare
+      document.getElementById("file").onchange = async (e) => {
+        const fl = e.target.files[0];
+        if (!fl) return;
+        const text = await fl.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          return alert("JSON non valido");
+        }
+        // Accetta sia graphData diretto, sia Threadscape project.json (converte al volo)
+        if (isGraphData(data)) {
+          pushHistory();
+          currentData = normalizeData(data);
+          setGraphData(currentData);
+        } else if (isThreadscape(data)) {
+          pushHistory();
+          currentData = normalizeData(convertProjectToGraphData(data));
+          setGraphData(currentData);
+        } else {
+          return alert("Formato non riconosciuto");
+        }
+        selectedIds = new Set();
+        updateEditor();
+      };
 
       function isGraphData(d) {
         return (
@@ -779,10 +706,7 @@
       }
 
       function connectSelectedNodes() {
-        if (selectedIds.size !== 2) {
-          setStatus('Seleziona 2 nodi');
-          return;
-        }
+        if (selectedIds.size !== 2) return;
         const [a, b] = [...selectedIds];
         if (a === b) return;
         // evita duplicati (nondirezionale)
@@ -792,46 +716,30 @@
           typeof l.target === 'object' ? l.target?.id : l.target
         )));
         const k = key(a, b);
-        if (existing.has(k)) { setStatus('Già collegati'); return; }
+        if (existing.has(k)) return;
         pushHistory();
         currentData.links.push({ source: a, target: b });
         setGraphData(currentData);
-        setStatus('Nodi collegati');
-      }
-
-      function addNewNode() {
-        pushHistory();
-        const id = uid();
-        currentData.nodes.push({ id, name: 'Nuovo nodo', areas: [], tags: [], desc: '', files: [] });
-        setGraphData(currentData);
-        selectOnly(id);
-        setStatus('Nuovo nodo creato');
       }
 
       // === Editor bindings ===
       document.getElementById('fTitle').addEventListener('input', () => {
         const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
-        n.name = document.getElementById('fTitle').value.trim();
-        syncGraphNodeById(sid);
-        refreshNodeRenderer();
+        n.name = document.getElementById('fTitle').value.trim(); refreshNodeRenderer();
       });
       document.getElementById('fAreas').addEventListener('change', () => {
         const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
         const raw = document.getElementById('fAreas').value || '';
-        n.areas = raw.split(/,\s*/).filter(Boolean);
-        syncGraphNodeById(sid);
-        refreshNodeRenderer();
+        n.areas = raw.split(/,\s*/).filter(Boolean); refreshNodeRenderer();
       });
       document.getElementById('fTags').addEventListener('change', () => {
         const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
         const raw = document.getElementById('fTags').value || '';
         n.tags = raw.split(/,\s*/).filter(Boolean);
-        syncGraphNodeById(sid);
       });
       document.getElementById('fDesc').addEventListener('change', () => {
         const sid = getSingleSelectedId(); if (!sid) return; const n = currentData.nodes.find(x=>x.id===sid); if (!n) return;
         n.desc = document.getElementById('fDesc').value;
-        syncGraphNodeById(sid);
       });
 
       document.getElementById('btnAddFiles').addEventListener('click', () => document.getElementById('fFiles').click());
@@ -846,7 +754,6 @@
         }
         const firstImg = (n.files || []).find(x=>x.isImage);
         n.image = firstImg ? firstImg.url : n.image;
-        syncGraphNodeById(sid);
         renderFilesListFor(n);
         refreshNodeRenderer();
         inp.value = '';
@@ -859,23 +766,9 @@
         n.files.splice(idx, 1);
         const firstImg = (n.files || []).find(x=>x.isImage);
         n.image = firstImg ? (firstImg.url || resolveImageURL(firstImg.path)) : null;
-        syncGraphNodeById(sid);
         renderFilesListFor(n);
         refreshNodeRenderer();
       });
-
-      // sincronizza i cambi di currentData sul grafo vivo
-      function syncGraphNodeById(id) {
-        const gd = Graph.graphData(); if (!gd) return;
-        const gn = (gd.nodes || []).find(x => x.id === id); if (!gn) return;
-        const src = (currentData.nodes || []).find(x => x.id === id); if (!src) return;
-        gn.name = src.name || '';
-        gn.areas = Array.isArray(src.areas) ? [...src.areas] : [];
-        gn.tags = Array.isArray(src.tags) ? [...src.tags] : [];
-        gn.desc = src.desc || '';
-        gn.image = src.image || null;
-        gn.files = Array.isArray(src.files) ? src.files.map(f => ({...f})) : [];
-      }
 
       // === File System Access: open/save ===
       const projectCtx = { dirHandle: null };
@@ -895,7 +788,6 @@
         await attachObjectURLsFromDir(root, currentData);
         setGraphData(currentData);
         selectOnly(null);
-        setStatus('Nodo/i eliminati');
       }
 
       // Cerca ricorsivamente project.json partendo dalla cartella scelta
@@ -1000,50 +892,9 @@
         if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
         else if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); saveProjectSmart(); }
         else if (mod && e.key.toLowerCase() === 'o') { e.preventDefault(); openProjectFromFolder(); }
-        else if (e.key === 'Delete' || e.key === 'Backspace') {
-          if (selectedIds.size) { e.preventDefault(); deleteSelected(); }
-          else if (selectedEdge) { e.preventDefault(); deleteSelectedEdge(); }
-        }
+        else if (e.key === 'Delete' || e.key === 'Backspace') { if (selectedIds.size) { e.preventDefault(); deleteSelected(); } }
         else if (!mod && e.key.toLowerCase() === 'c') { e.preventDefault(); connectSelectedNodes(); }
-        else if (e.key === 'Escape') {
-          if (!isTyping) {
-            selectOnly(null); selectedEdge = null; ensureLinkStyleRefresh();
-          }
-        }
       });
-
-      // === Edge helper ===
-      function linkIds(l) {
-        const s = typeof l.source === 'object' ? l.source?.id : l.source;
-        const t = typeof l.target === 'object' ? l.target?.id : l.target;
-        return { s, t };
-      }
-      function sameUndirected(a, b) {
-        return (a.s === b.s && a.t === b.t) || (a.s === b.t && a.t === b.s);
-      }
-      function isEdgeSelected(l) {
-        if (!selectedEdge) return false;
-        return sameUndirected(linkIds(l), selectedEdge);
-      }
-      function deleteSelectedEdge() {
-        if (!selectedEdge) return;
-        pushHistory();
-        currentData.links = (currentData.links || []).filter((l) => !sameUndirected(linkIds(l), selectedEdge));
-        selectedEdge = null;
-        setGraphData(currentData);
-        setStatus('Edge eliminato');
-      }
-
-      // === Status helper ===
-      function setStatus(msg) {
-        const el = document.getElementById('status');
-        if (!el) return;
-        if (!msg) { el.style.display = 'none'; el.textContent = ''; return; }
-        el.textContent = msg;
-        el.style.display = 'block';
-        clearTimeout(setStatus._t);
-        setStatus._t = setTimeout(() => { el.style.display = 'none'; }, 1800);
-      }
     </script>
   </body>
 </html>

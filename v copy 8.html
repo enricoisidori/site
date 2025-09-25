@@ -99,8 +99,7 @@
         width: 100%; background: #0f0f0f; color: #eee; border: 1px solid #333;
         border-radius: 6px; padding: 8px 10px; font: inherit;
       }
-      .edit-panel textarea { min-height: 220px; resize: vertical; }
-      .edit-panel { overflow: auto; overflow-wrap: anywhere; }
+      .edit-panel textarea { min-height: 120px; resize: vertical; }
       .file-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; padding:6px 0; border-bottom:1px solid #333; }
       .file-left { display:flex; align-items:center; gap:8px; min-width:0; }
       .thumb { width:16px; height:16px; border-radius:3px; border:1px solid #333; object-fit:cover; display:block; }
@@ -130,6 +129,23 @@
     <div id="scene"></div>
 
     <div class="toolbar">
+      <label data-tip="Carica JSON da file">
+        <input
+          id="file"
+          type="file"
+          accept="application/json"
+          style="display: none"
+        />
+        Carica JSON…
+      </label>
+      <button id="btnFit" data-tip="Fit"><span class="material-symbols-outlined">fit_screen</span></button>
+      <button id="btnToggleSize" data-tip="Dimensione testo"><span class="material-symbols-outlined">format_size</span></button>
+      <select id="colorBy" title="Colora per…" data-tip="Colori per…">
+        <option value="none" selected>Colori: Nessuno</option>
+        <option value="area">Colori: per Area</option>
+        <option value="cluster">Colori: per Cluster</option>
+      </select>
+      <span class="spacer"></span>
       <button id="btnOpenFolder" title="Apri cartella" data-tip="Apri cartella"><span class="material-symbols-outlined">folder_open</span></button>
       <button id="btnSave" title="Salva" data-tip="Salva"><span class="material-symbols-outlined">save</span></button>
       <button id="btnUndo" title="Undo" data-tip="Undo (⌘/Ctrl+Z)"><span class="material-symbols-outlined">undo</span></button>
@@ -138,18 +154,6 @@
       <button id="btnNewNode" title="Nuovo nodo" data-tip="Nuovo nodo"><span class="material-symbols-outlined">add_circle</span></button>
       <button id="btnSpawn" title="Nuovo collegato" data-tip="Nuovo collegato"><span class="material-symbols-outlined">call_split</span></button>
       <button id="btnDelete" title="Elimina" data-tip="Elimina"><span class="material-symbols-outlined">delete</span></button>
-      <span class="spacer"></span>
-      <button id="btnFit" data-tip="Fit"><span class="material-symbols-outlined">fit_screen</span></button>
-      <button id="btnToggleSize" data-tip="Dimensione testo"><span class="material-symbols-outlined">format_size</span></button>
-      <select id="colorBy" title="Colora per…" data-tip="Colori per…">
-        <option value="none" selected>Colori: Nessuno</option>
-        <option value="area">Colori: per Area</option>
-        <option value="cluster">Colori: per Cluster</option>
-      </select>
-      <label style="display:inline-flex;align-items:center;gap:6px" data-tip="Selezione camera (POV)">
-        <input id="chkPOV" type="checkbox" style="accent-color:#888" />
-        POV
-      </label>
     </div>
 
     
@@ -198,14 +202,12 @@
           // click sul nodo cancella selezione edge
           selectedEdge = null;
           ensureLinkStyleRefresh();
-          if (camOnSelect) {
-            // camera verso il nodo (3D: usa cameraPosition), movimento morbido
-            const distance = 120;
-            const nx = node.x || 0, ny = node.y || 0, nz = node.z || 0;
-            const len = Math.max(1, Math.hypot(nx, ny, nz));
-            const ratio = 1 + distance / len;
-            Graph.cameraPosition({ x: nx * ratio, y: ny * ratio, z: nz * ratio }, { x: nx, y: ny, z: nz }, 700);
-          }
+          // camera verso il nodo (3D: usa cameraPosition)
+          const distance = 80;
+          const nx = node.x || 0, ny = node.y || 0, nz = node.z || 0;
+          const len = Math.max(1, Math.hypot(nx, ny, nz));
+          const ratio = 1 + distance / len;
+          Graph.cameraPosition({ x: nx * ratio, y: ny * ratio, z: nz * ratio }, { x: nx, y: ny, z: nz }, 800);
           lastPinned = node;
         })
         .onLinkClick((link) => {
@@ -214,11 +216,6 @@
           selectedEdge = ids;
           // clear node selection
           selectOnly(null);
-          ensureLinkStyleRefresh();
-        })
-        .onBackgroundClick(() => {
-          selectOnly(null);
-          selectedEdge = null;
           ensureLinkStyleRefresh();
         });
 
@@ -639,10 +636,6 @@
       document.getElementById("btnSave").onclick = async () => {
         try { await saveProjectSmart(); } catch (e) { alert(e.message || e); }
       };
-      // POV toggle (default off)
-      let camOnSelect = false;
-      const chkPOV = document.getElementById('chkPOV');
-      if (chkPOV) chkPOV.addEventListener('change', () => { camOnSelect = !!chkPOV.checked; });
 
       // Rimosso il caricamento rapido di graphdata.json
 
@@ -662,7 +655,31 @@
         bar.addEventListener('mouseout', (e)=>{ if (!bar.contains(e.relatedTarget)) hide(); });
       })();
 
-      // Rimosso il picker JSON: usa Apri cartella per caricare/salvare
+      document.getElementById("file").onchange = async (e) => {
+        const fl = e.target.files[0];
+        if (!fl) return;
+        const text = await fl.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          return alert("JSON non valido");
+        }
+        // Accetta sia graphData diretto, sia Threadscape project.json (converte al volo)
+        if (isGraphData(data)) {
+          pushHistory();
+          currentData = normalizeData(data);
+          setGraphData(currentData);
+        } else if (isThreadscape(data)) {
+          pushHistory();
+          currentData = normalizeData(convertProjectToGraphData(data));
+          setGraphData(currentData);
+        } else {
+          return alert("Formato non riconosciuto");
+        }
+        selectedIds = new Set();
+        updateEditor();
+      };
 
       function isGraphData(d) {
         return (
@@ -1005,11 +1022,6 @@
           else if (selectedEdge) { e.preventDefault(); deleteSelectedEdge(); }
         }
         else if (!mod && e.key.toLowerCase() === 'c') { e.preventDefault(); connectSelectedNodes(); }
-        else if (e.key === 'Escape') {
-          if (!isTyping) {
-            selectOnly(null); selectedEdge = null; ensureLinkStyleRefresh();
-          }
-        }
       });
 
       // === Edge helper ===
