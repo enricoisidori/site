@@ -17,6 +17,8 @@
         --yaw: 0deg;
         --pitch: 0deg;
         --sceneZ: 0px;
+        --sceneX: 0px;
+        --sceneY: 0px;
         --pushOpacity: 0.25;
         --pushBlur: 1px;
       }
@@ -76,13 +78,22 @@
         transform: translateX(4px);
       }
       .bullet {
-        width: 10px;
-        height: 10px;
-        border-radius: 999px;
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
         background: transparent;
         border: 2px solid rgba(0, 0, 0, 0.6);
-        flex: 0 0 18px;
-        margin-top: 6px;
+        flex: 0 0 20px;
+        margin-top: 4px;
+      }
+      .bullet::after {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        border-radius: 50%;
+        background: transparent;
+        transition: background var(--smooth);
       }
       .toc .meta {
         font-size: 12px;
@@ -102,10 +113,8 @@
         max-height: 3.6em;
         overflow: hidden;
       }
-      .toc .active .bullet {
-        background: var(--accent);
-        border-color: var(--accent);
-      }
+      .toc .active .bullet { border-color: var(--accent); }
+      .toc .active .bullet::after { background: var(--accent); }
       .toc .active .title {
         color: var(--accent);
       }
@@ -127,11 +136,12 @@
         padding: var(--pad);
         box-sizing: border-box;
         transform-style: preserve-3d;
-        transform: rotateX(var(--pitch)) rotateY(var(--yaw)) translateZ(var(--sceneZ));
+        transform: translate3d(var(--sceneX), var(--sceneY), var(--sceneZ)) rotateX(var(--pitch)) rotateY(var(--yaw));
         transition: transform var(--smooth) ease;
         overflow: visible;
         will-change: transform;
       }
+      .h-scroll.linear { transition-timing-function: linear; }
       /* each face (section) placed around the ring */
       .section {
         position: absolute;
@@ -1024,15 +1034,17 @@
           setYawDeg(-currentIndex * angleStep, false);
         }
 
+        // override previous applyView (adds pan X/Y and no focus transform)
         function applyView(animate = true) {
           if (!animate) hScroll.classList.add("no-anim");
           hScroll.style.setProperty("--yaw", `${yaw}deg`);
           hScroll.style.setProperty("--pitch", `${pitch}deg`);
           hScroll.style.setProperty("--sceneZ", `${sceneZ}px`);
+          hScroll.style.setProperty("--sceneX", `${sceneX}px`);
+          hScroll.style.setProperty("--sceneY", `${sceneY}px`);
           if (!animate) requestAnimationFrame(() => hScroll.classList.remove("no-anim"));
           updateActiveFromRotation();
           updateYawSlider();
-          updateFocusedTransform();
         }
         function setYawDeg(deg, animate = true) { yaw = deg; applyView(animate); }
         function setPitchDeg(deg, animate = true) { pitch = Math.max(-80, Math.min(80, deg)); applyView(animate); }
@@ -1125,6 +1137,7 @@
         }
 
         function updateActiveFromRotation() {
+          if (mode !== 'ring') return;
           currentIndex = indexFromRotY();
           buttons.forEach((b) => b.classList.remove("active"));
           const btn = buttons[currentIndex];
@@ -1151,7 +1164,56 @@
             setYawDeg(-idx * angleStep, true);
           } else {
             focusSection(sec);
+            moveViewToSection(sec, { orient: true, linear: true });
           }
+        }
+
+        // move view (camera) to center a section, without moving sections
+        let sceneX = 0, sceneY = 0; // screen-plane pan
+        function applyView(animate = true) {
+          if (!animate) hScroll.classList.add("no-anim");
+          hScroll.style.setProperty("--yaw", `${yaw}deg`);
+          hScroll.style.setProperty("--pitch", `${pitch}deg`);
+          hScroll.style.setProperty("--sceneZ", `${sceneZ}px`);
+          hScroll.style.setProperty("--sceneX", `${sceneX}px`);
+          hScroll.style.setProperty("--sceneY", `${sceneY}px`);
+          if (!animate) requestAnimationFrame(() => hScroll.classList.remove("no-anim"));
+          updateActiveFromRotation();
+          updateYawSlider();
+          updateFocusedTransform();
+        }
+        function setYawDeg(deg, animate = true) { yaw = deg; applyView(animate); }
+        function setPitchDeg(deg, animate = true) { pitch = Math.max(-80, Math.min(80, deg)); applyView(animate); }
+        function setSceneZPx(px, animate = true) { sceneZ = Math.max(-1200, Math.min(1200, px)); applyView(animate); }
+        function setScenePan(dx, dy, animate = true) { sceneX += dx; sceneY += dy; applyView(animate); }
+
+        function moveViewToSection(sec, opts = {}) {
+          if (!sec) return;
+          const { orient = true, linear = true } = opts;
+          if (linear) hScroll.classList.add('linear');
+          // optionally orient the view to face section
+          if (orient) {
+            const ry = parseFloat(sec.dataset.ry || '0');
+            const rx = parseFloat(sec.dataset.rx || '0');
+            yaw = -ry; pitch = -rx;
+          }
+          applyView(true);
+          // after orientation is applied, pan so the section is centered
+          requestAnimationFrame(() => {
+            const container = document.querySelector('.right');
+            if (!container) return;
+            const crect = container.getBoundingClientRect();
+            const srect = sec.getBoundingClientRect();
+            const cx = crect.left + crect.width / 2;
+            const cy = crect.top + crect.height / 2;
+            const sx = srect.left + srect.width / 2;
+            const sy = srect.top + srect.height / 2;
+            sceneX += (cx - sx);
+            sceneY += (cy - sy);
+            applyView(true);
+            // remove linear flag after transition ends
+            hScroll.addEventListener('transitionend', () => hScroll.classList.remove('linear'), { once: true });
+          });
         }
 
         // Ring drag (Shift+drag) and free orbit drag on background
@@ -1403,33 +1465,83 @@
           else scatterLayout();
         });
 
-        // click on sections -> focus
+        // click on sections -> focus + center view (linear)
+        function unfocusAll() {
+          sections.forEach((el) => {
+            el.classList.remove('focused', 'pushed');
+            el.style.transform = baseTransformFor(el);
+          });
+          focusedEl = null;
+          buttons.forEach((b) => b.classList.remove('active'));
+        }
         sections.forEach((s) => {
-          s.addEventListener('click', () => {
-            if (mode === 'scatter') focusSection(s);
+          s.addEventListener('click', (e) => {
+            if (mode !== 'scatter' || s.dataset.dragging) return;
+            if (focusedEl === s) {
+              // toggle off focus on same section
+              unfocusAll();
+              return;
+            }
+            focusSection(s);
+            moveViewToSection(s, { orient: true, linear: true });
           });
         });
-        // unfocus when clicking background
+        // reset view + unfocus when clicking background
         const right = document.querySelector('.right');
         right && right.addEventListener('click', (e) => {
           const onSection = e.target.closest && e.target.closest('.section');
           const onControls = e.target.closest && e.target.closest('.controls');
-          if (focusedEl && !onSection && !onControls) {
-            sections.forEach((el) => {
-              el.classList.remove('focused', 'pushed');
-              el.style.transform = baseTransformFor(el);
-            });
-            focusedEl = null;
+          if (!onSection && !onControls) {
+            sceneX = 0; sceneY = 0; yaw = 0; pitch = 0; sceneZ = 0;
+            applyView(true);
+            unfocusAll();
           }
         });
-        // ESC to unfocus
+        // ESC to reset view + unfocus
         window.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && focusedEl) {
-            sections.forEach((el) => {
-              el.classList.remove('focused', 'pushed');
-              el.style.transform = baseTransformFor(el);
-            });
-            focusedEl = null;
+          if (e.key === 'Escape') { sceneX = 0; sceneY = 0; yaw = 0; pitch = 0; sceneZ = 0; applyView(true); unfocusAll(); }
+        });
+
+        // DRAG sections in space (scatter): X/Y by default, hold Alt/Ctrl to drag Z
+        let draggingSec = null;
+        let dragStartX = 0, dragStartY = 0;
+        let start3DX = 0, start3DY = 0, start3DZ = 0;
+        let moved = false;
+        const dragZScale = 1.5;
+        sections.forEach((s) => {
+          s.addEventListener('mousedown', (e) => {
+            if (mode !== 'scatter' || e.button !== 0) return;
+            draggingSec = s;
+            moved = false;
+            dragStartX = e.clientX; dragStartY = e.clientY;
+            start3DX = parseFloat(s.dataset.x || '0');
+            start3DY = parseFloat(s.dataset.y || '0');
+            start3DZ = parseFloat(s.dataset.z || '-600');
+            s.dataset.dragging = '1';
+            e.preventDefault();
+          });
+        });
+        window.addEventListener('mousemove', (e) => {
+          if (!draggingSec) return;
+          const dx = e.clientX - dragStartX;
+          const dy = e.clientY - dragStartY;
+          if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+          let nx = start3DX, ny = start3DY, nz = start3DZ;
+          if (e.altKey || e.ctrlKey) {
+            nz = start3DZ - dy * dragZScale;
+          } else {
+            nx = start3DX + dx;
+            ny = start3DY + dy;
+          }
+          draggingSec.dataset.x = nx.toFixed(2);
+          draggingSec.dataset.y = ny.toFixed(2);
+          draggingSec.dataset.z = nz.toFixed(2);
+          draggingSec.style.transform = `translate3d(-50%, -50%, 0) translate3d(${nx}px, ${ny}px, ${nz}px) rotateY(${draggingSec.dataset.ry || 0}deg) rotateX(${draggingSec.dataset.rx || 0}deg)`;
+        });
+        window.addEventListener('mouseup', () => {
+          if (draggingSec) {
+            delete draggingSec.dataset.dragging;
+            draggingSec = null;
           }
         });
       })();
