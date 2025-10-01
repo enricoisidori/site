@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>WP1 — Understanding Cognitive Warfare — layout orizzontale</title>
+    <style>
+      :root {
+        --left-w: 320px;
+        --gap: 16px;
+        --pad: 16px;
+        --bg: #fff;
+        --fg: #000;
+        --accent: #111;
+        --smooth: 0.18s;
+        --persp: 1200px;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: "Times New Roman", Times, serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .wrap {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+      /* left column: points / mini riassunti */
+      .left {
+        width: var(--left-w);
+        min-width: var(--left-w);
+        box-sizing: border-box;
+        padding: 16px 14px;
+        border-right: 1px solid rgba(0, 0, 0, 0.06);
+        position: relative;
+        background: transparent;
+      }
+      .left h2 {
+        font-size: 16px;
+        margin: 0 0 14px 0;
+        letter-spacing: 0.02em;
+      }
+      .toc {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .toc button {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        border: 0;
+        background: transparent;
+        padding: 8px;
+        text-align: left;
+        width: 100%;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background var(--smooth), transform var(--smooth);
+      }
+      .toc button:hover {
+        background: rgba(0, 0, 0, 0.03);
+        transform: translateX(4px);
+      }
+      .bullet {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: transparent;
+        border: 2px solid rgba(0, 0, 0, 0.6);
+        flex: 0 0 18px;
+        margin-top: 6px;
+      }
+      .toc .meta {
+        font-size: 12px;
+        line-height: 1.2;
+        color: rgba(0, 0, 0, 0.7);
+      }
+      .toc .title {
+        font-size: 13px;
+        line-height: 1.15;
+        margin: 0 0 4px 0;
+        font-weight: 700;
+      }
+      .toc .summary {
+        font-size: 12px;
+        line-height: 1.2;
+        color: rgba(0, 0, 0, 0.85);
+        max-height: 3.6em;
+        overflow: hidden;
+      }
+      .toc .active .bullet {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .toc .active .title {
+        color: var(--accent);
+      }
+      /* right area: 3D ring */
+      .right {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        perspective: var(--persp);
+        background: var(--bg);
+      }
+      .h-scroll {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: var(--pad);
+        box-sizing: border-box;
+        transform-style: preserve-3d;
+        transform: rotateY(var(--rotY, 0deg));
+        transition: transform var(--smooth) ease;
+        overflow: visible;
+        will-change: transform;
+      }
+      /* each face (section) placed around the ring */
+      .section {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 680px;
+        max-width: 880px;
+        width: clamp(620px, 62vw, 880px);
+        height: calc(100vh - (var(--pad) * 2));
+        transform: translate3d(-50%, -50%, 0);
+        box-sizing: border-box;
+        padding: 12px 16px;
+        background: transparent;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+        box-shadow: none;
+        backface-visibility: hidden;
+      }
+      .section h1 {
+        font-size: 20px;
+        margin: 0 0 8px 0;
+        letter-spacing: 0.01em;
+      }
+      .section h2 {
+        font-size: 16px;
+        margin: 0 0 6px 0;
+      }
+      .lead {
+        font-size: 14px;
+        line-height: 1.42;
+        margin: 0 0 8px 0;
+      }
+      .body {
+        font-size: 14px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+      .small {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.6);
+      }
+      /* snap rules removed in 3D layout */
+      /* active marker indicator */
+      .left .indicator {
+        position: absolute;
+        right: -8px;
+        top: 20px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: transparent;
+        box-shadow: none;
+      }
+      /* responsive */
+      @media (max-width: 960px) {
+        :root {
+          --left-w: 260px;
+          --gap: 12px;
+          --pad: 12px;
+        }
+        .section { min-width: 540px; width: clamp(480px, 86vw, 620px); }
+      }
+      @media (max-width: 760px) {
+        .wrap {
+          flex-direction: column;
+        }
+        .left {
+          width: 100%;
+          min-width: 100%;
+          border-right: none;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          display: flex;
+          overflow: auto;
+          gap: 8px;
+          padding: 12px 16px;
+        }
+        .right {
+          flex: 1;
+        }
+        .h-scroll { padding: var(--pad); }
+        .section { width: 92vw; min-width: 92vw; }
+      }
+      /* optional: mouse drag to scroll horizontally */
+      .h-scroll.dragging {
+        cursor: grabbing;
+        cursor: -webkit-grabbing;
+      }
+      .h-scroll.no-anim { transition: none; }
+
+      /* controls */
+      .controls {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0,0,0,0.08);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        border-radius: 8px;
+        padding: 10px 12px;
+        backdrop-filter: blur(4px);
+        font-size: 12px;
+        color: #111;
+        min-width: 240px;
+      }
+      .controls .row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+      .controls label { flex: 0 0 92px; }
+      .controls input[type="range"] { flex: 1; }
+      .controls .val { width: 48px; text-align: right; color: rgba(0,0,0,0.7); }
+      /* citations */
+      .cite {
+        color: var(--accent);
+        text-decoration: none;
+        border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
+        padding: 0 2px;
+        cursor: pointer;
+      }
+      .cite:hover,
+      .cite:focus {
+        background: rgba(0, 0, 0, 0.06);
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <aside class="left" aria-label="Sommario e punti chiave">
+        <h2>WP1 — Understanding Cognitive Warfare</h2>
+        <nav>
+          <ul class="toc" id="toc">
+            <li>
+              <button data-target="s-abstract">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">Abstract</div>
+                  <div class="summary">
+                    Sintesi: la guerra cognitiva come spostamento dal campo
+                    fisico al dominio cognitivo; necessità di regolamentazione e
+                    protezione della sovranità cognitiva.
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-intro">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">Introduction</div>
+                  <div class="summary">
+                    Contesto: convergenza neuroscienze-tecnologia; interessi
+                    geopolitici; impatti su memoria, attenzione e
+                    decision-making.
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-echoes">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">1. Echoes from the Past</div>
+                  <div class="summary">
+                    Storia d'uso del suono e della risonanza; archaeoacoustics e
+                    armi sonore moderne (LRAD, PSYOP).
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-soundweapon">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">1.1 Sound as a Weapon</div>
+                  <div class="summary">
+                    Vibrational ontology, risonanza, esempi storici e effetti
+                    neurofisiologici.
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-mindcontrol">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">1.2 Mind Control</div>
+                  <div class="summary">
+                    Moscow Signals, microonde, effetti biologici, progetti
+                    brain-research (HBP, BRAIN).
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-sixth">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">2. Sixth Domain</div>
+                  <div class="summary">
+                    NBIC, DARPA, 'super soldiers', weaponization of neuroscience
+                    e rischi etici.
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-cogwar">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">2.2 Cognitive Warfare</div>
+                  <div class="summary">
+                    Havana Syndrome e nuovi esempi di attacchi cognitivi;
+                    pansensory control.
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-holosonic">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">3. Holosonic Architecture</div>
+                  <div class="summary">
+                    Definizione NATO ACT; influence, interference, alteration
+                    come categorie operative.
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-future">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">4. Future Scenarios</div>
+                  <div class="summary">
+                    Neuroshield, cerebral firewall, neural malware e la
+                    necessità di governance internazionale.
+                  </div>
+                </div>
+              </button>
+            </li>
+            <li>
+              <button data-target="s-conclusions">
+                <span class="bullet"></span>
+                <div>
+                  <div class="title">Conclusions & Bibliography</div>
+                  <div class="summary">
+                    Sintesi finale e spunti per quattro white papers successivi;
+                    bibliografia essenziale.
+                  </div>
+                </div>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="right" role="main">
+        <div class="controls" id="controls" aria-label="Controlli 3D">
+          <div class="row">
+            <label for="rotRange">Rotazione</label>
+            <input id="rotRange" type="range" min="0" max="359" step="1" value="0" />
+            <span class="val" id="rotOut">0°</span>
+          </div>
+          <div class="row">
+            <label for="radRange">Raggio</label>
+            <input id="radRange" type="range" min="40" max="200" step="1" value="100" />
+            <span class="val" id="radOut">1.00×</span>
+          </div>
+          <div class="row">
+            <label for="perspRange">Prospettiva</label>
+            <input id="perspRange" type="range" min="600" max="2200" step="20" value="1200" />
+            <span class="val" id="perspOut">1200px</span>
+          </div>
+        </div>
+        <div class="h-scroll" id="hScroll" tabindex="0">
+          <!-- SECTION: Abstract -->
+          <article class="section" id="s-abstract" data-index="0">
+            <h1>Abstract</h1>
+            <p class="lead">
+              WP1_Understanding Cognitive Warfare — Daniela Gentile, Umanesimo
+              Artificiale
+            </p>
+            <div class="body">
+              The evolution of warfare has shifted dramatically from traditional
+              kinetic engagements to cognitive warfare, focusing on the
+              increasing integration of neuroscience and technology into
+              military strategies. It charts the historical progression of
+              cognitive manipulation, from early uses of sound and psychological
+              operations to the modern application of neuroscientific and
+              neurotechnological tools. The study analyzes how vibrational
+              ontology, psychoactive substances, and advanced technologies like
+              brain-computer interfaces are strategically deployed to influence
+              human cognition, decision-making, and behavior. Crucially, it
+              addresses the ethical, legal, and social challenges presented by
+              these advancements, particularly the development of neuroweapons
+              and the emerging concept of "neurosecurity." The paper argues for
+              international dialogue and regulatory frameworks to safeguard
+              cognitive sovereignty in the face of growing competition for
+              dominance in the cognitive domain, considered a crucial sixth
+              dimension of warfare alongside land, sea, air, cyberspace, and
+              space. By exploring the implications for both military
+              applications and broader society, this work emphasizes the need
+              for a multidisciplinary approach to ensure the responsible
+              development and governance of these powerful technologies.
+            </div>
+          </article>
+
+          <!-- SECTION: Introduction -->
+          <article class="section" id="s-intro" data-index="1">
+            <h1>Introduction</h1>
+            <div class="body">
+              In recent decades, understanding the functioning of the human
+              brain has become a central focus of scientific research, driven by
+              advancements in neuroscience and digital technological innovation.
+              Since the early 2000s, the increasingly sophisticated development
+              of neuroimaging tools and techniques—enabling detailed mapping of
+              the nervous system’s structure and functions—has made it possible
+              to explore the human brain with unprecedented precision. This has
+              led to significant improvements in the understanding, diagnosis,
+              and treatment of numerous diseases. At the same time, digital
+              technological progress and the convergence of the internet,
+              artificial neural networks, and artificial intelligence (AI) have
+              highlighted the necessity of comprehending how human interaction
+              with technology affects cognitive functions, from memory and
+              attention to decision-making processes. The symbiotic relationship
+              between neuroscience and technology has given rise to new fields
+              of study, attracting the interest of governments, military
+              organizations, and private enterprises that have invested
+              substantial resources in research initiatives. On the one hand,
+              these efforts have driven scientific and technological
+              advancements that continue to deepen our understanding of
+              cognitive processes and their neurophysiological correlates. On
+              the other hand, they have led to the development of techniques and
+              tools aimed at modifying and influencing cognitive functions in
+              individuals and groups for tactical and strategic purposes. In The
+              Art of War, Sun Tzu states that "subduing the enemy without
+              fighting is the ultimate skill" [1]. Reformulated in a
+              contemporary context, this principle underpins modern
+              politico-military strategies and their future developments,
+              shifting the operational focus from the physical domain to the
+              cognitive one. The objective is to subjugate and manipulate
+              adversaries not through direct force or kinetic coercion but by
+              targeting their conceptual frameworks, mental logic, perception of
+              reality, and behavioral dynamics, thereby destabilizing social and
+              political equilibria. For these reasons, today’s geopolitical
+              landscape is increasingly shaped by cognitive warfare, an
+              integrated strategy that combines elements of psychological
+              operations (PSYOPS), information warfare, behavioral science,
+              neuroscience, robotics, emerging neuromodulation technologies,
+              artificial intelligence, and psychoacoustic tactics designed to
+              manipulate human psychology for strategic ends. Cognitive warfare
+              extends beyond military operations, playing a pivotal role in
+              political influence campaigns, economic destabilization, and
+              social fragmentation. This paper examines the fundamental
+              principles of cognitive warfare, outlining its historical
+              evolution and analyzing the role and operational methodologies of
+              emerging neuroscientific and neurotechnological (neuro S/T)
+              research within military applications. The intensifying race to
+              dominate the human mind raises significant ethical, legal, social,
+              and cultural concerns regarding the use of cutting-edge
+              technologies. This necessitates an urgent global debate and
+              international commitment to the development of regulations and
+              countermeasures to safeguard cognitive sovereignty
+              (neurosecurity), ensuring the autonomy of individual thought and
+              national and global security in the face of the emerging threats
+              posed by next-generation cognitive warfare.
+            </div>
+          </article>
+
+          <!-- SECTION: Echoes from the Past -->
+          <article class="section" id="s-echoes" data-index="2">
+            <h1>1. Echoes from the Past</h1>
+            <div class="body">
+              1.1 Sound as a Weapon: From Archaeoacoustics to Sonic Warfare
+              Vibrational ontology refers to the capacity of infrasound (&lt;20
+              Hz, below the human auditory threshold), sound (20–20 kHz), and
+              ultrasound (&gt;20 kHz, above the human auditory threshold) to
+              evoke and induce emotional, sensory, and psychophysiological
+              responses in humans. This mechanism is rooted in the phenomenon of
+              resonance, first described in 1665 by the Dutch physicist and
+              mathematician Christiaan Huygens as the ability of a body, when
+              subjected to external oscillations, to begin "vibrating"
+              (resonating) at the same frequency as the stimulating source,
+              thereby amplifying the effects of the applied frequencies and
+              producing various psychophysiological effects. Such knowledge was
+              already known to ancient civilizations, as suggested by numerous
+              studies in Archaeoacoustics—a discipline emerging in the 1980s and
+              1990s that investigates the acoustic properties of archaeological
+              sites and ancient artifacts. These studies demonstrate that our
+              ancestors possessed a profound understanding of and ability to
+              manipulate sound matter to enhance physical, emotional, and
+              spiritual well-being. Over time, this expertise was systematically
+              applied to the deliberate construction of architectural spaces
+              designed to harness and amplify the harmonic resonance of sound
+              sources (e.g., the voices of priests) [2] to induce well-being,
+              intensify sensory experiences, and facilitate altered states of
+              consciousness. Several prehistoric megalithic structures exhibit
+              spatial resonance at frequencies between 95 and 120 Hz,
+              particularly at 110 Hz [3-5]. Neuroimaging studies, including
+              electroencephalography (EEG) and functional magnetic resonance
+              imaging (fMRI), suggest that this frequency "may be involved in
+              inducing altered states of consciousness or changes in cognitive
+              processing" [6], leading to calcium efflux [7] - a biomolecule
+              critical for cellular homeostasis - and stimulating activity
+              within the CA3 region of the hippocampus [8-9], a brain structure
+              involved in memory as well as in subjective anomalous experiences.
+              The deep understanding of the cognitive-sensory effects of sound
+              was later applied in combat scenarios to instill fear and exert
+              psychological pressure on enemies. Examples include the Aztec
+              death whistle, whose screaming, terrifying sounds evoked
+              significant psychophysical and emotional dimensions [10], as well
+              as the horns and war drums used by Mongol and Roman armies. As
+              history progressed, the intersection and dynamic interaction
+              between technological advancements and scientific progress
+              provided numerous promising opportunities to explore how
+              vibrational ontology can non-invasively enhance human mental and
+              physical health, while also deepening the understanding of how
+              sound matter can interfere with and impair cognitive functions and
+              an individual’s overall well-being. The speculative use of sound
+              acquired new meanings and applications aimed at conquering the
+              realms of human perception to exert power and control. Following
+              World War I, sound became an essential resource in military
+              operations and strategic applications, both in warfare and in
+              everyday life, providing a tactical advantage. This led to
+              extensive military research into sound-based weaponry, resulting
+              in the development of numerous sonic weapons (classified as
+              "non-lethal weapons") and highly sophisticated psychoacoustic
+              devices with immense destructive potential. Initially designed as
+              tools for auditory dominance - intended to disorient and
+              demoralize adversaries on the battlefield - these instruments have
+              since evolved into destructive assets central to the development
+              of new persuasion and manipulation tactics by governments and
+              military organizations. The use of sound "both seductive and
+              violent, abstract and physical, through a series of acoustic
+              machines - biotechnical, social, cultural, artistic, and
+              conceptual - designed to modulate the physical, affective, and
+              libidinal dynamics of populations, bodies, and crowds" [11] forms
+              the conceptual foundation of sonic warfare, or the politics of
+              frequency. This approach extends the vibrational ontology of sound
+              into a tactical-strategic context, enabling the territorialization
+              of sensory perception domains and the colonization of human
+              bodies. This shift marks a paradigm change in power structures and
+              social control, introducing new dimensions of conflict that
+              increasingly transition toward the cognitive domain, laying the
+              conceptual groundwork for contemporary cognitive warfare. From the
+              deployment of Long Range Acoustic Devices (LRAD) - capable of
+              projecting ultrasonic sound waves of up to 162 dB over long
+              distances to suppress protests and restrict population movement -
+              to Psychological Operations (PSYOP) developed and deployed by the
+              U.S. military, the goal is to influence governments,
+              organizations, global superpowers, and civilian populations alike.
+              According to the U.S. Department of Defense directive (1984),
+              PSYOPs are defined as "planned political, economic, military, and
+              ideological activities directed at foreign countries,
+              organizations, and individuals to create emotions, attitudes,
+              understandings, beliefs, or behaviors favorable to achieving U.S.
+              political and military objectives" [12]. These operations aimed at
+              influencing governments, organisations, major foreign powers and
+              citizens, constitute an important action within the set of
+              information, military, economic and diplomatic activities, both in
+              military conflicts and in peace contexts. Examples of this are the
+              well-known ‘Wandering Soul’ and ‘Urban Funk Campaign’, operations
+              carried out by the US army during the Vietnam War to strike at the
+              identity of the Vietnamese people, to irritate and terrorise them
+              and to destabilise the morale of the Viet Cong army [11], the
+              acoustic assault engineered by the United States for the surrender
+              of General Manuel Noriega who had taken refuge in the Vatican
+              Embassy in Panama, rather than the use of acoustic bombing and
+              sound torture through rock, punk and heavy metal music used in the
+              Guantanamo prison in Cuba as a method of coercion and sensory
+              deprivation to be inflicted on detainees [13-14].
+            </div>
+          </article>
+
+          <!-- SECTION: Mind Control -->
+          <article class="section" id="s-soundweapon" data-index="3">
+            <h1>1.1 Sound as a Weapon (continua)</h1>
+            <div class="body">
+              (continua) 1.2 Mind Control Between Technology and Conflict With
+              the onset of the Cold War, PSYOP strategies were further refined
+              and became increasingly sophisticated and effective, driven by
+              advancements in scientific and technological capabilities. Between
+              1953 and 1979, a series of incidents known as the "Moscow Signals"
+              occurred, in which the Soviet Union irradiated the U.S. Embassy in
+              Moscow with microwave emissions ranging from 2 to 7 GHz at a
+              maximum radiation intensity of 15 μW/cm² [15-16]. These emissions
+              targeted specific sections of the building, allegedly to disrupt
+              U.S. intelligence operations [17]. American diplomats reported
+              various health issues, including memory loss and difficulty
+              concentrating—symptoms associated with microwave radiation
+              exposure [17-18], which is known to affect biological systems at
+              multiple levels [19]. In humans, such radiation—depending on
+              frequency, intensity, and duration of exposure—causes electrons or
+              ions to vibrate due to resonance effects, leading to molecular
+              collisions within biological tissues [20]. This process
+              contributes to brain degeneration, DNA damage, and potential risks
+              of neurodegenerative diseases and fertility impairments [17].
+              Furthermore, microwaves can stimulate the cochlea similarly to
+              auditory stimuli, transmitting impulses directly to the brain that
+              induce auditory perceptions such as ringing and tinnitus (the Frey
+              effect), or, in extreme cases, cause acute pain and even death due
+              to thermally induced damage [21-22]. The success of these
+              psychological and physiological manipulations has driven
+              governments and military organizations to fund new research
+              initiatives focused on understanding the human mind. This has led
+              to large-scale governmental projects dedicated to brain research,
+              such as the Human Brain Project (HBP)—a ten-year European Union
+              initiative launched in 2013 with the objective of "laying the
+              technical foundations for a new model of brain research based on
+              Information and Communication Technologies (ICT), integrating data
+              and knowledge from various disciplines, and catalyzing a
+              collective effort to achieve a new understanding of the brain, new
+              treatments for brain diseases, and new brain-inspired computing
+              technologies" [23]. Among the key outcomes of the HBP are digital
+              brain simulation platforms, such as the Virtual Epileptic Patient
+              Technology—which enhances surgical interventions for epilepsy
+              treatment—and The Virtual Brain (TVB), providing new insights into
+              dementia. Other significant achievements include the creation of
+              high-resolution 3D brain atlases and the development of
+              neuromorphic computing, aimed at designing computing systems with
+              brain-like capabilities and improved energy efficiency to enhance
+              AI technologies. One of the project's most impactful results has
+              been the creation of EBRAINS, an open-source digital platform
+              providing advanced tools and a vast database to support ongoing
+              research in these fields. In 2013, under the Obama administration,
+              the BRAIN Initiative (Brain Research through Advancing Innovative
+              Neurotechnologies) was launched in the U.S., aimed at developing
+              novel experimental technologies for studying and controlling brain
+              cells. This includes optogenetics, which combines optical and
+              genetic techniques to activate or inhibit neural circuits, as well
+              as the creation of advanced brain-computer interfaces (BCI).
+            </div>
+          </article>
+
+          <!-- SECTION: Sixth Domain -->
+          <article class="section" id="s-sixth" data-index="4">
+            <h1>2. Towards the Sixth Domain of Operation</h1>
+            <div class="body">
+              The significant potential of emerging neuroscientific methods and
+              technologies to access the deepest recesses of the human mind has
+              begun to generate renewed and growing interest in governmental and
+              military applications. This interest has fostered the development
+              of military and intelligence initiatives aimed at producing
+              systems and techniques to optimize and enhance the performance of
+              soldiers in combat. The objective is to create "super soldiers"—a
+              central focus of DARPA’s N3 program—ensuring strategic and
+              technological superiority over adversaries while compromising
+              their security, stability, and public health, often disregarding
+              existing legal frameworks established by international treaties
+              and conventions [27]. While such programs are often framed as
+              crucial to national security and population protection [27], they
+              simultaneously pose a tangible threat, as the same principles can
+              be leveraged to negatively influence or even incapacitate
+              adversaries. Bioethicist Jonathan Moreno, in his book Mind Wars:
+              Brain Research and National Defense (2006), and neuroscientist and
+              neuroethicist James Giordano were among the first to draw academic
+              attention to the concerning potential of neuroscience applications
+              in military contexts. Their work primarily focuses on the
+              development and deployment of neurological weapons, explicitly
+              designed to undermine the integrity of democratic societies’
+              political processes and strategic-military objectives [28] through
+              remote brain stimulation. Giordano describes this phenomenon as an
+              accelerating race toward the “weaponization of neuroscience”
+              [29-30], highlighting the increasing use of neuro S/T research to
+              influence cognitive, emotional, and sensory functions via
+              biological agents, chemical substances, and the speculative
+              manipulation of the electromagnetic spectrum (EMS)—particularly
+              infrasound (&lt;20 Hz), sound, and ultrasound (&gt;20 kHz). These
+              new neuroweapons harness the destructive potential of sound matter
+              within NeuroStrike strategies, incapacitating individuals on a
+              psychophysiological level by inducing resonant frequencies within
+              the brain and internal organs, leading to cognitive dysfunction,
+              disorientation, and even lasting physical damage. From memory,
+              learning abilities, and cognitive speed to decision-making
+              processes, from self-perception to mood modulation and emotions
+              such as empathy and trust, from impulse control to
+              wakefulness-sleep cycles and fatigue-alertness balance, as well as
+              motor functions and performance (e.g., speed, strength, endurance,
+              etc.) [31], the ability to modify and control these functions in
+              military and strategic contexts represents an unprecedented
+              advantage—allowing for the effective and targeted "neutralization"
+              of adversaries.
+            </div>
+          </article>
+
+          <!-- SECTION: Cognitive Warfare -->
+          <article class="section" id="s-cogwar" data-index="5">
+            <h1>2.2 Cognitive Warfare</h1>
+            <div class="body">
+              Since 2016, numerous military personnel and diplomatic officials
+              stationed abroad have reported experiencing psychophysical
+              distress following exposure to loud and discomforting localized
+              sounds. These incidents, collectively known as the Havana
+              Syndrome, were first documented at the U.S. and Canadian embassies
+              in Cuba before spreading to governmental and military personnel in
+              China, Russia, Austria, India, Vietnam, Colombia, Uzbekistan,
+              Kyrgyzstan, and Washington, D.C. [16]. Affected individuals
+              exhibited consistent neurophysiological and cognitive symptoms,
+              including headaches, fatigue, anxiety, dizziness, nausea, vertigo,
+              memory loss, traumatic brain injuries, and concussions. Initially
+              dismissed as a mass psychosis, subsequent medical investigations
+              and neuroimaging studies have provided compelling evidence linking
+              these symptoms to sonic attacks executed with unidentified
+              neuroweapons, specifically Directed Energy Weapons (DEW). Clinical
+              examinations using neuroimaging techniques have revealed
+              significant alterations in total brain white matter volume,
+              regional gray and white matter volume, microstructural integrity
+              of cerebellar tissue, and functional connectivity within auditory
+              processing regions. Given that none of the affected individuals
+              had preexisting brain injuries or hearing impairments, the
+              cognitive effects observed in diplomats, intelligence officials,
+              and military personnel were deemed "consistent with the biological
+              effects of modulated or pulsed radiofrequency energy" [16]—a
+              technology previously tested by Russia. The Havana Syndrome is now
+              widely recognized as the inaugural event of cognitive warfare,
+              marking the first documented use of neuroweapons and NeuroStrikes
+              to target the human nervous system, influencing cognitive,
+              emotional, and/or motor functions (e.g., perception, judgment,
+              morale, pain tolerance, physical abilities, and endurance)" [32].
+              The adoption of cognitive strategies represents a fundamental
+              paradigm shift in power structures and social organization,
+              transitioning from panoptic control—a surveillance model inspired
+              by Jeremy Bentham’s Panopticon prison design (1791), characterized
+              by constant visibility and oversight [33]—to a pansensory form of
+              control [11]. This transition introduces an "invisible" dimension
+              of power, one that directly targets bodies, identities, and
+              sensory experiences. This paradigm shift paves the way for a
+              future shaped by panpsychic control, wherein remote mind influence
+              becomes the central axis of political and military strategy. As
+              these tactics and operations grow increasingly subliminal, silent,
+              and difficult to detect, the challenge of exposing, countering,
+              and regulating cognitive warfare becomes more urgent than ever.
+            </div>
+          </article>
+
+          <!-- SECTION: Holosonic -->
+          <article class="section" id="s-holosonic" data-index="6">
+            <h1>3. Holosonic Architecture: Hacking the Human Brain</h1>
+            <div class="body">
+              Since the second decade of the 2000s, the concept of cognitive
+              warfare has gained increasing prominence and concern within
+              medical-scientific research, strategic discourse, and
+              geopolitical, military, social, and cultural structures. First
+              defined by NATO’s Allied Command Transformation (ACT)—a military
+              command established in 2003 to develop and enhance the alliance’s
+              defense and offensive capabilities—cognitive warfare is
+              conceptualized as a "set of activities conducted in
+              synchronization with other instruments of power to modify
+              attitudes and behaviors by influencing, protecting, or disrupting
+              individual and group cognition to gain an advantage over an
+              adversary" [34]. Unlike traditional warfare, which relies on
+              kinetic force, cognitive warfare aims at the conquest of the human
+              mind, now regarded as the new battlefield—the sixth domain of
+              operations [27, 29], following the five domains already colonized
+              by military power: land, sea, air, cyberspace, and outer space
+              [29]. In line with NATO’s initial conceptualization, cognitive
+              warfare operates through a vast array of hybrid strategies,
+              seamlessly blending offensive actions to blur the line between
+              peacetime and conflict. It employs "deliberate targeting of the
+              human mind through offensive actions designed to influence
+              perceptions, beliefs, interests, objectives, decisions, and
+              behaviors" [34]. Cognitive control is applied by governments and
+              military bodies through a combination of direct and indirect
+              technological and strategic tools, aimed at both manipulating
+              perceptions and behaviors and enhancing or impairing brain
+              functions in targeted individuals or populations. Depending on the
+              method of action, these interventions can be categorized into
+              three main types: influence, interference, and alteration [35].
+            </div>
+          </article>
+
+          <!-- SECTION: Future -->
+          <article class="section" id="s-future" data-index="7">
+            <h1>4. Future Speculative Scenarios</h1>
+            <div class="body">
+              The rapid evolution of neuroweapons raises critical ethical,
+              legal, and social concerns, underscoring the urgent need for
+              protective measures against potential threats to cognitive
+              security. In this context, the concept of the neuroshield
+              emerges—an integrated defense system designed to encompass
+              specific regulations, media industry codes of conduct, and
+              practical tools to safeguard citizens’ cognitive liberty. This
+              approach would extend beyond military applications, significantly
+              impacting everyday life, particularly in counteracting
+              informational manipulation conducted through digital platforms,
+              with profound implications for democracy and geopolitical
+              stability [43]. The implementation of ethical standards and
+              international regulations thus becomes a strategic priority,
+              particularly in preventing unauthorized access to cognitive data
+              by hostile actors, including foreign states and cybercriminal
+              organizations. The increasing ability to modulate human cognitive
+              processes necessitates a strategic approach to neurosecurity,
+              which should be integrated into risk management strategies at both
+              political and military levels. One of the emerging threats in this
+              domain involves the development of neural malware. A research team
+              at the University of Washington (Seattle) successfully translated
+              a simple computer command into a sequence of 176 human DNA
+              letters, which was then inserted into a sequencing machine. The
+              machine converted these DNA sequences into binary code (0s and
+              1s), effectively allowing the malware to take control of a
+              computer. This experiment highlights a potential future risk where
+              DNA samples could be exploited in cyberattacks, granting
+              unauthorized access to digital databases and sensitive private
+              information [44]. To address these growing challenges, new
+              defensive solutions are being explored, including the development
+              of cerebral firewalls—protective systems designed to shield both
+              soldiers and civilians from psychological and cognitive attacks.
+              At the same time, the rising interest in neurosecurity is
+              reflected in increased public investment in neuroscience and
+              neurotechnology research, with a particular emphasis on: the study
+              of complex cognitive functions such as empathy, consciousness, and
+              language; the understanding of pathogenic mechanisms affecting the
+              brain; the development of interventions for neurological and
+              mental disorders. Ultimately, the future of cognitive security
+              will require a multidisciplinary approach, integrating scientific
+              research, technological innovation, and ethical regulation. Only
+              through responsible governance of neurotechnologies can we ensure
+              the protection of both individual and collective cognitive
+              faculties, preventing the misuse of emerging methods of cognitive
+              manipulation.
+            </div>
+          </article>
+
+          <!-- SECTION: Conclusions & Bibliography -->
+          <article class="section" id="s-conclusions" data-index="8">
+            <h1>Conclusions</h1>
+            <div class="body">
+              Cognitive warfare's principles have been examined, outlining its
+              historical evolution and the role of emerging neuroscientific and
+              neurotechnological applications in military strategy. The growing
+              race to control the human mind is reshaping power dynamics,
+              raising critical ethical, legal, social, and cultural questions.
+              NBIC science advancements are opening unprecedented scenarios for
+              cognitive warfare, with applications ranging from cognitive
+              enhancement to individual and collective manipulation. These
+              developments demand urgent debate and coordinated international
+              effort to establish effective regulations, ensuring cognitive
+              sovereignty and safeguarding individual autonomy and global
+              security. Further technical and strategic insights will be
+              explored in four dedicated White Papers, focusing on NBIC's
+              technological, ethical, and socio-cultural implications for
+              next-generation cognitive warfare. Bibliography (estratto) [1] S.
+              Ztu, The Art of War, Feltrinelli Editore, 2013. [2] I. Reznikoff,
+              The Evidence of the Use of Sound Resonance... ... [44] A.
+              Regalado, Scientists Hack a Computer Using DNA. MIT Technology
+              Review, 2017.
+            </div>
+          </article>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        const hScroll = document.getElementById("hScroll");
+        const toc = document.getElementById("toc");
+        const buttons = toc.querySelectorAll("button");
+        const sections = Array.from(document.querySelectorAll(".section"));
+        // click navigation -> scroll to section
+        buttons.forEach((btn, i) => {
+          btn.addEventListener("click", () => {
+            const id = btn.dataset.target;
+            const target = document.getElementById(id);
+            if (!target) return;
+            centerSection(target);
+          });
+        });
+
+        // 3D RING LAYOUT ---------------------------------------------------
+        let rotY = 0;
+        let angleStep = 0; // degrees between faces
+        let currentIndex = 0;
+        let radiusScale = 1; // controlled by slider (1.0 = auto)
+
+        // control elements
+        const rotRange = document.getElementById('rotRange');
+        const radRange = document.getElementById('radRange');
+        const perspRange = document.getElementById('perspRange');
+        const rotOut = document.getElementById('rotOut');
+        const radOut = document.getElementById('radOut');
+        const perspOut = document.getElementById('perspOut');
+
+        function layoutRing() {
+          const N = sections.length;
+          if (!N) return;
+          angleStep = 360 / N;
+          // compute radius from a representative face width
+          const faceW = sections[0].getBoundingClientRect().width;
+          const gap = 12; // px visual gap between faces
+          const rBase = (faceW + gap) / (2 * Math.tan(Math.PI / N));
+          const r = Math.max(200, rBase * radiusScale);
+          sections.forEach((el, i) => {
+            const a = i * angleStep;
+            el.style.transform =
+              `translate3d(-50%, -50%, 0) rotateY(${a}deg) translateZ(${-r}px)`;
+          });
+          // keep current orientation
+          setRotY(-currentIndex * angleStep, false);
+        }
+
+        function setRotY(deg, animate = true) {
+          rotY = deg;
+          if (!animate) hScroll.classList.add("no-anim");
+          hScroll.style.setProperty("--rotY", `${rotY}deg`);
+          if (!animate) requestAnimationFrame(() => hScroll.classList.remove("no-anim"));
+          updateActiveFromRotation();
+          updateRotSlider();
+        }
+
+        function indexFromRotY() {
+          const N = sections.length;
+          if (!N || angleStep === 0) return 0;
+          let x = (-rotY / angleStep) % N;
+          if (x < 0) x += N;
+          return Math.round(x) % N;
+        }
+
+        function updateActiveFromRotation() {
+          currentIndex = indexFromRotY();
+          buttons.forEach((b) => b.classList.remove("active"));
+          const btn = buttons[currentIndex];
+          if (btn) btn.classList.add("active");
+        }
+
+        function updateRotSlider() {
+          const norm = ((rotY % 360) + 360) % 360; // 0..359
+          if (rotRange) {
+            rotRange.value = Math.round(norm);
+            rotOut.textContent = `${Math.round(norm)}°`;
+          }
+        }
+
+        function centerSection(target) {
+          const idx = sections.indexOf(target);
+          if (idx < 0) return;
+          currentIndex = idx;
+          setRotY(-idx * angleStep, true);
+        }
+
+        // make ring draggable with mouse (hold Shift to rotate)
+        let isDown = false,
+          startX;
+        hScroll.addEventListener("mousedown", (e) => {
+          if (!e.shiftKey) return; // only when holding Shift
+          isDown = true;
+          hScroll.classList.add("dragging");
+          startX = e.clientX;
+        });
+        window.addEventListener("mouseup", () => {
+          isDown = false;
+          hScroll.classList.remove("dragging");
+        });
+        window.addEventListener("mousemove", (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          const dx = e.clientX - startX;
+          startX = e.clientX;
+          setRotY(rotY + dx * 0.3);
+        });
+
+        // Touch drag to rotate (mobile)
+        let tStartX = null;
+        hScroll.addEventListener(
+          "touchstart",
+          (e) => {
+            if (!e.touches || e.touches.length !== 1) return;
+            tStartX = e.touches[0].clientX;
+          },
+          { passive: true }
+        );
+        hScroll.addEventListener(
+          "touchmove",
+          (e) => {
+            if (tStartX == null || !e.touches || e.touches.length !== 1) return;
+            const x = e.touches[0].clientX;
+            const dx = x - tStartX;
+            tStartX = x;
+            setRotY(rotY + dx * 0.25);
+          },
+          { passive: true }
+        );
+        hScroll.addEventListener("touchend", () => (tStartX = null), { passive: true });
+
+        // Wheel: use horizontal deltas to rotate the ring
+        hScroll.addEventListener(
+          "wheel",
+          (e) => {
+            // if user scrolls inside a section vertically, allow default
+            const insideSection = e.target.closest && e.target.closest(".section");
+            if (insideSection && Math.abs(e.deltaY) > Math.abs(e.deltaX)) return;
+            if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) {
+              e.preventDefault();
+              setRotY(rotY + e.deltaX * 0.2);
+            }
+          },
+          { passive: false }
+        );
+
+        // Make inline [n] references clickable -> jump to bibliography
+        const bodies = document.querySelectorAll(".section .body");
+        const citeRegex = /\[(\d{1,3})\]/g;
+        bodies.forEach((b) => {
+          b.innerHTML = b.innerHTML.replace(
+            citeRegex,
+            '<a href="#s-conclusions" class="cite" data-ref="$1">[$1]</a>'
+          );
+        });
+
+        document.addEventListener("click", (e) => {
+          const a = e.target.closest(".cite");
+          if (!a) return;
+          e.preventDefault();
+          const target = document.getElementById("s-conclusions");
+          if (target) centerSection(target);
+        });
+
+        // keyboard navigation: left/right arrows
+        window.addEventListener("keydown", (e) => {
+          if (
+            document.activeElement &&
+            (document.activeElement.tagName === "INPUT" ||
+              document.activeElement.tagName === "TEXTAREA")
+          )
+            return;
+          if (e.key === "ArrowRight") {
+            currentIndex = (currentIndex + 1) % sections.length;
+            setRotY(-currentIndex * angleStep);
+          }
+          if (e.key === "ArrowLeft") {
+            currentIndex = (currentIndex - 1 + sections.length) % sections.length;
+            setRotY(-currentIndex * angleStep);
+          }
+          if (e.key === "Home") setRotY(0);
+          if (e.key === "End") setRotY(-angleStep * (sections.length - 1));
+        });
+
+        // accessibility: focus first section on load
+        sections[0] && sections[0].setAttribute("tabindex", "-1");
+
+        // controls wiring
+        if (rotRange) {
+          rotRange.addEventListener('input', (e) => {
+            const v = parseFloat(e.target.value) || 0;
+            rotOut.textContent = `${v}°`;
+            setRotY(v);
+          });
+        }
+        if (radRange) {
+          radRange.addEventListener('input', (e) => {
+            const v = (parseFloat(e.target.value) || 100) / 100; // 0.4..2.0
+            radiusScale = v;
+            radOut.textContent = `${v.toFixed(2)}×`;
+            layoutRing();
+          });
+        }
+        if (perspRange) {
+          perspRange.addEventListener('input', (e) => {
+            const v = parseInt(e.target.value, 10) || 1200;
+            document.documentElement.style.setProperty('--persp', `${v}px`);
+            perspOut.textContent = `${v}px`;
+          });
+        }
+
+        // init 3D layout and controls state
+        layoutRing();
+        updateRotSlider();
+        document.documentElement.style.setProperty('--persp', `${perspRange ? perspRange.value : 1200}px`);
+
+        window.addEventListener("resize", () => layoutRing());
+      })();
+    </script>
+  </body>
+</html>
