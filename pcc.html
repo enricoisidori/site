@@ -43,8 +43,8 @@
         font-style: normal;
         line-height: 1.2; /* interlinea corpo generale 110% */
         white-space: normal;
-        color: #ffffff;
-        background-color: #0e0e0e; /* quasi nero */
+        color: black;
+        background-color: white; /* quasi nero */
         padding: 0 22vw; /* rimosso padding superiore, manteniamo solo laterali */
         will-change: text-shadow;
         /* Effetto scia semplice + blur verticale di base */
@@ -103,30 +103,28 @@
       /* Link stile base */
 
       a {
-        color: #fff;
+        color: black;
         text-decoration-line: underline;
         text-decoration-style: dotted;
 
         text-underline-offset: 3px;
         text-decoration-thickness: auto;
-        text-decoration-color: #fff;
+        text-decoration-color: black;
         border-bottom: none;
       }
 
       /* Hover: linea continua e più intensa */
       a:hover {
         text-decoration-style: solid;
-        text-decoration-color: #ffffff;
       }
-      a:hover {
-        border-bottom-color: #fff;
-      }
+
       /* Mailto: underline bianco, senza bordo */
 
       /* Evidenziazione con tracking aumentato */
       .hl {
         font-size: 12.66pt;
-        color: green;
+        color: ;
+
         /* letter-spacing: 0.3em; */
         /* text-decoration: underline; */
         text-decoration-style: dotted;
@@ -163,6 +161,20 @@
         margin: 0 auto; /* centra orizzontalmente */
         width: 200px; /* larghezza fissa */
         height: auto; /* mantiene le proporzioni */
+      }
+
+      .img-fill {
+        width: 100%;
+        height: 400px;
+        overflow: hidden; /* taglia l'eccesso */
+        position: relative;
+      }
+
+      .img-fill img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* riempie il contenitore mantenendo proporzioni */
+        display: block;
       }
 
       /* Immagine con scia (applicare classe .trail) */
@@ -213,13 +225,13 @@
       }
       /* Selezione: inverti (sfondo bianco, testo scuro), rimuovi scia */
       ::selection {
-        background: #ffffff;
-        color: #0b0b0b;
+        background: black;
+        color: white;
         text-shadow: none;
       }
       ::-moz-selection {
-        background: #ffffff;
-        color: #0b0b0b;
+        background: black;
+        color: white;
         text-shadow: none;
       }
 
@@ -247,6 +259,9 @@
     </style>
   </head>
   <body>
+    <div class="img-fill">
+      <img src="asset/anim.gif" alt="Animated background" />
+    </div>
     <h1 class="trail">
       Post-Computing Lab<br />
       Antidisciplinary Research Network &amp; Platform
@@ -436,8 +451,8 @@
       </li>
     </ul>
 
-    <img class="center-img" src="asset/pcc.png" />
-    <br />
+    <!-- <img class="center-img" src="asset/pcc.png" />
+    <br /> -->
 
     <p class="center-full">
       <a
