@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="asset/pcc.ico" />
     <!--
     NOTE / ISTRUZIONI RAPIDE (modifiche principali e come cambiarle)
 
@@ -91,23 +92,29 @@
       /* dimensioni titoli uniformi già impostate sopra */
 
       /* Link stile base */
+    
+
       a {
-        color: #fff;
-        text-decoration: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-      }
+  color: #fff;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+
+        text-underline-offset: 3px;
+        text-decoration-thickness: auto;
+        text-decoration-color: #fff;
+        border-bottom: none;
+}
+
+/* Hover: linea continua e più intensa */
+a:hover {
+  text-decoration-style: solid;
+  text-decoration-color: #ffffff;
+}
       a:hover {
         border-bottom-color: #fff;
       }
       /* Mailto: underline bianco, senza bordo */
-      a[href^="mailto:"] {
-        color: #fff;
-        text-decoration: underline;
-        text-underline-offset: 2px;
-        text-decoration-thickness: auto;
-        text-decoration-color: #fff;
-        border-bottom: none;
-      }
+   
 
       /* Evidenziazione con tracking aumentato */
       .hl {
@@ -387,57 +394,60 @@
 
     <!-- <img src="asset/pcc.png" alt="PCC" /> -->
 
-    <script>
-      (function () {
-        // Effetto scia semplice (prima versione)
-        var mql =
-          window.matchMedia &&
-          window.matchMedia("(prefers-reduced-motion: reduce)");
-        if (!mql || !mql.matches) {
-          var lastY = window.scrollY || window.pageYOffset || 0;
-          var trailY = 0;
-          var rafId = null;
+   <script>
+  (function () {
+    // Rispetta sempre prefers-reduced-motion
+    var mql =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)");
 
-          function setVar() {
-            document.documentElement.style.setProperty(
-              "--trail-y",
-              trailY.toFixed(2) + "px"
-            );
-          }
+    if (mql && mql.matches) {
+      // Niente scia se l'utente ha ridotto le animazioni
+      document.documentElement.style.setProperty("--trail-y", "0px");
+      return;
+    }
 
-          function step() {
-            // Damping non lineare: rapido all'inizio, lento alla fine
-            var abs = Math.abs(trailY);
-            var t = Math.min(1, abs / 200); // 0..1 rispetto alla portata
-            var damping = 0.86 + (0.992 - 0.86) * (1 - t); // lontano=0.86, vicino=0.992
-            trailY *= damping;
-            if (Math.abs(trailY) < 0.1) {
-              trailY = 0;
-              setVar();
-              rafId = null;
-              return;
-            }
-            setVar();
-            rafId = requestAnimationFrame(step);
-          }
+    var lastY = window.scrollY || window.pageYOffset || 0;
+    var trailY = 0;
 
-          window.addEventListener(
-            "scroll",
-            function () {
-              var y = window.scrollY || window.pageYOffset || 0;
-              var dy = y - lastY;
-              lastY = y;
-              trailY += dy;
-              if (trailY > 200) trailY = 200;
-              if (trailY < -200) trailY = -200;
-              if (!rafId) rafId = requestAnimationFrame(step);
-            },
-            { passive: true }
-          );
-        }
+    function setVar() {
+      document.documentElement.style.setProperty(
+        "--trail-y",
+        trailY.toFixed(2) + "px"
+      );
+    }
 
-        // Titoli a dimensione fissa via CSS (nessun auto-fit JS)
-      })();
-    </script>
+    function loop() {
+      var y = window.scrollY || window.pageYOffset || 0;
+      var dy = y - lastY;
+      lastY = y;
+
+      // accumula movimento
+      trailY += dy;
+
+      // clamp (puoi aumentare se vuoi scia più lunga)
+      if (trailY > 200) trailY = 200;
+      if (trailY < -200) trailY = -200;
+
+      // damping non lineare come prima
+      var abs = Math.abs(trailY);
+      var t = Math.min(1, abs / 200); // 0..1
+      var damping = 0.86 + (0.992 - 0.86) * (1 - t);
+
+      trailY *= damping;
+
+      if (Math.abs(trailY) < 0.1) {
+        trailY = 0;
+      }
+
+      setVar();
+      requestAnimationFrame(loop);
+    }
+
+    // Avvia il loop una volta sola
+    requestAnimationFrame(loop);
+  })();
+</script>
+
   </body>
 </html>
