@@ -44,22 +44,24 @@
         line-height: 1.2; /* interlinea corpo generale 110% */
         white-space: normal;
         color: #ffffff;
-        background-color: #0b0b0b; /* quasi nero */
+        background-color: #0e0e0e; /* quasi nero */
         padding: 0 22vw; /* rimosso padding superiore, manteniamo solo laterali */
         will-change: text-shadow;
         /* Effetto scia semplice + blur verticale di base */
-        text-shadow: 0 var(--blur-px) 0 rgba(255, 255, 255, var(--blur-opacity)),
-          0 calc(var(--blur-px) * -1) 0 rgba(255, 255, 255, var(--blur-opacity)),
-          0 calc(var(--trail-y) * 0.1) 0 rgba(255, 255, 255, 0.14),
-          0 calc(var(--trail-y) * 0.2) 0 rgba(255, 255, 255, 0.12),
-          0 calc(var(--trail-y) * 0.3) 0 rgba(255, 255, 255, 0.1),
-          0 calc(var(--trail-y) * 0.4) 0 rgba(255, 255, 255, 0.08),
-          0 calc(var(--trail-y) * 0.5) 0 rgba(255, 255, 255, 0.07),
-          0 calc(var(--trail-y) * 0.6) 0 rgba(255, 255, 255, 0.06),
-          0 calc(var(--trail-y) * 0.7) 0 rgba(255, 255, 255, 0.05),
-          0 calc(var(--trail-y) * 0.8) 0 rgba(255, 255, 255, 0.04),
-          0 calc(var(--trail-y) * 0.9) 0 rgba(255, 255, 255, 0.03),
-          0 calc(var(--trail-y) * 1) 0 rgba(255, 255, 255, 0.02);
+        text-shadow: 0 var(--blur-px) 0
+            rgb(from currentColor r g b / var(--blur-opacity)),
+          0 calc(var(--blur-px) * -1) 0
+            rgb(from currentColor r g b / var(--blur-opacity)),
+          0 calc(var(--trail-y) * 0.1) 0 rgb(from currentColor r g b / 0.14),
+          0 calc(var(--trail-y) * 0.2) 0 rgb(from currentColor r g b / 0.12),
+          0 calc(var(--trail-y) * 0.3) 0 rgb(from currentColor r g b / 0.1),
+          0 calc(var(--trail-y) * 0.4) 0 rgb(from currentColor r g b / 0.08),
+          0 calc(var(--trail-y) * 0.5) 0 rgb(from currentColor r g b / 0.07),
+          0 calc(var(--trail-y) * 0.6) 0 rgb(from currentColor r g b / 0.06),
+          0 calc(var(--trail-y) * 0.7) 0 rgb(from currentColor r g b / 0.05),
+          0 calc(var(--trail-y) * 0.8) 0 rgb(from currentColor r g b / 0.04),
+          0 calc(var(--trail-y) * 0.9) 0 rgb(from currentColor r g b / 0.03),
+          0 calc(var(--trail-y) * 1) 0 rgb(from currentColor r g b / 0.02);
       }
 
       p {
@@ -85,6 +87,15 @@
         display: block;
         width: 100%;
         font-size: 12.66pt; /* dimensione uniforme titoli */
+        /* color: #0b0b0b; */
+        color: red;
+        /* border: rebeccapurple 2px solid; */
+        /* background-color: white;
+        border: #fff 2px solid; */
+      }
+
+      h1 {
+        color: red;
       }
 
       /* dimensioni titoli uniformi già impostate sopra */
@@ -115,6 +126,7 @@
       /* Evidenziazione con tracking aumentato */
       .hl {
         font-size: 12.66pt;
+        color: green;
         /* letter-spacing: 0.3em; */
         /* text-decoration: underline; */
         text-decoration-style: dotted;
@@ -125,8 +137,8 @@
       }
       /* Blocco label+contenuto con rientro 2em dopo la label */
       .hl-block {
-        margin: 0 0 1em;
-        margin-left: 2em;
+        /* margin: 0 0 1em;
+        margin-left: 2em; */
       }
       .sub {
         display: block;
@@ -139,6 +151,20 @@
         /* font-weight: bolder; */
       }
 
+      .center-full {
+        text-align: center;
+      }
+      .center-img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        display: block;
+        margin: 0 auto; /* centra orizzontalmente */
+        width: 200px; /* larghezza fissa */
+        height: auto; /* mantiene le proporzioni */
+      }
+
       /* Immagine con scia (applicare classe .trail) */
       img.trail {
         display: block;
@@ -147,24 +173,44 @@
         margin: 3rem 0 0;
         will-change: filter;
         filter: drop-shadow(
-            0 var(--blur-px) 0 rgba(255, 255, 255, var(--blur-opacity))
+            0 var(--blur-px) 0
+              rgb(from currentColor r g b / var(--blur-opacity))
           )
           drop-shadow(
             0 calc(var(--blur-px) * -1) 0
-              rgba(255, 255, 255, var(--blur-opacity))
+              rgb(from currentColor r g b / var(--blur-opacity))
           )
-          drop-shadow(0 calc(var(--trail-y) * 0.1) 0 rgba(255, 255, 255, 0.14))
-          drop-shadow(0 calc(var(--trail-y) * 0.2) 0 rgba(255, 255, 255, 0.12))
-          drop-shadow(0 calc(var(--trail-y) * 0.3) 0 rgba(255, 255, 255, 0.1))
-          drop-shadow(0 calc(var(--trail-y) * 0.4) 0 rgba(255, 255, 255, 0.08))
-          drop-shadow(0 calc(var(--trail-y) * 0.5) 0 rgba(255, 255, 255, 0.07))
-          drop-shadow(0 calc(var(--trail-y) * 0.6) 0 rgba(255, 255, 255, 0.06))
-          drop-shadow(0 calc(var(--trail-y) * 0.7) 0 rgba(255, 255, 255, 0.05))
-          drop-shadow(0 calc(var(--trail-y) * 0.8) 0 rgba(255, 255, 255, 0.04))
-          drop-shadow(0 calc(var(--trail-y) * 0.9) 0 rgba(255, 255, 255, 0.03))
-          drop-shadow(0 calc(var(--trail-y) * 1) 0 rgba(255, 255, 255, 0.02));
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.1) 0 rgb(from currentColor r g b / 0.14)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.2) 0 rgb(from currentColor r g b / 0.12)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.3) 0 rgb(from currentColor r g b / 0.1)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.4) 0 rgb(from currentColor r g b / 0.08)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.5) 0 rgb(from currentColor r g b / 0.07)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.6) 0 rgb(from currentColor r g b / 0.06)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.7) 0 rgb(from currentColor r g b / 0.05)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.8) 0 rgb(from currentColor r g b / 0.04)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 0.9) 0 rgb(from currentColor r g b / 0.03)
+          )
+          drop-shadow(
+            0 calc(var(--trail-y) * 1) 0 rgb(from currentColor r g b / 0.02)
+          );
       }
-
       /* Selezione: inverti (sfondo bianco, testo scuro), rimuovi scia */
       ::selection {
         background: #ffffff;
@@ -201,7 +247,7 @@
     </style>
   </head>
   <body>
-    <h1>
+    <h1 class="trail">
       Post-Computing Lab<br />
       Antidisciplinary Research Network &amp; Platform
     </h1>
@@ -390,7 +436,17 @@
       </li>
     </ul>
 
-    <!-- <img src="asset/pcc.png" alt="PCC" /> -->
+    <img class="center-img" src="asset/pcc.png" />
+    <br />
+
+    <p class="center-full">
+      <a
+        href="https://www.instagram.com/transmediaresearch.institute/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >@transmediaresearch.institute</a
+      >
+    </p>
 
     <script>
       (function () {
