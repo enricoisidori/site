@@ -1,674 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --trail-y: 0px;
-      --blur-px: 0.6px; /* base motion blur verticale */
-      --blur-opacity: 0.06; /* intensità del blur di base */
-    }
-    body {
-      font-family: Helvetica, Arial, sans-serif;
-      font-size: 16pt;
-      font-weight: 400;
-      font-style: normal;
-      line-height: 1.5;
-      white-space: normal;
-      color: #ffffff;
-      background-color: #0b0b0b; /* quasi nero */
-      padding: 64px 22vw; /* margini laterali più spessi su desktop */
-      will-change: text-shadow;
-      text-shadow:
-        0 var(--blur-px) 0 rgba(255,255,255,var(--blur-opacity)),
-        0 calc(var(--blur-px) * -1) 0 rgba(255,255,255,var(--blur-opacity)),
-        0 calc(var(--trail-y) * -0.10) 0 rgba(255,255,255,0.14),
-        0 calc(var(--trail-y) * -0.20) 0 rgba(255,255,255,0.12),
-        0 calc(var(--trail-y) * -0.30) 0 rgba(255,255,255,0.10),
-        0 calc(var(--trail-y) * -0.40) 0 rgba(255,255,255,0.08),
-        0 calc(var(--trail-y) * -0.50) 0 rgba(255,255,255,0.07),
-        0 calc(var(--trail-y) * -0.60) 0 rgba(255,255,255,0.06),
-        0 calc(var(--trail-y) * -0.70) 0 rgba(255,255,255,0.05),
-        0 calc(var(--trail-y) * -0.80) 0 rgba(255,255,255,0.04),
-        0 calc(var(--trail-y) * -0.90) 0 rgba(255,255,255,0.03),
-        0 calc(var(--trail-y) * -1.00) 0 rgba(255,255,255,0.02);
-    }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+    NOTE / ISTRUZIONI RAPIDE (modifiche principali e come cambiarle)
 
-    p { margin: 0 0 1em; }
-    ul { margin: 0 0 1em; padding-left: 1.1em; }
-    li { margin: 0.2em 0; }
-    h1, h2, h3, h4, h5, h6 { font-weight: 400; text-transform: uppercase; letter-spacing: 0.02em; margin: 1.1em 0 0.5em; }
+    Tipografia e colori
+    - Font unico: Helvetica, 16pt, peso 400 (regola body).
+    - Colori: sfondo quasi nero (#0b0b0b), testo bianco (#fff).
 
-    @media (max-width: 768px) {
+    Margini
+    - Desktop: body -> padding: 64px 22vw;  (22vw = margini laterali: aumenta/diminuisci)
+    - Mobile: nella media query @media (max-width: 768px) il padding orizzontale è 0.
+
+    Titoli in MAIUSCOLO
+    - Regola CSS per h1..h6 usa text-transform: uppercase (nessun bold). I titoli sono h1/h2/h3.
+
+    Blur verticale di base (motion blur leggero)
+    - Variabili in :root:
+        --blur-px: 0.6px;       // spessore del blur (aumenta per più blur)
+        --blur-opacity: 0.06;   // intensità (0-1)
+
+    Effetto scia on scroll (moltiplicazione che svanisce)
+    - Persistenza: modifica il damping nello script (cerca "damping quasi permanente").
+      Valori più vicini a 1 = scia più lunga (es. 0.992); più bassi = più breve (es. 0.96).
+    - Ampiezza massima: clamp ±300 nello script.
+    - Intensità visiva: regola le opacità nella catena di text-shadow nella regola body (valori rgba 0.14 → 0.02).
+    - Accessibilità: con "Reduce Motion" la scia è disabilitata (vedi @media prefers-reduced-motion e controllo nello script).
+  -->
+    <style>
+      :root {
+        --trail-y: 0px; /* usato per l'effetto scia semplice */
+        --blur-px: 0.6px; /* blur verticale di base */
+        --blur-opacity: 0.06; /* intensità blur di base (0-1) */
+      }
       body {
-        padding: 16px 0; /* nessun margine laterale su mobile */
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 16pt;
+        font-weight: 400;
+        font-style: normal;
+        line-height: 1.2; /* interlinea corpo generale 110% */
+        white-space: normal;
+        color: #ffffff;
+        background-color: #0b0b0b; /* quasi nero */
+        padding: 0 22vw; /* rimosso padding superiore, manteniamo solo laterali */
+        will-change: text-shadow;
+        /* Effetto scia semplice + blur verticale di base */
+        text-shadow: 0 var(--blur-px) 0 rgba(255, 255, 255, var(--blur-opacity)),
+          0 calc(var(--blur-px) * -1) 0 rgba(255, 255, 255, var(--blur-opacity)),
+          0 calc(var(--trail-y) * 0.1) 0 rgba(255, 255, 255, 0.14),
+          0 calc(var(--trail-y) * 0.2) 0 rgba(255, 255, 255, 0.12),
+          0 calc(var(--trail-y) * 0.3) 0 rgba(255, 255, 255, 0.1),
+          0 calc(var(--trail-y) * 0.4) 0 rgba(255, 255, 255, 0.08),
+          0 calc(var(--trail-y) * 0.5) 0 rgba(255, 255, 255, 0.07),
+          0 calc(var(--trail-y) * 0.6) 0 rgba(255, 255, 255, 0.06),
+          0 calc(var(--trail-y) * 0.7) 0 rgba(255, 255, 255, 0.05),
+          0 calc(var(--trail-y) * 0.8) 0 rgba(255, 255, 255, 0.04),
+          0 calc(var(--trail-y) * 0.9) 0 rgba(255, 255, 255, 0.03),
+          0 calc(var(--trail-y) * 1) 0 rgba(255, 255, 255, 0.02);
       }
-    }
 
-    @media (prefers-reduced-motion: reduce) {
-      body { text-shadow: none !important; }
-    }
-  </style>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </head>
-<body>
-<h1>Post-Computing Lab</h1>
-<h2>Antidisciplinary Research Network &amp; Platform</h2>
-
-<p>The Post-Computing Lab is an antidisciplinary research network &amp; platform, a cross-departmental initiative led by MDEF (Master in Design for Emergent Futures) at Elisava School of Design. This platform reimagines research and education in a world where computation is ambient, embodied, and entangled with life. It serves as a catalyst for radical inquiry, speculative design, and collaborative experimentation at the edge of art, technology, and philosophy. Operating across Elisava Bachelor and Master programs and anchored by a six-month curriculum from January to June 2026, the platform invites students and faculty to engage in a post-computing civilization centered on themes such as AI, neural media, intimate technologies, and synthetic ecologies. This is an extra-curricular program designed for students who want to develop their final year project within its radical framework, culminating in a global summit in June in Barcelona.</p>
-
-<p>Key Pillars:</p>
-<ul>
-  <li>Antidisciplinary Research — Breaking disciplinary silos to merge science, design, philosophy, and emerging technologies.</li>
-  <li>Speculative Prototyping — Creating tangible future scenarios that challenge conventional assumptions.</li>
-  <li>Experimental Collaboration — Bringing together institutions, researchers, artists, designers, and technologists to co-create new knowledge.</li>
-  </ul>
-
-<p>We are actively seeking student projects that align with and explore the following critical themes:</p>
-<ul>
-  <li>Neural Media — The fusion of AI, neural interfaces, and immersive environments.</li>
-  <li>Intimate Technologies — Computing in, on, around the body.</li>
-  <li>NBIC Convergence — The convergence of nanotechnology, biotechnology, information technology, and cognitive science.</li>
-  <li>Biology &lt;&gt; Technology — Brain organoids and Organoid Intelligence.</li>
-  <li>Ethical &amp; Social Implications — The risks and responsibilities of a world where life itself is programmable.</li>
-  <li>Planetary Interfaces — How computation operates across scales from the microscopic to the planetary.</li>
-  <li>Synthetic Ecologies — Designing with and for post-natural systems.</li>
-</ul>
-
-<h3>Program Architecture</h3>
-<p>This is an extra-curricular program designed for students who want to develop their final year project within its framework. It does not grant CFU credits. Participation is free of charge, upon selection.</p>
-<ul>
-  <li>Cycle: January – June 2026</li>
-  <li>Participants: 10–15 selected participants from MDEF and Elisava Bachelor/Master programs, alongside those from partner institutions.</li>
-  <li>Delivery: monthly studios, labs, or thesis work.</li>
-  <li>Engagement: in-person in Barcelona and online.</li>
-</ul>
-
-<h3>Initial Calendar</h3>
-<ul>
-  <li>November 10th: Filippo Rosati presentation at Beyond Masters. Application officially open.</li>
-  <li>November 14th: One-on-one studio sessions for interested participants about the program and potential projects.</li>
-  <li>December 14th: Deadline for all applications.</li>
-  <li>December 19th: Notifications sent to all selected participants.</li>
-  <li>January 16th: All-day Opening Symposium in Barcelona with the selected participants and invited guests.</li>
-</ul>
-
-<h3>Next steps &amp; Contact</h3>
-<ul>
-  <li>Book a One-on-One Studio Session: To book an individual discussion on Friday, November 14th, please use this link: link</li>
-  <li>Apply for the Program: Submit your application before the deadline: link</li>
-  <li>Request More Information: For general inquiries about the program, please contact us at: hello@umanesimoartificiale.xyz or umanesimoartificiale@gmail.com</li>
-</ul>
-
-<h3>Antidisciplinary Research Network &amp; Platform for a Post-Computing Civilization</h3>
-<h3>A Cross-Departmental Research Initiative at Elisava School of Design and Engineering</h3>
-
-<h3>Summary</h3>
-<p>The Antidisciplinary Research Network &amp; Platform for a Post-Computing Civilization is a cross-departmental initiative led by MDEF at Elisava School of Design. This platform reimagines research and education in a world where computation is ambient, embodied, and entangled with life. It serves as a catalyst for radical inquiry, speculative design, and collaborative experimentation at the edge of art, technology, and philosophy. Operating across Elisava Bachelor and Master programs, the platform invites students and faculty to engage in a post-computing civilization centered on themes such as AI, neural media, intimate technologies, and synthetic ecologies. Participants gain access to mentorship, hybrid labs, public exhibitions, and international networks. Anchored by a six-month long curriculum and culminating in a global summit in Barcelona, this initiative cultivates the next generation of post-disciplinary thinkers and creators.</p>
-
-<h3>1. Vision &amp; Mission</h3>
-<p>Global research initiative that explores the evolution of human existence beyond the paradigm of classical computation. In an era where technology is becoming more biological, and biology is becoming more technological, this lab serves as a platform for radical inquiry, speculative design, and hybrid experimentation across disciplines.</p>
-
-<p>Key Pillars:</p>
-<ul>
-  <li>Antidisciplinary Research — Breaking disciplinary silos to merge science, design, philosophy, and emerging technologies.</li>
-  <li>Speculative Prototyping — Creating tangible future scenarios that challenge conventional assumptions.</li>
-  <li>Experimental Collaboration — Bringing together institutions, researchers, artists, designers, and technologists to co-create new knowledge.</li>
-</ul>
-
-<p>Run by MDEF (lead partner) the platform unites Elisava’s Bachelor and Master programs as well as external partner institutions, building a shared, future-facing research culture across the school.</p>
-
-<h3>2. Thematic Focus &amp; Challenges</h3>
-<p>The platform centers on the hypothesis that computation is no longer isolated to machines: it is ambient, embodied, and entangled with life itself. Thematic research reframes design as a site of post-disciplinary inquiry and technological reflection.</p>
-<ul>
-  <li>Computation is ubiquitous and embodied rather than confined to screens.</li>
-  <li>Human cognition is extended and networked beyond the brain.</li>
-  <li>AI, biotechnology, and neural interfaces blur the boundaries between human, machine, and environment.</li>
-  <li>Society operates in non-linear, emergent systems, requiring new models of governance, ethics, and creativity.</li>
-</ul>
-
-<p>This overarching theme is explored through multiple research areas, including:</p>
-<ul>
-  <li>Neural Media — The fusion of AI, neural interfaces, and immersive environments.</li>
-  <li>Intimate Technologies — Computing in, on, around the body.</li>
-  <li>NBIC Convergence — The convergence of nanotechnology, biotechnology, information technology, and cognitive science.</li>
-  <li>Biology &lt;&gt; Technology — Brain organoids and Organoid Intelligence.</li>
-  <li>Ethical &amp; Social Implications — The risks and responsibilities of a world where life itself is programmable.</li>
-  <li>Planetary Interfaces — How computation operates across scales from the microscopic to the planetary.</li>
-  <li>Synthetic Ecologies — Designing with and for post-natural systems.</li>
-</ul>
-
-<h3>3. Program Architecture</h3>
-<p>This isn't a traditional course in the sense of a standard curricular lab that grants CFU credits. Instead, in this first year, it's an extra-curricular program designed for students who want to develop their final year project within its framework. While it operates outside the standard curriculum, it's open to both Elisava Bachelor and Master students, with formats adapted to their level. We're actively looking for students eager to align their final projects with our program's unique focus, offering a dedicated space for hybrid experimentation.</p>
-<ul>
-  <li>Cycle: January – June 2026 with a public introductory session on November 3rd and 1-on-1 meetings with potential candidates throughout November and December.</li>
-  <li>Participants: the program will select 10–15 participants through an application process before December 2025. These will include students from MDEF and Elisava Bachelor/Master programs, alongside those from partner institutions.</li>
-  <li>Delivery: studios, labs, or thesis work.</li>
-  <li>Engagement: in-person in Barcelona and online.</li>
-</ul>
-
-<p>The program includes regular meetings, hands-on experimentation, and deep-dive sessions open to all lab participants (both individual and team wide):</p>
-<ul>
-  <li>1× Symposia (deep dives with guests) in January 2026</li>
-  <li>1× Workshop in February 2026 as part of MDEF “Extended Intelligence III”</li>
-  <li>5× Monthly Critique Studios with all participants (hybrid online/offline, also with guests)</li>
-  <li>Participants work collaboratively, guided by mentors and peers with occasional individual studio sessions</li>
-  <li>Global Summit in June 2026 at MDEFest (final presentation)</li>
-</ul>
-
-<p>Global Summit:</p>
-<ul>
-  <li>Final presentation in Barcelona in June 2026 (during MDEFest)</li>
-  <li>Involves the participants, staff, and external partner institutions for cross-pollination, testing ideas, and public engagement</li>
-  <li>Combines exhibitions, labs, performances, and discussions</li>
-</ul>
-
-<p>Lab Space (ideal but optional): A dedicated physical venue within Elisava as a shared studio, research hub, and meeting space for the participants of the lab, to run also individual mentorships by the core team of the lab.</p>
-
-<h3>4. Calendar</h3>
-<ul>
-  <li>November 10th: Filippo Rosati presentation at Beyond Masters. Submission opening.</li>
-  <li>November 14th (Friday morning): Individual studio sessions for interested participants (one-on-one) about the program and potential projects.</li>
-  <li>December 14th: Submission closing.</li>
-  <li>December 19th: Notifications sent to selected participants.</li>
-  <li>January 16th (all day): Opening Symposium in Barcelona with all participants, open to all MDEF and Master's students.</li>
-  <li>February 13th (Friday morning): first mentoring + critique session (Barcelona and online).</li>
-  <li>March 13th (Friday morning): second mentoring + critique session (Barcelona and online).</li>
-  <li>April 10th (Friday morning): third mentoring + critique session (Barcelona and online).</li>
-  <li>May 8th (Friday morning): fourth mentoring + critique session (Barcelona and online).</li>
-  <li>June 5th (Friday morning): fifth mentoring + critique session (Barcelona and online).</li>
-  <li>June 2026 TBC: Global Summit, final presentation of the works at MDEFest.</li>
-</ul>
-
-<h3>5. Student Learning Model</h3>
-<p>The initiative is designed as an open-ended educational environment that centers experimentation, peer-to-peer learning, and embodied inquiry.</p>
-
-<p>Challenge-Based Learning: Participants engage deeply with one thematic challenge per year. Each challenge blends:</p>
-<ul>
-  <li>Speculative research</li>
-  <li>Prototyping and critical making</li>
-  <li>Interdisciplinary dialogue and reflexive writing</li>
-</ul>
-
-<p>Distributed Mentorship: Participants are guided and supported by the broader lab team, and have access to a rotating network of guest researchers, artists, designers, and technologists. Peer feedback and collective critique are central elements of the learning experience, fostering collaborative intelligence and critical reflection.</p>
-
-<p>Portfolio-Based Assessment: Each participant produces a speculative artifact, prototype, or research output as their core deliverable. This may take the form of a physical installation, speculative film, performance, publication, or hybrid format.</p>
-
-<p>Student opportunities:</p>
-<ul>
-  <li>Showcase &amp; Public Visibility: Present speculative artifacts, prototypes, and research outputs at the annual Global Summit in Barcelona, as well as in curated external exhibitions, symposia, and festivals locally and internationally.</li>
-  <li>Cross-Studies Collaboration: Collaborate with students from diverse bachelor and master programs at Elisava, fostering transversal dialogue and cross-disciplinary knowledge exchange within the school.</li>
-  <li>Access to External Mentorship: Engage with a rotating network of guest researchers, technologists, artists, and designers from international institutions who act as mentors, critics, and collaborators throughout the year.</li>
-  <li>Extended Research Pathways: Outstanding projects may lead to funded research fellowships, post-program residencies, or the opportunity to evolve into thesis work, startups, or speculative ventures.</li>
-  <li>Peer Recognition &amp; Leadership: Students may be invited to take active roles in organizing workshops, moderating online sessions, or co-leading collaborative activities, fostering leadership and facilitation skills.</li>
-</ul>
-
-<h3>6. Governance</h3>
-<p>MDEF (Lead) defines the foundational methodology, challenge framework, and documentation strategy, while coordinating the annual Global Summit and school-wide communication.</p>
-<p>Alignment with Elisava Research and Strategic Initiatives: The lab contributes to Elisava’s strategic objectives by generating original research outputs; creating a connective tissue across departments, linking research, teaching, and public discourse; expanding Elisava’s international visibility; strengthening an international network of like-minded institutions.</p>
-
-<h3>7. Outcomes &amp; Impact</h3>
-<ul>
-  <li>Hybrid Prototypes &amp; Speculative Artifacts — Physical and digital outputs exploring new futures.</li>
-  <li>Cross-Studies Publications &amp; Exhibitions — Showcasing research in academic and cultural spaces.</li>
-  <li>Global Network of Next-Generation Thinkers — Connecting pioneers across disciplines.</li>
-</ul>
-
-<script>
-  (function() {
-    var mql = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    var lastY = window.scrollY || window.pageYOffset || 0;
-    var trailY = 0;
-    var rafId = null;
-
-    function setVar() {
-      document.documentElement.style.setProperty('--trail-y', trailY.toFixed(2) + 'px');
-    }
-
-    function step() {
-      trailY *= 0.985; // damping quasi permanente
-      if (Math.abs(trailY) < 0.1) {
-        trailY = 0;
-        setVar();
-        rafId = null;
-        return;
+      p {
+        margin: 0 0 1em;
       }
-      setVar();
-      rafId = requestAnimationFrame(step);
-    }
+      ul {
+        margin: 0 0 1em;
+        padding-left: 1.1em;
+      }
+      li {
+        margin: 0.2em 0;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        line-height: 1; /* 100% per i titoli */
+        margin: 0.6em 0 0.4em;
+        white-space: normal;
+        display: block;
+        width: 100%;
+        font-size: 12.66pt; /* dimensione uniforme titoli */
+      }
 
-    window.addEventListener('scroll', function() {
-      var y = window.scrollY || window.pageYOffset || 0;
-      var dy = y - lastY;
-      lastY = y;
-      trailY += dy;
-      if (trailY > 300) trailY = 300;
-      if (trailY < -300) trailY = -300;
-      if (!rafId) rafId = requestAnimationFrame(step);
-    }, { passive: true });
+      /* dimensioni titoli uniformi già impostate sopra */
 
-    if (mql && mql.addEventListener) {
-      mql.addEventListener('change', function(e){
-        if (e.matches) {
-          document.documentElement.style.setProperty('--trail-y', '0px');
-          if (rafId) cancelAnimationFrame(rafId);
-          rafId = null;
+      /* Link stile base */
+      a {
+        color: #fff;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      }
+      a:hover {
+        border-bottom-color: #fff;
+      }
+      /* Mailto: underline bianco, senza bordo */
+      a[href^="mailto:"] {
+        color: #fff;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-thickness: auto;
+        text-decoration-color: #fff;
+        border-bottom: none;
+      }
+
+      /* Evidenziazione con tracking aumentato */
+      .hl {
+        font-size: 12.66pt;
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-decoration-color: #ffffff;
+        text-underline-offset: 0.2em;
+        text-transform: uppercase;
+      }
+      /* Blocco label+contenuto con rientro 2em dopo la label */
+      .hl-block {
+        margin: 0 0 1em;
+        margin-left: 2em;
+      }
+      .sub {
+        display: block;
+        margin-left: 0em;
+      }
+
+      /* Immagine con scia (applicare classe .trail) */
+      img.trail {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 3rem 0 0;
+        will-change: filter;
+        filter: drop-shadow(
+            0 var(--blur-px) 0 rgba(255, 255, 255, var(--blur-opacity))
+          )
+          drop-shadow(
+            0 calc(var(--blur-px) * -1) 0
+              rgba(255, 255, 255, var(--blur-opacity))
+          )
+          drop-shadow(0 calc(var(--trail-y) * 0.1) 0 rgba(255, 255, 255, 0.14))
+          drop-shadow(0 calc(var(--trail-y) * 0.2) 0 rgba(255, 255, 255, 0.12))
+          drop-shadow(0 calc(var(--trail-y) * 0.3) 0 rgba(255, 255, 255, 0.1))
+          drop-shadow(0 calc(var(--trail-y) * 0.4) 0 rgba(255, 255, 255, 0.08))
+          drop-shadow(0 calc(var(--trail-y) * 0.5) 0 rgba(255, 255, 255, 0.07))
+          drop-shadow(0 calc(var(--trail-y) * 0.6) 0 rgba(255, 255, 255, 0.06))
+          drop-shadow(0 calc(var(--trail-y) * 0.7) 0 rgba(255, 255, 255, 0.05))
+          drop-shadow(0 calc(var(--trail-y) * 0.8) 0 rgba(255, 255, 255, 0.04))
+          drop-shadow(0 calc(var(--trail-y) * 0.9) 0 rgba(255, 255, 255, 0.03))
+          drop-shadow(0 calc(var(--trail-y) * 1) 0 rgba(255, 255, 255, 0.02));
+      }
+
+      /* Selezione: inverti (sfondo bianco, testo scuro), rimuovi scia */
+      ::selection {
+        background: #ffffff;
+        color: #0b0b0b;
+        text-shadow: none;
+      }
+      ::-moz-selection {
+        background: #ffffff;
+        color: #0b0b0b;
+        text-shadow: none;
+      }
+
+      /* Breakpoint tablet */
+      @media (max-width: 1024px) and (min-width: 769px) {
+        body {
+          padding: 0 12vw;
         }
-      });
-    }
-  })();
-</script>
+      }
 
-</body>
+      @media (max-width: 768px) {
+        body {
+          padding: 0 0 16px 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        body {
+          text-shadow: none !important;
+        }
+        img.trail {
+          filter: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      Post-Computing Lab<br />
+      Antidisciplinary Research Network &amp; Platform
+    </h1>
+
+    <p>
+      The Post-Computing Lab is an antidisciplinary research network &amp;
+      platform, a cross-departmental initiative led by MDEF (Master in Design
+      for Emergent Futures) at Elisava School of Design. <br />This platform
+      reimagines research and education in a world where computation is ambient,
+      embodied, and entangled with life. It serves as a catalyst for radical
+      inquiry, speculative design, and collaborative experimentation at the edge
+      of art, technology, and philosophy. <br />Operating across Elisava
+      Bachelor and Master programs and anchored by a six-month curriculum from
+      January to June 2026, the platform invites students and faculty to engage
+      in a post-computing civilization centered on themes such as AI, neural
+      media, intimate technologies, and synthetic ecologies. <br />This is an
+      <span class="hl">extra-curricular</span> program designed for students who
+      want to develop their final year project within its radical framework,
+      culminating in a global summit in June in Barcelona.
+    </p>
+
+    <h3>Key Pillars</h3>
+    <ul>
+      <li>
+        <span class="hl">Antidisciplinary Research</span
+        ><span class="sub"
+          >Breaking disciplinary silos to merge science, design, philosophy, and
+          emerging technologies.</span
+        >
+      </li>
+      <li>
+        <span class="hl">Speculative Prototyping</span
+        ><span class="sub"
+          >Creating tangible future scenarios that challenge conventional
+          assumptions.</span
+        >
+      </li>
+      <li>
+        <span class="hl">Experimental Collaboration</span
+        ><span class="sub"
+          >Bringing together institutions, researchers, artists, designers, and
+          technologists to co-create new knowledge.</span
+        >
+      </li>
+    </ul>
+
+    <p>
+      We are actively seeking student projects that align with and explore the
+      following critical themes:
+    </p>
+    <ul>
+      <li>
+        <span class="hl">Neural Media</span
+        ><span class="sub"
+          >The fusion of AI, neural interfaces, and immersive
+          environments.</span
+        >
+      </li>
+      <li>
+        <span class="hl">Intimate Technologies</span
+        ><span class="sub">Computing in, on, around the body.</span>
+      </li>
+      <li>
+        <span class="hl">NBIC Convergence</span
+        ><span class="sub"
+          >The convergence of nanotechnology, biotechnology, information
+          technology, and cognitive science.</span
+        >
+      </li>
+      <li>
+        <span class="hl">Biology &lt;&gt; Technology</span
+        ><span class="sub">Brain organoids and Organoid Intelligence.</span>
+      </li>
+      <li>
+        <span class="hl">Ethical &amp; Social Implications</span
+        ><span class="sub"
+          >The risks and responsibilities of a world where life itself is
+          programmable.</span
+        >
+      </li>
+      <li>
+        <span class="hl">Planetary Interfaces</span
+        ><span class="sub"
+          >How computation operates across scales from the microscopic to the
+          planetary.</span
+        >
+      </li>
+      <li>
+        <span class="hl">Synthetic Ecologies</span
+        ><span class="sub">Designing with and for post-natural systems.</span>
+      </li>
+    </ul>
+
+    <h3>Program Architecture</h3>
+    <p>
+      This is an <span class="hl">extra-curricular</span> program designed for
+      students who want to develop their final year project within its
+      framework. It does not grant CFU credits. Participation is free of charge,
+      upon selection.
+    </p>
+    <ul>
+      <li>
+        <span class="hl">Cycle</span
+        ><span class="sub">January – June 2026</span>
+      </li>
+      <li>
+        <span class="hl">Participants</span
+        ><span class="sub"
+          >10–15 selected participants from MDEF and Elisava Bachelor/Master
+          programs, alongside those from partner institutions.</span
+        >
+      </li>
+      <li>
+        <span class="hl">Delivery</span
+        ><span class="sub">monthly studios, labs, or thesis work.</span>
+      </li>
+      <li>
+        <span class="hl">Engagement</span
+        ><span class="sub">in-person in Barcelona and online.</span>
+      </li>
+    </ul>
+
+    <h3>Initial Calendar</h3>
+    <ul>
+      <li>
+        <span class="hl">November 10th</span
+        ><span class="sub"
+          >Filippo Rosati presentation at Beyond Masters. Application officially
+          open.</span
+        >
+      </li>
+      <li>
+        <span class="hl">November 14th</span
+        ><span class="sub"
+          >One-on-one studio sessions for interested participants about the
+          program and potential projects.</span
+        >
+      </li>
+      <li>
+        <span class="hl">December 14th</span
+        ><span class="sub">Deadline for all applications.</span>
+      </li>
+      <li>
+        <span class="hl">December 19th</span
+        ><span class="sub"
+          >Notifications sent to all selected participants.</span
+        >
+      </li>
+      <li>
+        <span class="hl">January 16th</span
+        ><span class="sub"
+          >All-day Opening Symposium in Barcelona with the selected participants
+          and invited guests.</span
+        >
+      </li>
+    </ul>
+
+    <h3>Next steps &amp; Contact</h3>
+    <ul>
+      <li>
+        <span class="hl">Book a One-on-One Studio Session</span
+        ><span class="sub"
+          >To book an individual discussion on Friday, November 14th, please use
+          this link: link</span
+        >
+      </li>
+      <li>
+        <span class="hl">Apply for the Program</span
+        ><span class="sub"
+          >Submit your application before the deadline: link</span
+        >
+      </li>
+      <li>
+        <span class="hl">Request More Information</span
+        ><span class="sub"
+          >For general inquiries about the program, please contact us at:
+          <a href="mailto:hello@umanesimoartificiale.xyz"
+            >hello@umanesimoartificiale.xyz</a
+          >
+          or
+          <a href="mailto:umanesimoartificiale@gmail.com"
+            >umanesimoartificiale@gmail.com</a
+          ></span
+        >
+      </li>
+    </ul>
+
+    <img src="asset/pcc.png" alt="PCC" />
+
+    <script>
+      (function () {
+        // Effetto scia semplice (prima versione)
+        var mql =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)");
+        if (!mql || !mql.matches) {
+          var lastY = window.scrollY || window.pageYOffset || 0;
+          var trailY = 0;
+          var rafId = null;
+
+          function setVar() {
+            document.documentElement.style.setProperty(
+              "--trail-y",
+              trailY.toFixed(2) + "px"
+            );
+          }
+
+          function step() {
+            // Damping non lineare: rapido all'inizio, lento alla fine
+            var abs = Math.abs(trailY);
+            var t = Math.min(1, abs / 200); // 0..1 rispetto alla portata
+            var damping = 0.86 + (0.992 - 0.86) * (1 - t); // lontano=0.86, vicino=0.992
+            trailY *= damping;
+            if (Math.abs(trailY) < 0.1) {
+              trailY = 0;
+              setVar();
+              rafId = null;
+              return;
+            }
+            setVar();
+            rafId = requestAnimationFrame(step);
+          }
+
+          window.addEventListener(
+            "scroll",
+            function () {
+              var y = window.scrollY || window.pageYOffset || 0;
+              var dy = y - lastY;
+              lastY = y;
+              trailY += dy;
+              if (trailY > 200) trailY = 200;
+              if (trailY < -200) trailY = -200;
+              if (!rafId) rafId = requestAnimationFrame(step);
+            },
+            { passive: true }
+          );
+        }
+
+        // Titoli a dimensione fissa via CSS (nessun auto-fit JS)
+      })();
+    </script>
+  </body>
 </html>
