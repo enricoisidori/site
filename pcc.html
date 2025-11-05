@@ -63,14 +63,13 @@
       }
 
       p {
-        margin: 0 0 1em;
+        padding-bottom: 16pt;
       }
       ul {
-        margin: 0 0 1em;
-        padding-left: 1.1em;
+        padding-bottom: 0pt;
       }
       li {
-        margin: 0.2em 0;
+        padding-bottom: 16pt;
       }
       h1,
       h2,
@@ -82,7 +81,6 @@
         text-transform: uppercase;
         letter-spacing: 0.02em;
         line-height: 1; /* 100% per i titoli */
-        margin: 0.6em 0 0.4em;
         white-space: normal;
         display: block;
         width: 100%;
@@ -92,33 +90,32 @@
       /* dimensioni titoli uniformi già impostate sopra */
 
       /* Link stile base */
-    
 
       a {
-  color: #fff;
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
+        color: #fff;
+        text-decoration-line: underline;
+        text-decoration-style: dotted;
 
         text-underline-offset: 3px;
         text-decoration-thickness: auto;
         text-decoration-color: #fff;
         border-bottom: none;
-}
+      }
 
-/* Hover: linea continua e più intensa */
-a:hover {
-  text-decoration-style: solid;
-  text-decoration-color: #ffffff;
-}
+      /* Hover: linea continua e più intensa */
+      a:hover {
+        text-decoration-style: solid;
+        text-decoration-color: #ffffff;
+      }
       a:hover {
         border-bottom-color: #fff;
       }
       /* Mailto: underline bianco, senza bordo */
-   
 
       /* Evidenziazione con tracking aumentato */
       .hl {
         font-size: 12.66pt;
+        /* letter-spacing: 0.3em; */
         /* text-decoration: underline; */
         text-decoration-style: dotted;
         line-height: 1;
@@ -212,15 +209,16 @@ a:hover {
     <p>
       The Post-Computing Lab is an antidisciplinary research network &amp;
       platform, a cross-departmental initiative led by MDEF (Master in Design
-      for Emergent Futures) at Elisava School of Design. <br />This platform
-      reimagines research and education in a world where computation is ambient,
-      embodied, and entangled with life. It serves as a catalyst for radical
-      inquiry, speculative design, and collaborative experimentation at the edge
-      of art, technology, and philosophy. <br />Operating across Elisava
-      Bachelor and Master programs and anchored by a six-month curriculum from
-      January to June 2026, the platform invites students and faculty to engage
-      in a post-computing civilization centered on themes such as AI, neural
-      media, intimate technologies, and synthetic ecologies. <br />This is an
+      for Emergent Futures) at Elisava School of Design.<br />
+      <br />This platform reimagines research and education in a world where
+      computation is ambient, embodied, and entangled with life. It serves as a
+      catalyst for radical inquiry, speculative design, and collaborative
+      experimentation at the edge of art, technology, and philosophy.<br />
+      <br />Operating across Elisava Bachelor and Master programs and anchored
+      by a six-month curriculum from January to June 2026, the platform invites
+      students and faculty to engage in a post-computing civilization centered
+      on themes such as AI, neural media, intimate technologies, and synthetic
+      ecologies. <br /><br />This is an
       <span class="und">extra-curricular</span> program designed for students
       who want to develop their final year project within its radical framework,
       culminating in a global summit in June in Barcelona.
@@ -250,11 +248,11 @@ a:hover {
         >
       </li>
     </ul>
-
     <p>
       We are actively seeking student projects that align with and explore the
       following critical themes:
     </p>
+
     <ul>
       <li>
         <span class="hl">Neural Media</span
@@ -304,7 +302,7 @@ a:hover {
       students who want to develop their final year project within its
       framework. It does not grant CFU credits. Participation is free of charge,
       upon selection.
-
+    </p>
     <ul>
       <li>
         <span class="hl">Cycle</span
@@ -361,7 +359,7 @@ a:hover {
         >
       </li>
     </ul>
-    </p>
+
     <h3>Next steps &amp; Contact</h3>
     <ul>
       <li>
@@ -394,60 +392,59 @@ a:hover {
 
     <!-- <img src="asset/pcc.png" alt="PCC" /> -->
 
-   <script>
-  (function () {
-    // Rispetta sempre prefers-reduced-motion
-    var mql =
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)");
+    <script>
+      (function () {
+        // Rispetta sempre prefers-reduced-motion
+        var mql =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    if (mql && mql.matches) {
-      // Niente scia se l'utente ha ridotto le animazioni
-      document.documentElement.style.setProperty("--trail-y", "0px");
-      return;
-    }
+        if (mql && mql.matches) {
+          // Niente scia se l'utente ha ridotto le animazioni
+          document.documentElement.style.setProperty("--trail-y", "0px");
+          return;
+        }
 
-    var lastY = window.scrollY || window.pageYOffset || 0;
-    var trailY = 0;
+        var lastY = window.scrollY || window.pageYOffset || 0;
+        var trailY = 0;
 
-    function setVar() {
-      document.documentElement.style.setProperty(
-        "--trail-y",
-        trailY.toFixed(2) + "px"
-      );
-    }
+        function setVar() {
+          document.documentElement.style.setProperty(
+            "--trail-y",
+            trailY.toFixed(2) + "px"
+          );
+        }
 
-    function loop() {
-      var y = window.scrollY || window.pageYOffset || 0;
-      var dy = y - lastY;
-      lastY = y;
+        function loop() {
+          var y = window.scrollY || window.pageYOffset || 0;
+          var dy = y - lastY;
+          lastY = y;
 
-      // accumula movimento
-      trailY += dy;
+          // accumula movimento
+          trailY += dy;
 
-      // clamp (puoi aumentare se vuoi scia più lunga)
-      if (trailY > 200) trailY = 200;
-      if (trailY < -200) trailY = -200;
+          // clamp (puoi aumentare se vuoi scia più lunga)
+          if (trailY > 200) trailY = 200;
+          if (trailY < -200) trailY = -200;
 
-      // damping non lineare come prima
-      var abs = Math.abs(trailY);
-      var t = Math.min(1, abs / 200); // 0..1
-      var damping = 0.86 + (0.992 - 0.86) * (1 - t);
+          // damping non lineare come prima
+          var abs = Math.abs(trailY);
+          var t = Math.min(1, abs / 200); // 0..1
+          var damping = 0.86 + (0.992 - 0.86) * (1 - t);
 
-      trailY *= damping;
+          trailY *= damping;
 
-      if (Math.abs(trailY) < 0.1) {
-        trailY = 0;
-      }
+          if (Math.abs(trailY) < 0.1) {
+            trailY = 0;
+          }
 
-      setVar();
-      requestAnimationFrame(loop);
-    }
+          setVar();
+          requestAnimationFrame(loop);
+        }
 
-    // Avvia il loop una volta sola
-    requestAnimationFrame(loop);
-  })();
-</script>
-
+        // Avvia il loop una volta sola
+        requestAnimationFrame(loop);
+      })();
+    </script>
   </body>
 </html>

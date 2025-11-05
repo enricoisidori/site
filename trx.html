@@ -185,5 +185,26 @@
         } catch (_) {}
       });
     </script>
+    <script>
+      const favicon = document.createElement("link");
+      favicon.rel = "icon";
+      favicon.type = "image/png";
+
+      // Crea una mini canvas 32x32
+      const canvas = document.createElement("canvas");
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext("2d");
+
+      // Disegna sfondo rosso pieno e scritta nera (T)
+      ctx.fillStyle = "#ff0000";
+      ctx.fillRect(0, 0, 32, 32);
+
+      ctx.textBaseline = "middle";
+
+      // converte in dataURL
+      favicon.href = canvas.toDataURL("image/png");
+      document.head.appendChild(favicon);
+    </script>
   </body>
 </html>
