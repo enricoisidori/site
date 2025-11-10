@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Antidisciplinary Communication Design Lab</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff6929'/%3E%3C/svg%3E"
+    />
+    <style>
+      :root {
+        --bg: #ff6929;
+        --fg: #000000;
+        --title-font: "Suisse Intl", "SuisseIntl", "Suisse INTL",
+          "Helvetica Neue", Arial, sans-serif;
+        --body-font: "Suisse Intl", "SuisseIntl", "Suisse INTL",
+          "Helvetica Neue", Arial, sans-serif;
+
+        --title-pad-y: 6px;
+        --title-pad-x: 8px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 6px;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--body-font);
+        font-weight: 500;
+        font-size: 12pt;
+        line-height: 1.4;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:focus-visible {
+        outline: 2px solid var(--fg);
+        outline-offset: 2px;
+      }
+
+      h1,
+      h2 {
+        font-family: var(--title-font);
+        font-weight: 900;
+        font-size: 12pt;
+        margin: 0 0 1rem 0;
+      }
+      h3 {
+        font-family: var(--title-font);
+        font-weight: 700;
+        font-size: 11pt;
+        margin: 1.25rem 0 0.4rem;
+      }
+
+      p {
+        margin: 0 0 0.6rem;
+      }
+
+      .logo-title {
+        margin: 0;
+      }
+      .logo-link {
+        display: block;
+      }
+
+      ::selection {
+        background-color: #000000;
+        color: #ff6929;
+      }
+
+      .logo-title,
+      .section-title {
+        padding: var(--title-pad-y) var(--title-pad-x);
+      }
+      /* Remove perceived indent on section titles */
+      .section-title {
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      /* Header on top (same as mobile) + snap content */
+      .layout {
+        display: flex;
+        flex-direction: column;
+        min-height: calc(100vh - 12px);
+      }
+
+      aside.sidebar {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 12px 6px 36px;
+        background: var(--bg);
+      }
+      aside.sidebar::after {
+        content: none;
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .nav a {
+        padding: 6px 8px;
+        border-radius: 4px;
+        opacity: 0.25;
+        transition: opacity 120ms ease;
+      }
+      .nav a:hover,
+      .nav a:focus-visible,
+      .nav a.active {
+        opacity: 1;
+      }
+
+      main.content {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        scroll-snap-type: y mandatory;
+      }
+
+      section.section {
+        min-height: 100%;
+        padding: 1.75rem 6px; /* slightly tighter default */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+      .section .section-title {
+        margin-bottom: 0.5rem;
+      }
+      .section p {
+        margin-top: 0;
+      }
+
+      /* Hero gallery (full-width slides) */
+      .hero {
+        padding: 0;
+      }
+      .hero-track {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 100%;
+        gap: 0;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .hero-track::-webkit-scrollbar {
+        display: none;
+      }
+      .hero-item {
+        scroll-snap-align: start;
+      }
+      .hero-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      /* Content helpers */
+      .section-inner {
+        max-width: 800px;
+      }
+
+      .section-intro {
+        margin-bottom: 0.75rem;
+      }
+
+      .subsection {
+        margin-top: 0.75rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.3);
+        padding-top: 0.6rem;
+      }
+
+      .subsection:first-of-type {
+        border-top: none;
+        padding-top: 0;
+      }
+
+      .muted {
+        opacity: 0.8;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        font-size: 10pt;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Cards + images */
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-top: 0.6rem;
+      }
+
+      .card {
+        border: 1px solid rgba(0, 0, 0, 0.4);
+        padding: 0.6rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .card-title {
+        font-family: var(--title-font);
+        font-size: 10pt;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .card-meta {
+        font-size: 9pt;
+        opacity: 0.9;
+      }
+
+      .thumb {
+        width: 100%;
+        display: block;
+        margin-bottom: 0.4rem;
+        object-fit: cover;
+        aspect-ratio: 4 / 3;
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      /* Compact professors/people lists */
+      .professors img,
+      .people img {
+        display: none !important;
+      }
+      .professors,
+      .people {
+        display: grid;
+        gap: 4px;
+      }
+      .professors .card,
+      .people .card {
+        padding: 0;
+        margin: 0;
+        border: 0;
+      }
+      .professors .name,
+      .people .name {
+        font-weight: 700;
+      }
+
+      .taglist {
+        font-size: 9pt;
+        opacity: 0.9;
+      }
+
+      .link-list {
+        margin: 0.5rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .link-list li {
+        margin-bottom: 0.25rem;
+      }
+      .link-list a {
+        text-decoration: underline;
+        text-decoration-style: dotted;
+      }
+
+      /* Small screens adjustments */
+      @media (max-width: 700px) {
+        .hero-track {
+          aspect-ratio: 4 / 3;
+        }
+        section.section {
+          padding: 1.25rem 6px 2.25rem;
+          justify-content: flex-start;
+        }
+      }
+      /* Visually hidden utility */
+      .sr-only {
+        position: absolute !important;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        main.content {
+          scroll-snap-type: none;
+        }
+        .nav a {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar" aria-label="Section navigation">
+        <div class="logo">
+          <a class="logo-link" href="#home">
+            <h1 class="logo-title">
+              Antidisciplinary Communication Design Lab
+            </h1>
+          </a>
+        </div>
+        <nav class="nav">
+          <a href="#laboratory" id="link-laboratory">Laboratory</a>
+          <a href="#research" id="link-research">Research</a>
+          <a href="#contact" id="link-contact">Contact</a>
+        </nav>
+      </aside>
+
+      <main class="content" id="content" tabindex="-1">
+        <!-- HOME / HERO GALLERY
+        <section class="section hero" id="home" aria-labelledby="title-home">
+          <h2 id="title-home" class="sr-only">
+            Antidisciplinary Communication Design Lab
+          </h2>
+          <div class="hero-track" aria-label="Hero gallery">
+            <div class="hero-item">
+              <img src="asset/specta/specta1.jpg" alt="" loading="eager" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta2.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta3.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta4.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta5.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta6.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta7.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta8.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta9.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta10.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta11.jpg" alt="" loading="lazy" />
+            </div>
+            <div class="hero-item">
+              <img src="asset/specta/specta12.jpg" alt="" loading="lazy" />
+            </div>
+          </div>
+        </section> -->
+
+        <!-- LABORATORY -->
+        <section
+          class="section"
+          id="laboratory"
+          aria-labelledby="title-laboratory"
+        >
+          <div class="section-inner">
+            <h2 id="title-laboratory" class="section-title">Laboratory</h2>
+
+            <div class="subsection">
+              <span class="pill">About</span>
+              <p>
+                The Lab treats communication design as a tool for
+                <strong>epistemic resistance</strong>. We don’t design
+                decoration; we design situations that question how knowledge is
+                produced and circulated through images, interfaces, and media
+                systems.
+              </p>
+              <p>
+                Students work in small groups to construct speculative worlds,
+                fictional brands, and interactive prototypes that expose the
+                politics behind everyday communication.
+              </p>
+            </div>
+
+            <div class="subsection">
+              <span class="pill">Method</span>
+              <h3>From research to Communicative Machines</h3>
+              <p>
+                Our process overlaps exploration, speculation, visual
+                communication, and prototyping. It is iterative and messy on
+                purpose: the goal is not to “solve” problems, but to reframe
+                them.
+              </p>
+              <p>
+                Each project moves through five interconnected phases:
+                <strong>Exploration</strong>, <strong>Speculation</strong>,
+                <strong>Communication</strong>, <strong>Interaction</strong>,
+                and <strong>Realization</strong>.
+              </p>
+              <p>
+                The outcome is a <strong>Communicative Machine</strong>: an
+                interactive artifact that acts as a narrative gateway into the
+                speculative scenario and a provocation for public debate.
+              </p>
+              <!-- Placeholder diagram image -->
+              <img
+                src="https://picsum.photos/600/260?random=11"
+                alt="Process diagram placeholder image"
+                class="thumb"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="subsection">
+              <span class="pill">Themes by year</span>
+              <h3>Annual topics</h3>
+              <p class="muted">
+                Every edition of the Lab focuses on a specific tension of
+                contemporary life:
+              </p>
+              <div class="card-grid">
+                <div class="card">
+                  <p class="card-title">Rituals, death, and afterlives</p>
+                  <p class="card-meta">
+                    Mourning, memorials, and how we design for endings.
+                  </p>
+                  <p class="taglist">2019 / 2020 — theme placeholder</p>
+                </div>
+                <div class="card">
+                  <p class="card-title">Pandemic rituals</p>
+                  <p class="card-meta">
+                    Collective practices turned intimate during lockdown.
+                  </p>
+                  <p class="taglist">2020 / 2021 — theme placeholder</p>
+                </div>
+                <div class="card">
+                  <p class="card-title">Data &amp; Surveillance</p>
+                  <p class="card-meta">
+                    Public and personal data as material for design fiction.
+                  </p>
+                  <p class="taglist">2021 / 2022 — theme placeholder</p>
+                </div>
+                <div class="card">
+                  <p class="card-title">More themes</p>
+                  <p class="card-meta">
+                    Climate, food, conspiracy, conflict, and others.
+                  </p>
+                  <p class="taglist">2022 → 2026 — to be detailed</p>
+                </div>
+              </div>
+
+              <ul class="link-list">
+                <li>
+                  <a href="#" aria-label="All editions (placeholder link)"
+                    >See all editions &amp; themes →</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="subsection">
+              <span class="pill">Projects</span>
+              <h3>Gallery – Selected projects</h3>
+              <p>
+                A few examples of student projects exploring critical issues
+                such as climate, politics, and social media imaginaries.
+              </p>
+              <div class="card-grid">
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/400/260?random=1"
+                    alt="Project placeholder image 1"
+                    class="thumb"
+                    loading="lazy"
+                  />
+                  <p class="card-title">Fictional Climate Agency</p>
+                  <p class="card-meta">
+                    A speculative institution that manages future climate
+                    credits and ecological guilt.
+                  </p>
+                </div>
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/400/260?random=2"
+                    alt="Project placeholder image 2"
+                    class="thumb"
+                    loading="lazy"
+                  />
+                  <p class="card-title">Rituals for Remote Grief</p>
+                  <p class="card-meta">
+                    A set of communicative devices designed for mourning at a
+                    distance.
+                  </p>
+                </div>
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/400/260?random=3"
+                    alt="Project placeholder image 3"
+                    class="thumb"
+                    loading="lazy"
+                  />
+                  <p class="card-title">Conspiracy Broadcasting Unit</p>
+                  <p class="card-meta">
+                    A fictional media platform that amplifies and distorts
+                    online narratives.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <span class="pill">Exhibitions</span>
+              <h3>Gallery – Process &amp; installations</h3>
+              <p>
+                At the end of each cycle, projects are presented as a single
+                collective exhibition, where all Communicative Machines occupy a
+                shared narrative space.
+              </p>
+              <div class="card-grid">
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/400/260?random=4"
+                    alt="Exhibition placeholder image 1"
+                    class="thumb"
+                    loading="lazy"
+                  />
+                  <p class="card-title">Lab Exhibition 01</p>
+                  <p class="card-meta">
+                    Immersive environment of interactive devices and printed
+                    matter.
+                  </p>
+                </div>
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/400/260?random=5"
+                    alt="Exhibition placeholder image 2"
+                    class="thumb"
+                    loading="lazy"
+                  />
+                  <p class="card-title">Lab Exhibition 02</p>
+                  <p class="card-meta">
+                    Multi-room installation exploring conflict, propaganda, and
+                    media infrastructures.
+                  </p>
+                </div>
+              </div>
+
+              <ul class="link-list">
+                <li>
+                  <a href="#" aria-label="All exhibitions (placeholder link)"
+                    >Browse past exhibitions →</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- RESEARCH -->
+        <section class="section" id="research" aria-labelledby="title-research">
+          <div class="section-inner">
+            <h2 id="title-research" class="section-title">Research</h2>
+
+            <div class="subsection">
+              <span class="pill">Position</span>
+              <p>
+                The Lab develops research on
+                <strong>antidisciplinary design</strong>,
+                <strong>speculative communication</strong>, and
+                <strong>critical pedagogy</strong>. We are interested in how
+                design can resist purely commercial roles and instead act as a
+                tool to question norms, values, and power structures.
+              </p>
+              <p>
+                Our publications connect theory and practice, using case
+                studies, student projects, and communicative machines as
+                research devices.
+              </p>
+              <img
+                src="https://picsum.photos/600/260?random=6"
+                alt="Research placeholder image"
+                class="thumb"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="subsection">
+              <span class="pill">Publications</span>
+              <h3>Selected papers</h3>
+              <div class="card-grid">
+                <div class="card">
+                  <p class="card-title">
+                    Antidisciplinary Design as Epistemic Resistance
+                  </p>
+                  <p class="card-meta">
+                    Journal / Conference name, year — placeholder.
+                  </p>
+                  <p class="taglist">
+                    Topics: critical communication design, epistemic injustice,
+                    speculative pedagogy.
+                  </p>
+                  <ul class="link-list">
+                    <li><a href="#">Read paper (PDF) →</a></li>
+                  </ul>
+                </div>
+                <div class="card">
+                  <p class="card-title">Communicative Machines as Provotypes</p>
+                  <p class="card-meta">
+                    Journal / Conference name, year — placeholder.
+                  </p>
+                  <p class="taglist">
+                    Topics: speculative design, installations, public
+                    engagement.
+                  </p>
+                  <ul class="link-list">
+                    <li><a href="#">Read paper (PDF) →</a></li>
+                  </ul>
+                </div>
+                <div class="card">
+                  <p class="card-title">
+                    Teaching Speculation: Design Education Beyond Problem
+                    Solving
+                  </p>
+                  <p class="card-meta">
+                    Journal / Conference name, year — placeholder.
+                  </p>
+                  <p class="taglist">
+                    Topics: design methods, studio pedagogy, process models.
+                  </p>
+                  <ul class="link-list">
+                    <li><a href="#">Read paper (PDF) →</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <ul class="link-list">
+                <li>
+                  <a href="#" aria-label="All publications (placeholder link)"
+                    >View full publication list →</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="subsection">
+              <span class="pill">Models</span>
+              <h3>Process diagrams</h3>
+              <p>
+                The Lab’s research also includes process modelling: overlapping
+                double diamonds, design cones, and network-based diagrams that
+                describe how projects move across domains and decision nodes.
+              </p>
+              <p class="muted">
+                These visual models are descriptive, not prescriptive: they map
+                how projects actually evolve in practice, including dead ends,
+                detours, and unexplored spaces.
+              </p>
+              <div class="card-grid">
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/400/260?random=7"
+                    alt="Diagram placeholder image 1"
+                    class="thumb"
+                    loading="lazy"
+                  />
+                  <p class="card-title">Overlapping Double Diamonds</p>
+                </div>
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/400/260?random=8"
+                    alt="Diagram placeholder image 2"
+                    class="thumb"
+                    loading="lazy"
+                  />
+                  <p class="card-title">Cones &amp; Decision Nodes</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section class="section" id="contact" aria-labelledby="title-contact">
+          <div class="section-inner">
+            <h2 id="title-contact" class="section-title">Contact</h2>
+
+            <div class="subsection">
+              <span class="pill">People</span>
+              <h3>Faculty</h3>
+              <div class="card-grid">
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/300/300?random=9"
+                    alt="Professor portrait placeholder"
+                    class="thumb"
+                    loading="lazy"
+                    style="aspect-ratio: 1 / 1"
+                  />
+                  <p class="card-title">[Professor Name 1]</p>
+                  <p class="card-meta">
+                    Communication designer and researcher in speculative and
+                    critical design.
+                  </p>
+                  <p class="taglist">
+                    Focus: epistemic resistance, communication systems, design
+                    activism.
+                  </p>
+                  <ul class="link-list">
+                    <li><a href="#">Personal page →</a></li>
+                  </ul>
+                </div>
+                <div class="card">
+                  <img
+                    src="https://picsum.photos/300/300?random=10"
+                    alt="Professor portrait placeholder"
+                    class="thumb"
+                    loading="lazy"
+                    style="aspect-ratio: 1 / 1"
+                  />
+                  <p class="card-title">[Professor Name 2]</p>
+                  <p class="card-meta">
+                    Design educator working on visual narratives, interaction,
+                    and media theory.
+                  </p>
+                  <p class="taglist">
+                    Focus: representation, pedagogy, collaborative practices.
+                  </p>
+                  <ul class="link-list">
+                    <li><a href="#">Personal page →</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <span class="pill">Practical info</span>
+              <h3>Where to find us</h3>
+              <p>
+                Antidisciplinary Communication Design Lab<br />
+                School of Design, Politecnico di Milano<br />
+                [Building / Room placeholder]<br />
+                Via Candiani 72, 20158 Milano, Italy
+              </p>
+
+              <p>
+                Email:
+                <a href="mailto:lab-email@polimi.it">lab-email@polimi.it</a
+                ><br />
+                Instagram:
+                <a href="https://instagram.com/placeholder" target="_blank"
+                  >@lab_placeholder</a
+                ><br />
+                Website:
+                <a href="https://placeholder-url" target="_blank"
+                  >Full course page →</a
+                >
+              </p>
+
+              <img
+                src="https://picsum.photos/600/240?random=12"
+                alt="Team or lab space placeholder image"
+                class="thumb"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="subsection">
+              <span class="pill">Links</span>
+              <h3>Extended resources</h3>
+              <ul class="link-list">
+                <li><a href="#">Syllabus &amp; course structure →</a></li>
+                <li><a href="#">Archive of all projects by year →</a></li>
+                <li><a href="#">Toolkit &amp; references for students →</a></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // Highlight active nav, and reflect section in the URL
+      (function () {
+        const sections = Array.from(
+          document.querySelectorAll("section.section")
+        );
+        const linkById = new Map([
+          ["laboratory", document.getElementById("link-laboratory")],
+          ["research", document.getElementById("link-research")],
+          ["contact", document.getElementById("link-contact")],
+        ]);
+
+        const content = document.querySelector("main.content");
+        const logoLink = document.querySelector(".logo-link");
+        const heroTrack = document.querySelector(".hero-track");
+
+        function setActive(id) {
+          for (const [, link] of linkById) {
+            link.classList.remove("active");
+            link.removeAttribute("aria-current");
+          }
+          const active = linkById.get(id);
+          if (active) {
+            active.classList.add("active");
+            active.setAttribute("aria-current", "true");
+          }
+        }
+
+        function updateHash(id, method = "replace") {
+          const url = id ? `#${id}` : "#";
+          try {
+            if (method === "push") history.pushState(null, "", url);
+            else history.replaceState(null, "", url);
+          } catch (_) {
+            if (method === "push") location.hash = id;
+          }
+        }
+
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const id = entry.target.id;
+                setActive(id);
+                updateHash(id, "replace");
+              }
+            });
+          },
+          {
+            root: content,
+            threshold: 0.6,
+          }
+        );
+
+        sections.forEach((s) => io.observe(s));
+
+        // Ensure nav links scroll the content pane, not the whole page
+        document.querySelector(".nav").addEventListener("click", (e) => {
+          const a = e.target.closest('a[href^="#"]');
+          if (!a) return;
+          e.preventDefault();
+          const id = a.getAttribute("href").slice(1);
+          const target = document.getElementById(id);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+            updateHash(id, "push");
+          }
+        });
+
+        if (logoLink) {
+          logoLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            const target = document.getElementById("home");
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+              updateHash("home", "push");
+            }
+          });
+        }
+
+        // Handle initial hash and back/forward navigation
+        const initial = (location.hash || "").slice(1);
+        if (initial) {
+          const target = document.getElementById(initial);
+          if (target)
+            target.scrollIntoView({ behavior: "auto", block: "start" });
+        }
+        window.addEventListener("popstate", () => {
+          const id = (location.hash || "").slice(1) || "home";
+          const target = document.getElementById(id);
+          if (target)
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        // Hero auto-scroll: advance one full slide periodically
+        if (heroTrack) {
+          const slides = Array.from(heroTrack.children);
+          let autoplay = true;
+          let timer = null;
+
+          function currentIndex() {
+            const w = heroTrack.clientWidth || 1;
+            return Math.round(heroTrack.scrollLeft / w);
+          }
+          function goTo(idx) {
+            if (!slides.length) return;
+            const w = heroTrack.clientWidth;
+            const next =
+              ((idx % slides.length) + slides.length) % slides.length;
+            heroTrack.scrollTo({ left: next * w, behavior: "smooth" });
+          }
+          function start() {
+            if (timer) return;
+            timer = setInterval(() => {
+              if (!autoplay) return;
+              goTo(currentIndex() + 1);
+            }, 3000);
+          }
+          function stop() {
+            if (timer) {
+              clearInterval(timer);
+              timer = null;
+            }
+          }
+
+          heroTrack.addEventListener("mouseenter", () => {
+            autoplay = false;
+          });
+          heroTrack.addEventListener("mouseleave", () => {
+            autoplay = true;
+          });
+          heroTrack.addEventListener("pointerdown", () => {
+            autoplay = false;
+          });
+
+          const heroObserver = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  autoplay = true;
+                  start();
+                } else {
+                  autoplay = false;
+                }
+              });
+            },
+            { root: content, threshold: 0.3 }
+          );
+          heroObserver.observe(heroTrack);
+
+          document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+              autoplay = false;
+              stop();
+            } else {
+              autoplay = true;
+              start();
+            }
+          });
+
+          start();
+          window.addEventListener("resize", () => {
+            // Snap to nearest slide after resize to keep alignment
+            goTo(currentIndex());
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

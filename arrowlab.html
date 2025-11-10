@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>arrowlab</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --muted:#555555;
+      --text:#000000;
+      --accent:#222222;
+      --accent2:#444444;
+      --ok:#2a7f5f;
+      --warn:#d99c00;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-size:14px; line-height:1.4;
+      font-weight:400;
+      display:grid; grid-template-rows:auto 1fr; grid-template-columns:auto 1fr; gap:0;
+      grid-template-areas:
+        "head head"
+        "controls stage";
+    }
+    header{
+      grid-area:head; display:flex; align-items:center; justify-content:space-between;
+      padding:10px 14px; border-bottom:1px solid #e6e6e6; background:linear-gradient(180deg,#ffffff,#f7f7f7);
+    }
+    header .actions{ display:flex; gap:8px; }
+    header button{
+      background:#ffffff; color:#111111; border:1px solid #d0d0d0; border-radius:8px;
+      padding:8px 10px; cursor:pointer; transition:all .15s ease; font-weight:500;
+    }
+    header button:hover{ border-color:#bdbdbd; background:#f1f1f1 }
+    header button.primary{ background:linear-gradient(180deg,#ffffff,#f3f3f3); border-color:#cfcfcf; }
+    header button.primary:hover{ background:linear-gradient(180deg,#ffffff,#eaeaea); }
+
+    .controls{
+      grid-area:controls; background:var(--panel); border-right:1px solid #e6e6e6; overflow:auto;
+      padding:16px; display:flex; flex-direction:column; gap:18px;
+      width:420px; min-width:320px; max-width:60vw; resize:horizontal;
+    }
+    .group{ border:1px solid #eaeaea; border-radius:10px; padding:12px; background:#ffffff; }
+    .group h3{ margin:0 0 10px; font-size:13px; font-weight:400; color:#111111; text-transform:none; letter-spacing:0 }
+    .row{ display:grid; grid-template-columns: minmax(130px, 150px) 1fr; gap:14px; align-items:center; margin:6px 0; }
+    .row .lab{ font-size:12px; color:#111111 }
+    .row output{ font-variant-tabular-nums:tabular-nums; color:#111111; text-align:right; }
+    input[type="range"]{ width:100% }
+    .row .wide{ grid-column:1 / span 2 }
+    .row select, .row input[type="number"], .row input[type="color"], .row input[type="text"], .row input[type="checkbox"]{
+      width:100%; background:#ffffff; border:1px solid #d0d0d0; color:#000000; border-radius:8px; padding:6px 8px;
+    }
+    .row .inline{ display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center }
+    .row .inline output{ min-width:60px }
+    .muted{ color:var(--muted) }
+
+    .stage-wrap{ grid-area:stage; position:relative; overflow:hidden; background:#ffffff; }
+    .stage{ position:absolute; inset:0; display:grid; place-items:center; }
+    svg{ width:100%; height:100%; display:block; background:transparent; }
+    .hud{ position:absolute; left:12px; bottom:12px; color:#333333; font-size:12px; padding:6px 8px; background:rgba(255,255,255,.9); border:1px solid #e0e0e0; border-radius:8px }
+
+    details summary{ cursor:pointer }
+    textarea{ width:100%; min-height:160px; background:#ffffff; border:1px solid #d0d0d0; color:#000000; border-radius:10px; padding:10px }
+
+    @media (max-width: 980px){
+      body{ grid-template-columns:1fr; grid-template-areas: "head" "stage" "controls"; }
+      .controls{ order:3; width:100%; min-width:0; max-width:none; resize:none }
+    }
+  </style>
+  <meta name="description" content="Tool per generare reti vettoriali con frecce, totalmente parametrico e con esportazione SVG/PNG/JSON." />
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;gap:12px">
+     arrowlab</span>
+    </div>
+    <div class="actions">
+      <button id="btn-random">Randomizza</button>
+      <button id="btn-reset">Reset</button>
+      <button id="btn-export-svg" class="primary">Esporta SVG</button>
+      <button id="btn-export-png">Esporta PNG</button>
+      <button id="btn-json" title="Import/Export JSON">JSON</button>
+    </div>
+  </header>
+
+  <aside class="controls">
+    <div class="group">
+      <h3>Spazio</h3>
+      <div class="row">
+        <div class="lab">Modalità</div>
+        <div>
+          <select id="mode">
+            <option value="2d">2D</option>
+            <option value="3d">3D</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Area</h3>
+      <div class="row">
+        <div class="lab">Forma 2D</div>
+        <div>
+          <select id="areaShape">
+            <option value="rect">Rettangolo</option>
+            <option value="circle">Cerchio</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Larghezza (px)</div>
+        <input id="areaW" type="number" min="200" max="4000" step="10" value="1000"/>
+      </div>
+      <div class="row">
+        <div class="lab">Altezza (px)</div>
+        <input id="areaH" type="number" min="200" max="4000" step="10" value="700"/>
+      </div>
+      <div class="row">
+        <div class="lab">Raggio (cerchio)</div>
+        <input id="areaR" type="number" min="100" max="2000" step="5" value="350"/>
+      </div>
+      <div class="row" id="row3dShape">
+        <div class="lab">Forma 3D</div>
+        <div>
+          <select id="area3DShape">
+            <option value="box">Parallelepipedo</option>
+            <option value="sphere">Sfera</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" id="row3dW">
+        <div class="lab">Larghezza 3D</div>
+        <input id="areaW3" type="number" min="100" max="8000" step="10" value="1000"/>
+      </div>
+      <div class="row" id="row3dH">
+        <div class="lab">Altezza 3D</div>
+        <input id="areaH3" type="number" min="100" max="8000" step="10" value="700"/>
+      </div>
+      <div class="row" id="row3dD">
+        <div class="lab">Profondità 3D</div>
+        <input id="areaD3" type="number" min="100" max="8000" step="10" value="700"/>
+      </div>
+      <div class="row" id="row3dR">
+        <div class="lab">Raggio sfera</div>
+        <input id="areaR3" type="number" min="50" max="4000" step="5" value="350"/>
+      </div>
+      <div class="row">
+        <div class="lab">Margine (%)</div>
+        <div class="inline">
+          <input id="margin" type="range" min="0" max="20" step="1" value="5"/>
+          <output id="margin_o">5%</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Mostra contorno area</div>
+        <div>
+          <select id="showOutline">
+            <option value="true">Sì</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Tratteggiato contorno</div>
+        <div>
+          <select id="outlineDashed">
+            <option value="false">No</option>
+            <option value="true">Sì</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Colore sfondo</div>
+        <div class="inline">
+          <input id="bg" type="color" value="#ffffff"/>
+          <input id="bgHex" type="text" placeholder="#ffffff" value="#ffffff"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Geometria punti</h3>
+      <div class="row">
+        <div class="lab">Distribuzione</div>
+        <select id="distribution">
+          <option value="uniform">Uniforme</option>
+          <option value="clustered">Cluster</option>
+          <option value="ring">Anello (se cerchio)</option>
+          <option value="grid">Griglia sfocata</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="lab">Punti immaginari</div>
+        <div class="inline">
+          <input id="points" type="range" min="4" max="2000" step="1" value="180"/>
+          <output id="points_o">180</output>
+        </div>
+      </div>
+      <div class="row" id="clusterRow">
+        <div class="lab"># Cluster</div>
+        <div class="inline">
+          <input id="clusters" type="range" min="1" max="20" step="1" value="5"/>
+          <output id="clusters_o">5</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Jitter punti</div>
+        <div class="inline">
+          <input id="jitter" type="range" min="0" max="1" step="0.01" value="0.12"/>
+          <output id="jitter_o">0.12</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Raggio punti (px)</div>
+        <div class="inline">
+          <input id="pointRadius" type="range" min="0" max="80" step="1" value="12"/>
+          <output id="pointRadius_o">12</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Seed</div>
+        <input id="seed" type="number" min="0" max="999999" step="1" value="12345"/>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Connessioni</h3>
+      <div class="row">
+        <div class="lab">Quantità frecce</div>
+        <div class="inline">
+          <input id="edges" type="range" min="0" max="8000" step="1" value="600"/>
+          <output id="edges_o">600</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Connettività media</div>
+        <div class="inline">
+          <input id="connectivity" type="range" min="0" max="1" step="0.01" value="0.38"/>
+          <output id="connectivity_o">0.38</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Ramificazione</div>
+        <div class="inline">
+          <input id="branchiness" type="range" min="0" max="1" step="0.01" value="0.5"/>
+          <output id="branchiness_o">0.50</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Caos</div>
+        <div class="inline">
+          <input id="chaos" type="range" min="0" max="1" step="0.01" value="0.2"/>
+          <output id="chaos_o">0.20</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Curvatura</div>
+        <div class="inline">
+          <input id="curvature" type="range" min="0" max="1" step="0.01" value="0.35"/>
+          <output id="curvature_o">0.35</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Scala lunghezza</div>
+        <div class="inline">
+          <input id="lengthScale" type="range" min="0.2" max="1" step="0.01" value="0.9"/>
+          <output id="lengthScale_o">0.90</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Bias direzione (°)</div>
+        <div class="inline">
+          <input id="dirBias" type="range" min="0" max="360" step="1" value="0"/>
+          <output id="dirBias_o">0°</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Forza bias</div>
+        <div class="inline">
+          <input id="dirStrength" type="range" min="0" max="1" step="0.01" value="0.0"/>
+          <output id="dirStrength_o">0.00</output>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>Stile</h3>
+      <div class="row">
+        <div class="lab">Spessore</div>
+        <div class="inline">
+          <input id="stroke" type="range" min="0.2" max="8" step="0.1" value="1.4"/>
+          <output id="stroke_o">1.4</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Opacità</div>
+        <div class="inline">
+          <input id="opacity" type="range" min="0.05" max="1" step="0.01" value="0.9"/>
+          <output id="opacity_o">0.90</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Tratteggio</div>
+        <div class="inline">
+          <input id="dash" type="range" min="0" max="40" step="1" value="0"/>
+          <output id="dash_o">0</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Gap tratteggio</div>
+        <div class="inline">
+          <input id="gap" type="range" min="0" max="60" step="1" value="0"/>
+          <output id="gap_o">0</output>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Colore frecce</div>
+        <div class="inline">
+          <input id="strokeColor" type="color" value="#000000"/>
+          <input id="strokeColorHex" type="text" placeholder="#000000" value="#000000"/>
+        </div>
+      </div>
+      <div class="row">
+        <div class="lab">Modo colore</div>
+        <select id="colorMode">
+          <option value="mono">Monocromo</option>
+          <option value="angle">Angolo → Gradiente</option>
+          <option value="distance">Distanza → Gradiente</option>
+          <option value="random">Casuale morbido</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="lab">Terminali</div>
+        <select id="terminals">
+          <option value="start">Solo inizio</option>
+          <option value="end">Solo fine</option>
+          <option value="both">Entrambi</option>
+          <option value="none">Nessuno</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="lab">Stile terminale</div>
+        <select id="terminalStyle">
+          <option value="arrow">Freccia</option>
+          <option value="dot">Punto</option>
+          <option value="bar">Barra</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="lab">Dimensione terminale</div>
+        <div class="inline">
+          <input id="arrowSize" type="range" min="2" max="30" step="1" value="8"/>
+          <output id="arrowSize_o">8</output>
+        </div>
+      </div>
+    </div>
+
+    <details class="group">
+      <summary><h3>JSON (schema semplice)</h3></summary>
+      <p class="muted">Puoi incollare un JSON con <code>points</code> e <code>edges</code>. Vedi Export → JSON per esempio.</p>
+      <div class="row">
+        <textarea id="jsonio" placeholder="{ \"points\": [...], \"edges\": [...], \"area\": {...}, \"params\": {...} }"></textarea>
+      </div>
+      <div class="row">
+        <button id="btn-import-json">Importa JSON</button>
+        <button id="btn-export-json">Esporta JSON</button>
+      </div>
+    </details>
+  </aside>
+
+  <main class="stage-wrap">
+    <div class="stage">
+      <svg id="board" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet">
+        <defs id="defs"></defs>
+        <g id="bgLayer"></g>
+        <g id="areaLayer"></g>
+        <g id="edgeLayer"></g>
+      </svg>
+      <div id="gl3d" style="position:absolute; inset:0; display:none;"></div>
+    </div>
+    <div class="hud" id="hud">Pronto</div>
+  </main>
+  <script src="three.js"></script>
+  <script>
+  // ————— Utility: PRNG deterministico (Mulberry32)
+  function mulberry32(seed){
+    let t = seed >>> 0;
+    return function(){
+      t += 0x6D2B79F5;
+      let r = Math.imul(t ^ t >>> 15, 1 | t);
+      r ^= r + Math.imul(r ^ r >>> 7, 61 | r);
+      return ((r ^ r >>> 14) >>> 0) / 4294967296;
+    }
+  }
+
+  function lerp(a,b,t){ return a + (b-a)*t }
+  function clamp(x,min,max){ return Math.max(min, Math.min(max,x)) }
+  function shuffle(arr, rnd){
+    for(let i=arr.length-1;i>0;i--){ const j = Math.floor(rnd()* (i+1)); [arr[i],arr[j]]=[arr[j],arr[i]] }
+    return arr
+  }
+  function gaussian(rnd){
+    // Box-Muller
+    let u = 0, v = 0; while(u===0) u=rnd(); while(v===0) v=rnd();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
+  function hsl(h,s,l){ return `hsl(${h}, ${s}%, ${l}%)` }
+  function mixColor(c1, c2, t){
+    // c1,c2: #rrggbb
+    const a = [parseInt(c1.slice(1,3),16), parseInt(c1.slice(3,5),16), parseInt(c1.slice(5,7),16)]
+    const b = [parseInt(c2.slice(1,3),16), parseInt(c2.slice(3,5),16), parseInt(c2.slice(5,7),16)]
+    const m = a.map((v,i)=>Math.round(v+(b[i]-v)*t))
+    return `#${m.map(x=>x.toString(16).padStart(2,'0')).join('')}`
+  }
+  function angleBetween(p,q){ return Math.atan2(q.y-p.y, q.x-p.x) }
+  function dist2(p,q){ const dx=q.x-p.x, dy=q.y-p.y; return dx*dx+dy*dy }
+  function norm({x,y}){ const d=Math.hypot(x,y)||1; return {x:x/d, y:y/d} }
+  function perp({x,y}){ return {x:-y,y:x} }
+
+  // ————— Stato
+  const S = {
+    mode:'2d',
+    areaShape:'rect', w:1000, h:700, r:350, marginPct:5, bg:'#ffffff',
+    area3DShape:'box', w3:1000, h3:700, d3:700, r3:350,
+    distribution:'uniform', points:180, clusters:5, jitter:0.12, pointRadius:12, seed:12345,
+    edges:600, connectivity:0.38, branchiness:0.5, chaos:0.2, curvature:0.35, lengthScale:0.9,
+    dirBias:0, dirStrength:0,
+    stroke:1.4, opacity:0.9, dash:0, gap:0,
+    strokeColor:'#000000', colorMode:'mono', terminals:'start', terminalStyle:'arrow', arrowSize:8,
+    showOutline:true, outlineDashed:true,
+  }
+
+  // ————— DOM refs
+  const board = document.getElementById('board')
+  const bgLayer = document.getElementById('bgLayer')
+  const areaLayer = document.getElementById('areaLayer')
+  const edgeLayer = document.getElementById('edgeLayer')
+  const defs = document.getElementById('defs')
+  const hud = document.getElementById('hud')
+
+  const $ = id => document.getElementById(id)
+
+  // ————— Bind sliders and inputs
+  const binds = [
+    ['mode','mode','value'],
+    ['areaShape','areaShape','value'], ['areaW','w','value'], ['areaH','h','value'], ['areaR','r','value'],
+    ['area3DShape','area3DShape','value'], ['areaW3','w3','value'], ['areaH3','h3','value'], ['areaD3','d3','value'], ['areaR3','r3','value'],
+    ['margin','marginPct','value'], ['bg','bg','value'], ['showOutline','showOutline','value'], ['outlineDashed','outlineDashed','value'],
+    ['distribution','distribution','value'], ['points','points','value'], ['clusters','clusters','value'], ['jitter','jitter','value'], ['pointRadius','pointRadius','value'], ['seed','seed','value'],
+    ['edges','edges','value'], ['connectivity','connectivity','value'], ['branchiness','branchiness','value'], ['chaos','chaos','value'], ['curvature','curvature','value'], ['lengthScale','lengthScale','value'],
+    ['dirBias','dirBias','value'], ['dirStrength','dirStrength','value'],
+    ['stroke','stroke','value'], ['opacity','opacity','value'], ['dash','dash','value'], ['gap','gap','value'], ['strokeColor','strokeColor','value'],
+    ['colorMode','colorMode','value'], ['terminals','terminals','value'], ['terminalStyle','terminalStyle','value'], ['arrowSize','arrowSize','value']
+  ]
+
+  function updateOutput(id,val, suffix=''){
+    const o = $(id+'_o'); if(o) o.textContent = suffix? (val+suffix) : val
+  }
+
+  function coerceTypes(){
+    S.w = +S.w; S.h = +S.h; S.r = +S.r; S.marginPct = +S.marginPct;
+    S.w3 = +S.w3; S.h3 = +S.h3; S.d3 = +S.d3; S.r3 = +S.r3;
+    S.points = +S.points; S.clusters = +S.clusters; S.jitter = +S.jitter; S.pointRadius = +S.pointRadius; S.seed = +S.seed;
+    S.edges = +S.edges; S.connectivity = +S.connectivity; S.branchiness = +S.branchiness; S.chaos = +S.chaos; S.curvature = +S.curvature; S.lengthScale = +S.lengthScale;
+    S.dirBias = +S.dirBias; S.dirStrength = +S.dirStrength;
+    S.stroke = +S.stroke; S.opacity = +S.opacity; S.dash = +S.dash; S.gap = +S.gap; S.arrowSize = +S.arrowSize;
+    S.showOutline = (S.showOutline===true || S.showOutline==='true');
+    S.outlineDashed = (S.outlineDashed===true || S.outlineDashed==='true');
+  }
+
+  function bindAll(){
+    for(const [id,key,prop] of binds){
+      const el = $(id); if(!el) continue
+      el.addEventListener('input', ()=>{
+        S[key] = el[prop]
+        coerceTypes()
+        // update outputs
+        if(['points','clusters','edges'].includes(id)) updateOutput(id, S[key])
+        if(['margin'].includes(id)) updateOutput(id, S[key], '%')
+        if(['jitter','connectivity','branchiness','chaos','curvature','lengthScale','opacity','dirStrength'].includes(id)) updateOutput(id, (+S[key]).toFixed( (id==='opacity'||id==='lengthScale')?2:2 ))
+        if(['dirBias'].includes(id)) updateOutput(id, S[key]+'°')
+        if(['dash','gap','stroke','arrowSize','pointRadius'].includes(id)) updateOutput(id, S[key])
+        toggleClusterRow(); toggle3DControls()
+        render()
+      })
+    }
+    // hex inputs sync
+    function normHex(v){
+      if(!v) return null; v = v.trim(); if(v[0] !== '#') v = '#'+v; v = v.replace(/[^#0-9a-fA-F]/g,'')
+      if(v.length===4){ v = '#'+v[1]+v[1]+v[2]+v[2]+v[3]+v[3] }
+      if(/^#[0-9a-fA-F]{6}$/.test(v)) return v.toLowerCase();
+      return null
+    }
+    const scHex = $('strokeColorHex'), scPick = $('strokeColor')
+    if(scHex && scPick){
+      scHex.addEventListener('input', ()=>{ const n = normHex(scHex.value); if(n){ S.strokeColor=n; scPick.value=n; render() } })
+      scPick.addEventListener('input', ()=>{ const n = normHex(scPick.value); if(n){ S.strokeColor=n; scHex.value=n; render() } })
+    }
+    const bgHex = $('bgHex'), bgPick = $('bg')
+    if(bgHex && bgPick){
+      bgHex.addEventListener('input', ()=>{ const n = normHex(bgHex.value); if(n){ S.bg=n; bgPick.value=n; render() } })
+      bgPick.addEventListener('input', ()=>{ const n = normHex(bgPick.value); if(n){ S.bg=n; bgHex.value=n; render() } })
+    }
+  }
+
+  function toggleClusterRow(){
+    const row = document.getElementById('clusterRow')
+    row.style.display = (S.distribution==='clustered') ? '' : 'none'
+  }
+
+  function toggle3DControls(){
+    const is3D = S.mode === '3d'
+    // Show/hide 2D-specific controls
+    const twoDIds = ['areaShape','areaW','areaH','areaR']
+    const threeDIds = ['row3dShape','row3dW','row3dH','row3dD','row3dR']
+    for(const id of ['areaW','areaH','areaR']){
+      const el = document.getElementById(id)?.closest('.row'); if(el) el.style.display = is3D ? 'none' : ''
+    }
+    const shapeRow = document.getElementById('areaShape')?.closest('.row'); if(shapeRow) shapeRow.style.display = is3D ? 'none' : ''
+    for(const id of threeDIds){ const el = document.getElementById(id); if(el) el.style.display = is3D ? '' : 'none' }
+    // Toggle render targets
+    document.getElementById('board').style.display = is3D ? 'none' : ''
+    document.getElementById('gl3d').style.display = is3D ? '' : 'none'
+  }
+
+  // ————— Generazione Punti
+  function genPoints(){
+    const rnd = mulberry32(S.seed)
+    const pts = []
+    const marginX = (S.areaShape==='rect' ? S.w : S.r*2) * (S.marginPct/100)
+    const marginY = (S.areaShape==='rect' ? S.h : S.r*2) * (S.marginPct/100)
+    const rectW = S.w - marginX*2
+    const rectH = S.h - marginY*2
+
+    function inCircle(x,y){
+      const cx = S.w/2, cy = S.h/2; const dx=x-cx, dy=y-cy; return Math.hypot(dx,dy) <= (S.r - Math.max(marginX,marginY))
+    }
+
+    let centers=[]
+    if(S.distribution==='clustered'){
+      for(let i=0;i<S.clusters;i++){
+        let x = marginX + rnd()*rectW
+        let y = marginY + rnd()*rectH
+        if(S.areaShape==='circle'){
+          // move towards circle center if outside
+          const cx=S.w/2, cy=S.h/2
+          if(!inCircle(x,y)){
+            const ang = rnd()*Math.PI*2; const rad = (S.r*0.7)*Math.sqrt(rnd())
+            x = cx + Math.cos(ang)*rad; y = cy + Math.sin(ang)*rad
+          }
+        }
+        centers.push({x,y})
+      }
+    }
+
+    for(let i=0;i<S.points;i++){
+      let x,y
+      if(S.distribution==='grid'){
+        const cols = Math.max(2, Math.round(Math.sqrt(S.points)))
+        const rows = Math.ceil(S.points/cols)
+        const c = i%cols, r = Math.floor(i/cols)
+        const gx = marginX + (c+0.5)/cols * rectW
+        const gy = marginY + (r+0.5)/rows * rectH
+        x = gx + (rnd()-0.5)*rectW*(S.jitter*0.15)
+        y = gy + (rnd()-0.5)*rectH*(S.jitter*0.15)
+      } else if(S.distribution==='clustered' && centers.length){
+        const k = Math.floor(rnd()*centers.length)
+        const c = centers[k]
+        const spread = 0.16 + (rnd()*0.28)
+        x = c.x + gaussian(rnd)*rectW*spread*S.jitter*0.5
+        y = c.y + gaussian(rnd)*rectH*spread*S.jitter*0.5
+      } else if(S.distribution==='ring' && S.areaShape==='circle'){
+        const cx=S.w/2, cy=S.h/2
+        const rad = S.r * (0.85 + (rnd()-0.5)*S.jitter)
+        const ang = rnd()*Math.PI*2
+        x = cx + Math.cos(ang)*rad
+        y = cy + Math.sin(ang)*rad
+      } else {
+        // uniforme
+        x = marginX + rnd()*rectW
+        y = marginY + rnd()*rectH
+        if(S.areaShape==='circle'){
+          // rigenera finché non è dentro al cerchio
+          const cx=S.w/2, cy=S.h/2
+          let tries=0
+          while(!inCircle(x,y) && tries<10){
+            const ang = rnd()*Math.PI*2; const rad = S.r*Math.sqrt(rnd())
+            x = cx + Math.cos(ang)*rad; y = cy + Math.sin(ang)*rad
+            tries++
+          }
+        }
+      }
+      // jitter generale
+      x += (rnd()-0.5)*rectW*(S.jitter*0.03)
+      y += (rnd()-0.5)*rectH*(S.jitter*0.03)
+      pts.push({id:i,x,y})
+    }
+    return pts
+  }
+
+  // ————— K vicini + candidati archi
+  function buildCandidates(points){
+    const k = Math.max(1, Math.round(1 + S.connectivity*8))
+    const candidates = new Map() // key "a-b" sorted
+    const dir = { x: Math.cos(S.dirBias*Math.PI/180), y: Math.sin(S.dirBias*Math.PI/180) }
+    const rnd = mulberry32(S.seed+999)
+
+    // naive O(n^2), sufficiente per n<=2000
+    for(let i=0;i<points.length;i++){
+      const p = points[i]
+      // trova k più vicini
+      let arr=[]
+      for(let j=0;j<points.length;j++){
+        if(i===j) continue
+        const q = points[j]
+        const d2 = dist2(p,q)
+        arr.push({j, d2})
+      }
+      arr.sort((a,b)=>a.d2-b.d2)
+      const take = Math.min(k, arr.length)
+      for(let t=0;t<take;t++){
+        const j = arr[t].j
+        const a = Math.min(i,j), b = Math.max(i,j)
+        const key = a+"-"+b
+        if(candidates.has(key)) continue
+        const P = points[a], Q = points[b]
+        const ang = angleBetween(P,Q)
+        const dirAlign = Math.abs(Math.cos(ang - Math.atan2(dir.y, dir.x))) // 0..1
+        const biasW = lerp(1, 1 + 2*dirAlign, S.dirStrength)
+        // lunghezze preferite (evita troppo lunghe)
+        const len2 = dist2(P,Q)
+        const typical = (S.areaShape==='rect') ? (S.w*S.h/ (S.points*4)) : (S.r*S.r/ (S.points*2))
+        const lenW = 1 / (1 + (len2 / (typical*typical)))
+        const w = biasW * lenW * (0.9 + rnd()*0.2)
+        candidates.set(key, {a,b, w, len2})
+      }
+    }
+    // ordina per peso desc
+    const list = Array.from(candidates.values())
+    list.sort((x,y)=> y.w - x.w)
+    return list
+  }
+
+  // ————— Selezione archi con ramificazione
+  function selectEdges(points, candidates){
+    const target = Math.min(S.edges, candidates.length)
+    const rnd = mulberry32(S.seed+333)
+    const active = new Set()
+    // semi iniziali
+    const seeds = Math.max(1, Math.round(points.length*0.06))
+    const picks = shuffle(candidates.slice(0, Math.min(candidates.length, points.length*6)), rnd)
+    for(let i=0;i<seeds && i<picks.length;i++){
+      active.add(picks[i].a); active.add(picks[i].b)
+    }
+    const edges=[]
+    let i=0, safety=0
+    const byNode = new Map()
+    for(const c of candidates){
+      if(!byNode.has(c.a)) byNode.set(c.a,[])
+      if(!byNode.has(c.b)) byNode.set(c.b,[])
+      byNode.get(c.a).push(c); byNode.get(c.b).push(c)
+    }
+    while(edges.length<target && safety<target*10){
+      const doBranch = rnd() < S.branchiness
+      let c
+      if(doBranch && active.size>0){
+        // prendi un nodo attivo e uno dei suoi candidati migliori
+        const arr = Array.from(active)
+        const node = arr[Math.floor(rnd()*arr.length)]
+        const local = (byNode.get(node)||[]).filter(cc=>!cc.used)
+        if(local.length>0){
+          local.sort((a,b)=>b.w-a.w)
+          c = local[Math.floor(Math.pow(rnd(),0.6)*local.length)]
+        }
+      }
+      if(!c){
+        // fallback: globale
+        while(i<candidates.length && candidates[i].used) i++
+        c = candidates[i]
+      }
+      if(!c){ safety++; continue }
+      c.used = true
+      edges.push(c)
+      active.add(c.a); active.add(c.b)
+      safety++
+    }
+    return edges
+  }
+
+  // ————— Colori
+  function colorForEdge(P,Q, base){
+    const mode = S.colorMode
+    if(mode==='mono') return base
+    const pId = P.id ?? 0
+    const qId = Q.id ?? 0
+    const rnd = mulberry32(S.seed + (pId*73856093 ^ qId*19349663))
+    if(mode==='random'){
+      const t = 0.2 + rnd()*0.6
+      return mixColor(base, '#'+Math.floor(rnd()*0xffffff).toString(16).padStart(6,'0'), t*0.3)
+    }
+    if(mode==='angle'){
+      const ang = (angleBetween(P,Q)+Math.PI)/(Math.PI*2)
+      const h = Math.round(lerp(200, 320, ang))
+      return hsl(h, 70, 65)
+    }
+    if(mode==='distance'){
+      const d = Math.sqrt(dist2(P,Q))
+      const maxd = Math.hypot(S.w,S.h)
+      const t = Math.pow(d/maxd, 0.6)
+      return mixColor('#71c1ff', base, t)
+    }
+    return base
+  }
+
+  // ————— Marker terminali
+  function ensureMarkers(){
+    defs.innerHTML = ''
+    const color = S.strokeColor
+    const size = S.arrowSize
+    const common = `markerUnits="strokeWidth" orient="auto" refX="0" refY="0"`;
+    if(S.terminalStyle==='arrow'){
+      defs.insertAdjacentHTML('beforeend',
+        `<marker id="m-arrow" ${common} markerWidth="${size}" markerHeight="${size}" viewBox="-1 -${size} ${size*2} ${size*2}">
+           <path d="M -1,0 L ${size-2},${size-2} L ${size-2},-${size-2} Z" fill="${color}" />
+         </marker>`)
+    } else if(S.terminalStyle==='dot'){
+      defs.insertAdjacentHTML('beforeend',
+        `<marker id="m-dot" ${common} markerWidth="${size}" markerHeight="${size}" viewBox="-${size} -${size} ${size*2} ${size*2}">
+           <circle cx="0" cy="0" r="${Math.max(1,size*0.4)}" fill="${color}" />
+         </marker>`)
+    } else if(S.terminalStyle==='bar'){
+      const w = Math.max(1, size*0.6)
+      defs.insertAdjacentHTML('beforeend',
+        `<marker id="m-bar" ${common} markerWidth="${size}" markerHeight="${size}" viewBox="-${size} -${size} ${size*2} ${size*2}">
+           <rect x="-${w/2}" y="-${size/2}" width="${w}" height="${size}" fill="${color}" />
+         </marker>`)
+    }
+  }
+
+  function markerId(){
+    if(S.terminalStyle==='arrow') return 'm-arrow'
+    if(S.terminalStyle==='dot') return 'm-dot'
+    if(S.terminalStyle==='bar') return 'm-bar'
+    return ''
+  }
+
+  // ————— Disegno area
+  function drawArea(){
+    areaLayer.innerHTML = ''
+    const bg = document.createElementNS('http://www.w3.org/2000/svg','rect')
+    bg.setAttribute('x','0'); bg.setAttribute('y','0'); bg.setAttribute('width', S.w); bg.setAttribute('height', S.h);
+    bg.setAttribute('fill', S.bg)
+    bgLayer.innerHTML=''; bgLayer.appendChild(bg)
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g')
+    const mX = S.w*(S.marginPct/100)
+    const mY = S.h*(S.marginPct/100)
+    const stroke='#e6e6e6'
+    if(S.areaShape==='rect'){
+      if(S.showOutline){
+        const r = document.createElementNS('http://www.w3.org/2000/svg','rect')
+        r.setAttribute('x', mX)
+        r.setAttribute('y', mY)
+        r.setAttribute('width', S.w - mX*2)
+        r.setAttribute('height', S.h - mY*2)
+        r.setAttribute('fill','none'); r.setAttribute('stroke', stroke);
+        if(S.outlineDashed) r.setAttribute('stroke-dasharray','6 6')
+        g.appendChild(r)
+      }
+    } else {
+      if(S.showOutline){
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle')
+        c.setAttribute('cx', S.w/2)
+        c.setAttribute('cy', S.h/2)
+        c.setAttribute('r', S.r - Math.max(mX,mY))
+        c.setAttribute('fill','none'); c.setAttribute('stroke', stroke);
+        if(S.outlineDashed) c.setAttribute('stroke-dasharray','6 6')
+        g.appendChild(c)
+      }
+    }
+    areaLayer.appendChild(g)
+  }
+
+  // ————— 3D support (Three.js)
+  const threeCtx = { inited:false, scene:null, camera:null, renderer:null, container:null, lines:null, arrowsStart:null, arrowsEnd:null, group:null, orbit:null };
+
+  function init3D(){
+    if(threeCtx.inited) return
+    const container = document.getElementById('gl3d')
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100000)
+    const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true})
+    renderer.setPixelRatio(window.devicePixelRatio||1)
+    container.appendChild(renderer.domElement)
+    const group = new THREE.Group(); scene.add(group)
+    // basic light for arrowheads/dots
+    const amb = new THREE.AmbientLight(0xffffff, 0.6); scene.add(amb)
+    const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(1,2,3); scene.add(dir)
+
+    // orbit controls (custom minimal)
+    const orbit = createBasicOrbit(camera, container)
+
+    threeCtx.inited=true; threeCtx.scene=scene; threeCtx.camera=camera; threeCtx.renderer=renderer; threeCtx.container=container; threeCtx.group=group; threeCtx.orbit=orbit
+
+    const ro = new ResizeObserver(()=> resize3D())
+    ro.observe(container)
+    window.addEventListener('resize', resize3D)
+    resize3D()
+    animate3D()
+  }
+
+  function resize3D(){
+    if(!threeCtx.inited) return
+    const {container, renderer, camera} = threeCtx
+    const w = container.clientWidth || container.offsetWidth || 800
+    const h = container.clientHeight || container.offsetHeight || 600
+    renderer.setSize(w,h,false)
+    camera.aspect = w/h; camera.updateProjectionMatrix()
+  }
+
+  function animate3D(){
+    if(!threeCtx.inited) return
+    requestAnimationFrame(animate3D)
+    threeCtx.renderer.setClearColor(0x000000, 0) // transparent
+    threeCtx.renderer.render(threeCtx.scene, threeCtx.camera)
+  }
+
+  function createBasicOrbit(camera, dom){
+    const state = { yaw:0, pitch:0, distance:1000, target:new THREE.Vector3(0,0,0), dragging:false, lastX:0, lastY:0 }
+    function update(){
+      const r = state.distance
+      const cp = clamp(state.pitch, -Math.PI/2+0.01, Math.PI/2-0.01)
+      const x = r * Math.cos(cp) * Math.cos(state.yaw)
+      const y = r * Math.sin(cp)
+      const z = r * Math.cos(cp) * Math.sin(state.yaw)
+      camera.position.set(state.target.x + x, state.target.y + y, state.target.z + z)
+      camera.lookAt(state.target)
+    }
+    dom.addEventListener('pointerdown', (e)=>{ state.dragging=true; state.lastX=e.clientX; state.lastY=e.clientY; dom.setPointerCapture(e.pointerId) })
+    dom.addEventListener('pointermove', (e)=>{
+      if(!state.dragging) return
+      const dx = e.clientX - state.lastX
+      const dy = e.clientY - state.lastY
+      state.yaw -= dx * 0.005
+      state.pitch -= dy * 0.005
+      state.lastX = e.clientX; state.lastY = e.clientY
+      update()
+    })
+    dom.addEventListener('pointerup', (e)=>{ state.dragging=false; dom.releasePointerCapture(e.pointerId) })
+    dom.addEventListener('wheel', (e)=>{ e.preventDefault(); const f = Math.pow(1.001, e.deltaY); state.distance = clamp(state.distance * f, 10, 100000); update() }, {passive:false})
+    update(); return { state, update }
+  }
+
+  function genPoints3D(){
+    const rnd = mulberry32(S.seed)
+    const pts=[]
+    const m = (S.marginPct/100)
+    const half = { x: S.w3*(1-m)/2, y: S.h3*(1-m)/2, z: S.d3*(1-m)/2 }
+    const R = S.r3*(1-m)
+    let centers=[]
+    if(S.distribution==='clustered'){
+      for(let i=0;i<S.clusters;i++){
+        if(S.area3DShape==='sphere'){
+          // random point in sphere
+          const u = rnd(), v = rnd(), w = rnd()
+          const theta = 2*Math.PI*u, phi = Math.acos(2*v-1), rr = R*Math.cbrt(w*0.6)
+          const cx = rr*Math.sin(phi)*Math.cos(theta)
+          const cy = rr*Math.cos(phi)
+          const cz = rr*Math.sin(phi)*Math.sin(theta)
+          centers.push({x:cx,y:cy,z:cz})
+        } else {
+          centers.push({ x:(rnd()*2-1)*half.x, y:(rnd()*2-1)*half.y, z:(rnd()*2-1)*half.z })
+        }
+      }
+    }
+    for(let i=0;i<S.points;i++){
+      let x,y,z
+      if(S.area3DShape==='sphere'){
+        // inside sphere
+        if(S.distribution==='clustered' && centers.length){
+          const c = centers[Math.floor(rnd()*centers.length)]
+          const s= (0.2 + rnd()*0.4)
+          x = c.x + gaussian(rnd)*R*s*S.jitter*0.5
+          y = c.y + gaussian(rnd)*R*s*S.jitter*0.5
+          z = c.z + gaussian(rnd)*R*s*S.jitter*0.5
+          const d = Math.hypot(x,y,z); if(d>R){ const k = R/d; x*=k; y*=k; z*=k }
+        } else {
+          const u = rnd(), v = rnd(), w = rnd()
+          const theta = 2*Math.PI*u, phi = Math.acos(2*v-1), rr = R*Math.cbrt(w)
+          x = rr*Math.sin(phi)*Math.cos(theta)
+          y = rr*Math.cos(phi)
+          z = rr*Math.sin(phi)*Math.sin(theta)
+        }
+      } else {
+        if(S.distribution==='clustered' && centers.length){
+          const c = centers[Math.floor(rnd()*centers.length)]
+          const s= (0.2 + rnd()*0.4)
+          x = c.x + gaussian(rnd)*half.x*s*S.jitter*0.6
+          y = c.y + gaussian(rnd)*half.y*s*S.jitter*0.6
+          z = c.z + gaussian(rnd)*half.z*s*S.jitter*0.6
+          x = clamp(x,-half.x,half.x); y = clamp(y,-half.y,half.y); z = clamp(z,-half.z,half.z)
+        } else {
+          x = (rnd()*2-1)*half.x
+          y = (rnd()*2-1)*half.y
+          z = (rnd()*2-1)*half.z
+        }
+      }
+      // slight jitter
+      x += (rnd()-0.5)*S.jitter*half.x*0.02
+      y += (rnd()-0.5)*S.jitter*half.y*0.02
+      z += (rnd()-0.5)*S.jitter*half.z*0.02
+      pts.push({id:i,x,y,z})
+    }
+    return pts
+  }
+
+  function dist2_3d(a,b){ const dx=b.x-a.x, dy=b.y-a.y, dz=b.z-a.z; return dx*dx+dy*dy+dz*dz }
+
+  function buildCandidates3D(points){
+    const k = Math.max(1, Math.round(1 + S.connectivity*8))
+    const candidates = new Map()
+    const dir = { x: Math.cos(S.dirBias*Math.PI/180), y: 0, z: Math.sin(S.dirBias*Math.PI/180) }
+    const rnd = mulberry32(S.seed+1999)
+    for(let i=0;i<points.length;i++){
+      const p = points[i]
+      let arr=[]
+      for(let j=0;j<points.length;j++){
+        if(i===j) continue
+        const d2 = dist2_3d(p, points[j])
+        arr.push({j, d2})
+      }
+      arr.sort((a,b)=>a.d2-b.d2)
+      const take = Math.min(k, arr.length)
+      for(let t=0;t<take;t++){
+        const j = arr[t].j
+        const a = Math.min(i,j), b = Math.max(i,j)
+        const key = a+"-"+b
+        if(candidates.has(key)) continue
+        const P = points[a], Q = points[b]
+        const v = {x:Q.x-P.x, y:Q.y-P.y, z:Q.z-P.z}
+        const vlen = Math.hypot(v.x,v.y,v.z)||1
+        const vnorm = {x:v.x/vlen,y:v.y/vlen,z:v.z/vlen}
+        const dirAlign = Math.abs(vnorm.x*dir.x + vnorm.y*dir.y + vnorm.z*dir.z)
+        const biasW = lerp(1, 1 + 2*dirAlign, S.dirStrength)
+        const len2 = dist2_3d(P,Q)
+        const typical = (S.w3*S.h3*S.d3)/(S.points*8)
+        const lenW = 1 / (1 + (len2 / (typical)))
+        const w = biasW * lenW * (0.9 + rnd()*0.2)
+        candidates.set(key, {a,b,w,len2})
+      }
+    }
+    const list = Array.from(candidates.values())
+    list.sort((x,y)=> y.w - x.w)
+    return list
+  }
+
+  function colorForEdge3D(P,Q, base){
+    const mode = S.colorMode
+    if(mode==='mono') return base
+    const pId = P.id ?? 0, qId = Q.id ?? 0
+    const rnd = mulberry32(S.seed + (pId*73856093 ^ qId*19349663))
+    if(mode==='random'){
+      const t = 0.2 + rnd()*0.6
+      return mixColor(base, '#'+Math.floor(rnd()*0xffffff).toString(16).padStart(6,'0'), t*0.3)
+    }
+    if(mode==='angle'){
+      // usa azimuth XY per colorare
+      const ang = (Math.atan2(Q.y-P.y, Q.x-P.x)+Math.PI)/(Math.PI*2)
+      const h = Math.round(lerp(200, 320, ang))
+      return hsl(h, 70, 65)
+    }
+    if(mode==='distance'){
+      const d = Math.sqrt(dist2_3d(P,Q))
+      const maxd = Math.hypot(S.w3,S.h3,S.d3)
+      const t = Math.pow(d/maxd, 0.6)
+      return mixColor('#71c1ff', base, t)
+    }
+    return base
+  }
+
+  function draw3D(points, edges){
+    init3D()
+    const {scene, group, renderer, camera, orbit} = threeCtx
+    // clear previous
+    while(group.children.length) group.remove(group.children[0])
+    const lenScale = S.lengthScale
+    const shrink = Math.max(0, S.pointRadius||0)
+    const positions = new Float32Array(edges.length*2*3)
+    const colors = new Float32Array(edges.length*2*3)
+    let pi=0, ci=0
+    const colTmp = new THREE.Color()
+    // bounds for centering
+    let minX= Infinity, minY= Infinity, minZ= Infinity, maxX=-Infinity, maxY=-Infinity, maxZ=-Infinity
+    for(const e of edges){
+      const P = points[e.a], Q = points[e.b]
+      // scale length and shrink ends
+      const v = {x: (Q.x-P.x)*lenScale, y:(Q.y-P.y)*lenScale, z:(Q.z-P.z)*lenScale}
+      let s = {x:P.x,y:P.y,z:P.z}
+      let t = {x:P.x+v.x,y:P.y+v.y,z:P.z+v.z}
+      const dirv = {x:t.x-s.x,y:t.y-s.y,z:t.z-s.z}
+      const L = Math.hypot(dirv.x,dirv.y,dirv.z)||1
+      const u = {x:dirv.x/L,y:dirv.y/L,z:dirv.z/L}
+      const shrinkAmt = Math.min(shrink, Math.max(0, L/2-1))
+      s = {x:s.x+u.x*shrinkAmt, y:s.y+u.y*shrinkAmt, z:s.z+u.z*shrinkAmt}
+      t = {x:t.x-u.x*shrinkAmt, y:t.y-u.y*shrinkAmt, z:t.z-u.z*shrinkAmt}
+      // bounds
+      if(s.x<minX)minX=s.x; if(s.y<minY)minY=s.y; if(s.z<minZ)minZ=s.z
+      if(s.x>maxX)maxX=s.x; if(s.y>maxY)maxY=s.y; if(s.z>maxZ)maxZ=s.z
+      if(t.x<minX)minX=t.x; if(t.y<minY)minY=t.y; if(t.z<minZ)minZ=t.z
+      if(t.x>maxX)maxX=t.x; if(t.y>maxY)maxY=t.y; if(t.z>maxZ)maxZ=t.z
+      positions[pi++]=s.x; positions[pi++]=s.y; positions[pi++]=s.z
+      positions[pi++]=t.x; positions[pi++]=t.y; positions[pi++]=t.z
+      const c = colorForEdge3D(P,Q, S.strokeColor)
+      colTmp.set(c)
+      for(let k=0;k<2;k++){ colors[ci++]=colTmp.r; colors[ci++]=colTmp.g; colors[ci++]=colTmp.b }
+    }
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.BufferAttribute(positions,3))
+    geo.setAttribute('color', new THREE.BufferAttribute(colors,3))
+    const mat = new THREE.LineBasicMaterial({vertexColors:true, transparent:true, opacity:S.opacity})
+    const lines = new THREE.LineSegments(geo, mat)
+    group.add(lines)
+
+    // arrows instanced
+    const needStart = (S.terminals==='start'||S.terminals==='both')
+    const needEnd = (S.terminals==='end'||S.terminals==='both')
+    const arrowGeo = (S.terminalStyle==='arrow') ? new THREE.ConeGeometry(Math.max(1,S.arrowSize*0.6), Math.max(2,S.arrowSize*1.5), 12) :
+                     (S.terminalStyle==='dot') ? new THREE.SphereGeometry(Math.max(1,S.arrowSize*0.5), 12, 12) :
+                     new THREE.BoxGeometry(Math.max(0.5,S.arrowSize*0.4), Math.max(0.5,S.arrowSize*0.4), Math.max(1,S.arrowSize))
+    const arrowMat = new THREE.MeshStandardMaterial({color: S.strokeColor, metalness:0, roughness:1, transparent:true, opacity:S.opacity})
+    const startCount = needStart? edges.length : 0
+    const endCount = needEnd? edges.length : 0
+    if(startCount){
+      const inst = new THREE.InstancedMesh(arrowGeo, arrowMat, startCount)
+      let idx=0
+      const m = new THREE.Matrix4(); const q = new THREE.Quaternion(); const s = new THREE.Vector3(1,1,1)
+      for(const e of edges){
+        const P = points[e.a], Q = points[e.b]
+        const v = new THREE.Vector3(Q.x-P.x, Q.y-P.y, Q.z-P.z).multiplyScalar(lenScale)
+        const base = new THREE.Vector3(P.x,P.y,P.z)
+        const end = base.clone().add(v)
+        const dir = end.clone().sub(base)
+        const L = dir.length()||1
+        dir.normalize()
+        const shrinkAmt = Math.min(shrink, Math.max(0, L/2-1))
+        const pos = base.clone().add(dir.clone().multiplyScalar(shrinkAmt))
+        // orient arrow along dir (start points towards end)
+        q.setFromUnitVectors(new THREE.Vector3(0,1,0), dir)
+        m.compose(pos, q, s)
+        inst.setMatrixAt(idx++, m)
+      }
+      group.add(inst)
+    }
+    if(endCount){
+      const inst = new THREE.InstancedMesh(arrowGeo, arrowMat, endCount)
+      let idx=0
+      const m = new THREE.Matrix4(); const q = new THREE.Quaternion(); const s = new THREE.Vector3(1,1,1)
+      for(const e of edges){
+        const P = points[e.a], Q = points[e.b]
+        const v = new THREE.Vector3(Q.x-P.x, Q.y-P.y, Q.z-P.z).multiplyScalar(lenScale)
+        const base = new THREE.Vector3(P.x,P.y,P.z)
+        const end = base.clone().add(v)
+        const dir = end.clone().sub(base)
+        const L = dir.length()||1
+        dir.normalize()
+        const shrinkAmt = Math.min(shrink, Math.max(0, L/2-1))
+        const pos = end.clone().sub(dir.clone().multiplyScalar(shrinkAmt))
+        // orient arrow at end towards end direction
+        q.setFromUnitVectors(new THREE.Vector3(0,1,0), dir)
+        m.compose(pos, q, s)
+        inst.setMatrixAt(idx++, m)
+      }
+      group.add(inst)
+    }
+
+    // center and camera framing based on bounds
+    const cx = (minX+maxX)/2, cy = (minY+maxY)/2, cz = (minZ+maxZ)/2
+    group.position.set(0, 0, 0)
+    const sizeX = (maxX-minX), sizeY = (maxY-minY), sizeZ = (maxZ-minZ)
+    const radius = Math.max(1, Math.hypot(sizeX, sizeY, sizeZ)/2)
+    const fov = camera.fov * Math.PI/180
+    const dist = Math.max(radius / Math.sin(fov/2), radius*2)
+    threeCtx.orbit.state.target.set(cx, cy, cz)
+    // mantieni yaw/pitch esistenti ma aggiorna distanza
+    threeCtx.orbit.state.distance = dist * 1.1
+    camera.near = Math.max(0.1, dist/100)
+    camera.far = dist*10 + radius
+    camera.updateProjectionMatrix()
+    threeCtx.orbit.update()
+
+    // background color
+    threeCtx.renderer.setClearColor(new THREE.Color(S.bg), 1)
+  }
+
+  // ————— Disegno archi
+  function drawEdges(points, edges){
+    edgeLayer.innerHTML = ''
+    const marker = markerId()
+    const dash = S.dash>0 ? `${S.dash} ${Math.max(1,S.gap)}` : null
+    const baseColor = S.strokeColor
+    const lw = S.stroke
+    const rnd = mulberry32(S.seed+777)
+    const chaos = S.chaos
+    const curv = S.curvature
+    const lenScale = S.lengthScale
+    const ptRadius = Math.max(0, S.pointRadius || 0)
+
+    function drawEdge(P,Q){
+      // applica scala lunghezza dal punto P verso Q
+      const v = {x: Q.x - P.x, y: Q.y - P.y}
+      const P2 = {x: P.x + v.x*lenScale, y: P.y + v.y*lenScale}
+      const dirVec = {x: P2.x - P.x, y: P2.y - P.y}
+      const fullLen = Math.hypot(dirVec.x, dirVec.y) || 1
+      const shrinkLimit = Math.max(0, fullLen/2 - 1)
+      const shrink = ptRadius>0 ? Math.min(ptRadius, shrinkLimit) : 0
+      const unit = norm(dirVec)
+      const start = shrink>0 ? { x: P.x + unit.x*shrink, y: P.y + unit.y*shrink } : { x: P.x, y: P.y }
+      const end = shrink>0 ? { x: P2.x - unit.x*shrink, y: P2.y - unit.y*shrink } : { x: P2.x, y: P2.y }
+      const seg = { x: end.x - start.x, y: end.y - start.y }
+      const L = Math.hypot(seg.x, seg.y)
+      if(L<0.5) return
+      // curvatura (Q-quadratic con controllo a metà + offset perpendicolare)
+      const mid = {x: (start.x+end.x)/2, y:(start.y+end.y)/2}
+      const nv = norm(seg)
+      const n = perp(nv)
+      const chaosOffset = (rnd()-0.5) * chaos * L * 0.2
+      const ctrl = { x: mid.x + n.x*(curv*L*0.3 + chaosOffset), y: mid.y + n.y*(curv*L*0.3 + chaosOffset) }
+      const d = (curv>0.001)
+        ? `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} Q ${ctrl.x.toFixed(2)} ${ctrl.y.toFixed(2)} ${end.x.toFixed(2)} ${end.y.toFixed(2)}`
+        : `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} L ${end.x.toFixed(2)} ${end.y.toFixed(2)}`
+
+      const p = document.createElementNS('http://www.w3.org/2000/svg','path')
+      p.setAttribute('d', d)
+      const col = colorForEdge(P,Q, baseColor)
+      p.setAttribute('stroke', col)
+      p.setAttribute('fill','none')
+      p.setAttribute('stroke-width', lw)
+      p.setAttribute('stroke-linecap','round')
+      p.setAttribute('stroke-linejoin','round')
+      p.setAttribute('opacity', S.opacity)
+      if(dash) p.setAttribute('stroke-dasharray', dash)
+      if(S.terminals!=='none' && marker){
+        if(S.terminals==='start' || S.terminals==='both') p.setAttribute('marker-start', `url(#${marker})`)
+        if(S.terminals==='end' || S.terminals==='both') p.setAttribute('marker-end', `url(#${marker})`)
+      }
+      edgeLayer.appendChild(p)
+    }
+
+    for(const e of edges){
+      const P = points[e.a], Q = points[e.b]
+      drawEdge(P,Q)
+    }
+  }
+
+  // ————— JSON import/export
+  function exportJSON(points, edges){
+    const hasZ = points.length && points[0].z !== undefined
+    const data = {
+      area: S.mode==='3d'
+        ? { shape3D:S.area3DShape, width:S.w3, height:S.h3, depth:S.d3, radius:S.r3, marginPct:S.marginPct, bg:S.bg }
+        : { shape:S.areaShape, width:S.w, height:S.h, radius:S.r, marginPct:S.marginPct, bg:S.bg },
+      points: points.map(p=>{
+        const o = {id:p.id}
+        o.x = +p.x.toFixed(2); o.y = +p.y.toFixed(2); if(hasZ) o.z = +p.z.toFixed(2)
+        return o
+      }),
+      edges: edges.map(e=>({from:e.a, to:e.b})),
+      params: { ...S }
+    }
+    return JSON.stringify(data, null, 2)
+  }
+  function importJSON(text){
+    try{
+      const j = JSON.parse(text)
+      if(j.area){
+        if(j.area.shape) S.areaShape = j.area.shape
+        if(j.area.shape3D) { S.area3DShape = j.area.shape3D; S.mode='3d' }
+        if(j.area.width) { S.w = j.area.width; S.w3 = j.area.width }
+        if(j.area.height) { S.h = j.area.height; S.h3 = j.area.height }
+        if(j.area.depth) S.d3 = j.area.depth
+        if(j.area.radius) { S.r = j.area.radius; S.r3 = j.area.radius }
+        if(j.area.marginPct!=null) S.marginPct = j.area.marginPct
+        if(j.area.bg) S.bg = j.area.bg
+      }
+      if(j.params) Object.assign(S, j.params)
+      // Se points+edges sono definiti, disegna esattamente quelli
+      if(Array.isArray(j.points) && Array.isArray(j.edges)){
+        // set UI
+        const hasZ = j.points.length && j.points[0].z !== undefined
+        if(hasZ) S.mode='3d'
+        syncUIFromState(); toggle3DControls()
+        const pts = j.points.map((p,i)=>({id: p.id ?? i, x:+p.x, y:+p.y, ...(p.z!==undefined?{z:+p.z}:{}) }))
+        const eds = j.edges.map(e=>({a: e.from, b: e.to}))
+        if(S.mode==='3d'){
+          draw3D(pts, eds)
+        } else {
+          ensureMarkers(); drawArea(); drawEdges(pts, eds)
+        }
+        hud.textContent = `Import JSON: ${pts.length} punti${S.mode==='3d'?' (3D)':''}, ${eds.length} archi`
+        return
+      }
+      // altrimenti rigenera
+      syncUIFromState(); toggle3DControls(); render()
+    }catch(err){
+      alert('JSON non valido: '+ err.message)
+    }
+  }
+
+  function syncUIFromState(){
+    for(const [id,key,prop] of binds){
+      const el = $(id); if(!el) continue;
+      el[prop] = S[key]
+    }
+    if(document.getElementById('strokeColorHex')) document.getElementById('strokeColorHex').value = S.strokeColor
+    if(document.getElementById('bgHex')) document.getElementById('bgHex').value = S.bg
+    toggle3DControls()
+    updateOutput('points', S.points)
+    updateOutput('clusters', S.clusters)
+    updateOutput('edges', S.edges)
+    updateOutput('margin', S.marginPct, '%')
+    updateOutput('jitter', S.jitter.toFixed(2))
+    updateOutput('pointRadius', S.pointRadius)
+    updateOutput('connectivity', S.connectivity.toFixed(2))
+    updateOutput('branchiness', S.branchiness.toFixed(2))
+    updateOutput('chaos', S.chaos.toFixed(2))
+    updateOutput('curvature', S.curvature.toFixed(2))
+    updateOutput('lengthScale', S.lengthScale.toFixed(2))
+    updateOutput('dirBias', S.dirBias+'°')
+    updateOutput('dirStrength', S.dirStrength.toFixed(2))
+    updateOutput('stroke', S.stroke)
+    updateOutput('opacity', S.opacity.toFixed(2))
+    updateOutput('dash', S.dash)
+    updateOutput('gap', S.gap)
+    updateOutput('arrowSize', S.arrowSize)
+    toggleClusterRow()
+  }
+
+  // ————— Export helpers
+  function download(filename, dataUrl){
+    const a = document.createElement('a')
+    a.href = dataUrl
+    a.download = filename
+    document.body.appendChild(a)
+    a.click(); a.remove();
+  }
+
+  function exportSVG(){
+    if(S.mode==='3d'){
+      alert('Export SVG non disponibile in modalità 3D.')
+      return
+    }
+    const clone = board.cloneNode(true)
+    clone.setAttribute('viewBox', `0 0 ${S.w} ${S.h}`)
+    clone.setAttribute('width', S.w)
+    clone.setAttribute('height', S.h)
+    const xml = new XMLSerializer().serializeToString(clone)
+    const blob = new Blob([xml], {type:'image/svg+xml;charset=utf-8'})
+    const url = URL.createObjectURL(blob)
+    download('arrowlab.svg', url)
+    setTimeout(()=>URL.revokeObjectURL(url), 1000)
+  }
+
+  function exportPNG(){
+    if(S.mode==='3d'){
+      init3D(); resize3D()
+      const url = threeCtx.renderer.domElement.toDataURL('image/png')
+      download('arrowlab-3d.png', url)
+    } else {
+      const xml = new XMLSerializer().serializeToString(board)
+      const svg64 = btoa(unescape(encodeURIComponent(xml)))
+      const image64 = 'data:image/svg+xml;base64,' + svg64
+      const img = new Image()
+      img.onload = function(){
+        const canvas = document.createElement('canvas')
+        canvas.width = S.w; canvas.height = S.h
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = S.bg; ctx.fillRect(0,0,canvas.width,canvas.height)
+        ctx.drawImage(img, 0,0, canvas.width, canvas.height)
+        const url = canvas.toDataURL('image/png')
+        download('arrowlab.png', url)
+      }
+      img.src = image64
+    }
+  }
+
+  // ————— Render pipeline
+  function render(){
+    coerceTypes(); toggle3DControls()
+    if(S.mode==='3d'){
+      const t0 = performance.now()
+      const pts = genPoints3D()
+      const cand = buildCandidates3D(pts)
+      const eds = selectEdges(pts, cand)
+      draw3D(pts, eds)
+      const t1 = performance.now()
+      hud.textContent = `${pts.length} punti (3D) · ${eds.length} frecce · ${(t1-t0).toFixed(1)} ms`
+    } else {
+      board.setAttribute('viewBox', `0 0 ${S.w} ${S.h}`)
+      ensureMarkers(); drawArea()
+      const t0 = performance.now()
+      const pts = genPoints()
+      const cand = buildCandidates(pts)
+      const eds = selectEdges(pts, cand)
+      drawEdges(pts, eds)
+      const t1 = performance.now()
+      hud.textContent = `${pts.length} punti · ${eds.length} frecce · ${(t1-t0).toFixed(1)} ms`
+    }
+  }
+
+  // ————— Eventi UI
+  document.getElementById('btn-random').addEventListener('click', ()=>{ S.seed = Math.floor(Math.random()*1e6); $('seed').value = S.seed; render() })
+  document.getElementById('btn-reset').addEventListener('click', ()=>{ Object.assign(S, {
+    mode:'2d',
+    areaShape:'rect', w:1000, h:700, r:350, marginPct:5, bg:'#ffffff',
+    area3DShape:'box', w3:1000, h3:700, d3:700, r3:350,
+    distribution:'uniform', points:180, clusters:5, jitter:0.12, pointRadius:12, seed:12345,
+    edges:600, connectivity:0.38, branchiness:0.5, chaos:0.2, curvature:0.35, lengthScale:0.9,
+    dirBias:0, dirStrength:0,
+    stroke:1.4, opacity:0.9, dash:0, gap:0,
+    strokeColor:'#000000', colorMode:'mono', terminals:'start', terminalStyle:'arrow', arrowSize:8,
+    showOutline:true, outlineDashed:true,
+  }); syncUIFromState(); render() })
+  document.getElementById('btn-export-svg').addEventListener('click', exportSVG)
+  document.getElementById('btn-export-png').addEventListener('click', exportPNG)
+  document.getElementById('btn-json').addEventListener('click', ()=>{
+    const d = document.querySelector('details'); if(d) d.open = !d.open
+  })
+  document.getElementById('btn-export-json').addEventListener('click', ()=>{
+    let pts, cand, eds
+    if(S.mode==='3d'){
+      pts = genPoints3D(); cand = buildCandidates3D(pts); eds = selectEdges(pts,cand)
+    } else {
+      pts = genPoints(); cand = buildCandidates(pts); eds = selectEdges(pts,cand)
+    }
+    $('jsonio').value = exportJSON(pts, eds)
+  })
+  document.getElementById('btn-import-json').addEventListener('click', ()=>{
+    importJSON($('jsonio').value.trim())
+  })
+
+  // ————— Init
+  bindAll(); syncUIFromState(); render()
+  </script>
+</body>
+</html>
