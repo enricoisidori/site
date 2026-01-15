@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <title>aleph</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+      }
+      #stage {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+      }
+      img {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover; /* usa "contain" se vuoi vedere tutta l’immagine senza crop */
+        image-rendering: auto;
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none;
+      }
+      /* HUD UI rimossa: comandi restano attivi via tastiera */
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <img id="img" alt="Wikimedia Commons image" loading="lazy" decoding="async" />
+    </div>
+
+    
+
+    <script>
+      const img = document.getElementById("img");
+      const stateEl = document.getElementById("state");
+      const hzEl = document.getElementById("hz");
+
+      // Refresh aggressivo: ricarica la stessa immagine con cache-busting.
+      // Nota: caricare davvero 60Hz dal network non è realistico; qui forzi solo il browser a riprovare.
+      // Se la cache/CDN risponde velocemente può comunque "flickerare" come desideri.
+      let hz = 10; // default 10 Hz reale (modificabile con ↑/↓)
+      const HZ_STEPS = Array.from({ length: 24 }, (_, i) => i + 2); // 2..25
+      let hzIdx = Math.max(0, HZ_STEPS.indexOf(hz));
+      let playing = true;
+      let fitMode = "cover"; // "cover" o "contain"
+      let timerId = null;
+      const maxBuffer = 180; // obiettivo minimo di URL candidati in coda
+
+      // ---------- Solo parte immagini WikiCommons (come richiesto) ----------
+      const RES_STEPS = [96, 128, 192, 256, 320];
+      let resIdx = 1; // default 128
+
+      const Commons = {
+        // Miniature per massimizzare throughput; qualità secondaria
+        thumbWidth: RES_STEPS[resIdx],
+        urlsQueue: [], // [{id, url}]
+        prefetching: false,
+        minBuffer: 60, // cuscinetto URL
+        preloaded: [], // [{id, img}]
+        loadingCount: 0,
+        maxConcurrent: 12, // decodifica parallela
+        maxPool: 480, // cap del pool
+        heldIds: new Set(), // id attualmente in coda o pre-caricati
+        seenIds: new Set(), // id già mostrati
+        seenOrder: [], // LRU per trimming
+        seenCap: 50000,
+      };
+
+      function addSeen(id) {
+        if (!id) return;
+        if (!Commons.seenIds.has(id)) {
+          Commons.seenIds.add(id);
+          Commons.seenOrder.push(id);
+          if (Commons.seenOrder.length > Commons.seenCap) {
+            const old = Commons.seenOrder.shift();
+            Commons.seenIds.delete(old);
+          }
+        }
+      }
+
+      function commonsApiUrl(n, width) {
+        const base = "https://commons.wikimedia.org/w/api.php";
+        const p = new URLSearchParams({
+          action: "query",
+          generator: "random",
+          grnnamespace: "6",
+          grnlimit: String(n),
+          prop: "imageinfo",
+          iiprop: "url|mime",
+          iiurlwidth: String(width),
+          format: "json",
+          origin: "*",
+        });
+        return `${base}?${p.toString()}`;
+      }
+
+      async function fetchCommonsUrls(n = Commons.minBuffer) {
+        if (Commons.prefetching) return;
+        Commons.prefetching = true;
+        try {
+          const res = await fetch(commonsApiUrl(n, Commons.thumbWidth));
+          const data = await res.json();
+          const pages = data?.query?.pages || {};
+          const urls = [];
+          for (const k in pages) {
+            const title = pages[k]?.title || String(pages[k]?.pageid || "");
+            const info = pages[k]?.imageinfo?.[0];
+            const u = info?.thumburl || info?.url;
+            const mime = info?.mime || "";
+            if (!title || !u || !mime.startsWith("image/")) continue;
+            if (Commons.seenIds.has(title) || Commons.heldIds.has(title)) continue;
+            urls.push({ id: title, url: u });
+            Commons.heldIds.add(title);
+          }
+          Commons.urlsQueue.push(...urls);
+          // Fallback: Special:Random/File
+          while (Commons.urlsQueue.length < Commons.minBuffer) {
+            const one = await fetchOneFromSpecialRandom(Commons.thumbWidth);
+            if (!one) break;
+            if (Commons.seenIds.has(one.id) || Commons.heldIds.has(one.id)) continue;
+            Commons.urlsQueue.push(one);
+            Commons.heldIds.add(one.id);
+          }
+        } catch (e) {
+          console.warn("Commons fetch failed", e);
+        } finally {
+          Commons.prefetching = false;
+        }
+      }
+
+      async function fetchOneFromSpecialRandom(width = Commons.thumbWidth) {
+        try {
+          const resp = await fetch(
+            "https://commons.wikimedia.org/wiki/Special:Random/File",
+            { redirect: "follow" }
+          );
+          const finalUrl = resp.url || "";
+          const idx = finalUrl.indexOf("/wiki/");
+          if (idx === -1) return null;
+          const title = decodeURIComponent(finalUrl.slice(idx + 6));
+          if (!title || !title.startsWith("File:")) return null;
+          const p = new URLSearchParams({
+            action: "query",
+            titles: title,
+            prop: "imageinfo",
+            iiprop: "url|mime",
+            iiurlwidth: String(width),
+            format: "json",
+            origin: "*",
+          });
+          const r2 = await fetch(
+            `https://commons.wikimedia.org/w/api.php?${p.toString()}`
+          );
+          const d2 = await r2.json();
+          const pages = d2?.query?.pages || {};
+          for (const k in pages) {
+            const info = pages[k]?.imageinfo?.[0];
+            const u = info?.thumburl || info?.url;
+            const mime = info?.mime || "";
+            if (u && mime.startsWith("image/")) return { id: title, url: u };
+          }
+        } catch (_) {}
+        return null;
+      }
+
+      async function ensureCommonsBuffer(n = maxBuffer) {
+        if (Commons.urlsQueue.length >= n) return;
+        await fetchCommonsUrls(Math.max(Commons.minBuffer, n));
+      }
+
+      function pumpPreload() {
+        // Precarica immagini in parallelo (streaming continuo, senza loop)
+        const conc = Commons.maxConcurrent;
+        while (
+          Commons.preloaded.length < Commons.maxPool &&
+          Commons.loadingCount < conc &&
+          Commons.urlsQueue.length > 0
+        ) {
+          const cand = Commons.urlsQueue.shift();
+          const { id, url } = cand || {};
+          const im = new Image();
+          im.crossOrigin = "anonymous";
+          Commons.loadingCount++;
+          im.onload = () => {
+            // push oggetto con id + immagine; mantieni cap (discard vecchi)
+            Commons.preloaded.push({ id, img: im });
+            if (Commons.preloaded.length > Commons.maxPool) Commons.preloaded.shift();
+            Commons.loadingCount--;
+            pumpPreload();
+          };
+          im.onerror = () => {
+            // rimuovi il blocco per permettere un altro tentativo futuro
+            if (id) Commons.heldIds.delete(id);
+            Commons.loadingCount--;
+            pumpPreload();
+          };
+          im.src = url;
+        }
+      }
+
+      function setHz(newHz) {
+        hz = Math.max(1, Math.min(240, newHz | 0));
+        if (hzEl) hzEl.textContent = String(hz);
+        if (playing) restart();
+      }
+
+      function setHzByIndex(newIdx) {
+        hzIdx = Math.max(0, Math.min(HZ_STEPS.length - 1, newIdx | 0));
+        setHz(HZ_STEPS[hzIdx]);
+        console.log("Hz:", hz);
+      }
+      function incHz() { setHzByIndex(hzIdx + 1); }
+      function decHz() { setHzByIndex(hzIdx - 1); }
+
+      function setResolutionByIndex(newIdx) {
+        resIdx = Math.max(0, Math.min(RES_STEPS.length - 1, newIdx | 0));
+        Commons.thumbWidth = RES_STEPS[resIdx];
+        // Svuota code di attesa e buffer per applicare la nuova risoluzione
+        Commons.urlsQueue.length = 0;
+        Commons.preloaded.length = 0;
+        Commons.heldIds.clear();
+        console.log("Resolution thumbWidth:", Commons.thumbWidth, "px");
+        ensureCommonsBuffer(maxBuffer).then(() => pumpPreload());
+      }
+      function incRes() { setResolutionByIndex(resIdx + 1); }
+      function decRes() { setResolutionByIndex(resIdx - 1); }
+
+      function setPlaying(p) {
+        playing = !!p;
+        if (stateEl) stateEl.textContent = playing ? "PLAY" : "PAUSE";
+        if (playing) restart();
+        else stop();
+      }
+
+      function stop() {
+        if (timerId) clearInterval(timerId);
+        timerId = null;
+      }
+
+      let ticking = false;
+      async function tick() {
+        if (ticking) return;
+        ticking = true;
+        try {
+          // Se buffer vuoto, alimenta
+          if (Commons.preloaded.length === 0) {
+            if (Commons.urlsQueue.length < Commons.minBuffer) {
+              await ensureCommonsBuffer(maxBuffer);
+            }
+            pumpPreload();
+          }
+          // Consuma una nuova immagine (no loop: si scarta quella usata)
+          const frame = Commons.preloaded.length > 0 ? Commons.preloaded.shift() : null;
+          if (frame && frame.img && frame.img.src) {
+            img.src = frame.img.src;
+            // appena mostrata: marca come vista e libera il blocco
+            if (frame.id) {
+              Commons.heldIds.delete(frame.id);
+              addSeen(frame.id);
+            }
+          }
+          // Mantieni il buffer rifornito in background
+          if (Commons.urlsQueue.length < Math.floor(maxBuffer / 2)) ensureCommonsBuffer(maxBuffer);
+          pumpPreload();
+        } finally {
+          ticking = false;
+        }
+      }
+
+      // Schedulatore ad alta risoluzione con correzione di drift
+      let schedulerId = null;
+      function runScheduler() {
+        const interval = 1000 / hz;
+        let next = performance.now();
+        const maxBurst = 8; // evita loop troppo lunghi se in ritardo
+        function step() {
+          if (!playing) return;
+          const now = performance.now();
+          let count = 0;
+          while (now >= next && count < maxBurst) {
+            tick();
+            next += interval;
+            count++;
+          }
+          const delay = Math.max(0, next - performance.now());
+          schedulerId = setTimeout(step, delay);
+        }
+        step();
+      }
+
+      function stop() {
+        if (timerId) clearInterval(timerId);
+        timerId = null;
+        if (schedulerId) clearTimeout(schedulerId);
+        schedulerId = null;
+      }
+
+      function restart() {
+        stop();
+        tick(); // primo frame asap
+        runScheduler();
+      }
+
+      // Setup iniziale
+      img.style.objectFit = fitMode;
+      setHzByIndex(hzIdx);
+      // Avvio streaming: riempi una coda di URL e decodifica continua
+      ensureCommonsBuffer(maxBuffer).then(() => {
+        pumpPreload();
+        setPlaying(true);
+      });
+
+      // Salta rapidamente le immagini che danno errore di caricamento
+      img.addEventListener("error", () => {
+        setTimeout(() => {
+          // prova subito la prossima
+          tick();
+        }, 10);
+      });
+
+      // UI rimossa: nessun HUD, comandi da tastiera attivi
+
+      // Fullscreen helper
+      async function toggleFullscreen() {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+          } else {
+            await document.exitFullscreen();
+          }
+        } catch (_) {
+          /* ignore */
+        }
+      }
+
+      // Keybindings
+      window.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault();
+          setPlaying(!playing);
+        } else if (e.code === "ArrowUp") {
+          e.preventDefault();
+          incHz();
+        } else if (e.code === "ArrowDown") {
+          e.preventDefault();
+          decHz();
+        } else if (e.code === "ArrowRight") {
+          e.preventDefault();
+          incRes();
+        } else if (e.code === "ArrowLeft") {
+          e.preventDefault();
+          decRes();
+        } else if (e.key === "f" || e.key === "F") {
+          toggleFullscreen();
+        } else if (e.key === "c" || e.key === "C") {
+          fitMode = fitMode === "cover" ? "contain" : "cover";
+          img.style.objectFit = fitMode;
+        }
+      });
+
+      // Click per play/pause (utile senza tastiera)
+      document.addEventListener("click", () => setPlaying(!playing));
+
+      // Se la scheda va in background, riduci stress
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stop();
+        else if (playing) restart();
+      });
+    </script>
+  </body>
+</html>

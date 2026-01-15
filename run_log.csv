@@ -1,0 +1,501 @@
+timestamp,name,input_url,action,status,page_url,http_status,bytes,detail
+2025-12-18T12:48:45Z,Daniela Comani,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Timm Ulrichs,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Wim Delvoye,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Boetti,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Rebecca Horn,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Lorenzo Serraglia,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Michel Show,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Stelarc,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Jon Rafman,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,Martin DeVido,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:45Z,theokamecke.com,https://www.theokamecke.com/,fetch_homepage,start,https://www.theokamecke.com/,,,
+2025-12-18T12:48:46Z,theokamecke.com,https://www.theokamecke.com/,fetch_homepage,ok,https://www.theokamecke.com/,200,3063,
+2025-12-18T12:48:46Z,theokamecke.com,https://www.theokamecke.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:48:46Z,Gonzalez Torres,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:48:46Z,simonweckert.com,https://simonweckert.com/,fetch_homepage,start,https://simonweckert.com/,,,
+2025-12-18T12:48:46Z,simonweckert.com,https://simonweckert.com/,fetch_homepage,ok,https://simonweckert.com/,200,47083,
+2025-12-18T12:48:47Z,simonweckert.com,https://simonweckert.com/,fetch_about,start,https://simonweckert.com/about.html,,,
+2025-12-18T12:48:48Z,simonweckert.com,https://simonweckert.com/,fetch_about,ok,https://simonweckert.com/about.html,200,33484,
+2025-12-18T12:48:48Z,simonweckert.com,https://simonweckert.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:48:48Z,deappel.nl,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_homepage,start,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,,,
+2025-12-18T12:49:58Z,Daniela Comani,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Timm Ulrichs,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Wim Delvoye,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Alighiero Boetti,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Rebecca Horn,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Lorenzo Serraglia,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Michel Show,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Stelarc,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Jon Rafman,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,Martin DeVido,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:58Z,The Okamecke,https://www.theokamecke.com/,fetch_homepage,start,https://www.theokamecke.com/,,,
+2025-12-18T12:49:59Z,The Okamecke,https://www.theokamecke.com/,fetch_homepage,ok,https://www.theokamecke.com/,200,3063,
+2025-12-18T12:49:59Z,The Okamecke,https://www.theokamecke.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:49:59Z,Félix González-Torres,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:49:59Z,Simon Weckert,https://simonweckert.com/,fetch_homepage,start,https://simonweckert.com/,,,
+2025-12-18T12:49:59Z,Simon Weckert,https://simonweckert.com/,fetch_homepage,ok,https://simonweckert.com/,200,47083,
+2025-12-18T12:49:59Z,Simon Weckert,https://simonweckert.com/,fetch_about,start,https://simonweckert.com/about.html,,,
+2025-12-18T12:50:00Z,Simon Weckert,https://simonweckert.com/,fetch_about,ok,https://simonweckert.com/about.html,200,33484,
+2025-12-18T12:50:00Z,Simon Weckert,https://simonweckert.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:00Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_homepage,start,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,,,
+2025-12-18T12:50:01Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_homepage,ok,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,200,24876,
+2025-12-18T12:50:01Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,start,https://www.deappel.nl/en/menu/513/514-mission,,,
+2025-12-18T12:50:02Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,ok,https://www.deappel.nl/en/menu/513-about/514-mission,200,16353,
+2025-12-18T12:50:02Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,start,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story#,,,
+2025-12-18T12:50:03Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,ok,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,200,28768,
+2025-12-18T12:50:03Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,start,https://www.deappel.nl/en/menu/513-about/13183-privacy-policy,,,
+2025-12-18T12:50:05Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,ok,https://www.deappel.nl/en/menu/513-about/13183-privacy-policy,200,17350,
+2025-12-18T12:50:05Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:05Z,Jonas Fischer,https://www.jonas-fischer.com/,fetch_homepage,start,https://www.jonas-fischer.com/,,,
+2025-12-18T12:50:06Z,Jonas Fischer,https://www.jonas-fischer.com/,fetch_homepage,ok,https://www.jonas-fischer.com/,200,38624,
+2025-12-18T12:50:06Z,Jonas Fischer,https://www.jonas-fischer.com/,fetch_about,start,https://www.jonas-fischer.com/info,,,
+2025-12-18T12:50:07Z,Jonas Fischer,https://www.jonas-fischer.com/,fetch_about,ok,https://www.jonas-fischer.com/info,200,33182,
+2025-12-18T12:50:07Z,Jonas Fischer,https://www.jonas-fischer.com/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:50:07Z,Bertrand Lavier,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:07Z,Sasha Sime,https://www.instagram.com/sasha_sime/,fetch_homepage,start,https://www.instagram.com/sasha_sime/,,,
+2025-12-18T12:50:07Z,Sasha Sime,https://www.instagram.com/sasha_sime/,fetch_homepage,ok,https://www.instagram.com/sasha_sime/,200,799542,
+2025-12-18T12:50:07Z,Sasha Sime,https://www.instagram.com/sasha_sime/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:50:07Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_homepage,start,https://www.domesticstreamers.com/,,,
+2025-12-18T12:50:08Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_homepage,ok,https://www.domesticstreamers.com/,200,160036,
+2025-12-18T12:50:08Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,start,https://www.domesticstreamers.com/about/,,,
+2025-12-18T12:50:09Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,ok,https://www.domesticstreamers.com/about/,200,249836,
+2025-12-18T12:50:09Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,start,https://www.domesticstreamers.com/privacy-statement/,,,
+2025-12-18T12:50:10Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,ok,https://www.domesticstreamers.com/privacy-statement/,200,30449,
+2025-12-18T12:50:10Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,start,https://www.domesticstreamers.com/accessibility-statement/,,,
+2025-12-18T12:50:11Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,ok,https://www.domesticstreamers.com/accessibility-statement/,200,29710,
+2025-12-18T12:50:11Z,Domestic Data Streamers,https://www.domesticstreamers.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:11Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,fetch_homepage,start,https://lunamaurer.com/poly-luna/4/living-agenda.html,,,
+2025-12-18T12:50:12Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,fetch_homepage,ok,https://lunamaurer.com/poly-luna/4/living-agenda.html,200,89476,
+2025-12-18T12:50:12Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,fetch_about,start,https://lunamaurer.com/poly-luna/4/infocus.html,,,
+2025-12-18T12:50:14Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,fetch_about,ok,https://lunamaurer.com/poly-luna/4/infocus.html,200,89452,
+2025-12-18T12:50:14Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:14Z,LAV.IO,https://lav.io/,fetch_homepage,start,https://lav.io/,,,
+2025-12-18T12:50:15Z,LAV.IO,https://lav.io/,fetch_homepage,ok,https://lav.io/,200,27859,
+2025-12-18T12:50:15Z,LAV.IO,https://lav.io/,fetch_about,start,https://lav.io/about,,,
+2025-12-18T12:50:16Z,LAV.IO,https://lav.io/,fetch_about,ok,https://lav.io/about/,200,6549,
+2025-12-18T12:50:16Z,LAV.IO,https://lav.io/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:16Z,Cocksedge,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:16Z,De bello (mostra),nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:16Z,SUPERFLEX,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:16Z,Jenny Odell,https://www.jennyodell.com/,fetch_homepage,start,https://www.jennyodell.com/,,,
+2025-12-18T12:50:16Z,Jenny Odell,https://www.jennyodell.com/,fetch_homepage,ok,https://www.jennyodell.com/,200,1365,
+2025-12-18T12:50:17Z,Jenny Odell,https://www.jennyodell.com/,fetch_about,start,http://www.jennyodell.com/about-news.html,,,
+2025-12-18T12:50:19Z,Jenny Odell,https://www.jennyodell.com/,fetch_about,ok,https://www.jennyodell.com/about-news.html,200,5522,
+2025-12-18T12:50:19Z,Jenny Odell,https://www.jennyodell.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:19Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_homepage,start,https://federicabardelli.cargo.site/,,,
+2025-12-18T12:50:20Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_homepage,ok,https://federicabardelli.cargo.site/,200,98258,
+2025-12-18T12:50:20Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,start,https://federicabardelli.cargo.site/Information-visualisation,,,
+2025-12-18T12:50:20Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,ok,https://federicabardelli.cargo.site/Information-visualisation,200,112721,
+2025-12-18T12:50:20Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,start,https://federicabardelli.cargo.site/Teaching-Introduction-to-Information-visualisation-Images-as-data,,,
+2025-12-18T12:50:22Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,ok,https://federicabardelli.cargo.site/Teaching-Introduction-to-Information-visualisation-Images-as-data,200,159708,
+2025-12-18T12:50:22Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,start,https://federicabardelli.cargo.site/About,,,
+2025-12-18T12:50:23Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,ok,https://federicabardelli.cargo.site/About,200,110259,
+2025-12-18T12:50:23Z,Federica Bardelli,https://federicabardelli.cargo.site/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:23Z,Cortissonderegger,https://www.instagram.com/cortissonderegger/,fetch_homepage,start,https://www.instagram.com/cortissonderegger/,,,
+2025-12-18T12:50:24Z,Cortissonderegger,https://www.instagram.com/cortissonderegger/,fetch_homepage,ok,https://www.instagram.com/cortissonderegger/,200,809983,
+2025-12-18T12:50:24Z,Cortissonderegger,https://www.instagram.com/cortissonderegger/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:50:24Z,Sebastian Studio,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:24Z,Ian Burn,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:24Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_homepage,start,https://nicolaslamas.net/Digital-anomalies,,,
+2025-12-18T12:50:25Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_homepage,ok,https://nicolaslamas.net/Digital-anomalies,200,209649,
+2025-12-18T12:50:25Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,start,https://nicolaslamas.net/Thinking-about-things-that-are-thinking-1,,,
+2025-12-18T12:50:26Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,ok,https://nicolaslamas.net/Thinking-about-things-that-are-thinking-1,200,320793,
+2025-12-18T12:50:26Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,start,https://nicolaslamas.net/What-does-a-fish-know-about-the-water-in-which-he-swims-all-his-life,,,
+2025-12-18T12:50:28Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,ok,https://nicolaslamas.net/What-does-a-fish-know-about-the-water-in-which-he-swims-all-his-life,200,202418,
+2025-12-18T12:50:28Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,start,https://nicolaslamas.net/CV,,,
+2025-12-18T12:50:30Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,ok,https://nicolaslamas.net/CV,200,208463,
+2025-12-18T12:50:30Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:30Z,AutoDesignLuo (UIUC),https://autodesignluo.web.illinois.edu/Page%201.html,fetch_homepage,start,https://autodesignluo.web.illinois.edu/Page%201.html,,,
+2025-12-18T12:50:31Z,AutoDesignLuo (UIUC),https://autodesignluo.web.illinois.edu/Page%201.html,fetch_homepage,ok,https://autodesignluo.web.illinois.edu/Page%201.html,200,3009,
+2025-12-18T12:50:31Z,AutoDesignLuo (UIUC),https://autodesignluo.web.illinois.edu/Page%201.html,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:50:31Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_homepage,start,https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,,,
+2025-12-18T12:50:32Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_homepage,ok,https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,200,266926,
+2025-12-18T12:50:32Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_about,start,https://www.artsy.net/about,,,
+2025-12-18T12:50:33Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_about,ok,https://www.artsy.net/about,200,391075,
+2025-12-18T12:50:33Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_about,start,https://www.artsy.net/artsy-accessibility-statement,,,
+2025-12-18T12:50:34Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_about,ok,https://www.artsy.net/artsy-accessibility-statement,200,108929,
+2025-12-18T12:50:34Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:34Z,Instagram post (maps-only reference),https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,fetch_homepage,start,https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,,,
+2025-12-18T12:50:35Z,Instagram post (maps-only reference),https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,fetch_homepage,ok,https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,200,799614,
+2025-12-18T12:50:35Z,Instagram post (maps-only reference),https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:50:35Z,Spinelli,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:35Z,Candela Capitan,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:35Z,Carlo Buzzi (cartelli pubblici?),nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:35Z,Karin Sander – Mailed Paintings,https://www.karinsander.de/en/work/mailed-paintings,fetch_homepage,start,https://www.karinsander.de/en/work/mailed-paintings,,,
+2025-12-18T12:50:35Z,Karin Sander – Mailed Paintings,https://www.karinsander.de/en/work/mailed-paintings,fetch_homepage,ok,https://www.karinsander.de/en/work/mailed-paintings,200,31479,
+2025-12-18T12:50:35Z,Karin Sander – Mailed Paintings,https://www.karinsander.de/en/work/mailed-paintings,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:50:35Z,Jasper Johns – Map (Based on Buckminster Fuller's Dymaxion Airocean World) (1967),nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:35Z,Imran1000,https://imran1000.com/?fbclid=PAZXh0bgNhZW0CMTEAAabKq38i6ZiW3qCOkpg9gurf4QKQP91M6pa00w2UZGAu6sFHqv6-mMKIqo0_aem_2hu_mhLtO_fvjtw-P0Imig,fetch_homepage,start,https://imran1000.com/?fbclid=PAZXh0bgNhZW0CMTEAAabKq38i6ZiW3qCOkpg9gurf4QKQP91M6pa00w2UZGAu6sFHqv6-mMKIqo0_aem_2hu_mhLtO_fvjtw-P0Imig,,,
+2025-12-18T12:50:35Z,Imran1000,https://imran1000.com/?fbclid=PAZXh0bgNhZW0CMTEAAabKq38i6ZiW3qCOkpg9gurf4QKQP91M6pa00w2UZGAu6sFHqv6-mMKIqo0_aem_2hu_mhLtO_fvjtw-P0Imig,fetch_homepage,error,https://imran1000.com/?fbclid=PAZXh0bgNhZW0CMTEAAabKq38i6ZiW3qCOkpg9gurf4QKQP91M6pa00w2UZGAu6sFHqv6-mMKIqo0_aem_2hu_mhLtO_fvjtw-P0Imig,404,20725,
+2025-12-18T12:50:35Z,Rahel Zoller,https://rahelzoller.com/,fetch_homepage,start,https://rahelzoller.com/,,,
+2025-12-18T12:50:37Z,Rahel Zoller,https://rahelzoller.com/,fetch_homepage,ok,https://rahelzoller.com/,200,123971,
+2025-12-18T12:50:37Z,Rahel Zoller,https://rahelzoller.com/,fetch_about,start,https://rahelzoller.com/about-1,,,
+2025-12-18T12:50:38Z,Rahel Zoller,https://rahelzoller.com/,fetch_about,ok,https://rahelzoller.com/about-1,200,149912,
+2025-12-18T12:50:38Z,Rahel Zoller,https://rahelzoller.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:38Z,Olia Lialina (Rhizome anthology),https://sites.rhizome.org/anthology/lialina.html,fetch_homepage,start,https://sites.rhizome.org/anthology/lialina.html,,,
+2025-12-18T12:50:39Z,Olia Lialina (Rhizome anthology),https://sites.rhizome.org/anthology/lialina.html,fetch_homepage,ok,https://sites.rhizome.org/anthology/lialina.html,200,1463,
+2025-12-18T12:50:39Z,Olia Lialina (Rhizome anthology),https://sites.rhizome.org/anthology/lialina.html,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:50:39Z,Refik Anadol,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:39Z,Nam June Paik,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:39Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_homepage,start,https://www.youtube.com/watch?v=6fWQ9E2X-EY,,,
+2025-12-18T12:50:40Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_homepage,ok,https://www.youtube.com/watch?v=6fWQ9E2X-EY,200,1153170,
+2025-12-18T12:50:40Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,start,https://www.youtube.com/about/,,,
+2025-12-18T12:50:40Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,ok,https://about.youtube/,200,36959,
+2025-12-18T12:50:40Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,start,https://www.youtube.com/about/press/,,,
+2025-12-18T12:50:42Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,ok,https://blog.youtube/,200,189855,
+2025-12-18T12:50:42Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,start,https://www.youtube.com/about/copyright/,,,
+2025-12-18T12:50:43Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,ok,https://www.youtube.com/howyoutubeworks/copyright/,200,62758,
+2025-12-18T12:50:43Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:43Z,Haegeman-Temmerman,https://haegeman-temmerman.be/,fetch_homepage,start,https://haegeman-temmerman.be/,,,
+2025-12-18T12:50:44Z,Haegeman-Temmerman,https://haegeman-temmerman.be/,fetch_homepage,ok,https://haegeman-temmerman.be/,200,28552,
+2025-12-18T12:50:44Z,Haegeman-Temmerman,https://haegeman-temmerman.be/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:44Z,Studio Laucke Siebein,https://studio-laucke-siebein.com/,fetch_homepage,start,https://studio-laucke-siebein.com/,,,
+2025-12-18T12:50:44Z,Studio Laucke Siebein,https://studio-laucke-siebein.com/,fetch_homepage,ok,https://studio-laucke-siebein.com/,200,1999,
+2025-12-18T12:50:44Z,Studio Laucke Siebein,https://studio-laucke-siebein.com/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:50:44Z,Giacomo Nanni,https://giacomonanni.info/,fetch_homepage,start,https://giacomonanni.info/,,,
+2025-12-18T12:50:45Z,Giacomo Nanni,https://giacomonanni.info/,fetch_homepage,ok,https://giacomo.website,200,11082,
+2025-12-18T12:50:45Z,Giacomo Nanni,https://giacomonanni.info/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:50:45Z,Arthur Teboul,https://arthurteboul.com/,fetch_homepage,start,https://arthurteboul.com/,,,
+2025-12-18T12:50:46Z,Arthur Teboul,https://arthurteboul.com/,fetch_homepage,ok,https://arthurteboul.com/,200,116993,
+2025-12-18T12:50:46Z,Arthur Teboul,https://arthurteboul.com/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:50:46Z,Studio Moniker,https://studiomoniker.com/,fetch_homepage,start,https://studiomoniker.com/,,,
+2025-12-18T12:50:46Z,Studio Moniker,https://studiomoniker.com/,fetch_homepage,ok,https://studiomoniker.com/,200,53215,
+2025-12-18T12:50:46Z,Studio Moniker,https://studiomoniker.com/,fetch_about,start,https://studiomoniker.com/about,,,
+2025-12-18T12:50:47Z,Studio Moniker,https://studiomoniker.com/,fetch_about,ok,https://studiomoniker.com/about,200,63395,
+2025-12-18T12:50:47Z,Studio Moniker,https://studiomoniker.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:47Z,Alex is Mark,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:50:47Z,Simon Risi,https://www.simonrisi.ch/,fetch_homepage,start,https://www.simonrisi.ch/,,,
+2025-12-18T12:50:48Z,Simon Risi,https://www.simonrisi.ch/,fetch_homepage,ok,https://www.simonrisi.ch/,200,16954,
+2025-12-18T12:50:48Z,Simon Risi,https://www.simonrisi.ch/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:50:48Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,fetch_homepage,start,https://flexiblevisualsystems.info/,,,
+2025-12-18T12:50:48Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,fetch_homepage,ok,https://flexiblevisualsystems.info/,200,174787,
+2025-12-18T12:50:48Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,fetch_about,start,https://flexiblevisualsystems.info/about/,,,
+2025-12-18T12:50:49Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,fetch_about,ok,https://flexiblevisualsystems.info/about/,200,125263,
+2025-12-18T12:50:49Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:49Z,Jonas Elt – Projects,https://jonaselt.es/projects/,fetch_homepage,start,https://jonaselt.es/projects/,,,
+2025-12-18T12:50:50Z,Jonas Elt – Projects,https://jonaselt.es/projects/,fetch_homepage,ok,https://jonaselt.es/projects/,200,1667,
+2025-12-18T12:50:50Z,Jonas Elt – Projects,https://jonaselt.es/projects/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:50:50Z,Building Paris,https://www.buildingparis.fr/index/,fetch_homepage,start,https://www.buildingparis.fr/index/,,,
+2025-12-18T12:50:51Z,Building Paris,https://www.buildingparis.fr/index/,fetch_homepage,ok,https://www.buildingparis.fr/index/,200,164825,
+2025-12-18T12:50:51Z,Building Paris,https://www.buildingparis.fr/index/,fetch_about,start,https://www.buildingparis.fr/about/,,,
+2025-12-18T12:50:52Z,Building Paris,https://www.buildingparis.fr/index/,fetch_about,ok,https://www.buildingparis.fr/about/,200,22457,
+2025-12-18T12:50:52Z,Building Paris,https://www.buildingparis.fr/index/,fetch_about,start,https://www.buildingparis.fr/about,,,
+2025-12-18T12:50:54Z,Building Paris,https://www.buildingparis.fr/index/,fetch_about,ok,https://www.buildingparis.fr/about/,200,22457,
+2025-12-18T12:50:54Z,Building Paris,https://www.buildingparis.fr/index/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:50:54Z,Lena Weber,https://lenaweber.com/,fetch_homepage,start,https://lenaweber.com/,,,
+2025-12-18T12:50:55Z,Lena Weber,https://lenaweber.com/,fetch_homepage,ok,https://lenaweber.com/,200,237008,
+2025-12-18T12:50:55Z,Lena Weber,https://lenaweber.com/,fetch_about,start,https://lenaweber.com/about,,,
+2025-12-18T12:50:56Z,Lena Weber,https://lenaweber.com/,fetch_about,ok,https://lenaweber.com/about,200,183684,
+2025-12-18T12:50:56Z,Lena Weber,https://lenaweber.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:50:56Z,Monomodular,http://www.monomodular.de/index.html,fetch_homepage,start,http://www.monomodular.de/index.html,,,
+2025-12-18T12:50:56Z,Monomodular,http://www.monomodular.de/index.html,fetch_homepage,ok,http://www.monomodular.de/index.html,200,5213,
+2025-12-18T12:50:56Z,Monomodular,http://www.monomodular.de/index.html,fetch_about,start,http://www.monomodular.de/legal-information.html,,,
+2025-12-18T12:50:57Z,Monomodular,http://www.monomodular.de/index.html,fetch_about,error,http://www.monomodular.de/legal-information.html,404,808,
+2025-12-18T12:50:57Z,Monomodular,http://www.monomodular.de/index.html,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:50:57Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_homepage,start,https://hallointer.net/davidliebermann-de,,,
+2025-12-18T12:50:58Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_homepage,ok,https://hallointer.net/davidliebermann-de,200,3152608,
+2025-12-18T12:51:00Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,start,mailto:info@hallointer.net,,,
+2025-12-18T12:51:00Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,error,mailto:info@hallointer.net,,,
+2025-12-18T12:51:00Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,start,https://hallointer.net/simonrogers-info,,,
+2025-12-18T12:51:00Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,ok,https://hallointer.net/simonrogers-info,200,3152608,
+2025-12-18T12:51:02Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,start,https://hallointer.net/poeticcomputation-info,,,
+2025-12-18T12:51:02Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,ok,https://hallointer.net/poeticcomputation-info,200,3152608,
+2025-12-18T12:51:04Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:04Z,Cody Marian,https://codymarian.com,fetch_homepage,start,https://codymarian.com,,,
+2025-12-18T12:51:04Z,Cody Marian,https://codymarian.com,fetch_homepage,ok,https://www.codymarian.com/,200,49494,
+2025-12-18T12:51:04Z,Cody Marian,https://codymarian.com,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:51:04Z,Turner Motion,https://www.turnermotion.com/,fetch_homepage,start,https://www.turnermotion.com/,,,
+2025-12-18T12:51:05Z,Turner Motion,https://www.turnermotion.com/,fetch_homepage,ok,https://www.turnermotion.com/,200,103033,
+2025-12-18T12:51:05Z,Turner Motion,https://www.turnermotion.com/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:51:05Z,Federico Antonini,http://www.federicoantonini.info/,fetch_homepage,start,http://www.federicoantonini.info/,,,
+2025-12-18T12:51:05Z,Federico Antonini,http://www.federicoantonini.info/,fetch_homepage,ok,http://www.federicoantonini.info/,200,82633,
+2025-12-18T12:51:05Z,Federico Antonini,http://www.federicoantonini.info/,fetch_about,start,http://www.federicoantonini.info/info/,,,
+2025-12-18T12:51:06Z,Federico Antonini,http://www.federicoantonini.info/,fetch_about,ok,http://www.federicoantonini.info/info/,200,49129,
+2025-12-18T12:51:06Z,Federico Antonini,http://www.federicoantonini.info/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:51:06Z,ell.yot,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:06Z,Manuel Bürger,https://manuelbuerger.com/welcome,fetch_homepage,start,https://manuelbuerger.com/welcome,,,
+2025-12-18T12:51:07Z,Manuel Bürger,https://manuelbuerger.com/welcome,fetch_homepage,ok,https://manuelbuerger.com/welcome,200,200065,
+2025-12-18T12:51:07Z,Manuel Bürger,https://manuelbuerger.com/welcome,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:07Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,fetch_homepage,start,https://bariscavusoglu.info/,,,
+2025-12-18T12:51:08Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,fetch_homepage,ok,https://bariscavusoglu.info/,200,5526,
+2025-12-18T12:51:08Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,fetch_about,start,https://bariscavusoglu.info/bio.html,,,
+2025-12-18T12:51:09Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,fetch_about,ok,https://bariscavusoglu.info/bio.html,200,5024,
+2025-12-18T12:51:09Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:09Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,fetch_homepage,start,https://matteoguarnaccia.com/,,,
+2025-12-18T12:51:10Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,fetch_homepage,ok,https://matteoguarnaccia.com/,200,220864,
+2025-12-18T12:51:10Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,fetch_about,start,https://matteoguarnaccia.com/about,,,
+2025-12-18T12:51:11Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,fetch_about,ok,https://matteoguarnaccia.com/about,200,207711,
+2025-12-18T12:51:11Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:11Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,fetch_homepage,start,https://ateliertoutvabien.com/,,,
+2025-12-18T12:51:13Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,fetch_homepage,ok,https://ateliertoutvabien.com/,200,595306,
+2025-12-18T12:51:13Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,fetch_about,start,https://ateliertoutvabien.com/infos/,,,
+2025-12-18T12:51:15Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,fetch_about,ok,https://ateliertoutvabien.com/infos/,200,109529,
+2025-12-18T12:51:15Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:15Z,Jonathan Castro Alejos,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Pablo Delcan,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Baenziger Hug,https://www.baenziger-hug.com/,fetch_homepage,start,https://www.baenziger-hug.com/,,,
+2025-12-18T12:51:15Z,Baenziger Hug,https://www.baenziger-hug.com/,fetch_homepage,ok,https://www.baenziger-hug.com/,200,16609,
+2025-12-18T12:51:15Z,Baenziger Hug,https://www.baenziger-hug.com/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:51:15Z,Domenique Marchini,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Shiqing Chen,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Javier Jaén,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Provinciali,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,John Alcorn,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Push Pin Studios,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,George Maciunas,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Robert Filliou,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Frakestain Magazine,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Victor Papanek,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Experimental Jetset,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Ben Denzer,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Spin Studio (MUBI),nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Giga Studio,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Paul Rand,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Pierre Faucheux,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Quentin Fiore,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,schultzschultzgrafik,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,basil.js,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,Studio FNF,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:15Z,ScheffeShields – 333 Deluxe Merch,https://scheffeshields.com/work/333-deluxe-merchb,fetch_homepage,start,https://scheffeshields.com/work/333-deluxe-merchb,,,
+2025-12-18T12:51:16Z,ScheffeShields – 333 Deluxe Merch,https://scheffeshields.com/work/333-deluxe-merchb,fetch_homepage,error,https://scheffeshields.com/work/333-deluxe-merchb,404,3449,
+2025-12-18T12:51:27Z,Daniela Comani,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Timm Ulrichs,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Wim Delvoye,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Alighiero Boetti,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Rebecca Horn,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Lorenzo Serraglia,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Michel Show,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Stelarc,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Jon Rafman,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Martin DeVido,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,The Okamecke,https://www.theokamecke.com/,fetch_homepage,start,https://www.theokamecke.com/,,,
+2025-12-18T12:51:27Z,The Okamecke,https://www.theokamecke.com/,fetch_homepage,ok,https://www.theokamecke.com/,200,3063,
+2025-12-18T12:51:27Z,The Okamecke,https://www.theokamecke.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:27Z,Félix González-Torres,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:27Z,Simon Weckert,https://simonweckert.com/,fetch_homepage,start,https://simonweckert.com/,,,
+2025-12-18T12:51:28Z,Simon Weckert,https://simonweckert.com/,fetch_homepage,ok,https://simonweckert.com/,200,47083,
+2025-12-18T12:51:28Z,Simon Weckert,https://simonweckert.com/,fetch_about,start,https://simonweckert.com/about.html,,,
+2025-12-18T12:51:29Z,Simon Weckert,https://simonweckert.com/,fetch_about,ok,https://simonweckert.com/about.html,200,33484,
+2025-12-18T12:51:29Z,Simon Weckert,https://simonweckert.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:29Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_homepage,start,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,,,
+2025-12-18T12:51:29Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_homepage,ok,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,200,25590,
+2025-12-18T12:51:29Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,start,https://www.deappel.nl/en/menu/513/514-mission,,,
+2025-12-18T12:51:31Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,ok,https://www.deappel.nl/en/menu/513-about/514-mission,200,16353,
+2025-12-18T12:51:31Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,start,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story#,,,
+2025-12-18T12:51:33Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,ok,https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,200,26144,
+2025-12-18T12:51:33Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,start,https://www.deappel.nl/en/menu/513-about/13183-privacy-policy,,,
+2025-12-18T12:51:34Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,fetch_about,ok,https://www.deappel.nl/en/menu/513-about/13183-privacy-policy,200,17350,
+2025-12-18T12:51:34Z,Erica Scourti – The Outage / Her story (de Appel archive),https://www.deappel.nl/en/archive/books/20091-erica-scourti-the-outage-her-story,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:34Z,Jonas Fischer,https://www.jonas-fischer.com/,fetch_homepage,start,https://www.jonas-fischer.com/,,,
+2025-12-18T12:51:34Z,Jonas Fischer,https://www.jonas-fischer.com/,fetch_homepage,ok,https://www.jonas-fischer.com/,200,38624,
+2025-12-18T12:51:34Z,Jonas Fischer,https://www.jonas-fischer.com/,fetch_about,start,https://www.jonas-fischer.com/info,,,
+2025-12-18T12:51:36Z,Jonas Fischer,https://www.jonas-fischer.com/,fetch_about,ok,https://www.jonas-fischer.com/info,200,33182,
+2025-12-18T12:51:36Z,Jonas Fischer,https://www.jonas-fischer.com/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:51:36Z,Bertrand Lavier,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:36Z,Sasha Sime,https://www.instagram.com/sasha_sime/,fetch_homepage,start,https://www.instagram.com/sasha_sime/,,,
+2025-12-18T12:51:36Z,Sasha Sime,https://www.instagram.com/sasha_sime/,fetch_homepage,ok,https://www.instagram.com/sasha_sime/,200,799416,
+2025-12-18T12:51:36Z,Sasha Sime,https://www.instagram.com/sasha_sime/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:51:36Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_homepage,start,https://www.domesticstreamers.com/,,,
+2025-12-18T12:51:36Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_homepage,ok,https://www.domesticstreamers.com/,200,160036,
+2025-12-18T12:51:37Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,start,https://www.domesticstreamers.com/about/,,,
+2025-12-18T12:51:38Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,ok,https://www.domesticstreamers.com/about/,200,249836,
+2025-12-18T12:51:38Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,start,https://www.domesticstreamers.com/privacy-statement/,,,
+2025-12-18T12:51:40Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,ok,https://www.domesticstreamers.com/privacy-statement/,200,30449,
+2025-12-18T12:51:40Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,start,https://www.domesticstreamers.com/accessibility-statement/,,,
+2025-12-18T12:51:42Z,Domestic Data Streamers,https://www.domesticstreamers.com/,fetch_about,ok,https://www.domesticstreamers.com/accessibility-statement/,200,29710,
+2025-12-18T12:51:42Z,Domestic Data Streamers,https://www.domesticstreamers.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:42Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,fetch_homepage,start,https://lunamaurer.com/poly-luna/4/living-agenda.html,,,
+2025-12-18T12:51:42Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,fetch_homepage,ok,https://lunamaurer.com/poly-luna/4/living-agenda.html,200,89476,
+2025-12-18T12:51:42Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,fetch_about,start,https://lunamaurer.com/poly-luna/4/infocus.html,,,
+2025-12-18T12:51:43Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,fetch_about,ok,https://lunamaurer.com/poly-luna/4/infocus.html,200,89452,
+2025-12-18T12:51:43Z,Luna Maurer – Living Agenda,https://lunamaurer.com/poly-luna/4/living-agenda.html,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:43Z,LAV.IO,https://lav.io/,fetch_homepage,start,https://lav.io/,,,
+2025-12-18T12:51:44Z,LAV.IO,https://lav.io/,fetch_homepage,ok,https://lav.io/,200,27859,
+2025-12-18T12:51:44Z,LAV.IO,https://lav.io/,fetch_about,start,https://lav.io/about,,,
+2025-12-18T12:51:45Z,LAV.IO,https://lav.io/,fetch_about,ok,https://lav.io/about/,200,6549,
+2025-12-18T12:51:45Z,LAV.IO,https://lav.io/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:45Z,Cocksedge,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:45Z,De bello (mostra),nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:45Z,SUPERFLEX,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:45Z,Jenny Odell,https://www.jennyodell.com/,fetch_homepage,start,https://www.jennyodell.com/,,,
+2025-12-18T12:51:46Z,Jenny Odell,https://www.jennyodell.com/,fetch_homepage,ok,https://www.jennyodell.com/,200,1365,
+2025-12-18T12:51:46Z,Jenny Odell,https://www.jennyodell.com/,fetch_about,start,http://www.jennyodell.com/about-news.html,,,
+2025-12-18T12:51:48Z,Jenny Odell,https://www.jennyodell.com/,fetch_about,ok,https://www.jennyodell.com/about-news.html,200,5522,
+2025-12-18T12:51:48Z,Jenny Odell,https://www.jennyodell.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:48Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_homepage,start,https://federicabardelli.cargo.site/,,,
+2025-12-18T12:51:48Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_homepage,ok,https://federicabardelli.cargo.site/,200,98258,
+2025-12-18T12:51:48Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,start,https://federicabardelli.cargo.site/Information-visualisation,,,
+2025-12-18T12:51:50Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,ok,https://federicabardelli.cargo.site/Information-visualisation,200,112721,
+2025-12-18T12:51:50Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,start,https://federicabardelli.cargo.site/Teaching-Introduction-to-Information-visualisation-Images-as-data,,,
+2025-12-18T12:51:51Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,ok,https://federicabardelli.cargo.site/Teaching-Introduction-to-Information-visualisation-Images-as-data,200,159708,
+2025-12-18T12:51:51Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,start,https://federicabardelli.cargo.site/About,,,
+2025-12-18T12:51:52Z,Federica Bardelli,https://federicabardelli.cargo.site/,fetch_about,ok,https://federicabardelli.cargo.site/About,200,110259,
+2025-12-18T12:51:52Z,Federica Bardelli,https://federicabardelli.cargo.site/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:52Z,Cortissonderegger,https://www.instagram.com/cortissonderegger/,fetch_homepage,start,https://www.instagram.com/cortissonderegger/,,,
+2025-12-18T12:51:53Z,Cortissonderegger,https://www.instagram.com/cortissonderegger/,fetch_homepage,ok,https://www.instagram.com/cortissonderegger/,200,810105,
+2025-12-18T12:51:53Z,Cortissonderegger,https://www.instagram.com/cortissonderegger/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:51:53Z,Sebastian Studio,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:53Z,Ian Burn,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:51:53Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_homepage,start,https://nicolaslamas.net/Digital-anomalies,,,
+2025-12-18T12:51:54Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_homepage,ok,https://nicolaslamas.net/Digital-anomalies,200,209649,
+2025-12-18T12:51:54Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,start,https://nicolaslamas.net/Thinking-about-things-that-are-thinking-1,,,
+2025-12-18T12:51:55Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,ok,https://nicolaslamas.net/Thinking-about-things-that-are-thinking-1,200,320793,
+2025-12-18T12:51:55Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,start,https://nicolaslamas.net/What-does-a-fish-know-about-the-water-in-which-he-swims-all-his-life,,,
+2025-12-18T12:51:57Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,ok,https://nicolaslamas.net/What-does-a-fish-know-about-the-water-in-which-he-swims-all-his-life,200,202418,
+2025-12-18T12:51:57Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,start,https://nicolaslamas.net/CV,,,
+2025-12-18T12:51:58Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,fetch_about,ok,https://nicolaslamas.net/CV,200,208463,
+2025-12-18T12:51:58Z,Nicolas Lamas – Digital anomalies,https://nicolaslamas.net/Digital-anomalies,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:51:58Z,AutoDesignLuo (UIUC),https://autodesignluo.web.illinois.edu/Page%201.html,fetch_homepage,start,https://autodesignluo.web.illinois.edu/Page%201.html,,,
+2025-12-18T12:51:59Z,AutoDesignLuo (UIUC),https://autodesignluo.web.illinois.edu/Page%201.html,fetch_homepage,ok,https://autodesignluo.web.illinois.edu/Page%201.html,200,3009,
+2025-12-18T12:51:59Z,AutoDesignLuo (UIUC),https://autodesignluo.web.illinois.edu/Page%201.html,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:51:59Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_homepage,start,https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,,,
+2025-12-18T12:51:59Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_homepage,ok,https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,200,266939,
+2025-12-18T12:52:00Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_about,start,https://www.artsy.net/about,,,
+2025-12-18T12:52:00Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_about,ok,https://www.artsy.net/about,200,391075,
+2025-12-18T12:52:00Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_about,start,https://www.artsy.net/artsy-accessibility-statement,,,
+2025-12-18T12:52:02Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,fetch_about,ok,https://www.artsy.net/artsy-accessibility-statement,200,108929,
+2025-12-18T12:52:02Z,Emilio Chapela – Wasserfall 6 (Artsy),https://www.artsy.net/artwork/emilio-chapela-wasserfall-6,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:02Z,Instagram post (maps-only reference),https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,fetch_homepage,start,https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,,,
+2025-12-18T12:52:03Z,Instagram post (maps-only reference),https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,fetch_homepage,ok,https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,200,810032,
+2025-12-18T12:52:03Z,Instagram post (maps-only reference),https://www.instagram.com/p/DA9MS0pSdF0/?igsh=MW5zYTBpMmNzcXMxNw==,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:52:03Z,Spinelli,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:03Z,Candela Capitan,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:03Z,Carlo Buzzi (cartelli pubblici?),nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:03Z,Karin Sander – Mailed Paintings,https://www.karinsander.de/en/work/mailed-paintings,fetch_homepage,start,https://www.karinsander.de/en/work/mailed-paintings,,,
+2025-12-18T12:52:03Z,Karin Sander – Mailed Paintings,https://www.karinsander.de/en/work/mailed-paintings,fetch_homepage,ok,https://www.karinsander.de/en/work/mailed-paintings,200,31479,
+2025-12-18T12:52:03Z,Karin Sander – Mailed Paintings,https://www.karinsander.de/en/work/mailed-paintings,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:03Z,Jasper Johns – Map (Based on Buckminster Fuller's Dymaxion Airocean World) (1967),nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:03Z,Imran1000,https://imran1000.com/?fbclid=PAZXh0bgNhZW0CMTEAAabKq38i6ZiW3qCOkpg9gurf4QKQP91M6pa00w2UZGAu6sFHqv6-mMKIqo0_aem_2hu_mhLtO_fvjtw-P0Imig,fetch_homepage,start,https://imran1000.com/?fbclid=PAZXh0bgNhZW0CMTEAAabKq38i6ZiW3qCOkpg9gurf4QKQP91M6pa00w2UZGAu6sFHqv6-mMKIqo0_aem_2hu_mhLtO_fvjtw-P0Imig,,,
+2025-12-18T12:52:03Z,Imran1000,https://imran1000.com/?fbclid=PAZXh0bgNhZW0CMTEAAabKq38i6ZiW3qCOkpg9gurf4QKQP91M6pa00w2UZGAu6sFHqv6-mMKIqo0_aem_2hu_mhLtO_fvjtw-P0Imig,fetch_homepage,error,https://imran1000.com/?fbclid=PAZXh0bgNhZW0CMTEAAabKq38i6ZiW3qCOkpg9gurf4QKQP91M6pa00w2UZGAu6sFHqv6-mMKIqo0_aem_2hu_mhLtO_fvjtw-P0Imig,404,20725,
+2025-12-18T12:52:03Z,Rahel Zoller,https://rahelzoller.com/,fetch_homepage,start,https://rahelzoller.com/,,,
+2025-12-18T12:52:04Z,Rahel Zoller,https://rahelzoller.com/,fetch_homepage,ok,https://rahelzoller.com/,200,123971,
+2025-12-18T12:52:04Z,Rahel Zoller,https://rahelzoller.com/,fetch_about,start,https://rahelzoller.com/about-1,,,
+2025-12-18T12:52:05Z,Rahel Zoller,https://rahelzoller.com/,fetch_about,ok,https://rahelzoller.com/about-1,200,149912,
+2025-12-18T12:52:05Z,Rahel Zoller,https://rahelzoller.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:05Z,Olia Lialina (Rhizome anthology),https://sites.rhizome.org/anthology/lialina.html,fetch_homepage,start,https://sites.rhizome.org/anthology/lialina.html,,,
+2025-12-18T12:52:05Z,Olia Lialina (Rhizome anthology),https://sites.rhizome.org/anthology/lialina.html,fetch_homepage,ok,https://sites.rhizome.org/anthology/lialina.html,200,1463,
+2025-12-18T12:52:05Z,Olia Lialina (Rhizome anthology),https://sites.rhizome.org/anthology/lialina.html,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:52:05Z,Refik Anadol,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:05Z,Nam June Paik,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:05Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_homepage,start,https://www.youtube.com/watch?v=6fWQ9E2X-EY,,,
+2025-12-18T12:52:06Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_homepage,ok,https://www.youtube.com/watch?v=6fWQ9E2X-EY,200,1159983,
+2025-12-18T12:52:06Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,start,https://www.youtube.com/about/,,,
+2025-12-18T12:52:07Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,ok,https://about.youtube/,200,36959,
+2025-12-18T12:52:07Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,start,https://www.youtube.com/about/press/,,,
+2025-12-18T12:52:08Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,ok,https://blog.youtube/,200,189855,
+2025-12-18T12:52:08Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,start,https://www.youtube.com/about/copyright/,,,
+2025-12-18T12:52:09Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,fetch_about,ok,https://www.youtube.com/howyoutubeworks/copyright/,200,62758,
+2025-12-18T12:52:09Z,YouTube reference video,https://www.youtube.com/watch?v=6fWQ9E2X-EY,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:09Z,Haegeman-Temmerman,https://haegeman-temmerman.be/,fetch_homepage,start,https://haegeman-temmerman.be/,,,
+2025-12-18T12:52:09Z,Haegeman-Temmerman,https://haegeman-temmerman.be/,fetch_homepage,ok,https://haegeman-temmerman.be/,200,28166,
+2025-12-18T12:52:09Z,Haegeman-Temmerman,https://haegeman-temmerman.be/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:09Z,Studio Laucke Siebein,https://studio-laucke-siebein.com/,fetch_homepage,start,https://studio-laucke-siebein.com/,,,
+2025-12-18T12:52:10Z,Studio Laucke Siebein,https://studio-laucke-siebein.com/,fetch_homepage,ok,https://studio-laucke-siebein.com/,200,1999,
+2025-12-18T12:52:10Z,Studio Laucke Siebein,https://studio-laucke-siebein.com/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:52:10Z,Giacomo Nanni,https://giacomonanni.info/,fetch_homepage,start,https://giacomonanni.info/,,,
+2025-12-18T12:52:10Z,Giacomo Nanni,https://giacomonanni.info/,fetch_homepage,ok,https://giacomo.website,200,11082,
+2025-12-18T12:52:10Z,Giacomo Nanni,https://giacomonanni.info/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:52:10Z,Arthur Teboul,https://arthurteboul.com/,fetch_homepage,start,https://arthurteboul.com/,,,
+2025-12-18T12:52:11Z,Arthur Teboul,https://arthurteboul.com/,fetch_homepage,ok,https://arthurteboul.com/,200,116993,
+2025-12-18T12:52:11Z,Arthur Teboul,https://arthurteboul.com/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:11Z,Studio Moniker,https://studiomoniker.com/,fetch_homepage,start,https://studiomoniker.com/,,,
+2025-12-18T12:52:11Z,Studio Moniker,https://studiomoniker.com/,fetch_homepage,ok,https://studiomoniker.com/,200,53215,
+2025-12-18T12:52:11Z,Studio Moniker,https://studiomoniker.com/,fetch_about,start,https://studiomoniker.com/about,,,
+2025-12-18T12:52:13Z,Studio Moniker,https://studiomoniker.com/,fetch_about,ok,https://studiomoniker.com/about,200,63381,
+2025-12-18T12:52:13Z,Studio Moniker,https://studiomoniker.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:13Z,Alex is Mark,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:13Z,Simon Risi,https://www.simonrisi.ch/,fetch_homepage,start,https://www.simonrisi.ch/,,,
+2025-12-18T12:52:13Z,Simon Risi,https://www.simonrisi.ch/,fetch_homepage,ok,https://www.simonrisi.ch/,200,16954,
+2025-12-18T12:52:13Z,Simon Risi,https://www.simonrisi.ch/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:13Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,fetch_homepage,start,https://flexiblevisualsystems.info/,,,
+2025-12-18T12:52:13Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,fetch_homepage,ok,https://flexiblevisualsystems.info/,200,174787,
+2025-12-18T12:52:13Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,fetch_about,start,https://flexiblevisualsystems.info/about/,,,
+2025-12-18T12:52:15Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,fetch_about,ok,https://flexiblevisualsystems.info/about/,200,125263,
+2025-12-18T12:52:15Z,Flexible Visual Systems,https://flexiblevisualsystems.info/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:15Z,Jonas Elt – Projects,https://jonaselt.es/projects/,fetch_homepage,start,https://jonaselt.es/projects/,,,
+2025-12-18T12:52:16Z,Jonas Elt – Projects,https://jonaselt.es/projects/,fetch_homepage,ok,https://jonaselt.es/projects/,200,1667,
+2025-12-18T12:52:16Z,Jonas Elt – Projects,https://jonaselt.es/projects/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:52:16Z,Building Paris,https://www.buildingparis.fr/index/,fetch_homepage,start,https://www.buildingparis.fr/index/,,,
+2025-12-18T12:52:17Z,Building Paris,https://www.buildingparis.fr/index/,fetch_homepage,ok,https://www.buildingparis.fr/index/,200,164825,
+2025-12-18T12:52:17Z,Building Paris,https://www.buildingparis.fr/index/,fetch_about,start,https://www.buildingparis.fr/about/,,,
+2025-12-18T12:52:18Z,Building Paris,https://www.buildingparis.fr/index/,fetch_about,ok,https://www.buildingparis.fr/about/,200,22457,
+2025-12-18T12:52:18Z,Building Paris,https://www.buildingparis.fr/index/,fetch_about,start,https://www.buildingparis.fr/about,,,
+2025-12-18T12:52:19Z,Building Paris,https://www.buildingparis.fr/index/,fetch_about,ok,https://www.buildingparis.fr/about/,200,22457,
+2025-12-18T12:52:19Z,Building Paris,https://www.buildingparis.fr/index/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:19Z,Lena Weber,https://lenaweber.com/,fetch_homepage,start,https://lenaweber.com/,,,
+2025-12-18T12:52:20Z,Lena Weber,https://lenaweber.com/,fetch_homepage,ok,https://lenaweber.com/,200,237008,
+2025-12-18T12:52:20Z,Lena Weber,https://lenaweber.com/,fetch_about,start,https://lenaweber.com/about,,,
+2025-12-18T12:52:22Z,Lena Weber,https://lenaweber.com/,fetch_about,ok,https://lenaweber.com/about,200,183684,
+2025-12-18T12:52:22Z,Lena Weber,https://lenaweber.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:22Z,Monomodular,http://www.monomodular.de/index.html,fetch_homepage,start,http://www.monomodular.de/index.html,,,
+2025-12-18T12:52:22Z,Monomodular,http://www.monomodular.de/index.html,fetch_homepage,ok,http://www.monomodular.de/index.html,200,5213,
+2025-12-18T12:52:22Z,Monomodular,http://www.monomodular.de/index.html,fetch_about,start,http://www.monomodular.de/legal-information.html,,,
+2025-12-18T12:52:24Z,Monomodular,http://www.monomodular.de/index.html,fetch_about,error,http://www.monomodular.de/legal-information.html,404,808,
+2025-12-18T12:52:24Z,Monomodular,http://www.monomodular.de/index.html,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:24Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_homepage,start,https://hallointer.net/davidliebermann-de,,,
+2025-12-18T12:52:24Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_homepage,ok,https://hallointer.net/davidliebermann-de,200,3152608,
+2025-12-18T12:52:27Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,start,mailto:info@hallointer.net,,,
+2025-12-18T12:52:27Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,error,mailto:info@hallointer.net,,,
+2025-12-18T12:52:27Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,start,https://hallointer.net/simonrogers-info,,,
+2025-12-18T12:52:27Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,ok,https://hallointer.net/simonrogers-info,200,3152608,
+2025-12-18T12:52:28Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,start,https://hallointer.net/poeticcomputation-info,,,
+2025-12-18T12:52:28Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,fetch_about,ok,https://hallointer.net/poeticcomputation-info,200,3152608,
+2025-12-18T12:52:30Z,David Liebermann (Hallointer),https://hallointer.net/davidliebermann-de,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:30Z,Cody Marian,https://codymarian.com,fetch_homepage,start,https://codymarian.com,,,
+2025-12-18T12:52:30Z,Cody Marian,https://codymarian.com,fetch_homepage,ok,https://www.codymarian.com/,200,49494,
+2025-12-18T12:52:30Z,Cody Marian,https://codymarian.com,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:30Z,Turner Motion,https://www.turnermotion.com/,fetch_homepage,start,https://www.turnermotion.com/,,,
+2025-12-18T12:52:31Z,Turner Motion,https://www.turnermotion.com/,fetch_homepage,ok,https://www.turnermotion.com/,200,103033,
+2025-12-18T12:52:31Z,Turner Motion,https://www.turnermotion.com/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:31Z,Federico Antonini,http://www.federicoantonini.info/,fetch_homepage,start,http://www.federicoantonini.info/,,,
+2025-12-18T12:52:31Z,Federico Antonini,http://www.federicoantonini.info/,fetch_homepage,ok,http://www.federicoantonini.info/,200,82633,
+2025-12-18T12:52:31Z,Federico Antonini,http://www.federicoantonini.info/,fetch_about,start,http://www.federicoantonini.info/info/,,,
+2025-12-18T12:52:33Z,Federico Antonini,http://www.federicoantonini.info/,fetch_about,ok,http://www.federicoantonini.info/info/,200,49129,
+2025-12-18T12:52:33Z,Federico Antonini,http://www.federicoantonini.info/,classify,ok,,,,Unclear_missing: Insufficient text or no about page
+2025-12-18T12:52:33Z,ell.yot,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:33Z,Manuel Bürger,https://manuelbuerger.com/welcome,fetch_homepage,start,https://manuelbuerger.com/welcome,,,
+2025-12-18T12:52:33Z,Manuel Bürger,https://manuelbuerger.com/welcome,fetch_homepage,ok,https://manuelbuerger.com/welcome,200,200065,
+2025-12-18T12:52:34Z,Manuel Bürger,https://manuelbuerger.com/welcome,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:34Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,fetch_homepage,start,https://bariscavusoglu.info/,,,
+2025-12-18T12:52:34Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,fetch_homepage,ok,https://bariscavusoglu.info/,200,5526,
+2025-12-18T12:52:34Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,fetch_about,start,https://bariscavusoglu.info/bio.html,,,
+2025-12-18T12:52:35Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,fetch_about,ok,https://bariscavusoglu.info/bio.html,200,5024,
+2025-12-18T12:52:35Z,Barış Çavuşoğlu,https://bariscavusoglu.info/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:35Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,fetch_homepage,start,https://matteoguarnaccia.com/,,,
+2025-12-18T12:52:36Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,fetch_homepage,ok,https://matteoguarnaccia.com/,200,220864,
+2025-12-18T12:52:36Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,fetch_about,start,https://matteoguarnaccia.com/about,,,
+2025-12-18T12:52:37Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,fetch_about,ok,https://matteoguarnaccia.com/about,200,207711,
+2025-12-18T12:52:37Z,Matteo Guarnaccia,https://matteoguarnaccia.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:37Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,fetch_homepage,start,https://ateliertoutvabien.com/,,,
+2025-12-18T12:52:39Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,fetch_homepage,ok,https://ateliertoutvabien.com/,200,595306,
+2025-12-18T12:52:39Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,fetch_about,start,https://ateliertoutvabien.com/infos/,,,
+2025-12-18T12:52:41Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,fetch_about,ok,https://ateliertoutvabien.com/infos/,200,109529,
+2025-12-18T12:52:41Z,Atelier Tout Va Bien,https://ateliertoutvabien.com/,classify,ok,,,,Interdisciplinary: mentions_art and keywords include interdisciplinary terms
+2025-12-18T12:52:41Z,Jonathan Castro Alejos,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Pablo Delcan,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Baenziger Hug,https://www.baenziger-hug.com/,fetch_homepage,start,https://www.baenziger-hug.com/,,,
+2025-12-18T12:52:41Z,Baenziger Hug,https://www.baenziger-hug.com/,fetch_homepage,ok,https://www.baenziger-hug.com/,200,16609,
+2025-12-18T12:52:41Z,Baenziger Hug,https://www.baenziger-hug.com/,classify,ok,,,,Unclear_missing: Ambiguous signals
+2025-12-18T12:52:41Z,Domenique Marchini,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Shiqing Chen,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Javier Jaén,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Provinciali,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,John Alcorn,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Push Pin Studios,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,George Maciunas,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Robert Filliou,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Frakestain Magazine,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Victor Papanek,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Experimental Jetset,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Ben Denzer,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Spin Studio (MUBI),nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Giga Studio,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Paul Rand,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Pierre Faucheux,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Quentin Fiore,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,schultzschultzgrafik,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,basil.js,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,Studio FNF,nan,row,exception,,,,'float' object has no attribute 'strip'
+2025-12-18T12:52:41Z,ScheffeShields – 333 Deluxe Merch,https://scheffeshields.com/work/333-deluxe-merchb,fetch_homepage,start,https://scheffeshields.com/work/333-deluxe-merchb,,,
+2025-12-18T12:52:41Z,ScheffeShields – 333 Deluxe Merch,https://scheffeshields.com/work/333-deluxe-merchb,fetch_homepage,error,https://scheffeshields.com/work/333-deluxe-merchb,404,3449,

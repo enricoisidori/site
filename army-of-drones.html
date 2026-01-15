@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Army of Drones Bonus Console</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+        --bg: #030712;
+        --panel: #0f172a;
+        --panel-alt: #111c33;
+        --ink: #e5e7eb;
+        --accent: #22d3ee;
+        --alert: #fbbf24;
+        --danger: #f87171;
+        --success: #86efac;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(circle at top, #1e293b 0%, #020617 50%);
+        min-height: 100vh;
+        color: var(--ink);
+      }
+
+      main.dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        padding: 32px clamp(16px, 4vw, 48px) 48px;
+      }
+
+      header.program {
+        grid-column: 1 / -1;
+        background: var(--panel);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 20px 50px rgba(2, 6, 23, 0.65);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        letter-spacing: -0.02em;
+      }
+
+      p {
+        line-height: 1.55;
+        margin: 0;
+      }
+
+      p + p {
+        margin-top: 12px;
+      }
+
+      .story {
+        grid-column: 1 / -1;
+        background: var(--panel-alt);
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid rgba(226, 232, 240, 0.08);
+      }
+
+      .story strong {
+        color: var(--accent);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+      }
+
+      .metric {
+        padding: 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(226, 232, 240, 0.1);
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      .metric h2 {
+        margin: 0;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: rgba(148, 163, 184, 0.85);
+      }
+
+      .metric .value {
+        font-size: 2.4rem;
+        font-weight: 600;
+        margin-top: 6px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: inherit;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 12px 8px;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.08);
+      }
+
+      th {
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(148, 163, 184, 0.7);
+      }
+
+      tbody tr:hover {
+        background: rgba(34, 211, 238, 0.07);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        letter-spacing: 0.04em;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .badge.alert {
+        color: var(--alert);
+      }
+      .badge.danger {
+        color: var(--danger);
+      }
+      .badge.success {
+        color: var(--success);
+      }
+
+      .panel {
+        background: var(--panel);
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid rgba(241, 245, 249, 0.06);
+        box-shadow: inset 0 0 40px rgba(15, 23, 42, 0.4);
+      }
+
+      .market-items {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .market-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.08);
+      }
+
+      .market-item:last-child {
+        border-bottom: none;
+      }
+
+      .market-item strong {
+        display: block;
+        font-size: 1rem;
+      }
+
+      .market-item span {
+        font-size: 0.82rem;
+        color: rgba(148, 163, 184, 0.9);
+      }
+
+      .log {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: rgba(226, 232, 240, 0.9);
+      }
+
+      .log-entry {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.08);
+      }
+
+      .log-entry:last-child {
+        border-bottom: none;
+      }
+
+      .log-entry time {
+        font-size: 0.8rem;
+        color: rgba(148, 163, 184, 0.7);
+      }
+
+      .log-entry p {
+        margin: 0;
+      }
+
+      footer.note {
+        grid-column: 1 / -1;
+        font-size: 0.75rem;
+        color: rgba(148, 163, 184, 0.8);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="dashboard">
+      <header class="program">
+        <div class="badge alert">Army of Drones Bonus</div>
+        <h1>Gamified kill-chain incentives for frontline drone crews</h1>
+        <p>
+          Ukraine's military is turning to incentive schemes borrowed from
+          online shooters to spur operators to eliminate more Russian armor.
+          Flights logged through the Army of Drones bonus program earn
+          E-pointswhenever a crew uploads verifiable gun-camera evidence that
+          their quadcopter or FPV drone hit a Russian target.
+        </p>
+        <p>
+          Those points flow into the national leaderboard and sync with the
+          Brave 1 Market — a procurement portal that functions like an internal
+          Amazon, allowing high-performing platoons to order upgrades as soon as
+          the strikes are confirmed.
+        </p>
+      </header>
+
+      <section class="story">
+        <p>
+          Today's briefing tracks the most active crews. Metrics update in real
+          time as units submit footage and central command validates hits via AI
+          classifiers, SIGINT overlays, and human analysts. Approved kills move
+          units higher on the national board, while rejected claims dock points
+          and suspend market access for 12 hours.
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="metrics">
+          <article class="metric">
+            <h2>Total Russian assets eliminated</h2>
+            <div class="value" id="asset-count">0</div>
+          </article>
+          <article class="metric">
+            <h2>E-points cleared for Brave 1 Market</h2>
+            <div class="value" id="point-count">0</div>
+          </article>
+          <article class="metric">
+            <h2>Autonomous purchase orders</h2>
+            <div class="value" id="order-count">0</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="badge success">National leaderboard</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Unit</th>
+              <th>Confirmed strikes</th>
+              <th>E-points</th>
+              <th>Equipment unlocked</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <div class="badge">Brave 1 Market queue</div>
+        <div class="market-items" id="market"></div>
+      </section>
+
+      <section class="panel">
+        <div class="badge danger">Strike verification log</div>
+        <div class="log" id="log"></div>
+      </section>
+
+      <footer class="note">
+        Data set is simulated telemetry produced for design documentation.
+        Figures do not represent secret or classified information.
+      </footer>
+    </main>
+
+    <script>
+      const units = [
+        {
+          callsign: "Bureviy-12",
+          theater: "Kupiansk",
+          strikes: 18,
+          points: 540,
+          unlocked: ["Thermal rig Mk.III", "Starlink uplink"],
+        },
+        {
+          callsign: "Vovk-7",
+          theater: "Avdiivka",
+          strikes: 23,
+          points: 735,
+          unlocked: ["Carbon FPV frames", "Encrypted Goggles"],
+        },
+        {
+          callsign: "Duga-4",
+          theater: "Kherson delta",
+          strikes: 14,
+          points: 420,
+          unlocked: ["AI autopilot", "Explosive kits"],
+        },
+        {
+          callsign: "Molot-3",
+          theater: "Bakhmut",
+          strikes: 27,
+          points: 810,
+          unlocked: ["Loitering munitions", "Signal dampener"],
+        },
+        {
+          callsign: "Skif-20",
+          theater: "Robotyne",
+          strikes: 9,
+          points: 270,
+          unlocked: ["Night optics"],
+        },
+      ];
+
+      const marketCatalog = [
+        {
+          sku: "B1-845",
+          label: "Encrypted flight controller",
+          description: "Hardens telemetry links against Russian EW jamming",
+          cost: 170,
+        },
+        {
+          sku: "B1-966",
+          label: "FPV spearhead bundle",
+          description: "Six airframes + lithium packs",
+          cost: 400,
+        },
+        {
+          sku: "B1-701",
+          label: "Thermal reconnaissance kit",
+          description: "Long-wave payload with auto-target tagging",
+          cost: 320,
+        },
+        {
+          sku: "B1-552",
+          label: "Loitering munition upgrade",
+          description: "Extends range to 18km",
+          cost: 600,
+        },
+      ];
+
+      const verificationLog = [
+        {
+          time: "07:12 Z",
+          detail:
+            "Molot-3 uploaded FPV feed striking T-72B3. AI confidence 0.91; HUMINT reviewer confirmed kill.",
+        },
+        {
+          time: "08:40 Z",
+          detail:
+            "Duga-4 claim rejected — debris field not matched to target tank. Unit held from orders until 20:40 Z.",
+        },
+        {
+          time: "10:03 Z",
+          detail:
+            "Vovk-7 neutralized 2S19 howitzer. Strike synced to Brave 1 Market; auto-purchase triggered.",
+        },
+        {
+          time: "11:17 Z",
+          detail:
+            "Bureviy-12 destroyed EW antenna; SIGINT cross-check pending, provisional points issued.",
+        },
+      ];
+
+      const leaderboardEl = document.getElementById("leaderboard");
+      const marketEl = document.getElementById("market");
+      const logEl = document.getElementById("log");
+      const assetCountEl = document.getElementById("asset-count");
+      const pointCountEl = document.getElementById("point-count");
+      const orderCountEl = document.getElementById("order-count");
+
+      function renderLeaderboard() {
+        const fragment = document.createDocumentFragment();
+        // Sort highest scoring units first for clarity.
+        units
+          .slice()
+          .sort((a, b) => b.points - a.points)
+          .forEach((unit) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>
+                ${unit.callsign}</strong>
+                <div style="font-size:0.75rem;color:rgba(148,163,184,0.75)">
+                  ${unit.theater}
+                </div>
+              </td>
+              <td>${unit.strikes}</td>
+              <td>${unit.points}</td>
+              <td>${unit.unlocked.join(", ")}</td>`;
+            fragment.appendChild(tr);
+          });
+        leaderboardEl.innerHTML = "";
+        leaderboardEl.appendChild(fragment);
+      }
+
+      function renderMarket() {
+        marketEl.innerHTML = "";
+        marketCatalog.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = "market-item";
+          div.innerHTML = `
+            <div>
+              ${item.label}</strong>
+              <span>${item.description}</span>
+            </div>
+            <div class="badge">${item.cost} E-points</div>`;
+          marketEl.appendChild(div);
+        });
+      }
+
+      function renderLog() {
+        logEl.innerHTML = "";
+        verificationLog.forEach((entry) => {
+          const row = document.createElement("div");
+          row.className = "log-entry";
+          row.innerHTML = `
+            <time>${entry.time}</time>
+            <p>${entry.detail}</p>`;
+          logEl.appendChild(row);
+        });
+      }
+
+      function updateTotals() {
+        const totalStrikes = units.reduce((sum, unit) => sum + unit.strikes, 0);
+        const totalPoints = units.reduce((sum, unit) => sum + unit.points, 0);
+        const autoOrders = Math.floor(totalPoints / 160);
+        assetCountEl.textContent = totalStrikes;
+        pointCountEl.textContent = totalPoints;
+        orderCountEl.textContent = autoOrders;
+      }
+
+      function simulateTick() {
+        const candidate = units[Math.floor(Math.random() * units.length)];
+        const deltaStrikes = Math.random() > 0.6 ? 2 : 1;
+        const deltaPoints = deltaStrikes * 30;
+        candidate.strikes += deltaStrikes;
+        candidate.points += deltaPoints;
+        verificationLog.unshift({
+          time: new Date().toUTCString().slice(17, 22) + " Z",
+          detail: `${candidate.callsign} uploaded verified hit near ${
+            candidate.theater
+          }. ${deltaStrikes} asset${deltaStrikes > 1 ? "s" : ""} destroyed.`,
+        });
+        if (verificationLog.length > 6) {
+          verificationLog.pop();
+        }
+        renderLeaderboard();
+        renderLog();
+        updateTotals();
+      }
+
+      renderLeaderboard();
+      renderMarket();
+      renderLog();
+      updateTotals();
+
+      // Pulse the dashboard every 7 seconds to keep it lively for screenshots.
+      setInterval(simulateTick, 7000);
+    </script>
+  </body>
+</html>

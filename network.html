@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Citation Network (Gephi‑like)</title>
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { height: 100%; }
+    body { margin: 0; font: 14px/1.4 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:#f5f7fb; color:#111; }
+
+    header { padding: 12px 16px; background:#fff; border-bottom:1px solid #e5e9f2; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    header h1 { font-size: 16px; margin: 0 8px 0 0; font-weight:600; }
+    #status { color:#555; margin-left:auto; }
+
+    #controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    #controls input[type="text"] { padding:6px 8px; border:1px solid #d6dbe6; border-radius:6px; min-width: 220px; }
+    #controls button, #controls label { padding:6px 10px; background:#f3f6fb; border:1px solid #d6dbe6; border-radius:6px; cursor:pointer; }
+    #controls .sep { width:1px; height:26px; background:#e5e9f2; margin:0 6px; }
+    #legend { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .dot { width:10px; height:10px; border-radius:50%; display:inline-block; border:1px solid rgba(0,0,0,.2); }
+
+    #uploader { display:none; gap:8px; align-items:center; }
+    #uploader input { background:#fff; border:1px dashed #c8d0e0; padding:6px; border-radius:6px; }
+
+    #wrap { height: calc(100% - 60px); display:flex; }
+    #canvas-wrap { position: relative; flex:1; }
+    canvas { display:block; width:100%; height:100%; background:#fff; }
+    #tooltip { position:absolute; pointer-events:none; background:rgba(24,24,27,0.92); color:#fff; padding:6px 8px; border-radius:4px; font-size:12px; opacity:0; white-space:pre-line; transform: translate(8px, 8px); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Citation Network</h1>
+    <div id="controls">
+      <input id="search" type="text" placeholder="Cerca titolo o id…" />
+      <button id="fit">Adatta vista</button>
+      <label><input id="showLabels" type="checkbox" checked /> Etichette top-N</label>
+      <label>Tutte le etichette <input id="labelN" type="range" min="0" max="200" value="30" /></label>
+      <div class="sep"></div>
+      <span id="legend">Legenda discipline…</span>
+      <div class="sep"></div>
+      <button id="toggleUpload">Carica CSV locali…</button>
+      <span id="uploader">
+        <span>nodes.csv</span><input id="nodesFile" type="file" accept=".csv" />
+        <span>edges.csv</span><input id="edgesFile" type="file" accept=".csv" />
+        <span>references_with_disciplines.csv (opz.)</span><input id="refsFile" type="file" accept=".csv" />
+        <span>discipline_counts.csv (opz.)</span><input id="countsFile" type="file" accept=".csv" />
+        <button id="loadFiles">Visualizza</button>
+      </span>
+    </div>
+    <div id="status">Inizializzazione…</div>
+  </header>
+  <div id="wrap">
+    <div id="canvas-wrap">
+      <canvas id="scene"></canvas>
+      <div id="tooltip"></div>
+    </div>
+  </div>
+
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <script defer src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
+  <script>
+  window.addEventListener('load', function(){
+  // Gephi‑like force layout viewer (Canvas + d3-force), robust against file://
+  const NODE_CSV = 'nodes.csv';
+  const EDGE_CSV = 'edges.csv';
+  const REFS_CSV = 'references_with_disciplines.csv';
+  const COUNTS_CSV = 'discipline_counts.csv';
+
+  const canvas = document.getElementById('scene');
+  const tooltip = document.getElementById('tooltip');
+  const statusEl = document.getElementById('status');
+  const showLabelsEl = document.getElementById('showLabels');
+  const labelNEl = document.getElementById('labelN');
+  const searchEl = document.getElementById('search');
+
+  let ctx, width, height, transform = d3.zoomIdentity;
+  let nodes = [], edges = [];
+  let nodeById = new Map();
+  let neighbors = new Map();
+  let activeNode = null; // node object
+  let simulation = null;
+  let quadtree = null;
+  let disciplinePalette = new Map();
+  let presentDisciplines = new Set();
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    width = canvas.width = rect.width * devicePixelRatio;
+    height = canvas.height = rect.height * devicePixelRatio;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx = canvas.getContext('2d');
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    render();
+  }
+  window.addEventListener('resize', resize);
+
+  function radius(n) {
+    // Seed: scala su citazioni; Reference: su grado
+    if (n.type === 'seed') {
+      const cited = n.cited_by_count || 0;
+      return 4 + 12 * (cited / (n._maxCited || 1));
+    }
+    return Math.max(2, Math.min(6, 2 + (n.degree || 0) * 0.5));
+  }
+
+  function color(n) {
+    const d = n.discipline || 'Unknown';
+    return disciplinePalette.get(d) || '#9e9e9e';
+  }
+
+  function buildNeighbors() {
+    neighbors.clear();
+    for (const e of edges) {
+      if (!neighbors.has(e.source.id)) neighbors.set(e.source.id, new Set());
+      if (!neighbors.has(e.target.id)) neighbors.set(e.target.id, new Set());
+      neighbors.get(e.source.id).add(e.target.id);
+      neighbors.get(e.target.id).add(e.source.id);
+    }
+  }
+
+  function computeDegrees() {
+    for (const n of nodes) n.degree = 0;
+    for (const e of edges) {
+      e.source.degree++;
+      e.target.degree++;
+    }
+  }
+
+  function initSimulation() {
+    const maxCited = d3.max(nodes.filter(n => n.type === 'seed'), d => d.cited_by_count) || 1;
+    for (const n of nodes) n._maxCited = maxCited;
+
+    simulation = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(edges).id(d => d.id).distance(l => l.target.type === 'reference' ? 35 : 90).strength(0.4))
+      .force('charge', d3.forceManyBody().strength(-35))
+      .force('center', d3.forceCenter(width / devicePixelRatio / 2, height / devicePixelRatio / 2))
+      .force('collide', d3.forceCollide().radius(n => radius(n) + 2))
+      .alphaDecay(0.03)
+      .on('tick', () => {
+        if (!quadtree || Math.random() < 0.2) quadtree = d3.quadtree().x(d => d.x).y(d => d.y).addAll(nodes);
+        render();
+      });
+  }
+
+  function render() {
+    if (!ctx) return;
+    ctx.save();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.translate(transform.x, transform.y);
+    ctx.scale(transform.k, transform.k);
+
+    // Draw edges
+    ctx.globalAlpha = 0.15;
+    ctx.strokeStyle = '#8aa1c1';
+    ctx.lineWidth = 1 / transform.k;
+    ctx.beginPath();
+    for (const e of edges) {
+      ctx.moveTo(e.source.x, e.source.y);
+      ctx.lineTo(e.target.x, e.target.y);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Highlight neighbors if a node is active
+    if (activeNode) {
+      const neigh = neighbors.get(activeNode.id) || new Set();
+      ctx.strokeStyle = '#ff6d00';
+      ctx.lineWidth = Math.max(2 / transform.k, 1 / transform.k);
+      ctx.globalAlpha = 0.7;
+      ctx.beginPath();
+      for (const e of edges) {
+        if (e.source.id === activeNode.id || e.target.id === activeNode.id || (neigh.has(e.source.id) && neigh.has(e.target.id))) {
+          ctx.moveTo(e.source.x, e.source.y);
+          ctx.lineTo(e.target.x, e.target.y);
+        }
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Draw nodes
+    for (const n of nodes) {
+      const r = radius(n);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = color(n);
+      ctx.fill();
+      ctx.lineWidth = (n.type === 'seed' ? 1.8 : 1.0) / transform.k;
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.stroke();
+    }
+
+    // Labels: show for top-N by size or hovered/active
+    const N = showLabelsEl.checked ? +labelNEl.value : 0;
+    const sorted = [...nodes].sort((a,b) => (b.cited_by_count||b.degree||0) - (a.cited_by_count||a.degree||0));
+    const showSet = new Set(sorted.slice(0, N).map(n => n.id));
+    ctx.fillStyle = '#111';
+    ctx.font = `${Math.max(10, 10/transform.k)}px system-ui, Arial`;
+    ctx.textBaseline = 'middle';
+    for (const n of nodes) {
+      if (showSet.has(n.id) || n === activeNode || n._hover) {
+        const r = radius(n);
+        const label = n.title || n.id;
+        ctx.fillStyle = 'rgba(0,0,0,0.85)';
+        ctx.fillText(label, n.x + r + 3, n.y);
+      }
+    }
+    ctx.restore();
+  }
+
+  function pointToGraph(p) {
+    const inv = transform.invert(p);
+    return inv;
+  }
+
+  function findNodeAt(px, py) {
+    if (!quadtree) return null;
+    const p = pointToGraph([px, py]);
+    const r = 8 / transform.k;
+    let found = null;
+    quadtree.visit((node, x0, y0, x1, y1) => {
+      if (node.data) {
+        const d = node.data;
+        const dx = d.x - p[0];
+        const dy = d.y - p[1];
+        if (dx*dx + dy*dy <= Math.pow(radius(d) + r, 2)) {
+          found = d; return true;
+        }
+      }
+      return x0 > p[0] + r || x1 < p[0] - r || y0 > p[1] + r || y1 < p[1] - r;
+    });
+    return found;
+  }
+
+  // Zoom & pan
+  d3.select(canvas).call(
+    d3.zoom().scaleExtent([0.2, 6]).on('zoom', (ev) => { transform = ev.transform; render(); })
+  );
+
+  // Drag
+  d3.select(canvas).call(
+    d3.drag()
+      .container(canvas)
+      .subject((event) => findNodeAt(event.x, event.y))
+      .on('start', (event) => {
+        const n = event.subject; if (!n) return;
+        if (!event.active && simulation) simulation.alphaTarget(0.2).restart();
+        n.fx = n.x; n.fy = n.y;
+      })
+      .on('drag', (event) => {
+        const n = event.subject; if (!n) return;
+        const p = pointToGraph([event.x, event.y]);
+        n.fx = p[0]; n.fy = p[1];
+        render();
+      })
+      .on('end', (event) => {
+        const n = event.subject; if (!n) return;
+        if (!event.active && simulation) simulation.alphaTarget(0);
+        n.fx = null; n.fy = null;
+      })
+  );
+
+  // Hover + tooltip
+  canvas.addEventListener('mousemove', (e) => {
+    let n = findNodeAt(e.offsetX, e.offsetY);
+    nodes.forEach((x) => (x._hover = false));
+    if (n) {
+      n._hover = true;
+      tooltip.style.opacity = 1;
+      const lines = [n.title || n.id];
+      if (n.type === 'seed' && n.cited_by_count != null) lines.push(`Citations: ${n.cited_by_count}`);
+      if (n.discipline) lines.push(`Discipline: ${n.discipline}`);
+      lines.push(`Degree: ${n.degree ?? 0}`);
+      tooltip.textContent = lines.join('\n');
+      const rect = canvas.getBoundingClientRect();
+      tooltip.style.left = `${e.clientX - rect.left + 12}px`;
+      tooltip.style.top = `${e.clientY - rect.top + 12}px`;
+    } else {
+      tooltip.style.opacity = 0;
+    }
+    render();
+  });
+
+  canvas.addEventListener('click', (e) => {
+    const n = findNodeAt(e.offsetX, e.offsetY);
+    activeNode = n || null;
+    render();
+  });
+
+  document.getElementById('fit').addEventListener('click', () => {
+    // Fit to current nodes bbox
+    const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+    if (!xs.length) return;
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const w = (maxX - minX) || 1, h = (maxY - minY) || 1;
+    const m = 40; // margin
+    const scale = Math.min((canvas.width/devicePixelRatio - 2*m)/w, (canvas.height/devicePixelRatio - 2*m)/h);
+    const tx = (canvas.width/devicePixelRatio - scale*(minX+maxX))/2;
+    const ty = (canvas.height/devicePixelRatio - scale*(minY+maxY))/2;
+    transform = d3.zoomIdentity.translate(tx, ty).scale(scale);
+    render();
+  });
+
+  showLabelsEl.addEventListener('change', render);
+  labelNEl.addEventListener('input', render);
+
+  searchEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) return;
+      const hit = nodes.find(n => (n.title || n.id).toLowerCase().includes(q));
+      if (!hit) return;
+      activeNode = hit;
+      const tx = (canvas.width/devicePixelRatio)/2 - transform.k * hit.x;
+      const ty = (canvas.height/devicePixelRatio)/2 - transform.k * hit.y;
+      transform = d3.zoomIdentity.translate(tx, ty).scale(transform.k);
+      render();
+    }
+  });
+
+  function buildDisciplinePalette(discSet) {
+    // Fixed palette for broad disciplines; fallback to categorical
+    const fixed = new Map([
+      ['Art', '#8e44ad'],
+      ['Biology', '#27ae60'],
+      ['Business', '#2c3e50'],
+      ['Chemistry', '#16a085'],
+      ['Computer science', '#1f78b4'],
+      ['Economics', '#8e6c0c'],
+      ['Engineering', '#e67e22'],
+      ['Environmental science', '#2ecc71'],
+      ['Geography', '#1abc9c'],
+      ['Geology', '#795548'],
+      ['History', '#6c757d'],
+      ['Materials science', '#e84393'],
+      ['Mathematics', '#e74c3c'],
+      ['Medicine', '#c0392b'],
+      ['Philosophy', '#7f8c8d'],
+      ['Physics', '#2980b9'],
+      ['Political science', '#9b59b6'],
+      ['Psychology', '#f39c12'],
+      ['Sociology', '#d35400'],
+      ['Unknown', '#9e9e9e'],
+    ]);
+    const spare = d3.schemeTableau10 || d3.schemeCategory10;
+    disciplinePalette.clear();
+    let i = 0;
+    for (const d of discSet) {
+      if (fixed.has(d)) {
+        disciplinePalette.set(d, fixed.get(d));
+      } else {
+        disciplinePalette.set(d, spare[i % spare.length]);
+        i++;
+      }
+    }
+  }
+
+  function updateLegend() {
+    const el = document.getElementById('legend');
+    el.textContent = '';
+    const title = document.createElement('span');
+    title.textContent = 'Colori per disciplina (bordo=seed)';
+    title.style.marginRight = '6px';
+    el.appendChild(title);
+    for (const d of Array.from(presentDisciplines).sort()) {
+      const span = document.createElement('span');
+      const dot = document.createElement('span');
+      dot.className = 'dot';
+      dot.style.background = disciplinePalette.get(d) || '#9e9e9e';
+      span.appendChild(dot);
+      const label = document.createTextNode(' ' + d);
+      span.appendChild(label);
+      el.appendChild(span);
+    }
+  }
+
+  function parseData(nodeText, edgeText) {
+    // Nodes from nodes.csv (seeds)
+    const seedRows = d3.csvParse(nodeText);
+    nodeById = new Map();
+    for (const d of seedRows) {
+      if (!d.id) continue;
+      nodeById.set(d.id, {
+        id: d.id,
+        title: d.title || 'Untitled',
+        cited_by_count: d.cited_by_count ? +d.cited_by_count : 0,
+        type: 'seed',
+        discipline: 'Unknown'
+      });
+    }
+    // Edges
+    const edgeRows = d3.csvParse(edgeText);
+    const edgeSet = new Set();
+    edges = [];
+    for (const d of edgeRows) {
+      const s = d.source_id, t = d.target_id; if (!s || !t) continue;
+      if (!nodeById.has(s)) nodeById.set(s, { id: s, title: s, type: 'reference', cited_by_count: 0, discipline: 'Unknown' });
+      if (!nodeById.has(t)) nodeById.set(t, { id: t, title: t, type: 'reference', cited_by_count: 0, discipline: 'Unknown' });
+      const key = s + '>' + t;
+      if (!edgeSet.has(key)) {
+        edgeSet.add(key);
+        edges.push({ source: s, target: t });
+      }
+    }
+    nodes = Array.from(nodeById.values());
+    // Rebind edge endpoints to node objects for drawing
+    const map = new Map(nodes.map(n => [n.id, n]));
+    edges = edges.map(e => ({ source: map.get(e.source), target: map.get(e.target) }));
+    computeDegrees();
+    buildNeighbors();
+  }
+
+  async function fetchText(path) {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error('Impossibile caricare ' + path);
+    return res.text();
+  }
+
+  function applyDisciplinesFromFiles(refsText, countsText) {
+    presentDisciplines = new Set();
+    // 1) references_with_disciplines.csv: target discipline (maggioritaria)
+    if (refsText) {
+      const rows = d3.csvParse(refsText);
+      const agg = new Map(); // target_id -> Map(discipline -> count)
+      for (const r of rows) {
+        const t = r.target_id; const d = r.discipline || 'Unknown';
+        if (!t) continue;
+        if (!agg.has(t)) agg.set(t, new Map());
+        const m = agg.get(t);
+        m.set(d, (m.get(d) || 0) + 1);
+      }
+      for (const [tid, m] of agg) {
+        const best = Array.from(m.entries()).sort((a,b)=>b[1]-a[1])[0][0];
+        const node = nodeById.get(tid);
+        if (node) node.discipline = best;
+      }
+    }
+    // 2) discipline_counts.csv: top disciplina per seed (colonna max)
+    if (countsText) {
+      const rows = d3.csvParse(countsText);
+      const cols = rows.columns.filter(c => c !== 'source_id');
+      for (const r of rows) {
+        const src = r.source_id; if (!src) continue;
+        let best = 'Unknown', bestVal = -1;
+        for (const c of cols) {
+          const val = +r[c] || 0;
+          if (val > bestVal) { bestVal = val; best = c; }
+        }
+        const n = nodeById.get(src);
+        if (n) n.discipline = bestVal > 0 ? best : (n.discipline || 'Unknown');
+      }
+    }
+    // Palette e legenda
+    for (const n of nodes) presentDisciplines.add(n.discipline || 'Unknown');
+    buildDisciplinePalette(presentDisciplines);
+    updateLegend();
+  }
+
+  async function tryLoadDefault() {
+    try {
+      statusEl.textContent = 'Caricamento CSV…';
+      const [nodeText, edgeText] = await Promise.all([
+        fetchText(NODE_CSV), fetchText(EDGE_CSV)
+      ]);
+      parseData(nodeText, edgeText);
+      let refsText = null, countsText = null;
+      try { refsText = await fetchText(REFS_CSV); } catch (e) {}
+      try { countsText = await fetchText(COUNTS_CSV); } catch (e) {}
+      applyDisciplinesFromFiles(refsText, countsText);
+      statusEl.textContent = `Nodi: ${nodes.length} · Archi: ${edges.length}`;
+      initSimulation();
+      render();
+      return true;
+    } catch (err) {
+      console.warn(err);
+      statusEl.textContent = 'Caricamento locale non riuscito. Usa "Carica CSV locali…"';
+      return false;
+    }
+  }
+
+  // Local file fallback
+  document.getElementById('toggleUpload').addEventListener('click', () => {
+    const up = document.getElementById('uploader');
+    up.style.display = up.style.display === 'none' ? 'flex' : 'none';
+  });
+  document.getElementById('loadFiles').addEventListener('click', async () => {
+    const nf = document.getElementById('nodesFile').files[0];
+    const ef = document.getElementById('edgesFile').files[0];
+    const rf = document.getElementById('refsFile').files[0];
+    const cf = document.getElementById('countsFile').files[0];
+    if (!nf || !ef) { alert('Seleziona almeno nodes.csv ed edges.csv.'); return; }
+    const [nodeText, edgeText, refsText, countsText] = await Promise.all([
+      nf.text(), ef.text(), rf ? rf.text() : Promise.resolve(null), cf ? cf.text() : Promise.resolve(null)
+    ]);
+    parseData(nodeText, edgeText);
+    applyDisciplinesFromFiles(refsText, countsText);
+    statusEl.textContent = `Nodi: ${nodes.length} · Archi: ${edges.length}`;
+    initSimulation();
+    render();
+  });
+
+  // Bootstrap
+  function boot() {
+    resize();
+    tryLoadDefault();
+  }
+  boot();
+  });
+  </script>
+</body>
+</html>

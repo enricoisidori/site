@@ -6,6 +6,7 @@
     <title>3D Visualizer – Text Nodes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&display=swap"
@@ -19,6 +20,40 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
     <link rel="icon" type="image/png" href="./asset/threadscape/icon.png" />
+    <script>
+      // Lightweight perf defaults: lazy images/iframes, metadata-only videos
+      (function(){
+        const setAttrs = (el)=>{
+          if(el.tagName==='IMG'){
+            if(!el.hasAttribute('loading')) el.setAttribute('loading','lazy');
+            if(!el.hasAttribute('decoding')) el.setAttribute('decoding','async');
+            el.fetchPriority = el.fetchPriority || 'low';
+          } else if(el.tagName==='IFRAME'){
+            if(!el.hasAttribute('loading')) el.setAttribute('loading','lazy');
+          } else if(el.tagName==='VIDEO'){
+            if(!el.hasAttribute('preload')) el.setAttribute('preload','metadata');
+            el.playsInline = true;
+          }
+        };
+        if(document.readyState!=='loading'){
+          document.querySelectorAll('img,iframe,video').forEach(setAttrs);
+        } else {
+          document.addEventListener('DOMContentLoaded',()=>{
+            document.querySelectorAll('img,iframe,video').forEach(setAttrs);
+          });
+        }
+        const obs = new MutationObserver((muts)=>{
+          for(const m of muts){
+            m.addedNodes && m.addedNodes.forEach(n=>{
+              if(!(n instanceof Element)) return;
+              if(['IMG','IFRAME','VIDEO'].includes(n.tagName)) setAttrs(n);
+              n.querySelectorAll && n.querySelectorAll('img,iframe,video').forEach(setAttrs);
+            });
+          }
+        });
+        obs.observe(document.documentElement,{subtree:true,childList:true});
+      })();
+    </script>
     <style>
       :root {
         --bg: #0e0e0e;
@@ -70,6 +105,26 @@
       .toolbar button:active {
         background: var(--btn-active);
         transform: translateY(0.5px);
+      }
+      .cat-toggles {
+        display: inline-flex;
+        gap: 6px;
+        margin-left: 6px;
+      }
+      .cat-toggles button {
+        appearance: none;
+        -webkit-appearance: none;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        opacity: 0.8;
+      }
+      .cat-toggles button[data-active="true"] {
+        opacity: 1;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset;
       }
       .material-symbols-outlined {
         font-family: "Material Symbols Outlined", "Material Icons Outlined",
@@ -213,11 +268,11 @@
       }
     </style>
     <!-- Three prima di TUTTO -->
-    <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+    <script defer src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
     <!-- 3d-force-graph -->
-    <script src="https://unpkg.com/3d-force-graph"></script>
+    <script defer src="https://unpkg.com/3d-force-graph"></script>
     <!-- three-spritetext, ORA dopo THREE -->
-    <script src="https://unpkg.com/three-spritetext"></script>
+    <script defer src="https://unpkg.com/three-spritetext"></script>
     <script>
       // Fail-safe: se per CDN o cache SpriteText fosse namespaced, prendilo da window
       const SpriteText =
@@ -268,7 +323,18 @@
         <option value="none" selected>Colori: Nessuno</option>
         <option value="area">Colori: per Area</option>
         <option value="cluster">Colori: per Cluster</option>
+        <option value="category">Colori: per Categoria</option>
       </select>
+      <div class="cat-toggles" id="catToggles">
+        <button data-cat="exploring" title="Exploring">EXP</button>
+        <button data-cat="making" title="Making">MAK</button>
+        <button data-cat="interazione" title="Interazione">INT</button>
+        <button data-cat="comunicazione" title="Comunicazione">COM</button>
+        <button data-cat="speculazione" title="Speculazione">SPEC</button>
+      </div>
+      <button id="btnFilters" title="Filtri categorie" data-tip="Filtra per categoria">
+        <span class="material-symbols-outlined">filter_list</span>
+      </button>
       <label
         style="display: inline-flex; align-items: center; gap: 6px"
         data-tip="Selezione camera (POV)"
@@ -288,11 +354,30 @@
     <div id="tooltip" class="tooltip"></div>
     <div id="status" class="status" style="display: none"></div>
 
+    <div id="filterPanel" class="panel" style="display:none; top: 48px; left: 8px;">
+      <h3>Filtri categorie</h3>
+      <div class="muted">Assegna colore e filtra per categoria</div>
+      <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; align-items:center">
+        <label><input type="checkbox" class="fcat" value="exploring" /> Exploring</label>
+        <input type="color" class="fcatColor" data-cat="exploring" value="#34d399" style="width:22px;height:22px;border:none;background:none;padding:0" />
+        <label><input type="checkbox" class="fcat" value="making" /> Making</label>
+        <input type="color" class="fcatColor" data-cat="making" value="#f472b6" style="width:22px;height:22px;border:none;background:none;padding:0" />
+        <label><input type="checkbox" class="fcat" value="interazione" /> Interazione</label>
+        <input type="color" class="fcatColor" data-cat="interazione" value="#22d3ee" style="width:22px;height:22px;border:none;background:none;padding:0" />
+        <label><input type="checkbox" class="fcat" value="comunicazione" /> Comunicazione</label>
+        <input type="color" class="fcatColor" data-cat="comunicazione" value="#60a5fa" style="width:22px;height:22px;border:none;background:none;padding:0" />
+        <label><input type="checkbox" class="fcat" value="speculazione" /> Speculazione</label>
+        <input type="color" class="fcatColor" data-cat="speculazione" value="#f59e0b" style="width:22px;height:22px;border:none;background:none;padding:0" />
+      </div>
+    </div>
+
     <aside id="editor" class="edit-panel">
       <h3>Proprietà nodo</h3>
       <div id="selInfo" class="muted"></div>
       <label for="fTitle">Titolo</label>
       <input id="fTitle" type="text" placeholder="Titolo" />
+      <label for="fDate">Data</label>
+      <input id="fDate" type="date" />
       <label for="fAreas">Areas (separate da virgola)</label>
       <input id="fAreas" type="text" placeholder="Area1, Area2" />
       <label for="fTags">Tags (separati da virgola)</label>
@@ -387,6 +472,13 @@
       const THREE = window.THREE;
       // Base per i path relativi (se l'HTML e la cartella "assets/" sono accanto, lascia "./")
       const ASSET_BASE = "./";
+      const DISCIPLINE_JSON_PATH = "./asset/discipline-clusters.json";
+      const DISC_FLOOR_Z = -80;
+      const DISC_INNER_RADIUS = 70;
+      const DISC_OUTER_RADIUS = 320;
+      let disciplineLayout = null;
+      let disciplineFloor = null;
+      let axesGroup = null; // holds date axis + medians + tick labels
 
       // Risolvi una URL immagine a partire dal campo files.path / dataUrl / url
       function resolveImageURL(raw) {
@@ -448,19 +540,366 @@
         );
       }
 
+      // === Discipline clusters layout / floor ===
+      initDisciplineLayout();
+
+      async function initDisciplineLayout() {
+        // Keep compatibility with previous JSON, but it's no longer required
+        try {
+          if (typeof fetch === "function") {
+            const res = await fetch(DISCIPLINE_JSON_PATH, {
+              cache: "no-cache",
+            });
+            if (res.ok) {
+              const payload = await res.json();
+              disciplineLayout = prepareDisciplineLayout(payload);
+            }
+          }
+        } catch (err) {
+          console.warn("Impossibile caricare discipline-clusters.json", err);
+        } finally {
+          buildDisciplineFloor();
+          applyDisciplineLayout();
+        }
+      }
+
+      function prepareDisciplineLayout(raw) {
+        if (!raw) return null;
+        const defs = Array.isArray(raw.clusterDefinitions)
+          ? raw.clusterDefinitions.map((def, idx) => ({
+              id: def.id || `cluster_${idx}`,
+              label: def.label || def.id || `Cluster ${idx + 1}`,
+              angleDeg: Number(def.angleDeg) || 0,
+            }))
+          : [];
+        if (!defs.length) return null;
+        const sorted = defs
+          .map((d) => ({ ...d, angleDeg: normalizeAngleDeg(d.angleDeg) }))
+          .sort((a, b) => a.angleDeg - b.angleDeg);
+        const clusterById = new Map();
+        const total = sorted.length;
+        for (let i = 0; i < total; i++) {
+          const current = sorted[i];
+          const prev = sorted[(i - 1 + total) % total];
+          const next = sorted[(i + 1) % total];
+          const prevDelta = forwardAngleDelta(prev.angleDeg, current.angleDeg);
+          const nextDelta = forwardAngleDelta(current.angleDeg, next.angleDeg);
+          const startDeg = current.angleDeg - prevDelta / 2;
+          const endDeg = current.angleDeg + nextDelta / 2;
+          current.startRad = degToRad(startDeg);
+          current.endRad = degToRad(endDeg);
+          current.angleRad = degToRad(current.angleDeg);
+          current.widthRad = angleSpan(current.startRad, current.endRad);
+          current.color = groupColor(current.id || current.label);
+          clusterById.set(current.id, current);
+        }
+        const tagMap = new Map();
+        if (raw.tagToCluster && typeof raw.tagToCluster === "object") {
+          for (const [tag, cid] of Object.entries(raw.tagToCluster)) {
+            if (!tag) continue;
+            tagMap.set(tag.trim().toLowerCase(), cid);
+          }
+        }
+        return {
+          clusters: sorted,
+          clusterById,
+          tagToCluster: tagMap,
+        };
+      }
+
+      function normalizeAngleDeg(deg) {
+        const v = deg % 360;
+        return v < 0 ? v + 360 : v;
+      }
+      function forwardAngleDelta(from, to) {
+        let diff = normalizeAngleDeg(to) - normalizeAngleDeg(from);
+        if (diff <= 0) diff += 360;
+        return diff;
+      }
+      function degToRad(deg) {
+        return (deg * Math.PI) / 180;
+      }
+      function angleSpan(start, end) {
+        let span = end - start;
+        const tau = Math.PI * 2;
+        span = ((span % tau) + tau) % tau;
+        return span || tau;
+      }
+
+      function buildDisciplineFloor() {
+        // Build a triangular base (X–Z plane) with vertex labels
+        if (!THREE || typeof Graph.scene !== "function") return;
+        const scene = Graph.scene();
+        if (!scene) return;
+        if (disciplineFloor) scene.remove(disciplineFloor);
+
+        const group = new THREE.Group();
+        group.renderOrder = -10;
+
+        // Triangle as a softly tinted floor
+        const triShape = new THREE.Shape();
+        const vS = TRI_VERTICES.speculazione; // map z->y for shape (XY), then rotate
+        const vI = TRI_VERTICES.interazione;
+        const vC = TRI_VERTICES.comunicazione;
+        triShape.moveTo(vS.x, vS.z);
+        triShape.lineTo(vI.x, vI.z);
+        triShape.lineTo(vC.x, vC.z);
+        triShape.lineTo(vS.x, vS.z);
+        const triGeom = new THREE.ShapeGeometry(triShape, 1);
+        const triMesh = new THREE.Mesh(
+          triGeom,
+          new THREE.MeshBasicMaterial({
+            color: 0x111111,
+            transparent: true,
+            opacity: 0.5,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+          })
+        );
+        // Rotate from XY into XZ plane (horizontal)
+        triMesh.rotation.x = -Math.PI / 2;
+        triMesh.position.y = 0;
+        group.add(triMesh);
+
+        // Outline (triangle border)
+        const lineMat = new THREE.LineBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.15,
+          depthWrite: false,
+        });
+        const lineGeom = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(vS.x, 0, vS.z),
+          new THREE.Vector3(vI.x, 0, vI.z),
+          new THREE.Vector3(vC.x, 0, vC.z),
+          new THREE.Vector3(vS.x, 0, vS.z),
+        ]);
+        const triLine = new THREE.Line(lineGeom, lineMat);
+        group.add(triLine);
+
+        // Medians from centroid to each vertex to highlight areas
+        const centroid = {
+          x: (vS.x + vI.x + vC.x) / 3,
+          z: (vS.z + vI.z + vC.z) / 3,
+        };
+        const medGeom = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(centroid.x, 0, centroid.z),
+          new THREE.Vector3(vS.x, 0, vS.z),
+          new THREE.Vector3(centroid.x, 0, centroid.z),
+          new THREE.Vector3(vI.x, 0, vI.z),
+          new THREE.Vector3(centroid.x, 0, centroid.z),
+          new THREE.Vector3(vC.x, 0, vC.z),
+        ]);
+        const medLine = new THREE.LineSegments(
+          medGeom,
+          new THREE.LineDashedMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.25,
+            dashSize: 10,
+            gapSize: 6,
+            depthWrite: false,
+          })
+        );
+        // Apply dashes
+        medLine.computeLineDistances();
+        group.add(medLine);
+
+        // Vertex labels
+        if (SpriteText) {
+          const mk = (text, p) => {
+            const s = new SpriteText(text);
+            s.color = "#b9bcc1";
+            s.textHeight = 16;
+            s.position.set(p.x, 6, p.z);
+            return s;
+          };
+          group.add(
+            mk("Speculazione", vS),
+            mk("Interazione", vI),
+            mk("Comunicazione", vC)
+          );
+        }
+
+        // Axes group: vertical date axis and dynamic ticks
+        axesGroup = new THREE.Group();
+        group.add(axesGroup);
+        buildStaticAxes(axesGroup, centroid);
+
+        disciplineFloor = group;
+        scene.add(group);
+      }
+
+      function buildStaticAxes(container, center) {
+        // Vertical date axis (from oldest/top to newest/bottom)
+        const axisMat = new THREE.LineBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.45,
+          depthWrite: false,
+        });
+        const axisGeom = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(center.x, DATE_Y_BOTTOM, center.z),
+          new THREE.Vector3(center.x, DATE_Y_TOP, center.z),
+        ]);
+        const axisLine = new THREE.Line(axisGeom, axisMat);
+        container.add(axisLine);
+
+        // Title + end labels
+        if (SpriteText) {
+          const mkLbl = (text, y, size = 12) => {
+            const s = new SpriteText(text);
+            s.color = "#cfd3da";
+            s.textHeight = size;
+            s.position.set(center.x + 16, y, center.z);
+            return s;
+          };
+          container.add(
+            mkLbl("Data", DATE_Y_TOP + 10, 13),
+            mkLbl("Più vecchio", DATE_Y_TOP, 11),
+            mkLbl("Più recente", DATE_Y_BOTTOM, 11)
+          );
+        }
+      }
+
+      function updateDateAxisTicks(stats) {
+        if (!axesGroup) return;
+        // Remove previous ticks
+        const prev = axesGroup.getObjectByName("dateTicks");
+        if (prev) axesGroup.remove(prev);
+        if (!stats) return;
+
+        const ticksGroup = new THREE.Group();
+        ticksGroup.name = "dateTicks";
+
+        const nTicks = 6; // including min and max
+        const min = stats.min;
+        const max = stats.max;
+        const cx =
+          (TRI_VERTICES.speculazione.x +
+            TRI_VERTICES.interazione.x +
+            TRI_VERTICES.comunicazione.x) /
+          3;
+        const cz =
+          (TRI_VERTICES.speculazione.z +
+            TRI_VERTICES.interazione.z +
+            TRI_VERTICES.comunicazione.z) /
+          3;
+        const tickLen = 20;
+        for (let i = 0; i < nTicks; i++) {
+          const t = i / (nTicks - 1);
+          const y = DATE_Y_TOP + (DATE_Y_BOTTOM - DATE_Y_TOP) * t;
+          const geom = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(cx - tickLen / 2, y, cz),
+            new THREE.Vector3(cx + tickLen / 2, y, cz),
+          ]);
+          const mat = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: i === 0 || i === nTicks - 1 ? 0.4 : 0.25,
+            depthWrite: false,
+          });
+          const tick = new THREE.Line(geom, mat);
+          ticksGroup.add(tick);
+
+          if (SpriteText) {
+            const ts = min + (max - min) * t;
+            const d = new Date(ts);
+            const year = isFinite(ts) ? String(d.getFullYear()) : "";
+            const lbl = new SpriteText(year);
+            lbl.color = "#b9bcc1";
+            lbl.textHeight = 10;
+            lbl.position.set(cx + tickLen * 0.8, y, cz);
+            ticksGroup.add(lbl);
+          }
+        }
+
+        axesGroup.add(ticksGroup);
+      }
+
       // ————— TEXT + THUMBNAIL NODES —————
       const TEXT_H = 6; // altezza del testo (world units)
       const IMG_H = 14; // altezza thumbnail (world units)
-      let colorMode = "none"; // none | area | cluster
+      let colorMode = "none"; // none | area | cluster | category
+
+      // Categorie: colori e sinonimi
+      const CATEGORY_COLORS = {
+        exploring: "#34d399", // green
+        making: "#f472b6", // pink
+        interazione: "#22d3ee", // cyan
+        comunicazione: "#60a5fa", // blue
+        speculazione: "#f59e0b", // amber
+      };
+      const CATEGORY_SYNONYMS = {
+        exploring: ["exploring", "explore", "exploration", "esplorazione", "esplorare"],
+        making: ["making", "make", "fabrication", "prototyping", "costruzione", "costruire"],
+        interazione: ["interazione", "interaction", "interact", "interactive"],
+        comunicazione: ["comunicazione", "communication", "communicate"],
+        speculazione: ["speculazione", "speculative", "speculation"],
+      };
+      let activeCategories = new Set(); // vuoto = mostra tutto
 
       function getNodeColor(node) {
         if (colorMode === "none") return "#ffffff";
+        if (colorMode === "category") {
+          const cats = categoriesForNode(node);
+          if (!cats.length) return "#cbd5e1";
+          const cols = cats.map((c) => CATEGORY_COLORS[c]).filter(Boolean);
+          return cols.length ? blendHexColors(cols) : "#cbd5e1";
+        }
         let key = "";
         if (colorMode === "area")
           key = (Array.isArray(node.areas) && node.areas[0]) || "";
         else if (colorMode === "cluster") key = node.__cluster ?? "";
         key = String(key || "");
         return key ? groupColor(key) : "#cbd5e1";
+      }
+
+      function categoriesForNode(node) {
+        const tags = Array.isArray(node?.tags) ? node.tags : [];
+        const norm = tags.map((t) => String(t || "").trim().toLowerCase());
+        const found = [];
+        for (const [cat, syns] of Object.entries(CATEGORY_SYNONYMS)) {
+          if (norm.some((t) => syns.includes(t))) found.push(cat);
+        }
+        // Permetti anche match su areas
+        const areas = Array.isArray(node?.areas) ? node.areas : [];
+        const anorm = areas.map((a) => String(a || "").trim().toLowerCase());
+        for (const [cat, syns] of Object.entries(CATEGORY_SYNONYMS)) {
+          if (anorm.some((t) => t === cat || syns.includes(t)) && !found.includes(cat))
+            found.push(cat);
+        }
+        return found;
+      }
+
+      function blendHexColors(list) {
+        if (!Array.isArray(list) || !list.length) return "#ffffff";
+        let r = 0,
+          g = 0,
+          b = 0;
+        for (const hex of list) {
+          const c = hexToRgb(hex || "#ffffff");
+          r += c.r;
+          g += c.g;
+          b += c.b;
+        }
+        r = Math.round(r / list.length);
+        g = Math.round(g / list.length);
+        b = Math.round(b / list.length);
+        return rgbToHex(r, g, b);
+      }
+      function hexToRgb(hex) {
+        const m = String(hex || "").replace(/^#/, "");
+        const n = parseInt(m.length === 3 ? m.replace(/(.)/g, "$1$1") : m, 16);
+        return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+      }
+      function rgbToHex(r, g, b) {
+        return (
+          "#" +
+          [r, g, b]
+            .map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0"))
+            .join("")
+        );
       }
 
       function buildNodeObject(node) {
@@ -585,6 +1024,7 @@
         panel.style.display = "block";
         selInfo.textContent = `Selezionato: ${n.name || n.id}`;
         $("#fTitle").value = n.name || "";
+        $("#fDate").value = n.date || "";
         $("#fAreas").value = (n.areas || []).join(", ");
         $("#fTags").value = (n.tags || []).join(", ");
         $("#fDesc").value = n.desc || "";
@@ -651,6 +1091,7 @@
         const nodes = (d?.nodes || []).map((n) => ({
           id: n.id,
           name: n.name || "",
+          date: n.date || "",
           group: n.group || "",
           type: n.type || "",
           areas: Array.isArray(n.areas) ? [...n.areas] : [],
@@ -689,10 +1130,13 @@
           (clean.nodes || []).forEach((n) => (n.__cluster = 0));
         }
         Graph.graphData(clean);
+        applyDisciplineLayout();
         refreshNodeRenderer();
         setTimeout(() => Graph.zoomToFit(600, 60), 300);
         selectedEdge = null;
         ensureLinkStyleRefresh();
+        applyFilters();
+        updateCategoryTogglesUI();
       }
 
       function ensureLinkStyleRefresh() {
@@ -730,6 +1174,163 @@
         let h = 0;
         for (let i = 0; i < g.length; i++) h = (h * 31 + g.charCodeAt(i)) >>> 0;
         return PALETTE[h % PALETTE.length];
+      }
+
+      // Vertical date mapping (Y axis): oldest at top, newest at bottom
+      const DATE_SPAN_Y = 360; // total vertical span in world units
+      const DATE_Y_TOP = DATE_SPAN_Y / 2; // oldest
+      const DATE_Y_BOTTOM = -DATE_SPAN_Y / 2; // newest
+
+      // Triangular horizontal layout (X–Z plane)
+      const TRI_RADIUS = 280; // distance of triangle vertices from center
+      const TRI_JITTER = 22; // random jitter radius inside areas
+      // Place vertices in X–Z plane (y=0). Angles chosen for a pleasing view.
+      const TRI_VERTICES = {
+        speculazione: { x: 0, z: TRI_RADIUS }, // top
+        interazione: {
+          x: -Math.cos(Math.PI / 6) * TRI_RADIUS,
+          z: -Math.sin(Math.PI / 6) * TRI_RADIUS,
+        }, // bottom-left
+        comunicazione: {
+          x: Math.cos(Math.PI / 6) * TRI_RADIUS,
+          z: -Math.sin(Math.PI / 6) * TRI_RADIUS,
+        }, // bottom-right
+      };
+
+      function applyDisciplineLayout() {
+        // Lay out nodes using: vertical = date along Y (old→top, new→bottom),
+        // horizontal = barycentric position in a triangle (X–Z plane) using tags
+        if (typeof Graph.graphData !== "function") return;
+        const gd = Graph.graphData();
+        if (!gd || !Array.isArray(gd.nodes)) return;
+        const nodes = gd.nodes;
+
+        const dateStats = collectDateStats(nodes);
+
+        nodes.forEach((node, idx) => {
+          const { x, z } = pickTriangleXZFor(node, idx);
+          const y = pickVerticalYFor(node, dateStats);
+
+          node.x = x;
+          node.y = y;
+          node.z = z;
+          node.fx = x;
+          node.fy = y;
+          node.fz = z;
+        });
+
+        if (Graph.d3ReheatSimulation) Graph.d3ReheatSimulation();
+
+        // Refresh axis ticks according to current date range
+        updateDateAxisTicks(dateStats);
+      }
+
+      function inferClusterForNode(node) {
+        if (!disciplineLayout || !node) return null;
+        const tags = Array.isArray(node.tags) ? node.tags : [];
+        for (const raw of tags) {
+          const tag = String(raw || "")
+            .trim()
+            .toLowerCase();
+          if (!tag) continue;
+          const mapped = disciplineLayout.tagToCluster.get(tag);
+          if (mapped) return mapped;
+        }
+        return null;
+      }
+
+      function pickTriangleXZFor(node, idx) {
+        // Compute barycentric weights from tags
+        const w = triWeightsFromTags(node?.tags, idx);
+        const sum = w.spec + w.int + w.com || 1;
+        const ws = {
+          spec: w.spec / sum,
+          int: w.int / sum,
+          com: w.com / sum,
+        };
+        const vS = TRI_VERTICES.speculazione;
+        const vI = TRI_VERTICES.interazione;
+        const vC = TRI_VERTICES.comunicazione;
+        let x = vS.x * ws.spec + vI.x * ws.int + vC.x * ws.com;
+        let z = vS.z * ws.spec + vI.z * ws.int + vC.z * ws.com;
+        // Mild, deterministic jitter for better packing
+        const jx = (hashToUnit(`${node?.id || idx}:jx`) - 0.5) * 2 * TRI_JITTER;
+        const jz = (hashToUnit(`${node?.id || idx}:jz`) - 0.5) * 2 * TRI_JITTER;
+        x += jx;
+        z += jz;
+        return { x, z };
+      }
+
+      function pickVerticalYFor(node, stats) {
+        const ts = parseNodeDate(node?.date);
+        if (!stats || !Number.isFinite(ts))
+          return (DATE_Y_TOP + DATE_Y_BOTTOM) / 2;
+        if (stats.min === stats.max) return (DATE_Y_TOP + DATE_Y_BOTTOM) / 2;
+        const ratio = (ts - stats.min) / (stats.max - stats.min); // 0 old → 1 new
+        const clamped = Math.max(0, Math.min(1, ratio));
+        // Oldest at top (higher Y), newest at bottom (lower Y)
+        return DATE_Y_TOP + (DATE_Y_BOTTOM - DATE_Y_TOP) * clamped;
+      }
+
+      function triWeightsFromTags(tags, idx) {
+        const out = { spec: 0, int: 0, com: 0 };
+        const arr = Array.isArray(tags)
+          ? tags.map((t) =>
+              String(t || "")
+                .trim()
+                .toLowerCase()
+            )
+          : [];
+        const hasSpec = arr.some((t) =>
+          ["speculazione", "speculative", "speculation"].includes(t)
+        );
+        const hasInt = arr.some((t) =>
+          ["interazione", "interaction", "interact"].includes(t)
+        );
+        const hasCom = arr.some((t) =>
+          ["comunicazione", "communication", "communicate"].includes(t)
+        );
+        const count = (hasSpec ? 1 : 0) + (hasInt ? 1 : 0) + (hasCom ? 1 : 0);
+        if (count === 0) {
+          // fallback: distribute around center deterministically
+          const r = hashToUnit(`${idx}:tri`);
+          out.spec = 0.34 + (r - 0.5) * 0.08;
+          out.int = 0.33 + (r * 1.3 - 0.65) * 0.08;
+          out.com = Math.max(0.01, 1 - out.spec - out.int);
+          return out;
+        }
+        if (hasSpec) out.spec = 1 / count;
+        if (hasInt) out.int = 1 / count;
+        if (hasCom) out.com = 1 / count;
+        return out;
+      }
+
+      function collectDateStats(nodes) {
+        let min = Infinity;
+        let max = -Infinity;
+        for (const n of nodes || []) {
+          const ts = parseNodeDate(n?.date);
+          if (!Number.isFinite(ts)) continue;
+          if (ts < min) min = ts;
+          if (ts > max) max = ts;
+        }
+        if (!Number.isFinite(min) || !Number.isFinite(max)) return null;
+        return { min, max };
+      }
+
+      function parseNodeDate(value) {
+        if (!value) return NaN;
+        const parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? NaN : parsed;
+      }
+
+      function hashToUnit(str) {
+        const s = String(str || "");
+        let h = 0;
+        for (let i = 0; i < s.length; i++) {
+          h = (h * 131 + s.charCodeAt(i)) >>> 0;
+        }
+        return (h & 0xfffffff) / 0xfffffff;
       }
 
       // —— Tooltip ricco su hover ——
@@ -809,6 +1410,104 @@
         colorMode = e.target.value;
         refreshNodeRenderer();
       };
+
+      // Filtri categorie + toggle bar
+      (function initFiltersUI() {
+        const btn = document.getElementById("btnFilters");
+        const panel = document.getElementById("filterPanel");
+        if (btn && panel) {
+          btn.addEventListener("click", () => {
+            panel.style.display = panel.style.display === "none" ? "block" : "none";
+          });
+          panel.addEventListener("change", (e) => {
+            const el = e.target;
+            if (!el) return;
+            if (el.classList.contains("fcat")) {
+              const val = String(el.value || "").toLowerCase();
+              if (el.checked) activeCategories.add(val);
+              else activeCategories.delete(val);
+              // usando i filtri, attiva colori categoria
+              const sel = document.getElementById("colorBy");
+              if (sel) sel.value = "category";
+              colorMode = "category";
+              applyFilters();
+              refreshNodeRenderer();
+              updateCategoryTogglesUI();
+            } else if (el.classList.contains("fcatColor")) {
+              const cat = String(el.getAttribute("data-cat") || "");
+              const val = String(el.value || "").trim();
+              if (cat && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(val)) {
+                CATEGORY_COLORS[cat] = val;
+                refreshNodeRenderer();
+                updateCategoryTogglesUI();
+              }
+            }
+          });
+        }
+
+        // Init toggle buttons in toolbar
+        const bar = document.getElementById("catToggles");
+        if (bar) {
+          bar.addEventListener("click", (e) => {
+            const btn = e.target.closest("button[data-cat]");
+            if (!btn) return;
+            const cat = btn.getAttribute("data-cat");
+            if (!cat) return;
+            if (activeCategories.has(cat)) activeCategories.delete(cat);
+            else activeCategories.add(cat);
+            const sel = document.getElementById("colorBy");
+            if (sel) sel.value = "category";
+            colorMode = "category";
+            applyFilters();
+            refreshNodeRenderer();
+            updateCategoryTogglesUI();
+          });
+          updateCategoryTogglesUI();
+        }
+      })();
+
+      function applyFilters() {
+        const hasFilter = activeCategories && activeCategories.size > 0;
+        const visibleById = new Map();
+        const gd = Graph.graphData();
+        if (gd && Array.isArray(gd.nodes)) {
+          gd.nodes.forEach((n) => {
+            const cats = categoriesForNode(n);
+            const visible = !hasFilter || cats.some((c) => activeCategories.has(c));
+            visibleById.set(n.id, visible);
+          });
+        }
+        if (typeof Graph.nodeVisibility === "function") {
+          Graph.nodeVisibility((n) => visibleById.get(n.id) !== false);
+        }
+        if (typeof Graph.linkVisibility === "function") {
+          Graph.linkVisibility((l) => {
+            const s = typeof l.source === "object" ? l.source?.id : l.source;
+            const t = typeof l.target === "object" ? l.target?.id : l.target;
+            return visibleById.get(s) !== false && visibleById.get(t) !== false;
+          });
+        }
+      }
+
+      function updateCategoryTogglesUI() {
+        const bar = document.getElementById("catToggles");
+        if (!bar) return;
+        bar.querySelectorAll("button[data-cat]").forEach((b) => {
+          const cat = b.getAttribute("data-cat");
+          const hex = CATEGORY_COLORS[cat] || "#888888";
+          b.style.background = hex;
+          b.style.color = textColorFor(hex);
+          b.setAttribute("data-active", activeCategories.has(cat) ? "true" : "false");
+        });
+      }
+
+      function textColorFor(hex) {
+        const c = hexToRgb(hex);
+        // luminance (sRGB)
+        const srgb = [c.r, c.g, c.b].map((v) => v / 255);
+        const l = 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+        return l > 0.6 ? "#000" : "#fff";
+      }
 
       // Toggle 3D/2D
       (function init2DToggle() {
@@ -955,6 +1654,7 @@
           return {
             id: n.id,
             name: d.title || n.id,
+            date: d.date || n.date || "",
             // main area / type non usati in questa vista
             group: "",
             type: "",
@@ -1026,6 +1726,7 @@
         const child = {
           id,
           name: "Nuovo nodo",
+          date: parent.date || "",
           areas: [...(parent.areas || [])],
           tags: [],
           desc: "",
@@ -1084,6 +1785,7 @@
         currentData.nodes.push({
           id,
           name: "Nuovo nodo",
+          date: "",
           areas: [],
           tags: [],
           desc: "",
@@ -1104,6 +1806,15 @@
         syncGraphNodeById(sid);
         refreshNodeRenderer();
       });
+      document.getElementById("fDate").addEventListener("change", () => {
+        const sid = getSingleSelectedId();
+        if (!sid) return;
+        const n = currentData.nodes.find((x) => x.id === sid);
+        if (!n) return;
+        n.date = document.getElementById("fDate").value || "";
+        syncGraphNodeById(sid);
+        applyDisciplineLayout();
+      });
       document.getElementById("fAreas").addEventListener("change", () => {
         const sid = getSingleSelectedId();
         if (!sid) return;
@@ -1122,6 +1833,7 @@
         const raw = document.getElementById("fTags").value || "";
         n.tags = raw.split(/,\s*/).filter(Boolean);
         syncGraphNodeById(sid);
+        applyDisciplineLayout();
       });
       document.getElementById("fDesc").addEventListener("change", () => {
         const sid = getSingleSelectedId();
@@ -1192,6 +1904,7 @@
         const src = (currentData.nodes || []).find((x) => x.id === id);
         if (!src) return;
         gn.name = src.name || "";
+        gn.date = src.date || "";
         gn.areas = Array.isArray(src.areas) ? [...src.areas] : [];
         gn.tags = Array.isArray(src.tags) ? [...src.tags] : [];
         gn.desc = src.desc || "";
@@ -1314,6 +2027,7 @@
           return {
             id: n.id,
             data: {
+              date: n.date || "",
               title: n.name || n.id,
               type: "",
               mainArea: null,

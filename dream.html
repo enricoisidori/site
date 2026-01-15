@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dream Worlds (3 scenarios)</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      }
+      #ui {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+        padding: 10px 12px;
+        border-radius: 10px;
+        width: 340px;
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      #ui h1 {
+        font-size: 14px;
+        margin: 0 0 8px 0;
+        font-weight: 600;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 7px 0;
+      }
+      .row label {
+        flex: 1;
+        font-size: 12px;
+        opacity: 0.92;
+      }
+      .row input[type="range"] {
+        flex: 1.2;
+      }
+      .row input[type="number"],
+      .row select {
+        width: 140px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        padding: 6px 8px;
+        outline: none;
+      }
+      .row textarea {
+        width: 100%;
+        min-height: 70px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        padding: 6px 8px;
+        outline: none;
+        resize: vertical;
+      }
+      .row input[type="checkbox"] {
+        transform: translateY(1px);
+      }
+      .btns {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      button {
+        flex: 1;
+        padding: 8px 10px;
+        border-radius: 9px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        cursor: pointer;
+      }
+      button:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+      .hint {
+        font-size: 11px;
+        opacity: 0.75;
+        line-height: 1.25;
+        margin-top: 6px;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="ui">
+      <h1>Dream Worlds Controller</h1>
+
+      <div class="row">
+        <label><input id="run" type="checkbox" checked /> Run</label>
+        <label
+          ><input id="autoScenario" type="checkbox" checked /> Auto-switch
+          scenarios</label
+        >
+      </div>
+
+      <div class="row">
+        <label><input id="hideEnv" type="checkbox" /> Nascondi ambiente</label>
+      </div>
+
+      <div class="row">
+        <label>Scenario</label>
+        <select id="scenario">
+          <option value="desert">Desert</option>
+          <option value="mountains">Mountains</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label>Switch every (s)</label>
+        <input id="switchEvery" type="number" min="2" step="1" value="12" />
+      </div>
+
+      <div class="row">
+        <label><input id="autoSeed" type="checkbox" checked /> Auto-seed</label>
+        <label
+          >Seed every (s)
+          <input id="seedEvery" type="number" min="2" step="1" value="8"
+        /></label>
+      </div>
+
+      <div class="row">
+        <label>Drift</label>
+        <input
+          id="drift"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.45"
+        />
+      </div>
+
+      <div class="row">
+        <label>Saccades</label>
+        <input
+          id="saccades"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.35"
+        />
+      </div>
+
+      <div class="row">
+        <label>Jitter</label>
+        <input
+          id="jitter"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.25"
+        />
+      </div>
+
+      <div class="row">
+        <label>Freeze</label>
+        <input
+          id="freeze"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.20"
+        />
+      </div>
+
+      <div class="row">
+        <label
+          ><input id="useCommons" type="checkbox" /> Wikimedia textures</label
+        >
+        <label>
+          FPS
+          <input
+            id="commonsFps"
+            type="range"
+            min="1"
+            max="60"
+            step="1"
+            value="12"
+          />
+          <span id="commonsFpsVal">12</span>
+        </label>
+      </div>
+
+      <div class="btns">
+        <button id="refreshCommons">Refresh images</button>
+      </div>
+
+      <div class="btns">
+        <button id="regen">Rebuild world</button>
+        <button id="newSeed">New seed</button>
+      </div>
+
+      <div class="hint">
+        Tip: click on the canvas to lock pointer. Press <b>Esc</b> to release.
+        This is intentionally non-deterministic and “machine-like”.
+      </div>
+
+      <hr
+        style="
+          border: none;
+          border-top: 1px solid rgba(255, 255, 255, 0.12);
+          margin: 10px 0;
+        "
+      />
+      <div class="row">
+        <label
+          ><input id="useScans" type="checkbox" /> 3D scans (GLTF) spam</label
+        >
+      </div>
+      <div class="row">
+        <label>Spawn every (s)</label>
+        <input id="scanEvery" type="number" min="1" step="1" value="5" />
+        <label>Max active</label>
+        <input id="scanMax" type="number" min="1" step="1" value="6" />
+      </div>
+      <div class="row">
+        <label style="flex: 1">URLs (uno per riga)</label>
+      </div>
+      <div class="row">
+        <textarea
+          id="scanUrls"
+          placeholder="https://.../scene.gltf o .glb (CORS abilitato)"
+        ></textarea>
+      </div>
+      <div class="btns">
+        <button id="spawnNow">Spawn now</button>
+        <button id="clearScans">Clear scans</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+      // ---------- Utilities ----------
+      function clamp(x, a, b) {
+        return Math.max(a, Math.min(b, x));
+      }
+
+      // Simple seeded RNG (Mulberry32)
+      function mulberry32(seed) {
+        let t = seed >>> 0;
+        return function () {
+          t += 0x6d2b79f5;
+          let r = Math.imul(t ^ (t >>> 15), 1 | t);
+          r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+          return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      // ---------- Wikimedia Commons dynamic textures ----------
+      const Commons = {
+        enabled: false,
+        fps: 12,
+        frameMs: 1000 / 12,
+        lastSwitch: performance.now(),
+        thumbWidth: 1024,
+        textures: [], // loaded THREE.Texture
+        urlsQueue: [],
+        loadingCount: 0,
+        prefetching: false,
+        maxBuffer: 32,
+        minBuffer: 10,
+        currentIdx: -1,
+        currentTexture: null,
+        targets: new Set(), // materials to update when switching frame
+        loader: null,
+      };
+
+      Commons.loader = new THREE.TextureLoader();
+      if (Commons.loader.setCrossOrigin)
+        Commons.loader.setCrossOrigin("anonymous");
+
+      function commonsApiUrl(n, width) {
+        const base = "https://commons.wikimedia.org/w/api.php";
+        const p = new URLSearchParams({
+          action: "query",
+          generator: "random",
+          grnnamespace: "6", // File namespace
+          grnlimit: String(n),
+          prop: "imageinfo",
+          iiprop: "url",
+          iiurlwidth: String(width),
+          format: "json",
+          origin: "*",
+        });
+        return `${base}?${p.toString()}`;
+      }
+
+      async function fetchCommonsUrls(n = Commons.minBuffer) {
+        if (Commons.prefetching) return;
+        Commons.prefetching = true;
+        try {
+          const res = await fetch(commonsApiUrl(n, Commons.thumbWidth));
+          const data = await res.json();
+          const pages = data?.query?.pages || {};
+          const urls = [];
+          for (const k in pages) {
+            const info = pages[k]?.imageinfo?.[0];
+            const u = info?.thumburl || info?.url;
+            if (u) urls.push(u);
+          }
+          Commons.urlsQueue.push(...urls);
+          // fill remainder via Special:Random/File if needed
+          while (Commons.urlsQueue.length < Commons.minBuffer) {
+            const one = await fetchOneFromSpecialRandom(Commons.thumbWidth);
+            if (!one) break;
+            Commons.urlsQueue.push(one);
+          }
+        } catch (e) {
+          console.warn("Commons fetch failed", e);
+        } finally {
+          Commons.prefetching = false;
+        }
+      }
+
+      function setupCommonsTexture(tex) {
+        tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping; // NPOT-safe
+        tex.anisotropy = 4;
+        tex.needsUpdate = true;
+      }
+
+      function applyCommonsToTargets(tex) {
+        Commons.targets.forEach((mat) => {
+          if (!mat) return;
+          mat.map = tex;
+          mat.needsUpdate = true;
+        });
+      }
+
+      function skinNodeWithCurrentTexture(node) {
+        let tex = null;
+        if (Commons.enabled && Commons.currentTexture) {
+          tex = Commons.currentTexture;
+        } else {
+          // fallback: use a scenario-matched procedural tex so scans are visible
+          tex = makeProceduralTexture({
+            seed: WORLD.textureSeed,
+            mode: WORLD.scenario,
+            size: 512,
+          });
+        }
+        node.traverse((obj) => {
+          if (!obj.isMesh) return;
+          const mat = new THREE.MeshStandardMaterial({
+            map: tex,
+            roughness: WORLD.scenario === "mountains" ? 0.95 : 1.0,
+            metalness: 0.0,
+          });
+          obj.material = mat;
+          // Register for future updates (Wikimedia switching)
+          Commons.targets.add(mat);
+        });
+      }
+
+      function loadNextFromQueue() {
+        if (Commons.urlsQueue.length === 0) return;
+        if (Commons.loadingCount > 3) return; // cap parallel loads
+        const url = Commons.urlsQueue.shift();
+        Commons.loadingCount++;
+        Commons.loader.load(
+          url,
+          (tex) => {
+            setupCommonsTexture(tex);
+            Commons.textures.push(tex);
+            if (!Commons.currentTexture) {
+              Commons.currentTexture = tex;
+              Commons.currentIdx = Commons.textures.length - 1;
+              applyCommonsToTargets(tex);
+            }
+            Commons.loadingCount--;
+            // trim buffer if too large
+            if (Commons.textures.length > Commons.maxBuffer) {
+              const idxToRemove =
+                Commons.currentIdx === 0 ? Commons.textures.length - 1 : 0;
+              const [old] = Commons.textures.splice(idxToRemove, 1);
+              if (idxToRemove < Commons.currentIdx) Commons.currentIdx--;
+              try {
+                if (old && old !== Commons.currentTexture) old.dispose();
+              } catch (_) {}
+            }
+            // keep loading while we have queue
+            loadNextFromQueue();
+          },
+          undefined,
+          () => {
+            Commons.loadingCount--;
+            // continue with next
+            loadNextFromQueue();
+          }
+        );
+      }
+
+      async function ensureCommonsBuffer() {
+        if (!Commons.enabled) return;
+        // fetch more URLs if queue is low
+        if (Commons.urlsQueue.length < 4 && !Commons.prefetching) {
+          fetchCommonsUrls(Commons.minBuffer);
+        }
+        // kick off a few parallel loads
+        for (let i = 0; i < 4; i++) loadNextFromQueue();
+      }
+
+      function switchCommonsFrame() {
+        if (!Commons.enabled) return;
+        if (Commons.textures.length === 0) return;
+        Commons.currentIdx = (Commons.currentIdx + 1) % Commons.textures.length;
+        const tex = Commons.textures[Commons.currentIdx];
+        Commons.currentTexture = tex;
+        applyCommonsToTargets(tex);
+      }
+
+      function registerCommonsTarget(mat) {
+        if (!mat) return;
+        Commons.targets.add(mat);
+        if (Commons.enabled && Commons.currentTexture) {
+          mat.map = Commons.currentTexture;
+          mat.needsUpdate = true;
+        }
+      }
+
+      // Also allow fetching via Special:Random/File (as requested)
+      async function fetchOneFromSpecialRandom(width = Commons.thumbWidth) {
+        try {
+          const resp = await fetch(
+            "https://commons.wikimedia.org/wiki/Special:Random/File",
+            { redirect: "follow" }
+          );
+          const finalUrl = resp.url || ""; // e.g., https://commons.wikimedia.org/wiki/File:...
+          const idx = finalUrl.indexOf("/wiki/");
+          if (idx === -1) return null;
+          const title = decodeURIComponent(finalUrl.slice(idx + 6));
+          if (!title || !title.startsWith("File:")) return null;
+          const p = new URLSearchParams({
+            action: "query",
+            titles: title,
+            prop: "imageinfo",
+            iiprop: "url",
+            iiurlwidth: String(width),
+            format: "json",
+            origin: "*",
+          });
+          const r2 = await fetch(
+            `https://commons.wikimedia.org/w/api.php?${p.toString()}`
+          );
+          const d2 = await r2.json();
+          const pages = d2?.query?.pages || {};
+          for (const k in pages) {
+            const info = pages[k]?.imageinfo?.[0];
+            const u = info?.thumburl || info?.url;
+            if (u) return u;
+          }
+        } catch (e) {
+          console.warn("Special:Random fetch failed", e);
+        }
+        return null;
+      }
+
+      // Value noise-ish (cheap): layered sin/cos + random offsets
+      function noise2D(x, y, rng) {
+        // Deterministic offsets from rng state (but avoid consuming rng)
+        const ox = 1000.0;
+        const oy = 2000.0;
+        const a = Math.sin((x + ox) * 0.035) * Math.cos((y + oy) * 0.031);
+        const b = Math.sin((x + ox) * 0.11) * Math.cos((y + oy) * 0.09);
+        const c = Math.sin((x + ox) * 0.007) * Math.cos((y + oy) * 0.006);
+        return a * 0.55 + b * 0.35 + c * 0.1;
+      }
+
+      function makeProceduralTexture({
+        seed = 1,
+        mode = "desert",
+        size = 512,
+      }) {
+        const cnv = document.createElement("canvas");
+        cnv.width = cnv.height = size;
+        const ctx = cnv.getContext("2d");
+        const img = ctx.createImageData(size, size);
+        const data = img.data;
+
+        const rng = mulberry32(seed);
+        const r0 = rng(),
+          r1 = rng(),
+          r2 = rng();
+
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            const i = (y * size + x) * 4;
+            const nx = x / size - 0.5;
+            const ny = y / size - 0.5;
+
+            let v = noise2D(x + r0 * 999, y + r1 * 999);
+            v += noise2D(x * 2.0 + r2 * 777, y * 2.0 + r0 * 777) * 0.5;
+            v = v * 0.5 + 0.5; // 0..1
+
+            // Add subtle grain
+            const g = (rng() - 0.5) * 0.12;
+            v = clamp(v + g, 0, 1);
+
+            let R, G, B;
+
+            if (mode === "desert") {
+              // sand-ish
+              R = 180 + v * 55;
+              G = 150 + v * 45;
+              B = 110 + v * 30;
+            } else if (mode === "mountains") {
+              // rock + snow bands
+              const ridge = clamp(
+                Math.abs(nx) * 1.25 + Math.abs(ny) * 0.9,
+                0,
+                1
+              );
+              const snow = clamp(v * 1.15 - 0.75 + (1.0 - ridge) * 0.15, 0, 1);
+              R = 90 + v * 60 + snow * 130;
+              G = 95 + v * 55 + snow * 130;
+              B = 105 + v * 50 + snow * 140;
+            } else {
+              // city
+              // asphalt/concrete with interference lines
+              const lines = Math.sin(x * 0.12) * Math.sin(y * 0.08) * 0.5 + 0.5;
+              const c0 = 55 + v * 40;
+              const c1 = c0 + lines * 18;
+              R = c1;
+              G = c1;
+              B = c1 + 6;
+            }
+
+            data[i + 0] = clamp(R, 0, 255);
+            data[i + 1] = clamp(G, 0, 255);
+            data[i + 2] = clamp(B, 0, 255);
+            data[i + 3] = 255;
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+
+        const tex = new THREE.CanvasTexture(cnv);
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        tex.anisotropy = 8;
+        tex.needsUpdate = true;
+        return tex;
+      }
+
+      // ---------- Three.js setup ----------
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x000000, 0.0009);
+
+      const camera = new THREE.PerspectiveCamera(
+        55,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        5000
+      );
+      camera.position.set(0, 80, 180);
+
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x101010, 0.85);
+      scene.add(hemi);
+
+      const dir = new THREE.DirectionalLight(0xffffff, 0.65);
+      dir.position.set(200, 400, 150);
+      scene.add(dir);
+
+      // ---------- World building ----------
+      let worldGroup = new THREE.Group();
+      scene.add(worldGroup);
+      let terrainGroup = new THREE.Group();
+      let scansGroup = new THREE.Group();
+      worldGroup.add(terrainGroup);
+      worldGroup.add(scansGroup);
+
+      // Terrain meshes for ground intersection
+      let terrainMeshes = [];
+      // Settings
+      const SETTINGS = {
+        hideEnv: false,
+      };
+      // 3D scans state
+      const Scans = {
+        enabled: false,
+        every: 5,
+        lastSpawn: 0,
+        maxActive: 6,
+        urls: [],
+        active: [],
+        loader: null,
+      };
+      async function ensureGLTFLoader() {
+        if (Scans.loader) return true;
+        try {
+          const mod = await import(
+            "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js"
+          );
+          const { DRACOLoader } = await import(
+            "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/DRACOLoader.js"
+          );
+          const meshoptMod = await import(
+            "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/meshopt_decoder.module.js"
+          );
+          Scans.loader = new mod.GLTFLoader();
+          const draco = new DRACOLoader();
+          draco.setDecoderPath(
+            "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/"
+          );
+          Scans.loader.setDRACOLoader(draco);
+          Scans.loader.setMeshoptDecoder(meshoptMod.default || meshoptMod);
+          return true;
+        } catch (e) {
+          console.warn("GLTFLoader import failed", e);
+          return false;
+        }
+      }
+
+      let seed = (Math.random() * 1e9) | 0;
+      let rng = mulberry32(seed);
+
+      const WORLD = {
+        scenario: "desert",
+        size: 700,
+        segs: 220, // terrain detail
+        textureSeed: seed,
+        textureMode: "desert",
+      };
+
+      function clearWorld() {
+        // dispose only terrain, preserve scans
+        terrainGroup.traverse((obj) => {
+          if (obj.geometry) obj.geometry.dispose();
+          if (obj.material) {
+            if (Array.isArray(obj.material))
+              obj.material.forEach((m) => m.dispose?.());
+            else obj.material.dispose?.();
+          }
+          if (obj.material?.map) obj.material.map.dispose?.();
+        });
+        worldGroup.remove(terrainGroup);
+        terrainGroup = new THREE.Group();
+        worldGroup.add(terrainGroup);
+        terrainMeshes = [];
+      }
+
+      function buildDesert() {
+        const size = WORLD.size;
+        const segs = WORLD.segs;
+        const geo = new THREE.PlaneGeometry(size, size, segs, segs);
+        geo.rotateX(-Math.PI / 2);
+
+        const pos = geo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+
+          // dunes: smoother waves
+          let h = 0;
+          h += Math.sin((x + seed * 0.001) * 0.02) * 10.0;
+          h += Math.cos((z + seed * 0.001) * 0.018) * 9.0;
+          h += noise2D(x * 0.9 + seed * 0.01, z * 0.9 + seed * 0.01) * 8.0;
+          h += noise2D(x * 2.0 + 123.4, z * 2.0 + 567.8) * 3.5;
+
+          // flatten far edges slightly
+          const d = Math.sqrt(x * x + z * z) / (size * 0.5);
+          h *= 1.0 - clamp(d - 0.2, 0, 1) * 0.55;
+
+          pos.setY(i, h);
+        }
+        pos.needsUpdate = true;
+        geo.computeVertexNormals();
+
+        const tex = makeProceduralTexture({
+          seed: WORLD.textureSeed,
+          mode: "desert",
+          size: 512,
+        });
+        tex.repeat.set(6, 6);
+
+        const mat = new THREE.MeshStandardMaterial({
+          map: tex,
+          roughness: 1.0,
+          metalness: 0.0,
+        });
+        registerCommonsTarget(mat);
+
+        const mesh = new THREE.Mesh(geo, mat);
+        terrainGroup.add(mesh);
+        terrainMeshes.push(mesh);
+        // far skirt: simpler geometry extending to horizon
+        addFarSkirt("desert", tex);
+
+        scene.fog.density = 0.0011;
+      }
+
+      function buildMountains() {
+        const size = WORLD.size;
+        const segs = WORLD.segs;
+        const geo = new THREE.PlaneGeometry(size, size, segs, segs);
+        geo.rotateX(-Math.PI / 2);
+
+        const pos = geo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+
+          // sharper relief: combine waves + stronger noise
+          let h = 0;
+          h += noise2D(x * 0.8 + seed * 0.02, z * 0.8 + seed * 0.02) * 35.0;
+          h += noise2D(x * 2.1 + 111.1, z * 2.1 + 222.2) * 18.0;
+          h += Math.sin((x + seed * 0.002) * 0.013) * 12.0;
+          h += Math.cos((z + seed * 0.002) * 0.012) * 10.0;
+
+          // ridge shaping
+          const ridge = Math.abs(noise2D(x * 0.25 + 9.9, z * 0.25 + 4.4));
+          h += ridge * 55.0;
+
+          // basin falloff
+          const d = Math.sqrt(x * x + z * z) / (size * 0.5);
+          h *= 1.0 - clamp(d, 0, 1) * 0.4;
+
+          pos.setY(i, h);
+        }
+        pos.needsUpdate = true;
+        geo.computeVertexNormals();
+
+        const tex = makeProceduralTexture({
+          seed: WORLD.textureSeed,
+          mode: "mountains",
+          size: 512,
+        });
+        tex.repeat.set(5, 5);
+
+        const mat = new THREE.MeshStandardMaterial({
+          map: tex,
+          roughness: 0.95,
+          metalness: 0.0,
+        });
+        registerCommonsTarget(mat);
+
+        const mesh = new THREE.Mesh(geo, mat);
+        worldGroup.add(mesh);
+        terrainMeshes.push(mesh);
+
+        // far skirt: simpler geometry extending to horizon
+        addFarSkirt("mountains", tex);
+
+        // a thin mist layer
+        scene.fog.density = 0.00085;
+      }
+
+      function addFarSkirt(mode, baseTex) {
+        const farSize = WORLD.size * 8;
+        const segs = 60;
+        const geo = new THREE.PlaneGeometry(farSize, farSize, segs, segs);
+        geo.rotateX(-Math.PI / 2);
+
+        const pos = geo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i);
+          const z = pos.getZ(i);
+          let h = 0;
+          if (mode === "desert") {
+            h += noise2D(x * 0.02 + seed * 0.01, z * 0.02 + seed * 0.01) * 4.0;
+          } else if (mode === "mountains") {
+            h += noise2D(x * 0.01 + seed * 0.02, z * 0.01 + seed * 0.02) * 12.0;
+          }
+          pos.setY(i, h);
+        }
+        pos.needsUpdate = true;
+        geo.computeVertexNormals();
+
+        const mat = new THREE.MeshStandardMaterial({
+          map: baseTex,
+          roughness: mode === "desert" ? 1.0 : 0.95,
+          metalness: 0.0,
+        });
+        registerCommonsTarget(mat);
+        const skirt = new THREE.Mesh(geo, mat);
+        skirt.position.y = -0.5; // subtle seam hide
+        terrainGroup.add(skirt);
+        terrainMeshes.push(skirt);
+      }
+
+      // ---------- 3D scans spawner ----------
+      const scanRay = new THREE.Raycaster();
+
+      function disposeNode(node) {
+        node.traverse((obj) => {
+          if (obj.geometry) obj.geometry.dispose();
+          if (obj.material) {
+            const mats = Array.isArray(obj.material)
+              ? obj.material
+              : [obj.material];
+            mats.forEach((m) => {
+              if (m.map) m.map.dispose?.();
+              m.dispose?.();
+            });
+          }
+        });
+      }
+
+      function clearScans() {
+        Scans.active.forEach((n) => {
+          scansGroup.remove(n);
+          disposeNode(n);
+        });
+        Scans.active = [];
+      }
+
+      function placeOnGround(node) {
+        const spread = SETTINGS.hideEnv ? 40 : WORLD.size * 0.8;
+        const x = (rng() - 0.5) * spread;
+        const z = (rng() - 0.5) * spread;
+        scanRay.set(new THREE.Vector3(x, 4000, z), new THREE.Vector3(0, -1, 0));
+        const hits = scanRay.intersectObjects(terrainMeshes, true);
+        const y = hits.length > 0 ? hits[0].point.y : 0;
+        node.position.set(x, y, z);
+        node.rotation.y = rng() * Math.PI * 2;
+      }
+
+      async function spawnOneScan() {
+        if (!Scans.enabled) return;
+        if (!Scans.urls || Scans.urls.length === 0) return;
+        const ok = await ensureGLTFLoader();
+        if (!ok) return;
+        const url = Scans.urls[(Math.random() * Scans.urls.length) | 0];
+        Scans.loader.load(
+          url,
+          (gltf) => {
+            const n = gltf.scene || gltf.scenes?.[0];
+            if (!n) return;
+            const s = 0.6 + Math.random() * 1.4;
+            n.scale.setScalar(s);
+            placeOnGround(n);
+            // Retarget materials to current texture (Wikimedia if enabled)
+            skinNodeWithCurrentTexture(n);
+            scansGroup.add(n);
+            Scans.active.push(n);
+            // cull oldest
+            while (Scans.active.length > Scans.maxActive) {
+              const old = Scans.active.shift();
+              worldGroup.remove(old);
+              disposeNode(old);
+            }
+          },
+          undefined,
+          (err) => {
+            console.warn("scan load error", err);
+          }
+        );
+      }
+
+      // City removed
+
+      function buildWorld() {
+        clearWorld();
+
+        WORLD.textureSeed = seed ^ 0x9e3779b9;
+        const sc = WORLD.scenario;
+
+        // Preserve Commons.targets so scans continue updating across rebuilds
+
+        if (!SETTINGS.hideEnv) {
+          if (sc === "desert") buildDesert();
+          else if (sc === "mountains") buildMountains();
+        }
+
+        // reset camera per scenario or void
+        const r = mulberry32(seed);
+        if (SETTINGS.hideEnv) {
+          camera.position.set((r() - 0.5) * 40, 80 + r() * 20, 140 + r() * 60);
+          camera.lookAt(0, 0, 0);
+          scene.fog.density = 0.00015; // quasi disattivata per vedere gli oggetti
+        } else {
+          if (sc === "mountains") {
+            camera.position.set(
+              (r() - 0.5) * 80,
+              140 + r() * 80,
+              240 + r() * 140
+            );
+          } else {
+            camera.position.set(
+              (r() - 0.5) * 60,
+              90 + r() * 60,
+              220 + r() * 120
+            );
+          }
+          camera.lookAt(0, 25, 0);
+        }
+      }
+
+      // ---------- Camera motion: drift + saccades + freeze ----------
+      const motion = {
+        yawVel: 0,
+        pitchVel: 0,
+        rollVel: 0,
+        zoomVel: 0,
+
+        targetYawVel: 0,
+        targetPitchVel: 0,
+        targetZoomVel: 0,
+
+        freezeT: 0,
+        saccadeT: 0,
+        saccadeYaw: 0,
+        saccadePitch: 0,
+        saccadeZoom: 0,
+
+        t: 0,
+      };
+
+      function reseed(newSeed) {
+        seed = newSeed | 0;
+        rng = mulberry32(seed);
+      }
+
+      function pickDriftTargets(sc) {
+        const r = rng;
+        // “data-like” drift: small continuous velocities with bias
+        motion.targetYawVel = (r() - 0.5) * 0.55;
+        motion.targetPitchVel = (r() - 0.5) * 0.25;
+        motion.targetZoomVel = (r() - 0.5) * 0.4;
+
+        if (sc === "city") {
+          // city removed
+        }
+        if (sc === "mountains") {
+          motion.targetPitchVel *= 1.25;
+        }
+      }
+
+      function maybeTriggerSaccade(saccadesAmt) {
+        const r = rng;
+        if (motion.saccadeT > 0) return;
+        if (r() < 0.02 + saccadesAmt * 0.09) {
+          motion.saccadeT = 0.08 + r() * 0.18; // short impulse
+          motion.saccadeYaw = (r() < 0.5 ? -1 : 1) * (0.35 + r() * 1.8);
+          motion.saccadePitch = (r() - 0.5) * (0.25 + r() * 0.8);
+          motion.saccadeZoom = (r() - 0.5) * (0.35 + r() * 1.2);
+        }
+      }
+
+      function maybeTriggerFreeze(freezeAmt) {
+        const r = rng;
+        if (motion.freezeT > 0 || motion.saccadeT > 0) return;
+        if (r() < 0.01 + freezeAmt * 0.05) {
+          motion.freezeT = 0.15 + r() * 0.9;
+        }
+      }
+
+      function updateCamera(dt, params) {
+        const { driftAmt, saccadesAmt, jitterAmt, freezeAmt } = params;
+
+        motion.t += dt;
+
+        // occasional target changes
+        if (rng() < 0.015 + driftAmt * 0.03) pickDriftTargets(WORLD.scenario);
+
+        maybeTriggerSaccade(saccadesAmt);
+        maybeTriggerFreeze(freezeAmt);
+
+        // freeze: hold almost still, let jitter through
+        const freeze = motion.freezeT > 0;
+        if (freeze) motion.freezeT -= dt;
+
+        // ease current velocities toward target
+        const ease = freeze ? 0.02 : 0.06 + driftAmt * 0.16;
+        motion.yawVel += (motion.targetYawVel - motion.yawVel) * ease;
+        motion.pitchVel +=
+          (motion.targetPitchVel - motion.pitchVel) * (ease * 0.7);
+        motion.zoomVel +=
+          (motion.targetZoomVel - motion.zoomVel) * (ease * 0.8);
+
+        // apply saccade impulse
+        if (motion.saccadeT > 0) {
+          motion.saccadeT -= dt;
+          motion.yawVel += motion.saccadeYaw * (0.22 + saccadesAmt * 0.55);
+          motion.pitchVel += motion.saccadePitch * (0.18 + saccadesAmt * 0.45);
+          motion.zoomVel += motion.saccadeZoom * (0.25 + saccadesAmt * 0.6);
+        }
+
+        // machine jitter (micro)
+        const j = jitterAmt * 0.22;
+        const jitterYaw = (rng() - 0.5) * j;
+        const jitterPitch = (rng() - 0.5) * j * 0.7;
+        const jitterZoom = (rng() - 0.5) * j;
+
+        // interpret velocities as orbit around origin
+        const pivot = new THREE.Vector3(0, SETTINGS.hideEnv ? 0 : 25, 0);
+
+        // derive spherical-ish orbit
+        const offset = camera.position.clone().sub(pivot);
+        let radius = offset.length();
+
+        // zoom: change radius with clamps
+        radius *=
+          1.0 - clamp((motion.zoomVel + jitterZoom) * dt * 0.35, -0.08, 0.08);
+        radius = clamp(radius, 60, SETTINGS.hideEnv ? 320 : 650);
+
+        // rotate offset
+        const yaw = (motion.yawVel + jitterYaw) * dt * (freeze ? 0.2 : 1.0);
+        const pitch =
+          (motion.pitchVel + jitterPitch) * dt * (freeze ? 0.18 : 1.0);
+
+        // yaw around world up
+        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+
+        // pitch around camera right (approx: world X after yaw)
+        const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(
+          new THREE.Vector3(0, 1, 0),
+          yaw
+        );
+        offset.applyAxisAngle(right, pitch);
+
+        // re-normalize to radius
+        offset.setLength(radius);
+
+        camera.position.copy(pivot.clone().add(offset));
+
+        // look-at with slight “imperfect lock”
+        const wobble = jitterAmt * 4.0;
+        camera.lookAt(
+          pivot.x + (rng() - 0.5) * wobble,
+          pivot.y + (rng() - 0.5) * wobble * 0.7,
+          pivot.z + (rng() - 0.5) * wobble
+        );
+      }
+
+      // ---------- UI bindings ----------
+      const elRun = document.getElementById("run");
+      const elAutoScenario = document.getElementById("autoScenario");
+      const elScenario = document.getElementById("scenario");
+      const elSwitchEvery = document.getElementById("switchEvery");
+      const elAutoSeed = document.getElementById("autoSeed");
+      const elSeedEvery = document.getElementById("seedEvery");
+
+      const elDrift = document.getElementById("drift");
+      const elSaccades = document.getElementById("saccades");
+      const elJitter = document.getElementById("jitter");
+      const elFreeze = document.getElementById("freeze");
+      const elUseCommons = document.getElementById("useCommons");
+      const elCommonsFps = document.getElementById("commonsFps");
+      const elCommonsFpsVal = document.getElementById("commonsFpsVal");
+      const elHideEnv = document.getElementById("hideEnv");
+
+      document
+        .getElementById("regen")
+        .addEventListener("click", () => buildWorld());
+      document.getElementById("newSeed").addEventListener("click", () => {
+        reseed((Math.random() * 1e9) | 0);
+        buildWorld();
+      });
+
+      elScenario.addEventListener("change", () => {
+        WORLD.scenario = elScenario.value;
+        buildWorld();
+      });
+
+      elHideEnv.addEventListener("change", () => {
+        SETTINGS.hideEnv = elHideEnv.checked;
+        buildWorld();
+      });
+
+      // Wikimedia toggle and FPS
+      elUseCommons.addEventListener("change", () => {
+        Commons.enabled = elUseCommons.checked;
+        Commons.lastSwitch = performance.now();
+        if (Commons.enabled) {
+          ensureCommonsBuffer();
+        }
+        buildWorld();
+      });
+      elCommonsFps.addEventListener("input", () => {
+        const v = Math.max(1, Math.min(60, Number(elCommonsFps.value) || 12));
+        Commons.fps = v;
+        Commons.frameMs = 1000 / v;
+        elCommonsFpsVal.textContent = String(v);
+      });
+      document
+        .getElementById("refreshCommons")
+        .addEventListener("click", () => {
+          try {
+            Commons.textures.forEach((t) => t.dispose());
+          } catch (_) {}
+          Commons.textures = [];
+          Commons.urlsQueue = [];
+          Commons.loadingCount = 0;
+          Commons.currentIdx = -1;
+          Commons.currentTexture = null;
+          ensureCommonsBuffer();
+        });
+
+      // 3D scans UI
+      const elUseScans = document.getElementById("useScans");
+      const elScanEvery = document.getElementById("scanEvery");
+      const elScanMax = document.getElementById("scanMax");
+      const elScanUrls = document.getElementById("scanUrls");
+      const elSpawnNow = document.getElementById("spawnNow");
+      const elClearScans = document.getElementById("clearScans");
+
+      // default sample URLs (CORS-friendly samples). Sostituiscile con link Polycam/tuoi.
+      elScanUrls.value = [
+        "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf",
+        "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Avocado/glTF/Avocado.gltf",
+        "https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/BoomBox/glTF/BoomBox.gltf",
+      ].join("\n");
+
+      function parseScanUrls() {
+        Scans.urls = elScanUrls.value
+          .split(/\n+/)
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0);
+      }
+      parseScanUrls();
+
+      elUseScans.addEventListener("change", () => {
+        Scans.enabled = elUseScans.checked;
+        Scans.lastSpawn = performance.now();
+      });
+      elScanEvery.addEventListener("change", () => {
+        Scans.every = Math.max(1, Number(elScanEvery.value) || 5);
+      });
+      elScanMax.addEventListener("change", () => {
+        Scans.maxActive = Math.max(1, Number(elScanMax.value) || 6);
+      });
+      elScanUrls.addEventListener("change", parseScanUrls);
+      elSpawnNow.addEventListener("click", () => spawnOneScan());
+      elClearScans.addEventListener("click", () => clearScans());
+
+      // Pointer lock (optional for “hands off”)
+      renderer.domElement.addEventListener("click", () => {
+        renderer.domElement.requestPointerLock?.();
+      });
+
+      // ---------- Auto-switch timers ----------
+      let lastScenarioSwitch = 0;
+      let lastSeedSwitch = 0;
+
+      const scenarios = ["desert", "mountains"];
+      function nextScenario(cur) {
+        const i = scenarios.indexOf(cur);
+        return scenarios[(i + 1) % scenarios.length];
+      }
+
+      // ---------- Start ----------
+      WORLD.scenario = elScenario.value;
+      pickDriftTargets(WORLD.scenario);
+      buildWorld();
+
+      // ---------- Render loop ----------
+      const clock = new THREE.Clock();
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        const dt = Math.min(clock.getDelta(), 0.05);
+        const t = clock.elapsedTime;
+
+        if (elRun.checked) {
+          // Wikimedia dynamic texture switching
+          if (Commons.enabled) {
+            const now = performance.now();
+            if (now - Commons.lastSwitch >= Commons.frameMs) {
+              Commons.lastSwitch = now;
+              switchCommonsFrame();
+            }
+            ensureCommonsBuffer();
+          }
+
+          // 3D scans: spawn over time
+          if (Scans.enabled) {
+            const now = performance.now();
+            const everyMs = Math.max(
+              1000,
+              (Number(elScanEvery.value) || 5) * 1000
+            );
+            Scans.maxActive = Math.max(
+              1,
+              Number(elScanMax.value) || Scans.maxActive
+            );
+            if (now - Scans.lastSpawn > everyMs) {
+              Scans.lastSpawn = now;
+              spawnOneScan();
+            }
+          }
+
+          // auto scenario switch
+          if (elAutoScenario.checked) {
+            const every = Math.max(2, Number(elSwitchEvery.value) || 12);
+            if (t - lastScenarioSwitch > every) {
+              lastScenarioSwitch = t;
+              WORLD.scenario = nextScenario(WORLD.scenario);
+              elScenario.value = WORLD.scenario;
+              buildWorld();
+              pickDriftTargets(WORLD.scenario);
+            }
+          }
+
+          // auto seed switch (rebuild world to change textures/geometry)
+          if (elAutoSeed.checked) {
+            const every = Math.max(2, Number(elSeedEvery.value) || 8);
+            if (t - lastSeedSwitch > every) {
+              lastSeedSwitch = t;
+              reseed((Math.random() * 1e9) | 0);
+              buildWorld();
+              pickDriftTargets(WORLD.scenario);
+            }
+          }
+
+          updateCamera(dt, {
+            driftAmt: Number(elDrift.value),
+            saccadesAmt: Number(elSaccades.value),
+            jitterAmt: Number(elJitter.value),
+            freezeAmt: Number(elFreeze.value),
+          });
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // ---------- Resize ----------
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>

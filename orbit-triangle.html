@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Speculative — Communication — Interaction</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #FF6929;
+      cursor: grab;
+    }
+    body:active { cursor: grabbing; }
+    canvas { display: block; }
+  </style>
+  <!-- Usa i font locali se presenti sul sistema -->
+  <style>
+    @font-face {
+      font-family: "Suisse Intl Black";
+      src: local("Suisse Intl Black"), local("Suisse Int'l Black"), local("SuisseIntl-Black");
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
+</head>
+<body>
+  <script type="module">
+    import * as THREE from './three.module.js';
+
+    // Scene + Renderer
+    const scene = new THREE.Scene();
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setClearColor(0xFF6929, 1);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Camera + simple orbit target
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 100);
+    const target = new THREE.Vector3(0, 0, 0);
+
+    // Spherical controls (custom, wheel = trackpad two-finger)
+    const spherical = new THREE.Spherical();
+    spherical.radius = 3.2;
+    spherical.theta = Math.PI * 0.25; // around Y
+    spherical.phi = Math.PI * 0.5;    // from top
+
+    function applySpherical() {
+      const p = new THREE.Vector3().setFromSpherical(spherical).add(target);
+      camera.position.copy(p);
+      camera.lookAt(target);
+    }
+    applySpherical();
+
+    // Helpers: text sprites that billboard automatically
+    function makeTextSprite(text, options = {}) {
+      const {
+        fontSize = 140,               // CSS px for canvas (will be multisampled)
+        fontWeight = 900,
+        fontFamily = '"Suisse Intl Black", "Helvetica Neue", Helvetica, Arial, sans-serif',
+        color = '#000',
+        padding = 24,                 // px
+        dpi = Math.min(window.devicePixelRatio || 1, 2),
+      } = options;
+
+      // Measure text
+      const cnvMeasure = document.createElement('canvas');
+      const cxm = cnvMeasure.getContext('2d');
+      cxm.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      const metrics = cxm.measureText(text);
+      const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+      const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+      const textWidth = Math.ceil(metrics.width);
+      const textHeight = Math.ceil(ascent + descent);
+
+      // Draw at device resolution for crispness
+      const w = Math.max(2, (textWidth + padding * 2) * dpi);
+      const h = Math.max(2, (textHeight + padding * 2) * dpi);
+      const cnv = document.createElement('canvas');
+      cnv.width = w; cnv.height = h;
+      const ctx = cnv.getContext('2d');
+      ctx.scale(dpi, dpi);
+      ctx.clearRect(0, 0, cnv.width, cnv.height);
+      ctx.fillStyle = color;
+      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      ctx.textBaseline = 'top';
+      ctx.fillText(text, padding, padding);
+
+      const texture = new THREE.CanvasTexture(cnv);
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.anisotropy = 4;
+
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+      const sprite = new THREE.Sprite(material);
+
+      // Map canvas pixel size to world units — tweak scaleFactor to taste
+    const scaleFactor = 220; // higher = smaller in world
+      const worldW = (w / dpi) / scaleFactor;
+      const worldH = (h / dpi) / scaleFactor;
+      sprite.scale.set(worldW, worldH, 1);
+      return sprite;
+    }
+
+    // Create the three labels placed as a triangle in space
+    const labelTop = makeTextSprite('Speculative', { fontSize: 50 });
+    const labelLeft = makeTextSprite('Communication', { fontSize: 50 });
+    const labelRight = makeTextSprite('Interaction', { fontSize: 50 });
+
+    // Positions (triangle)
+    const A = new THREE.Vector3(0, 0.65, 0.05);    // top (Speculative)
+    const B = new THREE.Vector3(-0.6, -0.35, 0.15); // bottom-left (Communication)
+    const C = new THREE.Vector3(0.6, -0.35, -0.12); // bottom-right (Interaction)
+
+    labelTop.position.copy(A);
+    labelLeft.position.copy(B);
+    labelRight.position.copy(C);
+
+    scene.add(labelTop, labelLeft, labelRight);
+
+    // Soft black dot texture (radial gradient black -> transparent)
+    function makeDotTexture(size = 64) {
+      const c = document.createElement('canvas');
+      c.width = size; c.height = size;
+      const g = c.getContext('2d');
+      const r = size / 2;
+      const grd = g.createRadialGradient(r, r, 0, r, r, r);
+      grd.addColorStop(0.0, 'rgba(0,0,0,0.9)');
+      grd.addColorStop(0.6, 'rgba(0,0,0,0.35)');
+      grd.addColorStop(1.0, 'rgba(0,0,0,0.0)');
+      g.fillStyle = grd;
+      g.fillRect(0, 0, size, size);
+      const t = new THREE.CanvasTexture(c);
+      t.minFilter = THREE.LinearFilter;
+      t.magFilter = THREE.LinearFilter;
+      t.anisotropy = 2;
+      t.needsUpdate = true;
+      return t;
+    }
+
+    // Generate points roughly inside the triangle area, with slight depth jitter
+    function randomPointInTriangle(A, B, C) {
+      const r1 = Math.random();
+      const r2 = Math.random();
+      const sqrtR1 = Math.sqrt(r1);
+      const u = 1 - sqrtR1;
+      const v = sqrtR1 * (1 - r2);
+      const w = sqrtR1 * r2;
+      return new THREE.Vector3(
+        u * A.x + v * B.x + w * C.x,
+        u * A.y + v * B.y + w * C.y,
+        u * A.z + v * B.z + w * C.z,
+      );
+    }
+
+    const dotTexture = makeDotTexture(64);
+    const dotCount = 160;
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(dotCount * 3);
+
+    for (let i = 0; i < dotCount; i++) {
+      const p = randomPointInTriangle(A, B, C);
+      // Add mild 3D jitter so dots are volumetric around the triangle plane
+      p.x += (Math.random() - 0.5) * 0.12;
+      p.y += (Math.random() - 0.5) * 0.12;
+      p.z += (Math.random() - 0.5) * 0.35;
+      positions[i * 3 + 0] = p.x;
+      positions[i * 3 + 1] = p.y;
+      positions[i * 3 + 2] = p.z;
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const dots = new THREE.Points(
+      geo,
+      new THREE.PointsMaterial({
+        map: dotTexture,
+        color: 0x000000,
+        size: 0.12,            // world units
+        sizeAttenuation: true,
+        transparent: true,
+        depthWrite: false,
+        opacity: 0.9,
+      })
+    );
+    scene.add(dots);
+
+
+    // Interaction: pointer drag and trackpad wheel for orbit; pinch/ctrl+wheel for zoom
+    const state = {
+      dragging: false,
+      lastX: 0,
+      lastY: 0,
+      rotateSpeed: 0.005,
+      wheelRotateSpeed: 0.0022,
+      zoomSpeed: 0.002,
+    };
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      state.dragging = true;
+      state.lastX = e.clientX;
+      state.lastY = e.clientY;
+      renderer.domElement.setPointerCapture(e.pointerId);
+    });
+    window.addEventListener('pointerup', (e) => {
+      state.dragging = false;
+      try { renderer.domElement.releasePointerCapture(e.pointerId); } catch {}
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!state.dragging) return;
+      const dx = e.clientX - state.lastX;
+      const dy = e.clientY - state.lastY;
+      state.lastX = e.clientX;
+      state.lastY = e.clientY;
+      spherical.theta -= dx * state.rotateSpeed;
+      spherical.phi -= dy * state.rotateSpeed;
+      spherical.phi = Math.max(0.01, Math.min(Math.PI - 0.01, spherical.phi));
+      applySpherical();
+    });
+
+    // Trackpad friendly: two-finger scroll rotates, pinch (ctrlKey) zooms
+    renderer.domElement.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (e.ctrlKey) {
+        // Pinch zoom on macOS reports ctrlKey = true
+        spherical.radius *= (1 + (e.deltaY * state.zoomSpeed));
+        spherical.radius = Math.max(1.2, Math.min(12, spherical.radius));
+      } else {
+        spherical.theta -= e.deltaX * state.wheelRotateSpeed;
+        spherical.phi   -= e.deltaY * state.wheelRotateSpeed;
+        spherical.phi = Math.max(0.01, Math.min(Math.PI - 0.01, spherical.phi));
+      }
+      applySpherical();
+    }, { passive: false });
+
+    // Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      applySpherical();
+    });
+
+    // Animate
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+  </script>
+</body>
+</html>
