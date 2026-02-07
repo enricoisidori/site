@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generatore di Malafore</title>
+  <style>
+    :root {
+      --bg1: #fff8e8;
+      --bg2: #ffe6c7;
+      --ink: #1e1b18;
+      --accent: #ff5a2f;
+      --accent-dark: #df3f15;
+      --card: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 20% 10%, #fff3d6 0, transparent 40%),
+                  radial-gradient(circle at 80% 90%, #ffd8aa 0, transparent 40%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      padding: 24px;
+    }
+
+    .wrap {
+      width: min(860px, 100%);
+      background: var(--card);
+      border: 3px solid #1e1b18;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 8px 8px 0 #1e1b18;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 2.8vw, 2.6rem);
+      line-height: 1.1;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    #risultato {
+      margin: 24px 0;
+      padding: 18px;
+      border: 2px dashed #1e1b18;
+      border-radius: 12px;
+      background: #fff9ef;
+      font-size: clamp(1.3rem, 2.4vw, 2rem);
+      line-height: 1.35;
+      min-height: 96px;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+      color: #fff;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      padding: 18px 26px;
+      min-width: min(420px, 100%);
+      cursor: pointer;
+      box-shadow: 0 8px 0 #8e220a;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #8e220a;
+    }
+
+    .small {
+      margin-top: 14px;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Generatore di Malafore</h1>
+    <p>Mischia inizio e finale di proverbi italiani. Una combinazione nuova ogni click.</p>
+
+    <div id="risultato">Premi il pulsante per creare una malafora.</div>
+
+    <button id="genera">GENERA MALAFORA</button>
+    <div class="small">Inizi: 100 • Finali: 100</div>
+  </main>
+
+  <script>
+    const inizi = [
+      "Chi dorme",
+      "Chi va con lo zoppo",
+      "Chi fa da se",
+      "Chi cerca",
+      "Chi la dura",
+      "Chi si loda",
+      "Chi troppo vuole",
+      "Chi tace",
+      "Chi non risica",
+      "Chi semina vento",
+      "Chi e causa del suo mal",
+      "Chi di spada ferisce",
+      "Chi rompe",
+      "Chi va piano",
+      "Chi ben comincia",
+      "Chi ha tempo",
+      "Chi si assenta",
+      "Chi disprezza",
+      "Chi sa fa",
+      "Chi piu spende",
+      "A caval donato",
+      "A mali estremi",
+      "A buon intenditor",
+      "Al cuor non si comanda",
+      "Al peggio",
+      "Ambasciator",
+      "Anche l'occhio",
+      "Anno nuovo",
+      "Aprile",
+      "Bacco, tabacco e Venere",
+      "Batti il ferro",
+      "Bisogna fare",
+      "Can che abbaia",
+      "Carta canta",
+      "Campa cavallo",
+      "Cane non mangia",
+      "Chi bello vuole apparire",
+      "Chi di speranza vive",
+      "Chi fa per tre",
+      "Chi fa trenta",
+      "Chi mangia solo",
+      "Chi nasce tondo",
+      "Chi non fa",
+      "Chi non ha testa",
+      "Chi non lavora",
+      "Chi non muore",
+      "Chi non rispetta",
+      "Chi non sa",
+      "Chi paga in anticipo",
+      "Chi pecora si fa",
+      "Chi prima arriva",
+      "Chi ride venerdi",
+      "Chi rompe paga",
+      "Chi trova un amico",
+      "Chi ultimo arriva",
+      "Cielo a pecorelle",
+      "Da cosa",
+      "Dal dire al fare",
+      "Del doman",
+      "Di necessità",
+      "Dio li fa",
+      "Dove c'e gusto",
+      "Dove c'e fumo",
+      "Dove non arriva la volpe",
+      "Dopo la pioggia",
+      "Errare e umano",
+      "Fatta la legge",
+      "Fidarsi e bene",
+      "Finche c'e vita",
+      "Fra moglie e marito",
+      "Gatto frettoloso",
+      "Gli opposti",
+      "Il buongiorno",
+      "Il diavolo fa le pentole",
+      "Il gioco non vale",
+      "Il lupo perde il pelo",
+      "Il mattino",
+      "Il mondo e bello",
+      "Il troppo storpia",
+      "In bocca al lupo",
+      "La calma e la virtu",
+      "La fortuna aiuta",
+      "La fretta e cattiva",
+      "La gatta frettolosa",
+      "La lingua",
+      "La notte porta",
+      "La pazienza",
+      "Le bugie",
+      "L'erba del vicino",
+      "L'occasione",
+      "L'ozio e il padre",
+      "Meglio un uovo oggi",
+      "Meglio tardi",
+      "Morto un papa",
+      "Natale con i tuoi",
+      "Non c'e due",
+      "Non dire gatto",
+      "Non e tutto oro",
+      "Ogni promessa",
+      "Ogni lasciata"
+    ];
+
+    const finali = [
+      "non piglia pesci",
+      "impara a zoppicare",
+      "fa per tre",
+      "trova",
+      "la vince",
+      "si imbroda",
+      "nulla stringe",
+      "acconsente",
+      "non rosica",
+      "raccoglie tempesta",
+      "pianga se stesso",
+      "di spada perisce",
+      "paga",
+      "va sano e va lontano",
+      "e a meta dell'opera",
+      "non aspetti tempo",
+      "ha sempre torto",
+      "vuol comprare",
+      "chi non sa insegna",
+      "meno spende",
+      "non si guarda in bocca",
+      "estremi rimedi",
+      "poche parole",
+      "si puo solo obbedire",
+      "peggio non c'e mai fine",
+      "non porta pena",
+      "vuole la sua parte",
+      "vita nuova",
+      "dolce dormire",
+      "riducono l'uomo in cenere",
+      "finche e caldo",
+      "di necessita virtu",
+      "non morde",
+      "villan dorme",
+      "che l'erba cresce",
+      "cane",
+      "un po' deve soffrire",
+      "disperato muore",
+      "fa da se",
+      "fa trentuno",
+      "crepa solo",
+      "non puo morir quadro",
+      "falli fare",
+      "ha gambe",
+      "non mangia",
+      "si rivede",
+      "il pane",
+      "fare tace",
+      "spesso paga due volte",
+      "il lupo se la mangia",
+      "meglio alloggia",
+      "piange domenica",
+      "e tiene",
+      "trova un tesoro",
+      "ha sempre ragione",
+      "pioggia a catinelle",
+      "nasce cosa",
+      "c'e di mezzo il mare",
+      "non v'e certezza",
+      "virtu",
+      "e poi li accoppia",
+      "non c'e perdenza",
+      "c'e arrosto",
+      "non arriva l'uva",
+      "spunta il sole",
+      "perseverare e diabolico",
+      "trovato l'inganno",
+      "non fidarsi e meglio",
+      "c'e speranza",
+      "non mettere il dito",
+      "fa i figli ciechi",
+      "si attraggono",
+      "si vede dal mattino",
+      "ma non i coperchi",
+      "la candela",
+      "ma non il vizio",
+      "ha l'oro in bocca",
+      "se ognuno pensa a se",
+      "il troppo guasta",
+      "crepi",
+      "dei forti",
+      "gli audaci",
+      "consigliera",
+      "fece i gattini ciechi",
+      "batte dove il dente duole",
+      "consiglio",
+      "e una virtu",
+      "hanno le gambe corte",
+      "e sempre piu verde",
+      "fa l'uomo ladro",
+      "che una gallina domani",
+      "che mai",
+      "se ne fa un altro",
+      "Pasqua con chi vuoi",
+      "che non fa tre",
+      "se non ce l'hai nel sacco",
+      "quel che luccica",
+      "e debito",
+      "e persa",
+      "senza spine"
+    ];
+
+    function casuale(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generaMalafora() {
+      const prima = casuale(inizi);
+      const seconda = casuale(finali);
+      document.getElementById("risultato").textContent = prima + " " + seconda + ".";
+    }
+
+    document.getElementById("genera").addEventListener("click", generaMalafora);
+  </script>
+</body>
+</html>
