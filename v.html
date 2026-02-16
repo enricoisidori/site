@@ -1466,8 +1466,8 @@
         }
       })();
 
-      function applyFilters() {
-        const hasFilter = activeCategories && activeCategories.size > 0;
+      function applyFilters(doFilter = false) {
+        const hasFilter = doFilter && activeCategories && activeCategories.size > 0;
         const visibleById = new Map();
         const gd = Graph.graphData();
         if (gd && Array.isArray(gd.nodes)) {
@@ -1477,15 +1477,19 @@
             visibleById.set(n.id, visible);
           });
         }
+
+        const nodeVisFn = (n) => visibleById.get(n.id) !== false;
+        const linkVisFn = (l) => {
+          const s = typeof l.source === "object" ? l.source?.id : l.source;
+          const t = typeof l.target === "object" ? l.target?.id : l.target;
+          return nodeVisFn({ id: s }) && nodeVisFn({ id: t });
+        };
+
         if (typeof Graph.nodeVisibility === "function") {
-          Graph.nodeVisibility((n) => visibleById.get(n.id) !== false);
+          Graph.nodeVisibility(hasFilter ? nodeVisFn : () => true);
         }
         if (typeof Graph.linkVisibility === "function") {
-          Graph.linkVisibility((l) => {
-            const s = typeof l.source === "object" ? l.source?.id : l.source;
-            const t = typeof l.target === "object" ? l.target?.id : l.target;
-            return visibleById.get(s) !== false && visibleById.get(t) !== false;
-          });
+          Graph.linkVisibility(hasFilter ? linkVisFn : () => true);
         }
       }
 
