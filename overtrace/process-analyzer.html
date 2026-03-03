@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="0; url=./process.html" />
+    <title>Redirecting to Process</title>
+  </head>
+  <body>
+    <script>
+      const qs = window.location.search || "";
+      window.location.replace(`./process.html${qs}`);
+    </script>
+  </body>
+</html>

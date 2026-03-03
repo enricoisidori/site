@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content="0; url=./space.html?mode=overview" />
+    <title>Overview</title>
+  </head>
+  <body>
+    <script>
+      const params = new URLSearchParams(window.location.search || "");
+      params.set("mode", "overview");
+      window.location.replace(`./space.html?${params.toString()}`);
+    </script>
+  </body>
+</html>

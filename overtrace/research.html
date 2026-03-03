@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="it">
+ <head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title>Overtrace Research</title>
+ <style>
+ @font-face {
+ font-family: "Times New Roman";
+ src: url("./asset/Times New Roman-Book.woff2") format("woff2");
+ font-weight: 400;
+ font-style: normal;
+ font-display: swap;
+ }
+
+ :root {
+ --bg: #f2f2f2;
+ --panel: #ffffff;
+ --ink: #111111;
+ --muted: #666666;
+ --line: rgba(0, 0, 0, 0.12);
+ --hover: rgba(0, 0, 0, 0.06);
+ }
+
+ * {
+ box-sizing: border-box;
+ }
+
+ html,
+ body {
+ margin: 0;
+ width: 100%;
+ min-height: 100%;
+ }
+
+ body {
+ font: 14px/1.45 "Times New Roman", system-ui, -apple-system, "Segoe UI", Roboto,
+ sans-serif;
+ background: var(--bg);
+ color: var(--ink);
+ }
+
+ .wrap {
+ width: min(1100px, 92vw);
+ margin: 28px auto 40px;
+ }
+
+ h1 {
+ margin: 0 0 8px;
+ font-size: 28px;
+ line-height: 1.1;
+ }
+
+ .sub {
+ margin: 0 0 18px;
+ color: var(--muted);
+ }
+
+ .top-links {
+ display: flex;
+ gap: 10px;
+ margin-bottom: 18px;
+ flex-wrap: wrap;
+ }
+
+ .btn {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ border: 1px solid var(--line);
+ border-radius: 8px;
+ background: var(--panel);
+ color: var(--ink);
+ text-decoration: none;
+ padding: 7px 11px;
+ transition: background-color 120ms ease;
+ }
+
+ .btn:hover {
+ background: var(--hover);
+ }
+
+ .grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+ gap: 10px;
+ }
+
+ .card {
+ border: 1px solid var(--line);
+ border-radius: 10px;
+ background: var(--panel);
+ padding: 12px;
+ }
+
+ .id {
+ font-size: 12px;
+ color: var(--muted);
+ margin-bottom: 2px;
+ }
+
+ .name {
+ font-size: 16px;
+ margin-bottom: 10px;
+ }
+
+ .actions {
+ display: flex;
+ gap: 8px;
+ flex-wrap: wrap;
+ }
+
+ .actions a {
+ font-size: 12px;
+ }
+ </style>
+ </head>
+ <body>
+ <main class="wrap">
+ <h1>Research</h1>
+ <p class="sub">10 progetti attivi. Ogni link apre la vista con il <code>project.json</code> già caricato.</p>
+
+<div class="top-links">
+<a class="btn" href="./index.html">Editor</a>
+<a class="btn" href="./space.html">Space</a>
+<a class="btn" href="./process.html">Process</a>
+<a class="btn" href="./overview.html">Overview</a>
+</div>
+
+ <section class="grid">
+ <article class="card">
+ <div class="id">1_linguistic</div>
+ <div class="name">Linguistic</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=1_linguistic">Open Space</a>
+ <a class="btn" href="./process.html?project=1_linguistic">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">2_media</div>
+ <div class="name">Media</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=2_media">Open Space</a>
+ <a class="btn" href="./process.html?project=2_media">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">3_cognitive</div>
+ <div class="name">Cognitive</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=3_cognitive">Open Space</a>
+ <a class="btn" href="./process.html?project=3_cognitive">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">4_metric</div>
+ <div class="name">Metric</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=4_metric">Open Space</a>
+ <a class="btn" href="./process.html?project=4_metric">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">5_symbolic</div>
+ <div class="name">Symbolic</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=5_symbolic">Open Space</a>
+ <a class="btn" href="./process.html?project=5_symbolic">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">6_cultural</div>
+ <div class="name">Cultural</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=6_cultural">Open Space</a>
+ <a class="btn" href="./process.html?project=6_cultural">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">7_social</div>
+ <div class="name">Social</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=7_social">Open Space</a>
+ <a class="btn" href="./process.html?project=7_social">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">8_bureaucratic</div>
+ <div class="name">Bureaucratic</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=8_bureaucratic">Open Space</a>
+ <a class="btn" href="./process.html?project=8_bureaucratic">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">9_ecological</div>
+ <div class="name">Ecological</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=9_ecological">Open Space</a>
+ <a class="btn" href="./process.html?project=9_ecological">Open Process</a>
+ </div>
+ </article>
+
+ <article class="card">
+ <div class="id">10_infrastructural</div>
+ <div class="name">Infrastructural</div>
+ <div class="actions">
+ <a class="btn" href="./space.html?project=10_infrastructural">Open Space</a>
+ <a class="btn" href="./process.html?project=10_infrastructural">Open Process</a>
+ </div>
+ </article>
+ </section>
+ </main>
+ </body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content="0; url=./space.html" />
+    <title>Redirecting to Space</title>
+  </head>
+  <body>
+    <script>
+      const qs = window.location.search || "";
+      window.location.replace(`./space.html${qs}`);
+    </script>
+  </body>
+</html>
