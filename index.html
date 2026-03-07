@@ -1,28 +1,83 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin>
+<link rel="preconnect" href="https://upload.wikimedia.org" crossorigin>
     <meta charset="UTF-8" />
     <meta name="description" />
     <meta
       name="keywords"
-      content="enrico isidori, isidori, artist, researcher, enrico isidori researcher,unintentionally made, metalinguistic, arte involontartia, arte inintenzionale, antidisciplinary, antidisciplinary design, antidisciplinary designer, communication design, enrico isidori artist, enrico isidori artista, isidori artist, isidori artista, conceptual artist, artista, graphic designer, designer, visual designer, visual unlearning, interactive installations, speculative design, non-human perspectives, descriptive models of design"
+      content="enrico isidori, isidori, artist, researcher, enrico isidori researcher,unintentionally made, metalinguistic, arte involontartia, arte inintenzionale, antidisciplinary, antidisciplinary design, antidisciplinary designer, communication design, enrico isidori artist, enrico isidori artista, isidori artist, isidori artista, conceptual artist, artista, graphic designer, designer, visual designer, visual unlearning, interactive installations, speculative design, non-human perspectives, descriptive models of design, off-disciplinary, off-disciplinare, design out-of-place, out-of-place design, 
+boundary objects, communication design research, design methodology, 
+disciplinary disobedience, epistemic resistance, design space, approach space, 
+non-linear design process, out-of-phase design, design education, 
+transdisciplinary design, interdisciplinary design, postdisciplinary design, 
+antidisciplinary research, undisciplined design, design theory, 
+issue-based design, project-based design, design lab, synthesis studio, 
+Politecnico di Milano, blurred boundaries, design as a way of doing,
+para-disciplinary design, unbounded design, design approaches"
     />
+    <!-- i just asked AI to give me those tags from my writings c: -->
+
     <meta name="author" content="Enrico Isidori" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Enrico Isidori</title>
-    <link rel="shortcut icon" type="image/x-icon" href="asset/svg/white.ico?" />
+    <link rel="icon" id="favicon" type="image/png" href="asset/svg/arrow.svg" />
     <link
       rel="stylesheet"
       href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow"
     />
     <link rel="stylesheet" href="index.css" />
     <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query", generator: "random", grnnamespace: "6",
+            grnlimit: "50", prop: "imageinfo", iiprop: "url|mime",
+            iiurlwidth: "64", format: "json", origin: "*",
+          })
+      );
+    </script>
+    <style>
+      #aleph-stage {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background: #fff;
+      }
+      #aleph-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        pointer-events: none;
+      }
+      body > .col-12 {
+        position: relative;
+        z-index: 10;
+        text-shadow:
+          0 0 2px #fff,
+          0 0 4px #fff,
+          0 0 12px #fff;
+      }
+
+      a:link,
+      a:visited,
+      a:hover,
+      a:active {
+        color: #000;
+      }
+    </style>
   </head>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.1/jquery.min.js"></script>
 
   <body>
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
+    </div>
+
     <div class="col-12">
       Enrico Isidori<br />
       <a href="https://www.instagram.com/enrico.isidori/" target="_blank"
@@ -34,7 +89,7 @@
       <p class="outdent">
         Designer, artist and researcher with an antidisciplinary approach.
         <br />
-        Rome–Milan
+        Rome—Milan
       </p>
       <br />
       <br />
@@ -60,7 +115,14 @@
 
       <p class="outdent">
         Experience<br />
-        2025 — current <br />
+        2026—current <br />
+        <a
+          href="https://www.ied.edu/courses/turin/master-of-arts/communication-and-creative-technologies"
+          target="_blank"
+        >
+          Communication and Creative Technologies</a
+        >, IED Torino, Professor<br />
+        2025—current <br />
         <a
           href="https://www.instagram.com/operatingsystem_studio/"
           target="_blank"
@@ -71,20 +133,14 @@
           target="_blank"
           >Umanesimo Artificiale</a
         >, Transdisciplinary Designer <br />
-        2026 — current <br />
-        <a
-          href="https://www.ied.edu/courses/turin/master-of-arts/communication-and-creative-technologies"
-          target="_blank"
-        >
-          Communication and Creative Technologies</a
-        >, IED Torino, Professor<br />
-        2023 <br />
+
+        2023—current<br />
         <a
           href="https://www.researchgate.net/profile/Enrico_Isidori"
           target="_blank"
         >
           Antidisciplinary Communication Design Lab</a
-        >, Politecnico di Milano, Teaching Assistant<br />
+        >, Politecnico di Milano, Teaching and Research Assistant<br />
         2023 <br />
         <a href="https://gigadesignstudio.com/" target="_blank"
           >Giga Design Studio</a
@@ -103,13 +159,9 @@
         to Reflect on the Contemporary Information System, Cumulus
         <br />
         2024 <br />
-        <a
-          href="https://www.researchgate.net/publication/381320778_Anthropogenic_Narratives_Imagination_and_Anti-Disciplinarity_for_the_Communication_of_Non-Human_Perspectives"
-          target="_blank"
-        >
-          Anthropogenic Narratives</a
-        >: Imagination and Anti-Disciplinarity for the Communication of
-        Non-Human Perspectives, International Conference on Environmental Design
+
+        Anthropogenic Narratives: Imagination and Anti-Disciplinarity for the
+        Communication of Non-Human Perspectives, MDA
       </p>
 
       <p class="outdent">
@@ -122,9 +174,8 @@
         Apr 2025 <br />
         <a href="https://www.salonemilano.it/en" target="_blank"
           >Salone Satellite</a
-        >, Anthropogenic Scenarios, Rho <br />
-        Apr 2025 <br />
-        DesignxDesigners, Milan <br />
+        >, Rho <br />
+
         Feb 2025<br />
         <a href="https://www.meetcenter.it/en" target="_blank">Meet</a>,
         Milan<br />
@@ -141,31 +192,44 @@
           >Cavallerizza Reale</a
         >, Turin<br />
         May 2022 <br />
-        International Conference on Electronic Literature, Como
+                <a href="   https://www.elo2022.com/" target="_blank"
+    >
+        International Conference on Electronic Literature</a>, Como
       </p>
 
-      <p class="outdent">
+     
+
+            <p class="outdent">
+        Lectures & Conferences<br />
+        15 Feb 2026 <br />
+        Out-of-Place Design Condition, Post-Computing Lab, Elisava, Barcelona  <br />
+            6 Jun 2025<br />
+Ethical Leadership: A New Frontier for Design, Nantes<br />
+        15 Mar 2025 <br />
+        Symposium on Antidisciplinary, Transmedia Research Institute, Politecnico di Milano, Milan <br />
+   9 May 2024<br />
+Environmental Design 4th International Conference, Ginosa
+
+</p>
+      
+ <p class="outdent">
         Education <br />
-        <!-- 2024 — current <br /> -->
         MA Communication Design, Politecnico di Milano<br />
-        <!-- 2020 — 2023 <br /> -->
         BA Communication Design, Politecnico di Milano
       </p>
-
+ 
+    
+       
+    </p>
       <p class="outdent">
         Features<br />
+
         May 2025 <br />
         <a href="https://www.bellariafilmfestival.org/ " target="_blank"
           >Bellaria Film Festival</a
         >
         <br />
-
-        Mar 2025 <br />
-
-        <a href="https://www.transmediaresearch.institute/" target="_blank"
-          >Transmedia Research Institute</a
-        >
-        <br />
+       
         Nov 2024 <br />
         <a href="http://www.cdsaawards.com/en/" target="_blank"
           >CDSA Awards International Media Art Creativity Competition</a
@@ -178,7 +242,7 @@
           >Pittogramma</a
         >
         <br />
-        Set 2022 <br />
+        Sep 2022 <br />
         <a
           href="https://www.graphicdays.it/neologia/category/in-mostra/"
           target="_blank"
@@ -186,7 +250,355 @@
         >
       </p>
     </div>
-    <div style="display: block; float: left; height: 5px; width: 100%"></div>
+
+    <div style="display: block; float: left; height: 10px; width: 100%"></div>
     <!-- <script src="script.js"></script> -->
+
+    <script>
+      (function () {
+        // ── Toggle sfondo bianco / speciale ─────────────────────────
+        const stage = document.getElementById("aleph-stage");
+        let whiteBg = false;
+        document.body.addEventListener("click", (e) => {
+          if (e.target.closest("a")) return;
+          whiteBg = !whiteBg;
+          stage.style.display = whiteBg ? "none" : "";
+        });
+        // ─────────────────────────────────────────────────────────────
+
+        // ── Canvas setup ────────────────────────────────────────────
+        const canvas = document.getElementById("aleph-canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Risoluzione interna del canvas (più alta = qualità migliore, più lenta)
+        const CW = 480,
+          CH = 270;
+        canvas.width = CW;
+        canvas.height = CH;
+
+        // Canvas offscreen per estrarre pixel senza corrompere il display
+        const off = document.createElement("canvas");
+        off.width = CW;
+        off.height = CH;
+        const offCtx = off.getContext("2d", { willReadFrequently: true });
+
+        // ── Parametri luma key (regolabili) ─────────────────────────
+        // Pixel di scroll per una transizione completa (meno = più veloce)
+        const TRANSITION_PX = 250;
+        // Feathering: ammorbidisce il bordo tra A e B (0 = taglio netto)
+        const FEATHER = 0.12;
+        // false = i pixel scuri di A si dissolvono prima
+        // true  = i pixel chiari di A si dissolvono prima
+        const LUMA_INVERT = false;
+        // ────────────────────────────────────────────────────────────
+
+        const RES_STEPS = [96, 128, 192, 256, 320];
+        let resIdx = 2; // default 192
+
+        const maxBuffer = 180;
+
+        const Commons = {
+          thumbWidth: RES_STEPS[resIdx],
+          urlsQueue: [],
+          prefetching: false,
+          minBuffer: 60,
+          preloaded: [],
+          loadingCount: 0,
+          maxConcurrent: 12,
+          maxPool: 480,
+          heldIds: new Set(),
+          seenIds: new Set(),
+          seenOrder: [],
+          seenCap: 50000,
+        };
+
+        function addSeen(id) {
+          if (!id) return;
+          if (!Commons.seenIds.has(id)) {
+            Commons.seenIds.add(id);
+            Commons.seenOrder.push(id);
+            if (Commons.seenOrder.length > Commons.seenCap) {
+              Commons.seenIds.delete(Commons.seenOrder.shift());
+            }
+          }
+        }
+
+        function commonsApiUrl(n, width) {
+          const base = "https://commons.wikimedia.org/w/api.php";
+          const p = new URLSearchParams({
+            action: "query",
+            generator: "random",
+            grnnamespace: "6",
+            grnlimit: String(n),
+            prop: "imageinfo",
+            iiprop: "url|mime",
+            iiurlwidth: String(width),
+            format: "json",
+            origin: "*",
+          });
+          return `${base}?${p.toString()}`;
+        }
+
+        async function fetchCommonsUrls(n) {
+          if (Commons.prefetching) return;
+          Commons.prefetching = true;
+          try {
+            let res;
+            if (window.__alephPrefetch) {
+              res = await window.__alephPrefetch;
+              window.__alephPrefetch = null;
+            } else {
+              res = await fetch(commonsApiUrl(n, Commons.thumbWidth));
+            }
+            const data = await res.json();
+            const pages = data?.query?.pages || {};
+            const urls = [];
+            for (const k in pages) {
+              const title = pages[k]?.title || String(pages[k]?.pageid || "");
+              const info = pages[k]?.imageinfo?.[0];
+              const u = info?.thumburl || info?.url;
+              const mime = info?.mime || "";
+              if (!title || !u || !mime.startsWith("image/")) continue;
+              if (Commons.seenIds.has(title) || Commons.heldIds.has(title))
+                continue;
+              urls.push({ id: title, url: u });
+              Commons.heldIds.add(title);
+            }
+            Commons.urlsQueue.push(...urls);
+          } catch (e) {
+            console.warn("Commons fetch failed", e);
+          } finally {
+            Commons.prefetching = false;
+          }
+        }
+
+        async function ensureCommonsBuffer(n) {
+          if (Commons.urlsQueue.length >= n) return;
+          await fetchCommonsUrls(Math.max(Commons.minBuffer, n));
+        }
+
+        function pumpPreload() {
+          while (
+            Commons.preloaded.length < Commons.maxPool &&
+            Commons.loadingCount < Commons.maxConcurrent &&
+            Commons.urlsQueue.length > 0
+          ) {
+            const { id, url } = Commons.urlsQueue.shift();
+            const im = new Image();
+            im.crossOrigin = "anonymous";
+            Commons.loadingCount++;
+            im.onload = () => {
+              Commons.preloaded.push({ id, img: im });
+              if (Commons.preloaded.length > Commons.maxPool)
+                Commons.preloaded.shift();
+              Commons.loadingCount--;
+              pumpPreload();
+              // Se non c'è ancora un'immagine "next" pronta, preparala ora
+              if (!imgNext && imgCurrent) prepareNextImage();
+            };
+            im.onerror = () => {
+              if (id) Commons.heldIds.delete(id);
+              Commons.loadingCount--;
+              pumpPreload();
+            };
+            im.src = url;
+          }
+        }
+
+        // ── Stato immagini ───────────────────────────────────────────
+        let imgCurrent = null; // immagine corrente (mostrata sul canvas)
+        let imgNext = null; // immagine successiva (in attesa di transizione)
+        let pixA = null; // pixel data di imgCurrent
+        let pixB = null; // pixel data di imgNext
+
+        let transitionProgress = 0; // 0→1
+        let scrollAccum = 0;
+        let lastScrollY = 0;
+        let rafPending = false;
+
+        function getPixData(img) {
+          offCtx.drawImage(img, 0, 0, CW, CH);
+          return offCtx.getImageData(0, 0, CW, CH);
+        }
+
+        // ── Render ──────────────────────────────────────────────────
+        function renderFrame() {
+          rafPending = false;
+          if (!imgCurrent) return;
+
+          if (!imgNext || transitionProgress <= 0) {
+            ctx.drawImage(imgCurrent, 0, 0, CW, CH);
+            return;
+          }
+
+          // Luma key compositing
+          const A = pixA.data,
+            B = pixB.data;
+          const out = ctx.createImageData(CW, CH);
+          const d = out.data;
+          const t = transitionProgress;
+
+          for (let i = 0; i < A.length; i += 4) {
+            // Luminanza BT.601 normalizzata 0→1
+            const luma =
+              (0.299 * A[i] + 0.587 * A[i + 1] + 0.114 * A[i + 2]) / 255;
+            const key = LUMA_INVERT ? 1 - luma : luma;
+
+            // Alpha con soft feathering attorno alla soglia t
+            let alpha = (t - key) / FEATHER + 0.5;
+            if (alpha < 0) alpha = 0;
+            else if (alpha > 1) alpha = 1;
+            const ia = 1 - alpha;
+
+            d[i] = A[i] * ia + B[i] * alpha;
+            d[i + 1] = A[i + 1] * ia + B[i + 1] * alpha;
+            d[i + 2] = A[i + 2] * ia + B[i + 2] * alpha;
+            d[i + 3] = 255;
+          }
+
+          ctx.putImageData(out, 0, 0);
+
+          // Transizione completata → promuovi next→current
+          if (transitionProgress >= 1) {
+            imgCurrent = imgNext;
+            saveCached(imgCurrent);
+            pixA = pixB;
+            imgNext = null;
+            pixB = null;
+            transitionProgress = 0;
+            scrollAccum = 0;
+            prepareNextImage();
+          }
+        }
+
+        function scheduleRender() {
+          if (!rafPending) {
+            rafPending = true;
+            requestAnimationFrame(renderFrame);
+          }
+        }
+
+        // ── Gestione pool immagini ───────────────────────────────────
+        function prepareNextImage() {
+          if (imgNext) return;
+          if (Commons.preloaded.length === 0) {
+            if (Commons.urlsQueue.length < Commons.minBuffer)
+              ensureCommonsBuffer(maxBuffer);
+            pumpPreload();
+            return;
+          }
+          const frame = Commons.preloaded.shift();
+          if (!frame || !frame.img) return;
+          imgNext = frame.img;
+          pixB = getPixData(imgNext);
+          if (frame.id) {
+            Commons.heldIds.delete(frame.id);
+            addSeen(frame.id);
+          }
+          if (Commons.urlsQueue.length < Math.floor(maxBuffer / 2))
+            ensureCommonsBuffer(maxBuffer);
+          pumpPreload();
+        }
+
+        function saveCached(img) {
+          try { localStorage.setItem("aleph_last_url", img.src); } catch (_) {}
+        }
+
+        async function initFirstImage() {
+          while (Commons.preloaded.length === 0) {
+            await new Promise((r) => setTimeout(r, 100));
+          }
+          const frame = Commons.preloaded.shift();
+          if (frame && frame.img) {
+            if (!imgCurrent) {
+              imgCurrent = frame.img;
+              pixA = getPixData(imgCurrent);
+              ctx.drawImage(imgCurrent, 0, 0, CW, CH);
+              saveCached(imgCurrent);
+            } else {
+              imgNext = frame.img;
+              pixB = getPixData(imgNext);
+            }
+            if (frame.id) {
+              Commons.heldIds.delete(frame.id);
+              addSeen(frame.id);
+            }
+          }
+          prepareNextImage();
+        }
+
+        // ── Scroll → luma key ────────────────────────────────────────
+        function onScroll() {
+          const sy = document.body.scrollTop || window.scrollY || 0;
+          const delta = Math.abs(sy - lastScrollY);
+          lastScrollY = sy;
+          if (!imgCurrent) return;
+          if (!imgNext) {
+            prepareNextImage();
+            return;
+          }
+          scrollAccum += delta;
+          transitionProgress = Math.min(scrollAccum / TRANSITION_PX, 1);
+          scheduleRender();
+        }
+
+      // ── Avvio con fade semplice ──────────────────────────────────
+(async () => {
+
+  Commons.thumbWidth = 64;
+
+  await fetchCommonsUrls(50);
+
+  pumpPreload();
+
+  await initFirstImage();
+
+  // ── prima immagine con luma key da bianco ──
+
+let start = performance.now();
+const duration = 1000;
+
+function lumaIntro(t) {
+
+  const p = Math.min((t - start) / duration, 1);
+
+  const out = ctx.createImageData(CW, CH);
+  const d = out.data;
+  const A = pixA.data;
+
+  for (let i = 0; i < A.length; i += 4) {
+
+    const luma = (0.299*A[i] + 0.587*A[i+1] + 0.114*A[i+2]) / 255;
+
+    let alpha = (p - luma) / 0.15 + 0.5;
+    if (alpha < 0) alpha = 0;
+    if (alpha > 1) alpha = 1;
+
+    d[i]   = 255*(1-alpha) + A[i]*alpha;
+    d[i+1] = 255*(1-alpha) + A[i+1]*alpha;
+    d[i+2] = 255*(1-alpha) + A[i+2]*alpha;
+    d[i+3] = 255;
+  }
+
+  ctx.putImageData(out,0,0);
+
+  if (p < 1) requestAnimationFrame(lumaIntro);
+}
+
+requestAnimationFrame(lumaIntro);
+
+  Commons.thumbWidth = RES_STEPS[resIdx];
+  ensureCommonsBuffer(maxBuffer).then(() => pumpPreload());
+
+})();
+
+        document.body.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("scroll", onScroll, { passive: true });
+
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden) scheduleRender();
+        });
+      })();
+    </script>
   </body>
 </html>
