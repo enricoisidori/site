@@ -23,7 +23,7 @@ para-disciplinary design, unbounded design, design approaches"
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Enrico Isidori</title>
-    <link rel="icon" type="image/png" href="asset/svg/sd.png" />
+    <link rel="icon" type="image/png" href="asset/svg/cyan.png" />
     <link
       rel="stylesheet"
       href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow"
@@ -63,6 +63,10 @@ para-disciplinary design, unbounded design, design approaches"
           0 0 2px #fff,
           0 0 4px #fff,
           0 0 12px #fff;
+        user-select: none;
+      }
+      body > .col-12 * {
+        user-select: text;
       }
 
       a:link,
@@ -82,7 +86,7 @@ para-disciplinary design, unbounded design, design approaches"
     </div>
 
     <div class="col-12">
-      Enrico Isidori<br />
+      <span>Enrico Isidori</span><br />
       <a href="https://www.instagram.com/enrico.isidori/" target="_blank"
         >Instagram</a
       ><br />
@@ -195,11 +199,11 @@ para-disciplinary design, unbounded design, design approaches"
         <a href="https://www.cavallerizza.to.it/" target="_blank"
           >Cavallerizza Reale</a
         >, Turin<br />
-        May 2022 <br />
+        <!-- May 2022 <br />
                 <a href="   https://www.elo2022.com/" target="_blank"
     >
-        Electronic Literature</a>, Como
-      </p>
+        Electronic Literature Conference</a>, Como
+      </p> -->
 
      
 
@@ -604,6 +608,7 @@ requestAnimationFrame(lumaIntro);
         document.addEventListener("visibilitychange", () => {
           if (!document.hidden) scheduleRender();
         });
+
       })();
     </script>
   </body>
