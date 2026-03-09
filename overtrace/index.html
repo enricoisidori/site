@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
@@ -23,6 +23,7 @@
       /* Palette */
       :root {
         --bg: #0e0e0e;
+
         --panel: #151515;
         --panel-soft: #161616;
         --ink: #ffffff;
@@ -50,7 +51,10 @@
 
       /* Material Symbols: leggermente più sottili ma nitide */
       .material-symbols-outlined {
-        font-variation-settings: "FILL" 0, "wght" 200, "opsz" 24;
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 200,
+          "opsz" 24;
         font-size: 22px;
         line-height: 1;
         display: inline-block;
@@ -90,7 +94,9 @@
         align-items: center;
         justify-content: center;
         gap: 6px;
-        transition: background-color 120ms ease, opacity 120ms ease,
+        transition:
+          background-color 120ms ease,
+          opacity 120ms ease,
           transform 60ms ease;
       }
       header button:hover,
@@ -145,9 +151,12 @@
         position: relative;
         overflow: hidden;
         background: var(--bg);
-        background-image: linear-gradient(#111 1px, transparent 1px),
+        background-image:
+          linear-gradient(#111 1px, transparent 1px),
           linear-gradient(90deg, #111 1px, transparent 1px);
-        background-size: 24px 24px, 24px 24px;
+        background-size:
+          24px 24px,
+          24px 24px;
       }
       /* CSS da mettere nello <style> */
       .marquee-active *:not(input):not(textarea):not([contenteditable]) {
@@ -384,7 +393,9 @@
         border-radius: 8px !important;
         font-family: inherit;
         margin-top: 6px;
-        transition: background-color 120ms ease, box-shadow 120ms ease;
+        transition:
+          background-color 120ms ease,
+          box-shadow 120ms ease;
       }
       input:hover,
       textarea:hover {
@@ -473,7 +484,9 @@
         color: #eee;
         cursor: pointer;
         user-select: none;
-        transition: background-color 120ms ease, transform 60ms ease,
+        transition:
+          background-color 120ms ease,
+          transform 60ms ease,
           box-shadow 120ms ease;
       }
       .chip:hover {
@@ -638,7 +651,10 @@
       #helpPanel .doc-section h3::after {
         content: "expand_more";
         font-family: "Material Symbols Outlined";
-        font-variation-settings: "FILL" 0, "wght" 200, "opsz" 24;
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 200,
+          "opsz" 24;
         font-size: 18px;
         opacity: 0.8;
         margin-left: auto;
@@ -809,7 +825,10 @@
         margin: 0;
         background: var(--bg);
         color: #eee;
-        font: 700 14px/1.4 "Times New Roman", Times, serif;
+        font:
+          700 14px/1.4 "Times New Roman",
+          Times,
+          serif;
         -webkit-tap-highlight-color: transparent;
       }
       header {
@@ -834,7 +853,9 @@
       /* Hover feedback: bordo bianco puro; icona invariata */
       .icon-btn {
         border: 1px solid #444;
-        transition: border-color 120ms ease, opacity 120ms ease;
+        transition:
+          border-color 120ms ease,
+          opacity 120ms ease;
       }
       .icon-btn:hover {
         opacity: 1;
@@ -872,10 +893,15 @@
         overflow: hidden;
         user-select: none;
         background: #0e0e0e;
-        background-image: linear-gradient(#111 1px, transparent 1px),
+        background-image:
+          linear-gradient(#111 1px, transparent 1px),
           linear-gradient(90deg, #111 1px, transparent 1px);
-        background-size: 24px 24px, 24px 24px;
-        background-position: 0 0, 0 0;
+        background-size:
+          24px 24px,
+          24px 24px;
+        background-position:
+          0 0,
+          0 0;
         cursor: default;
       }
       svg#edges {
@@ -1322,7 +1348,8 @@
 
       #stage {
         background: var(--bg) !important;
-        background-image: linear-gradient(#dddddd 1px, transparent 1px),
+        background-image:
+          linear-gradient(#dddddd 1px, transparent 1px),
           linear-gradient(90deg, #dddddd 1px, transparent 1px) !important;
       }
       aside {
@@ -1661,7 +1688,11 @@
             <span class="material-symbols-outlined">menu_book</span>
             <span class="btn-label">Research</span>
           </button>
-          <button id="btnProcessAnalysis" data-tip="Process analysis" class="icon-btn">
+          <button
+            id="btnProcessAnalysis"
+            data-tip="Process analysis"
+            class="icon-btn"
+          >
             <span class="material-symbols-outlined">timeline</span>
             <span class="btn-label">Process</span>
           </button>
@@ -1769,7 +1800,6 @@
         />
         <div id="helpPanel"></div>
       </aside>
-
     </div>
 
     <script>
@@ -1992,8 +2022,8 @@
               from === "space"
                 ? "Space analysis"
                 : from === "process"
-                ? "Process analysis"
-                : "Analysis";
+                  ? "Process analysis"
+                  : "Analysis";
             setStatus(`Project restored from ${fromLabel}`);
             params.delete("from");
             const qs = params.toString();
@@ -2090,7 +2120,10 @@
           dataViewState.scale =
             dataViewState.scale === "relative" ? "absolute" : "relative";
           btnScale.dataset.mode = dataViewState.scale;
-          btnScale.classList.toggle("active", dataViewState.scale === "relative");
+          btnScale.classList.toggle(
+            "active",
+            dataViewState.scale === "relative",
+          );
           const textSpan = btnScale.querySelector("span:last-child");
           if (textSpan)
             textSpan.textContent =
@@ -2149,11 +2182,11 @@
             return;
           }
           const targets = [...state.selNodes].filter(
-            (id) => !connectSources.includes(id)
+            (id) => !connectSources.includes(id),
           );
           setStatusPulseHTML(
             targets.length > 0 ? MSG.completeHint : MSG.selectTargets,
-            true
+            true,
           );
         };
         // Bindings
@@ -2164,7 +2197,7 @@
           }
           const sources = [...connectSources];
           const targets = [...state.selNodes].filter(
-            (id) => !connectSources.includes(id)
+            (id) => !connectSources.includes(id),
           );
           if (sources.length === 0) {
             setStatusPulseHTML(MSG.needSources, true);
@@ -2243,7 +2276,7 @@
             if (!connectMode) return;
             setTimeout(updateConnectStatusDuringSelection, 0);
           },
-          false
+          false,
         );
 
         // === EDGE CANVAS (disegno) + SCHEDULER ===
@@ -2423,7 +2456,7 @@
                 ">": "&gt;",
                 '"': "&quot;",
                 "'": "&#39;",
-              }[c])
+              })[c],
           );
 
         function splitListComma(str) {
@@ -2548,7 +2581,7 @@
             "viewBox",
             `${-state.pan.x / state.zoom} ${-state.pan.y / state.zoom} ${
               w / state.zoom
-            } ${h / state.zoom}`
+            } ${h / state.zoom}`,
           );
         }
         window.addEventListener("resize", () => {
@@ -2813,7 +2846,7 @@
                   setStatus(
                     srcs.length > 1
                       ? "Children created and connected"
-                      : "Child created and connected"
+                      : "Child created and connected",
                   );
                 } else {
                   if (state.dragLink.from === "in") {
@@ -2851,7 +2884,7 @@
               startGhost(
                 state.press.side,
                 state.press.sources,
-                state.press.primary
+                state.press.primary,
               );
             }
             if (state.dragLink && state.dragLink.active) {
@@ -2863,7 +2896,7 @@
               const pick = pickDropTargetFromPointer(
                 e.clientX,
                 e.clientY,
-                state.dragLink.from
+                state.dragLink.from,
               );
               state.dragLink.snap = pick || null;
 
@@ -3106,7 +3139,8 @@
         // This keeps the native Find UI, but makes results navigable like “search in a canvas”.
         let _findPanRAF = 0;
         document.addEventListener("selectionchange", () => {
-          if (!state._findArmedUntil || Date.now() > state._findArmedUntil) return;
+          if (!state._findArmedUntil || Date.now() > state._findArmedUntil)
+            return;
           if (_findPanRAF) cancelAnimationFrame(_findPanRAF);
           _findPanRAF = requestAnimationFrame(() => {
             try {
@@ -3150,7 +3184,7 @@
               n && vocabRemoveNode(n);
             }
             state.edges = state.edges.filter(
-              (e) => !state.selNodes.has(e.s) && !state.selNodes.has(e.t)
+              (e) => !state.selNodes.has(e.s) && !state.selNodes.has(e.t),
             );
             ids.forEach((id) => document.getElementById(id)?.remove());
             state.nodes = state.nodes.filter((n) => !state.selNodes.has(n.id));
@@ -3280,7 +3314,7 @@
               const url = normalizeURL(raw);
               return url
                 ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(
-                    raw
+                    raw,
                   )}</a>`
                 : `<span class="muted">${esc(raw)}</span>`;
             })
@@ -3292,8 +3326,8 @@
             .map(
               (f) =>
                 `<img src="${esc(f.url)}" alt="${esc(
-                  f.name
-                )}" draggable="false">`
+                  f.name,
+                )}" draggable="false">`,
             )
             .join("");
 
@@ -3414,8 +3448,8 @@
             f.panelTitle.textContent = showNode
               ? "Node properties"
               : showEdge
-              ? "Edge properties"
-              : "";
+                ? "Edge properties"
+                : "";
           }
 
           // Toggle layout 1-colonna e forza ridisegno stage/SVG
@@ -3445,7 +3479,7 @@
           container.querySelectorAll(".chip").forEach((c) => {
             c.classList.toggle(
               "active",
-              c.getAttribute("data-val") === activeVal
+              c.getAttribute("data-val") === activeVal,
             );
           });
         }
@@ -3566,7 +3600,7 @@
             if (v <= 0) {
               counts.type.delete(snap.type);
               vocab.typeMRU.removeIf(
-                (x) => x.toLowerCase() === snap.type.toLowerCase()
+                (x) => x.toLowerCase() === snap.type.toLowerCase(),
               );
             } else counts.type.set(snap.type, v);
           }
@@ -3738,7 +3772,7 @@
             if (v <= 0) {
               counts.type.delete(prev);
               vocab.typeMRU.removeIf(
-                (x) => x.toLowerCase() === prev.toLowerCase()
+                (x) => x.toLowerCase() === prev.toLowerCase(),
               );
             } else {
               counts.type.set(prev, v);
@@ -3836,23 +3870,25 @@
           }
           // Ordine stabile e leggibile
           const live = Array.from(uniq).sort((a, b) =>
-            a.localeCompare(b, undefined, { sensitivity: "base" })
+            a.localeCompare(b, undefined, { sensitivity: "base" }),
           );
           // Render chip
           f.typeChips.innerHTML = live
             .map(
-              (x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`
+              (x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`,
             )
             .join("");
         }
         function renderSuggestionsForNode(node) {
-          const curAreas = new Set(normalizeAreasArray(node?.data?.areas || []));
+          const curAreas = new Set(
+            normalizeAreasArray(node?.data?.areas || []),
+          );
           const areasList = vocab.areasMRU
             .list()
             .filter((x) => (counts.areas.get(x) || 0) > 0 && !curAreas.has(x));
           f.areasChips.innerHTML = areasList
             .map(
-              (x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`
+              (x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`,
             )
             .join("");
 
@@ -3862,7 +3898,7 @@
             .filter((x) => (counts.tags.get(x) || 0) > 0 && !curTags.has(x));
           f.tagsChips.innerHTML = tagsList
             .map(
-              (x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`
+              (x) => `<div class="chip" data-val="${esc(x)}">${esc(x)}</div>`,
             )
             .join("");
 
@@ -3876,7 +3912,7 @@
           const val = chip.getAttribute("data-val");
           if (!val) return;
           const tokens = new Set(
-            normalizeAreasArray(splitListComma(f.areas.value || ""))
+            normalizeAreasArray(splitListComma(f.areas.value || "")),
           );
           if (!tokens.has(val)) {
             tokens.add(val);
@@ -3892,7 +3928,7 @@
           const val = chip.getAttribute("data-val");
           if (!val) return;
           const tokens = new Set(
-            normalizeArray(splitListComma(f.tags.value || ""))
+            normalizeArray(splitListComma(f.tags.value || "")),
           );
           if (!tokens.has(val)) {
             tokens.add(val);
@@ -4192,7 +4228,7 @@
             state.pan.y -= e.deltaY;
             applyView();
           },
-          { passive: false }
+          { passive: false },
         );
 
         function applyView() {
@@ -4257,8 +4293,8 @@
             };
           }
           const weekMs = 7 * 24 * 60 * 60 * 1000;
-          const dates = dated.map(
-            (n) => new Date(`${n.data.date}T00:00:00`).getTime()
+          const dates = dated.map((n) =>
+            new Date(`${n.data.date}T00:00:00`).getTime(),
           );
           const startMs = Math.min(...dates);
           const labels = [];
@@ -4330,7 +4366,8 @@
                   tooltip: {
                     callbacks: {
                       label: (ctx) => {
-                        if (rel) return `${ctx.dataset.label}: ${ctx.formattedValue}%`;
+                        if (rel)
+                          return `${ctx.dataset.label}: ${ctx.formattedValue}%`;
                         const v = ctx.raw;
                         return `${ctx.dataset.label}: ${v} node${v === 1 ? "" : "s"}`;
                       },
@@ -4395,10 +4432,7 @@
           const pad = 20;
           const spanX = Math.max(1, maxX - minX);
           const spanY = Math.max(1, maxY - minY);
-          const scale = Math.min(
-            (w - pad * 2) / spanX,
-            (h - pad * 2) / spanY
-          );
+          const scale = Math.min((w - pad * 2) / spanX, (h - pad * 2) / spanY);
           const toScreen = (x, y) => ({
             x: (x - minX) * scale + pad,
             y: (y - minY) * scale + pad,
@@ -4427,8 +4461,8 @@
               act === "exploring"
                 ? "#00c7d9"
                 : act === "making"
-                ? "#b87333"
-                : "#7a7a7a";
+                  ? "#b87333"
+                  : "#7a7a7a";
             ctx.fillStyle = fill;
             ctx.beginPath();
             ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
@@ -4470,11 +4504,11 @@
           drawMarqueeRect();
           const a = toWorld(
             state.marquee.startX + r.left,
-            state.marquee.startY + r.top
+            state.marquee.startY + r.top,
           );
           const b = toWorld(
             state.marquee.curX + r.left,
-            state.marquee.curY + r.top
+            state.marquee.curY + r.top,
           );
           const minX = Math.min(a.x, b.x),
             minY = Math.min(a.y, b.y),
@@ -4493,10 +4527,10 @@
                   n.x,
                   n.y,
                   n.x + (n.w || NODE_W),
-                  n.y + (n.h || NODE_H)
-                )
+                  n.y + (n.h || NODE_H),
+                ),
               )
-              .map((n) => n.id)
+              .map((n) => n.id),
           );
 
           if (state.marquee.mode === "toggle") {
@@ -4547,7 +4581,7 @@
           bMinX,
           bMinY,
           bMaxX,
-          bMaxY
+          bMaxY,
         ) {
           return (
             aMinX <= bMaxX && aMaxX >= bMinX && aMinY <= bMaxY && aMaxY >= bMinY
@@ -4616,7 +4650,7 @@
           if (children.length === 0) return { x: baseX, y: parent.y };
           const last = children.reduce(
             (a, c) => (c.y > a.y ? c : a),
-            children[0]
+            children[0],
           );
           return { x: baseX, y: last.y + (last.h || NODE_H) + VGAP };
         }
@@ -4710,7 +4744,7 @@
           worldX,
           worldY,
           fromSide,
-          excludeNodeIds = []
+          excludeNodeIds = [],
         ) {
           const wantSide = fromSide === "out" ? "left" : "right";
           const excl = new Set(excludeNodeIds || []);
@@ -4794,17 +4828,17 @@
             if (!s || !t) return;
             const g = document.createElementNS(
               "http://www.w3.org/2000/svg",
-              "g"
+              "g",
             );
             g.setAttribute("data-idx", String(i));
             const pv = document.createElementNS(
               "http://www.w3.org/2000/svg",
-              "path"
+              "path",
             );
             pv.setAttribute("d", pathCubic(s, t));
             pv.setAttribute(
               "class",
-              "edge-visible" + (e.dashed ? " weak" : "")
+              "edge-visible" + (e.dashed ? " weak" : ""),
             );
             if (state.selEdges.has(i)) pv.classList.add("selected");
             g.addEventListener("click", (ev) => {
@@ -4830,13 +4864,13 @@
                 const nid = addNodeAt(
                   mid.x - NODE_W / 2,
                   mid.y - NODE_H / 2,
-                  init
+                  init,
                 );
                 const dashed = !!e.dashed;
                 state.edges.splice(i, 1);
                 state.edges.push(
                   { s: e.s, t: nid, dashed },
-                  { s: nid, t: e.t, dashed }
+                  { s: nid, t: e.t, dashed },
                 );
                 if (typeof renderEdges === "function") renderEdges();
                 if (typeof scheduleEdgeCanvasDraw === "function")
@@ -4851,13 +4885,13 @@
                 const nid = addNodeAt(
                   mid.x - NODE_W / 2,
                   mid.y - NODE_H / 2,
-                  {}
+                  {},
                 );
                 const dashed = !!e.dashed;
                 state.edges.splice(i, 1);
                 state.edges.push(
                   { s: e.s, t: nid, dashed },
-                  { s: nid, t: e.t, dashed }
+                  { s: nid, t: e.t, dashed },
                 );
                 if (typeof renderEdges === "function") renderEdges();
                 if (typeof scheduleEdgeCanvasDraw === "function")
@@ -4892,7 +4926,7 @@
               const b = state.dragLink.from === "out" ? t : fromAnchor;
               const path = document.createElementNS(
                 "http://www.w3.org/2000/svg",
-                "path"
+                "path",
               );
               path.setAttribute("d", pathCubic(a, b));
               path.setAttribute("stroke", "#000000");
@@ -4972,7 +5006,11 @@
                   const blob = await (await fetch(f.url)).blob();
                   dataUrl = await blobToDataUrl(blob);
                 } catch (err) {
-                  console.warn("Unable to embed asset for download:", f?.name, err);
+                  console.warn(
+                    "Unable to embed asset for download:",
+                    f?.name,
+                    err,
+                  );
                 }
               }
               outFiles.push({ ...base, dataUrl });
@@ -5050,7 +5088,7 @@
             } catch (err) {
               console.warn(
                 "Save As cancelled or failed, falling back to light JSON",
-                err
+                err,
               );
             }
           }
@@ -5153,7 +5191,7 @@
               let blob = await fetch(file.url).then((r) => r.blob());
 
               const baseName = sanitizeName(
-                (file.name || "file").replace(/\s+/g, "_")
+                (file.name || "file").replace(/\s+/g, "_"),
               );
               const noExt = baseName.replace(/\.[a-z0-9]+$/i, "");
               let finalName, rel;
@@ -5400,7 +5438,7 @@
                 } else {
                   return { ...f, url: "" };
                 }
-              })
+              }),
             );
 
             state.nodes.push(node);
@@ -5640,13 +5678,13 @@
         async function resizeImageBlob(
           blob,
           maxSide = 1500,
-          targetBytes = 512 * 1024
+          targetBytes = 512 * 1024,
         ) {
           const img = await blobToImage(blob);
           const { w, h } = fitWithin(
             img.naturalWidth || img.width,
             img.naturalHeight || img.height,
-            maxSide
+            maxSide,
           );
           const canvas =
             "OffscreenCanvas" in window
@@ -5783,7 +5821,7 @@
                   status("Select source node(s) first");
                 }
               },
-              true
+              true,
             );
           }
 
@@ -5888,7 +5926,7 @@
                 return;
               }
             },
-            { capture: true }
+            { capture: true },
           );
         })();
 
@@ -5968,7 +6006,7 @@
 
             const g = document.createElementNS(
               "http://www.w3.org/2000/svg",
-              "g"
+              "g",
             );
             g.setAttribute("data-idx", String(i));
             const d = pathCubic(s, t);
@@ -5976,7 +6014,7 @@
             // Hit area (sotto)
             const ph = document.createElementNS(
               "http://www.w3.org/2000/svg",
-              "path"
+              "path",
             );
             ph.setAttribute("class", "edge-hit");
             ph.setAttribute("d", d);
@@ -5985,11 +6023,11 @@
             // Visibile (sopra)
             const pv = document.createElementNS(
               "http://www.w3.org/2000/svg",
-              "path"
+              "path",
             );
             pv.setAttribute(
               "class",
-              "edge-visible" + (e.dashed ? " weak" : "")
+              "edge-visible" + (e.dashed ? " weak" : ""),
             );
             pv.setAttribute("d", d);
             if (state.selEdges.has(i)) pv.classList.add("selected");
@@ -6005,13 +6043,13 @@
                 const nid = addNodeAt(
                   mid.x - NODE_W / 2,
                   mid.y - NODE_H / 2,
-                  {}
+                  {},
                 );
                 const dashed = !!e.dashed;
                 state.edges.splice(i, 1);
                 state.edges.push(
                   { s: e.s, t: nid, dashed },
-                  { s: nid, t: e.t, dashed }
+                  { s: nid, t: e.t, dashed },
                 );
                 renderEdges();
                 return;
@@ -6035,7 +6073,7 @@
               const b = state.dragLink.from === "out" ? t : fromAnchor;
               const path = document.createElementNS(
                 "http://www.w3.org/2000/svg",
-                "path"
+                "path",
               );
               path.setAttribute("d", pathCubic(a, b));
               path.setAttribute("stroke", "#000000");
@@ -6085,7 +6123,7 @@
         if (def) btn.setAttribute("data-tip", def.label);
       });
       window.OvertraceUI?.attachToolbarTooltips(
-        document.querySelector("header.ts-toolbar")
+        document.querySelector("header.ts-toolbar"),
       );
 
       // Help overlay (clone .doc-section → modal)
@@ -6096,7 +6134,7 @@
           const btnHelp = document.getElementById("btnHelp");
           const btnClose = document.getElementById("helpClose");
           const toolbarBtns = Array.from(
-            document.querySelectorAll("header button")
+            document.querySelectorAll("header button"),
           );
 
           if (!overlay || !content || !btnHelp) return;
@@ -6135,7 +6173,7 @@
               e.stopPropagation();
               openHelp();
             },
-            { capture: true }
+            { capture: true },
           );
 
           btnClose?.addEventListener("click", (e) => {
