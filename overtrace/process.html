@@ -682,6 +682,7 @@
  }
  }
  </style>
+ <link rel="stylesheet" href="./typography.css" />
  <link rel="stylesheet" href="./shared-ui.css" />
  <script src="./shared-ui.js"></script>
  </head>
@@ -689,6 +690,12 @@
  <div class="app">
  <header class="topbar ts-toolbar">
  <div class="nav-left">
+ <a class="toolbar-brand" href="./atlas.html" aria-label="Open Project Atlas">
+ <img class="brand-logo" src="./overtrace/logo.svg" alt="" width="36" height="36" />
+ <span class="brand-wordmark">Overtrace</span>
+ </a>
+ </div>
+ <div class="nav-center">
  <button id="btnOpen" class="icon-btn" type="button" data-tip="Open project folder (Cmd/Ctrl+O)">
  <span class="material-symbols-outlined">file_open</span>
  </button>
@@ -701,17 +708,21 @@
  <div id="navStatus" class="toolbar-status" aria-live="polite"></div>
  </div>
  <div class="nav-right">
- <button id="btnResearch" class="icon-btn switch-btn" type="button" data-tip="Go to Research">
- <span class="material-symbols-outlined">menu_book</span>
- <span class="btn-label">Research</span>
+ <button id="btnResearch" class="icon-btn switch-btn section-btn" type="button" data-tip="Go to Project Atlas">
+ <span class="material-symbols-outlined">category</span>
+ <span class="btn-label">Atlas</span>
  </button>
- <button id="btnSpace" class="icon-btn switch-btn" type="button" data-tip="Go to Space Analysis">
- <span class="material-symbols-outlined">view_in_ar</span>
- <span class="btn-label">Space</span>
- </button>
- <button id="btnEditor" class="icon-btn switch-btn" type="button" data-tip="Back to Editor">
+ <button id="btnEditor" class="icon-btn switch-btn section-btn" type="button" data-tip="Back to Editor">
  <span class="material-symbols-outlined">edit</span>
  <span class="btn-label">Editor</span>
+ </button>
+ <button class="icon-btn switch-btn section-btn is-active" type="button" data-tip="Process Analysis" aria-current="page">
+ <span class="material-symbols-outlined">timeline</span>
+ <span class="btn-label">Process</span>
+ </button>
+ <button id="btnSpace" class="icon-btn switch-btn section-btn" type="button" data-tip="Go to Space Analysis">
+ <span class="material-symbols-outlined">view_in_ar</span>
+ <span class="btn-label">Space</span>
  </button>
  </div>
  <input id="fileInput" type="file" accept="application/json,.json" hidden />
@@ -1065,8 +1076,9 @@
  },
  worldWidth: 1,
  worldHeight: 1,
- idleStatus: "Apri la cartella progetto (Open / Cmd/Ctrl+O)",
+ idleStatus: "",
  statusTimer: 0,
+ openDialogPending: false,
  spaceDown: false,
  view: {
  zoom: 1,
@@ -3037,7 +3049,10 @@ function refreshDotTuningOutputs() {
  setHint(`Progetto caricato: ${folderName || "project"}/project.json`, "ok");
  }
 
- async function openJsonDialog() {
+async function openJsonDialog() {
+ if (state.openDialogPending) return;
+ state.openDialogPending = true;
+ try {
  if ("showDirectoryPicker" in window && window.OvertraceUI?.openProjectFolder) {
  try {
  const entry = await window.OvertraceUI.openProjectFolder({
@@ -3074,6 +3089,9 @@ function refreshDotTuningOutputs() {
  }
  dom.fileInput.value = "";
  dom.fileInput.click();
+ } finally {
+ state.openDialogPending = false;
+ }
  }
 
  async function tryAutoloadFromQuery() {
@@ -3115,9 +3133,9 @@ function refreshDotTuningOutputs() {
  window.location.href = `./index.html?${qs.toString()}`;
  });
 
- dom.btnResearch?.addEventListener("click", () => {
- window.location.href = "./research.html";
- });
+dom.btnResearch?.addEventListener("click", () => {
+ window.location.href = "./atlas.html";
+});
 
  dom.btnSpace?.addEventListener("click", () => {
  let persisted = false;

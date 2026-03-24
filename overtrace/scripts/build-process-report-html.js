@@ -515,7 +515,7 @@ function svgBarChart(title, items, { width = 860, height = 280, valueMax = null,
     );
     const v = vmax * t;
     grid.push(
-      `<text x="${(margin.l - 8).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="end" font-family="SuisseIntl, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="12" fill="#666">${escapeHtml(
+      `<text x="${(margin.l - 8).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="end" font-family="Suisse Intl, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="12" fill="#666">${escapeHtml(
         fmtValue ? fmtValue(v) : v.toFixed(0)
       )}</text>`
     );
@@ -535,7 +535,7 @@ function svgBarChart(title, items, { width = 860, height = 280, valueMax = null,
       )}" height="${bh.toFixed(2)}" fill="#111" opacity="0.8"/>
         <text x="${xCenter.toFixed(2)}" y="${(h - 20).toFixed(
         2
-      )}" text-anchor="middle" font-family="SuisseIntl, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="11" fill="#666">${escapeHtml(
+      )}" text-anchor="middle" font-family="Suisse Intl, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="11" fill="#666">${escapeHtml(
         d.label
       )}</text>`;
     })
@@ -544,7 +544,7 @@ function svgBarChart(title, items, { width = 860, height = 280, valueMax = null,
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
   <rect width="100%" height="100%" fill="#ffffff"/>
-  <text x="${margin.l}" y="26" font-family="SuisseIntl, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="18" fill="#111">${escapeHtml(
+  <text x="${margin.l}" y="26" font-family="Suisse Intl, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="18" fill="#111">${escapeHtml(
     title
   )}</text>
   ${grid.join("\n")}
@@ -705,6 +705,7 @@ function main() {
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>${escapeHtml(opts.title)}</title>
+  <link rel="stylesheet" href="./typography.css"/>
   <style>
     :root{
       --bg:#ffffff;
@@ -722,7 +723,7 @@ function main() {
       margin:0;
       background:var(--bg);
       color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      font-family:var(--ot-font-sans);
       line-height:1.35;
     }
     .wrap{max-width:1120px;margin:0 auto;padding:28px 18px 60px;}

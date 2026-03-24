@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project Atlas - Overtrace</title>
+    <meta
+      name="description"
+      content="Project Atlas for Overtrace, with direct visual access to all mapped projects across Editor, Process and Space."
+    />
+    <meta name="application-name" content="Overtrace" />
+    <meta name="apple-mobile-web-app-title" content="Overtrace" />
+    <meta name="theme-color" content="#111111" />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:site_name" content="Overtrace" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Project Atlas - Overtrace" />
+    <meta
+      property="og:description"
+      content="Project Atlas for Overtrace, with direct visual access to all mapped projects across Editor, Process and Space."
+    />
+    <meta property="og:image" content="./overtrace/logo.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Project Atlas - Overtrace" />
+    <meta
+      name="twitter:description"
+      content="Project Atlas for Overtrace, with direct visual access to all mapped projects across Editor, Process and Space."
+    />
+    <link rel="icon" type="image/png" sizes="32x32" href="./overtrace/logo.png?v=2" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./overtrace/logo.png?v=2" />
+    <link rel="shortcut icon" type="image/png" href="./overtrace/logo.png?v=2" />
+    <link rel="apple-touch-icon" href="./overtrace/logo.png?v=2" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <link rel="stylesheet" href="./typography.css" />
+    <link rel="stylesheet" href="./shared-ui.css" />
+    <script src="./shared-ui.js"></script>
+    <style>
+      :root {
+        --bg: #f2f2f2;
+        --panel: #ffffff;
+        --ink: #111111;
+        --muted: #666666;
+        --line: rgba(0, 0, 0, 0.12);
+        --hover: rgba(0, 0, 0, 0.06);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        min-height: 100%;
+      }
+
+      body {
+        font: 500 14px/1.45 var(--ot-font-sans);
+        background: var(--bg);
+        color: var(--ink);
+      }
+
+      body.research-page {
+        min-height: 100vh;
+        overflow: hidden;
+      }
+
+      .research-view {
+        height: 100vh;
+        display: grid;
+        align-content: start;
+        gap: 14px;
+        padding: calc(var(--ts-toolbar-safe-top) + 4px) 14px 14px;
+        overflow: auto;
+      }
+
+      .research-title {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 42px);
+        line-height: 0.98;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .project-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .project-card {
+        display: grid;
+        grid-template-rows: auto auto;
+        border: 1px solid var(--ts-toolbar-border);
+        border-radius: calc(var(--ts-radius-panel) + 2px);
+        background: rgba(255, 255, 255, 0.92);
+        overflow: hidden;
+        box-shadow: var(--ts-toolbar-panel-shadow);
+      }
+
+      .project-preview {
+        position: relative;
+        display: block;
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at top left, rgba(0, 0, 0, 0.08), transparent 44%),
+          linear-gradient(180deg, #f7f7f7, #ececec);
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .project-video,
+      .project-still,
+      .project-hover-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 180ms ease;
+      }
+
+      .project-card.is-preview-ready .project-video,
+      .project-card.is-still-ready .project-still {
+        opacity: 1;
+      }
+
+      .project-hover-preview {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 120ms ease;
+      }
+
+      .project-card.has-hover-images:hover .project-hover-preview,
+      .project-card.has-hover-images:focus-within .project-hover-preview,
+      .project-card.is-hover-active .project-hover-preview {
+        opacity: 1;
+      }
+
+      .project-card.has-hover-images:hover .project-video,
+      .project-card.has-hover-images:hover .project-still,
+      .project-card.has-hover-images:focus-within .project-video,
+      .project-card.has-hover-images:focus-within .project-still,
+      .project-card.is-hover-active .project-video,
+      .project-card.is-hover-active .project-still {
+        opacity: 0.18;
+      }
+
+      .project-card.is-preview-ready .project-placeholder,
+      .project-card.is-still-ready .project-placeholder {
+        background: linear-gradient(180deg, rgba(17, 17, 17, 0.02), rgba(17, 17, 17, 0.18));
+      }
+
+      .project-card.is-preview-missing .project-placeholder {
+        background:
+          linear-gradient(160deg, rgba(17, 17, 17, 0.07), rgba(17, 17, 17, 0.14)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(245, 245, 245, 0.96));
+      }
+
+      .project-placeholder {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.36));
+        transition: background-color 180ms ease, color 180ms ease;
+      }
+
+      .project-meta-panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 14px 16px 16px;
+      }
+
+      .project-name {
+        margin: 0;
+        font-size: 19px;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+
+      .project-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .project-action {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: var(--ts-radius-control);
+        background: rgba(255, 255, 255, 0.76);
+        color: #111111;
+        text-decoration: none;
+        transition: background-color 120ms ease, border-color 120ms ease;
+      }
+
+      .project-action:hover {
+        background: var(--hover);
+        border-color: rgba(17, 17, 17, 0.18);
+      }
+
+      .project-action .material-symbols-outlined {
+        font-size: 20px;
+      }
+
+      @media (max-width: 1600px) {
+        .project-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 1320px) {
+        .project-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 980px) {
+        .project-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .project-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="research-page">
+    <header class="topbar ts-toolbar is-two-zone atlas-toolbar">
+      <div class="nav-left">
+        <a class="toolbar-brand" href="./atlas.html" aria-label="Open Project Atlas">
+          <img class="brand-logo" src="./overtrace/logo.svg" alt="" width="36" height="36" />
+          <span class="brand-wordmark">Overtrace</span>
+        </a>
+      </div>
+      <div class="nav-center"></div>
+      <div class="nav-right">
+        <a
+          class="icon-btn switch-btn section-btn is-active"
+          href="./atlas.html"
+          data-tip="Project Atlas"
+          aria-current="page"
+        >
+          <span class="material-symbols-outlined">category</span>
+          <span class="btn-label">Atlas</span>
+        </a>
+        <a class="icon-btn switch-btn section-btn" href="./index.html" data-tip="Go to Editor">
+          <span class="material-symbols-outlined">edit</span>
+          <span class="btn-label">Editor</span>
+        </a>
+        <a
+          class="icon-btn switch-btn section-btn"
+          href="./process.html"
+          data-tip="Go to Process Analysis"
+        >
+          <span class="material-symbols-outlined">timeline</span>
+          <span class="btn-label">Process</span>
+        </a>
+        <a
+          class="icon-btn switch-btn section-btn"
+          href="./space.html"
+          data-tip="Go to Space Analysis"
+        >
+          <span class="material-symbols-outlined">view_in_ar</span>
+          <span class="btn-label">Space</span>
+        </a>
+      </div>
+    </header>
+    <main class="research-view">
+      <section class="research-hero">
+        <h1 class="research-title">Project Atlas</h1>
+      </section>
+
+      <section id="projectGrid" class="project-grid" aria-label="Projects"></section>
+    </main>
+    <script>
+      const PROJECTS = [
+        "1_linguistic",
+        "2_media",
+        "3_cognitive",
+        "4_metric",
+        "5_symbolic",
+        "6_cultural",
+        "7_social",
+        "8_bureaucratic",
+        "9_ecological",
+        "10_infrastructural",
+      ].map((id) => {
+        const meta = window.OvertraceUI?.getProjectDisplayMeta?.(id);
+        return meta || { id, name: id, displayName: id };
+      });
+
+      const projectGrid = document.getElementById("projectGrid");
+      const projectAssetCache = new Map();
+
+      function nodePayload(rawNode) {
+        if (!rawNode || typeof rawNode !== "object") return {};
+        if (rawNode.data && typeof rawNode.data === "object") return rawNode.data;
+        return rawNode;
+      }
+
+      function isImageFile(file) {
+        const probe = String(file?.path || file?.url || file?.name || "").toLowerCase();
+        if (!probe) return false;
+        return !!file?.isImage || /\.(avif|gif|jpe?g|png|svg|webp)$/i.test(probe);
+      }
+
+      function resolveProjectAssetSrc(projectId, file) {
+        const raw = String(file?.path || file?.url || file?.name || "").trim();
+        if (!raw) return "";
+        return `./${projectId}/${raw.replace(/^\.\//, "")}`;
+      }
+
+      async function resolveProjectPreviewAssets(projectId) {
+        if (projectAssetCache.has(projectId)) return projectAssetCache.get(projectId);
+        const assets = { stillSrc: "", imageSources: [] };
+        try {
+          const res = await fetch(`./${projectId}/project.json`, {
+            cache: "no-store",
+          });
+          if (res.ok) {
+            const project = await res.json();
+            const imageSources = (Array.isArray(project?.nodes) ? project.nodes : [])
+              .map(nodePayload)
+              .flatMap((node) => (Array.isArray(node?.files) ? node.files : []))
+              .filter((file) => isImageFile(file))
+              .map((file) => resolveProjectAssetSrc(projectId, file))
+              .filter(Boolean);
+            assets.imageSources = [...new Set(imageSources)];
+            assets.stillSrc = assets.imageSources[0] || "";
+          }
+        } catch (err) {
+          console.warn(`Unable to resolve preview assets for ${projectId}`, err);
+        }
+        projectAssetCache.set(projectId, assets);
+        return assets;
+      }
+
+      function renderProjectCard(project) {
+        const editorHref = `./index.html?project=${encodeURIComponent(project.id)}`;
+        const processHref = `./process.html?project=${encodeURIComponent(project.id)}`;
+        const spaceHref = `./space.html?project=${encodeURIComponent(project.id)}`;
+        return `
+          <article class="project-card" data-project="${project.id}">
+            <a class="project-preview" href="${spaceHref}" aria-label="Open ${project.displayName} in Space">
+              <video class="project-video" muted loop autoplay playsinline preload="metadata"></video>
+              <img class="project-still" alt="" loading="lazy" />
+              <div class="project-hover-preview" aria-hidden="true">
+                <img class="project-hover-image" alt="" loading="lazy" />
+              </div>
+              <div class="project-placeholder" aria-hidden="true"></div>
+            </a>
+            <div class="project-meta-panel">
+              <h2 class="project-name">${project.displayName}</h2>
+              <nav class="project-actions" aria-label="Open ${project.displayName}">
+                <a class="project-action" href="${editorHref}" aria-label="Open ${project.displayName} in Editor" title="Open in Editor">
+                  <span class="material-symbols-outlined">edit</span>
+                </a>
+                <a class="project-action" href="${processHref}" aria-label="Open ${project.displayName} in Process" title="Open in Process">
+                  <span class="material-symbols-outlined">timeline</span>
+                </a>
+                <a class="project-action" href="${spaceHref}" aria-label="Open ${project.displayName} in Space" title="Open in Space">
+                  <span class="material-symbols-outlined">view_in_ar</span>
+                </a>
+              </nav>
+            </div>
+          </article>`;
+      }
+
+      function markCardReady(card, mode) {
+        card.classList.remove("is-preview-missing");
+        card.classList.toggle("is-preview-ready", mode === "video");
+        card.classList.toggle("is-still-ready", mode === "image");
+      }
+
+      function attachPreviewMedia(card, projectId) {
+        const video = card.querySelector(".project-video");
+        const still = card.querySelector(".project-still");
+        if (!video || !still) return;
+
+        const candidates = [
+          { type: "video", src: `./${projectId}/preview.webm` },
+          { type: "video", src: `./${projectId}/preview.mp4` },
+          { type: "image", src: `./${projectId}/preview.gif` },
+          { type: "image", src: `./${projectId}/preview.jpg` },
+          { type: "image", src: `./${projectId}/preview.png` },
+        ];
+
+        let index = -1;
+        let fallbackAttempted = false;
+
+        const markMissing = () => {
+          video.pause();
+          video.removeAttribute("src");
+          still.removeAttribute("src");
+          card.classList.add("is-preview-missing");
+        };
+
+        const loadFallbackStill = async () => {
+          fallbackAttempted = true;
+          const assets = await resolveProjectPreviewAssets(projectId);
+          if (assets.stillSrc) {
+            still.src = assets.stillSrc;
+            return;
+          }
+          markMissing();
+        };
+
+        const loadNext = () => {
+          index += 1;
+          if (index >= candidates.length) {
+            void loadFallbackStill();
+            return;
+          }
+          const candidate = candidates[index];
+          if (candidate.type === "video") {
+            still.removeAttribute("src");
+            video.src = candidate.src;
+            video.load();
+            return;
+          }
+          video.pause();
+          video.removeAttribute("src");
+          video.load();
+          still.src = candidate.src;
+        };
+
+        video.addEventListener("loadeddata", () => {
+          markCardReady(card, "video");
+          video.play().catch(() => {});
+        });
+        video.addEventListener("error", loadNext);
+        still.addEventListener("load", () => {
+          markCardReady(card, "image");
+        });
+        still.addEventListener("error", () => {
+          if (fallbackAttempted) {
+            markMissing();
+            return;
+          }
+          loadNext();
+        });
+
+        loadNext();
+      }
+
+      function shufflePreviewImages(sources) {
+        const queue = [...sources];
+        for (let i = queue.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [queue[i], queue[j]] = [queue[j], queue[i]];
+        }
+        return queue;
+      }
+
+      function attachHoverPreview(card, projectId) {
+        const hoverImg = card.querySelector(".project-hover-image");
+        if (!hoverImg) return;
+
+        let timer = 0;
+        let token = 0;
+        let queue = [];
+        let index = -1;
+
+        const stopHover = () => {
+          token += 1;
+          if (timer) {
+            clearInterval(timer);
+            timer = 0;
+          }
+          queue = [];
+          index = -1;
+          card.classList.remove("is-hover-active");
+          hoverImg.removeAttribute("src");
+        };
+
+        const showNext = () => {
+          if (!queue.length) return;
+          index = (index + 1) % queue.length;
+          hoverImg.src = queue[index];
+        };
+
+        const startHover = async () => {
+          const currentToken = ++token;
+          const assets = await resolveProjectPreviewAssets(projectId);
+          if (currentToken !== token) return;
+          if (!assets.imageSources.length) return;
+          queue = shufflePreviewImages(assets.imageSources);
+          if (!queue.length) return;
+          card.classList.add("has-hover-images");
+          card.classList.add("is-hover-active");
+          showNext();
+          if (timer) clearInterval(timer);
+          timer = window.setInterval(showNext, 180);
+        };
+
+        card.addEventListener("mouseenter", () => {
+          void startHover();
+        });
+        card.addEventListener("mouseleave", stopHover);
+        card.addEventListener("focusin", () => {
+          void startHover();
+        });
+        card.addEventListener("focusout", stopHover);
+      }
+
+      if (projectGrid) {
+        projectGrid.innerHTML = PROJECTS.map(renderProjectCard).join("");
+        projectGrid.querySelectorAll(".project-card").forEach((card) => {
+          const projectId = card.getAttribute("data-project");
+          if (projectId) {
+            attachPreviewMedia(card, projectId);
+            attachHoverPreview(card, projectId);
+          }
+        });
+      }
+
+      window.OvertraceUI?.attachToolbarTooltips(
+        document.querySelector("header.ts-toolbar"),
+      );
+    </script>
+  </body>
+</html>

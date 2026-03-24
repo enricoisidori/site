@@ -4,6 +4,107 @@
   const FS_DB_VERSION = 1;
   const FS_STORE_NAME = "project-fs-context";
   const FS_STORE_KEY = "active-project";
+  const PROJECT_DISPLAY_META = Object.freeze({
+    "1_linguistic": {
+      id: "1_linguistic",
+      index: 1,
+      name: "Linguistic",
+      displayName: "1. Linguistic",
+    },
+    "2_media": {
+      id: "2_media",
+      index: 2,
+      name: "Media",
+      displayName: "2. Media",
+    },
+    "3_cognitive": {
+      id: "3_cognitive",
+      index: 3,
+      name: "Cognitive",
+      displayName: "3. Cognitive",
+    },
+    "4_metric": {
+      id: "4_metric",
+      index: 4,
+      name: "Metric",
+      displayName: "4. Metric",
+    },
+    "5_symbolic": {
+      id: "5_symbolic",
+      index: 5,
+      name: "Symbolic",
+      displayName: "5. Symbolic",
+    },
+    "6_cultural": {
+      id: "6_cultural",
+      index: 6,
+      name: "Cultural",
+      displayName: "6. Cultural",
+    },
+    "7_social": {
+      id: "7_social",
+      index: 7,
+      name: "Social",
+      displayName: "7. Social",
+    },
+    "8_bureaucratic": {
+      id: "8_bureaucratic",
+      index: 8,
+      name: "Burocratic",
+      displayName: "8. Burocratic",
+    },
+    "9_ecological": {
+      id: "9_ecological",
+      index: 9,
+      name: "Ecological",
+      displayName: "9. Ecological",
+    },
+    "10_infrastructural": {
+      id: "10_infrastructural",
+      index: 10,
+      name: "Infrastructural",
+      displayName: "10. Infrastructural",
+    },
+  });
+
+  function normalizeProjectKey(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\/+$/, "")
+      .replace(/\/project\.json$/i, "")
+      .replace(/\.json$/i, "");
+  }
+
+  function getProjectDisplayMeta(value) {
+    const key = normalizeProjectKey(value);
+    if (!key) return null;
+    if (PROJECT_DISPLAY_META[key]) return PROJECT_DISPLAY_META[key];
+    const fromDisplayName = Object.values(PROJECT_DISPLAY_META).find(
+      (entry) => entry.displayName === key,
+    );
+    if (fromDisplayName) return fromDisplayName;
+    const match = key.match(/^(\d+)_([a-z0-9_-]+)$/i);
+    if (!match) return null;
+    const index = Number(match[1]);
+    const name = match[2]
+      .split(/[_-]+/)
+      .filter(Boolean)
+      .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
+      .join(" ");
+    return {
+      id: key,
+      index,
+      name,
+      displayName: `${index}. ${name}`,
+    };
+  }
+
+  function formatProjectDisplayName(value, fallback = "Project") {
+    const meta = getProjectDisplayMeta(value);
+    if (meta?.displayName) return meta.displayName;
+    const raw = String(value || "").trim();
+    return raw || fallback;
+  }
 
   function resolveToolbar(toolbarOrSelector) {
     if (!toolbarOrSelector) {
@@ -252,6 +353,8 @@
   NS.attachToolbarTooltips = attachToolbarTooltips;
   NS.buildProjectFsContext = buildProjectFsContext;
   NS.clearProjectFsContext = clearProjectFsContext;
+  NS.formatProjectDisplayName = formatProjectDisplayName;
+  NS.getProjectDisplayMeta = getProjectDisplayMeta;
   NS.loadProjectFsContext = loadProjectFsContext;
   NS.openProjectFolder = openProjectFolder;
   NS.openProjectJsonFile = openProjectJsonFile;

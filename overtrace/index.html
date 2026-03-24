@@ -1680,6 +1680,7 @@
         display: block;
       }
     </style>
+    <link rel="stylesheet" href="./typography.css" />
     <link rel="stylesheet" href="./shared-ui.css" />
     <script src="./shared-ui.js"></script>
   </head>
@@ -1687,6 +1688,18 @@
     <div class="app">
       <header class="ts-toolbar">
         <div class="nav-left">
+          <a class="toolbar-brand" href="./atlas.html" aria-label="Open Project Atlas">
+            <img
+              class="brand-logo"
+              src="./overtrace/logo.svg"
+              alt=""
+              width="36"
+              height="36"
+            />
+            <span class="brand-wordmark">Overtrace</span>
+          </a>
+        </div>
+        <div class="nav-center">
           <button id="btnNew" data-tip="New project">
             <span class="material-symbols-outlined">note_add</span>
           </button>
@@ -1727,19 +1740,36 @@
           <span id="status" class="toolbar-status" aria-live="polite"></span>
         </div>
         <div class="nav-right">
-          <button id="btnResearch" data-tip="Research" class="icon-btn">
-            <span class="material-symbols-outlined">menu_book</span>
-            <span class="btn-label">Research</span>
+          <button
+            id="btnResearch"
+            data-tip="Project Atlas"
+            class="icon-btn switch-btn section-btn"
+          >
+            <span class="material-symbols-outlined">category</span>
+            <span class="btn-label">Atlas</span>
+          </button>
+          <button
+            type="button"
+            data-tip="Editor"
+            class="icon-btn switch-btn section-btn is-active"
+            aria-current="page"
+          >
+            <span class="material-symbols-outlined">edit</span>
+            <span class="btn-label">Editor</span>
           </button>
           <button
             id="btnProcessAnalysis"
             data-tip="Process analysis"
-            class="icon-btn"
+            class="icon-btn switch-btn section-btn"
           >
             <span class="material-symbols-outlined">timeline</span>
             <span class="btn-label">Process</span>
           </button>
-          <button id="btnAnalysis" data-tip="Space analysis" class="icon-btn">
+          <button
+            id="btnAnalysis"
+            data-tip="Space analysis"
+            class="icon-btn switch-btn section-btn"
+          >
             <span class="material-symbols-outlined">view_in_ar</span>
             <span class="btn-label">Space</span>
           </button>
@@ -2267,6 +2297,7 @@
         const btnToggleView = document.getElementById("btnToggleView");
         const btnScale = document.getElementById("btnScale");
         const dataViewState = { scale: "relative", chart: null };
+        let __openProjectPending = false;
         let __statusTimer = null;
         function setStatus(msg) {
           status.textContent = msg || "";
@@ -4233,7 +4264,7 @@
         });
 
         $("#btnResearch")?.addEventListener("click", () => {
-          window.location.href = "./research.html";
+          window.location.href = "./atlas.html";
         });
         $("#btnAnalysis")?.addEventListener("click", async () => {
           try {
@@ -5421,83 +5452,79 @@
         }
 
         async function openProject() {
-          const supportsFS = "showDirectoryPicker" in window;
-          if (supportsFS) {
-            try {
-              const dir = await window.showDirectoryPicker({
-                mode: "readwrite",
-              });
-              let fileHandle;
+          if (__openProjectPending) return;
+          __openProjectPending = true;
+          try {
+            if ("showDirectoryPicker" in window && window.OvertraceUI?.openProjectFolder) {
               try {
-                fileHandle = await dir.getFileHandle("project.json", {
-                  create: false,
+                const entry = await window.OvertraceUI.openProjectFolder({
+                  mode: "readwrite",
                 });
-              } catch {
-                setStatus("project.json not found in selected folder");
+                pushHistory();
+                await loadProject(entry.project, entry.dirHandle || null);
+                projectCtx.mode = "folder";
+                projectCtx.dirHandle = entry.dirHandle || null;
+                projectCtx.fileHandle = null;
+                projectCtx.folderName =
+                  entry.folderName || entry.dirHandle?.name || null;
+                projectCtx.assetBase =
+                  entry.assetBase ||
+                  (entry.dirHandle?.name ? `${entry.dirHandle.name}/` : "");
+                await syncProjectFsContext();
+                setStatus("Project opened from folder");
+                return;
+              } catch (err) {
+                if (err && err.name === "AbortError") return;
+                if (err && err.name === "NotFoundError") {
+                  setStatus("project.json not found in selected folder");
+                  return;
+                }
+                console.warn("FS open error in Editor", err);
+                setStatus("Unable to open project folder");
                 return;
               }
-              const file = await fileHandle.getFile();
-              const project = JSON.parse(await file.text());
-              pushHistory();
-              await loadProject(project, dir);
-              projectCtx.mode = "folder";
-              projectCtx.dirHandle = dir;
-              projectCtx.fileHandle = null;
-              projectCtx.folderName = dir?.name || null;
-              projectCtx.assetBase = dir?.name ? `${dir.name}/` : "";
-              await syncProjectFsContext();
-              setStatus("Project opened from folder");
-              return;
-            } catch (err) {
-              console.warn("FS open error, falling back to JSON input", err);
             }
-          }
-          if ("showOpenFilePicker" in window) {
-            try {
-              const [fileHandle] = await window.showOpenFilePicker({
-                multiple: false,
-                types: [
-                  {
-                    description: "JSON Project",
-                    accept: { "application/json": [".json"] },
-                  },
-                ],
-              });
-              if (fileHandle) {
-                const file = await fileHandle.getFile();
-                const project = JSON.parse(await file.text());
+            if ("showOpenFilePicker" in window && window.OvertraceUI?.openProjectJsonFile) {
+              try {
+                const entry = await window.OvertraceUI.openProjectJsonFile({
+                  description: "JSON Project",
+                });
+                if (!entry) return;
                 pushHistory();
-                await loadProject(project, null);
+                await loadProject(entry.project, null);
                 projectCtx.mode = "file";
                 projectCtx.dirHandle = null;
-                projectCtx.fileHandle = fileHandle;
+                projectCtx.fileHandle = entry.fileHandle || null;
                 projectCtx.folderName = null;
                 projectCtx.assetBase = "";
                 await syncProjectFsContext();
                 setStatus("Project opened from JSON file (linked)");
                 return;
+              } catch (err) {
+                if (err && err.name === "AbortError") return;
+                console.warn("Open file picker failed in Editor", err);
               }
-            } catch (err) {
-              console.warn("Open file picker cancelled or failed", err);
             }
+            f.openFile.onchange = async () => {
+              const fl = f.openFile.files?.[0];
+              if (!fl) return;
+              const text = await fl.text();
+              const project = JSON.parse(text);
+              pushHistory();
+              await loadProject(project, null);
+              projectCtx.mode = "embedded";
+              projectCtx.dirHandle = null;
+              projectCtx.fileHandle = null;
+              projectCtx.folderName = null;
+              projectCtx.assetBase = "";
+              await syncProjectFsContext();
+              setStatus("Project opened from JSON file");
+              f.openFile.value = "";
+            };
+            f.openFile.click();
+          } finally {
+            __openProjectPending = false;
           }
-          f.openFile.onchange = async () => {
-            const fl = f.openFile.files?.[0];
-            if (!fl) return;
-            const text = await fl.text();
-            const project = JSON.parse(text);
-            pushHistory();
-            await loadProject(project, null);
-            projectCtx.mode = "embedded";
-            projectCtx.dirHandle = null;
-            projectCtx.fileHandle = null;
-            projectCtx.folderName = null;
-            projectCtx.assetBase = "";
-            await syncProjectFsContext();
-            setStatus("Project opened from JSON file");
-            f.openFile.value = "";
-          };
-          f.openFile.click();
         }
 
         async function newProject() {

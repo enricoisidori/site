@@ -716,6 +716,7 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="./typography.css" />
     <link rel="stylesheet" href="./shared-ui.css" />
     <script src="./shared-ui.js"></script>
   </head>
@@ -723,6 +724,18 @@
     <div class="app">
       <header class="topbar ts-toolbar">
         <div class="nav-left">
+          <a class="toolbar-brand" href="./atlas.html" aria-label="Open Project Atlas">
+            <img
+              class="brand-logo"
+              src="./overtrace/logo.svg"
+              alt=""
+              width="36"
+              height="36"
+            />
+            <span class="brand-wordmark">Overtrace</span>
+          </a>
+        </div>
+        <div class="nav-center">
           <button
             id="btnOpen"
             class="icon-btn"
@@ -740,6 +753,15 @@
             data-tip="Reset camera"
           >
             <span class="material-symbols-outlined">center_focus_strong</span>
+          </button>
+          <button
+            id="btnPreviewLoop"
+            class="icon-btn"
+            type="button"
+            aria-label="Generate 360 preview loop"
+            data-tip="Generate 360 preview loop"
+          >
+            <span class="material-symbols-outlined">movie</span>
           </button>
           <button
             id="btnPause"
@@ -787,16 +809,25 @@
         <div class="nav-right">
           <button
             id="btnResearch"
-            class="icon-btn switch-btn"
+            class="icon-btn switch-btn section-btn"
             type="button"
-            data-tip="Go to Research"
+            data-tip="Go to Project Atlas"
           >
-            <span class="material-symbols-outlined">menu_book</span>
-            <span class="btn-label">Research</span>
+            <span class="material-symbols-outlined">category</span>
+            <span class="btn-label">Atlas</span>
+          </button>
+          <button
+            id="btnEditor"
+            class="icon-btn switch-btn section-btn"
+            type="button"
+            data-tip="Back to Editor"
+          >
+            <span class="material-symbols-outlined">edit</span>
+            <span class="btn-label">Editor</span>
           </button>
           <button
             id="btnProcess"
-            class="icon-btn switch-btn"
+            class="icon-btn switch-btn section-btn"
             type="button"
             data-tip="Go to Process Analysis"
           >
@@ -804,13 +835,13 @@
             <span class="btn-label">Process</span>
           </button>
           <button
-            id="btnEditor"
-            class="icon-btn switch-btn"
+            class="icon-btn switch-btn section-btn is-active"
             type="button"
-            data-tip="Back to Editor"
+            data-tip="Space Analysis"
+            aria-current="page"
           >
-            <span class="material-symbols-outlined">edit</span>
-            <span class="btn-label">Editor</span>
+            <span class="material-symbols-outlined">view_in_ar</span>
+            <span class="btn-label">Space</span>
           </button>
         </div>
 
@@ -990,6 +1021,7 @@
           btnResearch: document.getElementById("btnResearch"),
           btnOpen: document.getElementById("btnOpen"),
           btnReset: document.getElementById("btnReset"),
+          btnPreviewLoop: document.getElementById("btnPreviewLoop"),
           btnPause: document.getElementById("btnPause"),
           fileInput: document.getElementById("fileInput"),
           projectName: document.getElementById("projectName"),
@@ -1083,9 +1115,9 @@
           viewValue: "__all__",
           showImages: true,
           overviewMode: OVERVIEW_MODE,
-          idleStatus:
-            "Apri la cartella progetto (Open / O / Cmd/Ctrl+O), o torna a Editor.",
+          idleStatus: "",
           statusTimer: 0,
+          openDialogPending: false,
           paletteByMode: {},
           modeStats: {},
           dataViewsDirty: true,
@@ -4252,6 +4284,9 @@
         }
 
         async function openJsonDialog() {
+          if (state.openDialogPending) return;
+          state.openDialogPending = true;
+          try {
           if ("showDirectoryPicker" in window && window.OvertraceUI?.openProjectFolder) {
             try {
               const entry = await window.OvertraceUI.openProjectFolder({
@@ -4293,6 +4328,9 @@
 
           dom.fileInput.value = "";
           dom.fileInput.click();
+          } finally {
+            state.openDialogPending = false;
+          }
         }
 
         function resizeDisciplineCanvas() {
@@ -4404,7 +4442,7 @@
           });
 
           dom.btnResearch?.addEventListener("click", () => {
-            window.location.href = "./research.html";
+            window.location.href = "./atlas.html";
           });
 
           dom.btnProcess?.addEventListener("click", () => {

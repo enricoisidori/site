@@ -4,15 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Overtrace Print</title>
+  <link rel="stylesheet" href="./typography.css" />
+  <script src="./shared-ui.js"></script>
   <style>
-   @font-face {
-    font-family: "Times New Roman";
-    src: url("./asset/Times New Roman-Book.woff2") format("woff2");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-   }
-
    * {
     box-sizing: border-box;
    }
@@ -26,7 +20,7 @@
    body {
     background: #f2efe9;
     color: #111111;
-    font: 700 14px/1.4 "Times New Roman", Times, serif;
+    font: 500 14px/1.4 var(--ot-font-sans);
    }
 
    .app {
@@ -695,7 +689,7 @@
      for (const node of nodes) {
       const maxWidth = node.radius * 1.5;
       const fontSize = clamp(node.radius * 0.28, 15, 22);
-      ctx.font = `700 ${fontSize}px "Times New Roman", Times, serif`;
+      ctx.font = `700 ${fontSize}px "Suisse Intl", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       const lines = wrapTextByMeasure(ctx, node.label, maxWidth, 2);
       const lineHeight = fontSize * 1.05;
       const startY = node.y - ((lines.length - 1) * lineHeight) * 0.5;
@@ -806,7 +800,7 @@
       ctx.stroke();
 
       ctx.fillStyle = "#111111";
-      ctx.font = `700 ${titleSize}px "Times New Roman", Times, serif`;
+      ctx.font = `700 ${titleSize}px "Suisse Intl", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       const titleLines = wrapTextByMeasure(ctx, node.title, innerW, 2);
       drawTextLines(ctx, titleLines, innerX, cursorY, titleSize * 1.14);
       cursorY += Math.max(titleSize * 1.35, titleLines.length * titleSize * 1.14 + 4);
@@ -819,7 +813,7 @@
       cursorY += clamp(6 * scale, 8, 14);
 
       ctx.fillStyle = "#5f5f5f";
-      ctx.font = `400 ${metaSize}px "Times New Roman", Times, serif`;
+      ctx.font = `400 ${metaSize}px "Suisse Intl", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       ctx.fillText(node.date, innerX, cursorY);
       cursorY += metaSize * 1.5;
 
@@ -831,7 +825,7 @@
       cursorY += clamp(6 * scale, 8, 14);
 
       ctx.fillStyle = "#666666";
-      ctx.font = `400 ${metaSize}px "Times New Roman", Times, serif`;
+      ctx.font = `400 ${metaSize}px "Suisse Intl", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       ctx.fillText("Type", innerX, cursorY);
       ctx.fillText("Action", innerX, cursorY + metaSize * 1.45);
       ctx.fillText("Areas", innerX, cursorY + metaSize * 2.9);
@@ -840,7 +834,7 @@
       ctx.fillText(node.type, innerX + innerW * 0.28, cursorY);
       ctx.fillText(node.action, innerX + innerW * 0.28, cursorY + metaSize * 1.45);
 
-      ctx.font = `400 ${smallSize}px "Times New Roman", Times, serif`;
+      ctx.font = `400 ${smallSize}px "Suisse Intl", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       const areaText = node.areas.length ? node.areas.join(", ") : "-";
       const areaLines = wrapTextByMeasure(ctx, areaText, innerW * 0.68, 2);
       drawTextLines(ctx, areaLines, innerX + innerW * 0.28, cursorY + metaSize * 2.9, smallSize * 1.18);
@@ -848,12 +842,12 @@
 
       if (node.desc) {
        ctx.fillStyle = "#666666";
-       ctx.font = `400 ${smallSize}px "Times New Roman", Times, serif`;
+       ctx.font = `400 ${smallSize}px "Suisse Intl", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
        ctx.fillText("Description", innerX, cursorY);
        cursorY += smallSize * 1.25;
 
        ctx.fillStyle = "#111111";
-       ctx.font = `400 ${descSize}px "Times New Roman", Times, serif`;
+       ctx.font = `400 ${descSize}px "Suisse Intl", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
        const descMaxLines = Math.max(2, Math.floor((h * 0.28) / (descSize * 1.22)));
        const descLines = wrapTextByMeasure(ctx, node.desc, innerW, descMaxLines);
        drawTextLines(ctx, descLines, innerX, cursorY, descSize * 1.22);
@@ -896,7 +890,7 @@
        .slice(0, 3);
       if (attachmentNames.length && cursorY < y + h - pad - 12) {
        ctx.fillStyle = "#111111";
-       ctx.font = `400 ${smallSize}px "Times New Roman", Times, serif`;
+       ctx.font = `400 ${smallSize}px "Suisse Intl", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
        const lines = attachmentNames.map((name) => `- ${name}`);
        drawTextLines(ctx, lines, innerX, cursorY, smallSize * 1.18);
       }
@@ -937,7 +931,14 @@
 
     async function loadProject(project, label, folderName = "", assetBase = "") {
      state.project = project;
-     state.label = label || folderName || "Project";
+     state.label =
+      window.OvertraceUI?.formatProjectDisplayName?.(
+       label || folderName || "Project",
+       "Project"
+      ) ||
+      label ||
+      folderName ||
+      "Project";
      state.folderName = folderName || "";
      state.assetBase = assetBase || (folderName ? `${folderName}/` : "");
      state.imageCache.clear();
