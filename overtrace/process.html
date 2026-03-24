@@ -690,7 +690,7 @@
  <div class="app">
  <header class="topbar ts-toolbar">
  <div class="nav-left">
- <a class="toolbar-brand" href="./atlas.html" aria-label="Open Project Atlas">
+ <a class="toolbar-brand" href="./index.html" aria-label="Open Project Atlas">
  <img class="brand-logo" src="./overtrace/logo.svg" alt="" width="36" height="36" />
  <span class="brand-wordmark">Overtrace</span>
  </a>
@@ -3127,14 +3127,14 @@ async function openJsonDialog() {
  const folder = state.folderName || inferFolderNameFromBase(state.assetBase);
  if (folder) qs.set("project", folder);
  if (!persisted) {
- window.location.href = "./index.html";
+ window.location.href = "./editor.html";
  return;
  }
- window.location.href = `./index.html?${qs.toString()}`;
+ window.location.href = `./editor.html?${qs.toString()}`;
  });
 
 dom.btnResearch?.addEventListener("click", () => {
- window.location.href = "./atlas.html";
+ window.location.href = "./index.html";
 });
 
  dom.btnSpace?.addEventListener("click", () => {

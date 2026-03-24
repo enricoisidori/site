@@ -21,7 +21,7 @@
   --ts-radius-control: 10px;
   --ts-panel-padding: 6px;
   --ts-control-size: 40px;
-  --ts-brand-size: 44px;
+  --ts-brand-size: 40px;
   --ts-toolbar-safe-top: 68px;
 }
 
@@ -85,6 +85,8 @@
 .ts-toolbar .nav-left {
   justify-self: start;
   justify-content: center;
+  width: calc(var(--ts-brand-size) + var(--ts-panel-padding) * 2);
+  min-width: calc(var(--ts-brand-size) + var(--ts-panel-padding) * 2);
 }
 
 .ts-toolbar .nav-center {
@@ -113,13 +115,13 @@
   height: var(--ts-brand-size);
   min-width: var(--ts-brand-size);
   min-height: var(--ts-brand-size);
-  border-radius: 12px;
+  border-radius: var(--ts-radius-control);
 }
 
 .ts-toolbar .brand-logo {
   display: block;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
 }
 
 .ts-toolbar .brand-wordmark {

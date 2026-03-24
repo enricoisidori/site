@@ -724,7 +724,7 @@
     <div class="app">
       <header class="topbar ts-toolbar">
         <div class="nav-left">
-          <a class="toolbar-brand" href="./atlas.html" aria-label="Open Project Atlas">
+          <a class="toolbar-brand" href="./index.html" aria-label="Open Project Atlas">
             <img
               class="brand-logo"
               src="./overtrace/logo.svg"
@@ -758,10 +758,10 @@
             id="btnPreviewLoop"
             class="icon-btn"
             type="button"
-            aria-label="Generate 360 preview loop"
-            data-tip="Generate 360 preview loop"
+            aria-label="Save preview snapshot"
+            data-tip="Save preview snapshot"
           >
-            <span class="material-symbols-outlined">movie</span>
+            <span class="material-symbols-outlined">photo_camera</span>
           </button>
           <button
             id="btnPause"
@@ -967,6 +967,7 @@
         ];
         const QUERY_PARAMS = new URLSearchParams(window.location.search);
         const OVERVIEW_MODE = QUERY_PARAMS.get("mode") === "overview";
+        const ATLAS_SNAPSHOT_MODE = QUERY_PARAMS.get("atlas_snapshot") === "1";
         const SHARED_PROJECT_KEY = "overtrace.shared.project.v1";
 
         const TYPE_COLORS = [
@@ -1190,6 +1191,398 @@
           state.statusTimer = window.setTimeout(() => {
             setIdleStatus();
           }, timeout);
+        }
+
+        function syncPauseButton() {
+          if (!dom.btnPause) return;
+          dom.btnPause.classList.toggle("running", !state.paused);
+          dom.btnPause.dataset.tip = state.paused
+            ? "Start simulation"
+            : "Stop simulation";
+          dom.btnPause.setAttribute(
+            "aria-label",
+            state.paused ? "Start simulation" : "Stop simulation",
+          );
+        }
+
+        function syncPreviewSnapshotButton() {
+          if (!dom.btnPreviewLoop) return;
+          const busy = !!state.previewCapture.active;
+          const enabled = !!state.nodes.length && !state.overviewMode;
+          dom.btnPreviewLoop.disabled = busy || !enabled;
+          dom.btnPreviewLoop.classList.toggle("is-active", busy);
+          dom.btnPreviewLoop.dataset.tip = busy
+            ? "Saving preview snapshot"
+            : "Save preview snapshot";
+          dom.btnPreviewLoop.setAttribute(
+            "aria-label",
+            busy ? "Saving preview snapshot" : "Save preview snapshot",
+          );
+        }
+
+        function getNodeLabelProjection(node, width, height) {
+          if (!node?.labelEl || node.visibleByFilter === false) return null;
+          const projected = node.pos.clone().project(camera);
+          if (projected.z < -1 || projected.z > 1) return null;
+          const x = (projected.x * 0.5 + 0.5) * width;
+          const y = (-projected.y * 0.5 + 0.5) * height;
+          const projectedOffset = node.pos
+            .clone()
+            .add(new THREE.Vector3(node.radius * 5.6, 0, 0))
+            .project(camera);
+          const pxRadius = Math.abs(
+            (projectedOffset.x - projected.x) * width * 0.5,
+          );
+          const baseScale = pxRadius / 13.5;
+          const isSelected =
+            state.selected >= 0 && state.nodes[state.selected] === node;
+          const scale = THREE.MathUtils.clamp(
+            baseScale,
+            isSelected ? 0.62 : 0.44,
+            isSelected ? 2.85 : 2.35,
+          );
+          return { x, y, scale };
+        }
+
+        function ellipsizeSnapshotText(ctx, text, maxWidth) {
+          const value = String(text || "").replace(/\s+/g, " ").trim();
+          if (!value) return "";
+          if (ctx.measureText(value).width <= maxWidth) return value;
+          let out = value;
+          while (out.length > 1) {
+            out = out.slice(0, -1).trimEnd();
+            if (ctx.measureText(`${out}...`).width <= maxWidth) {
+              return `${out}...`;
+            }
+          }
+          return "...";
+        }
+
+        function drawSnapshotImageCover(ctx, image, dx, dy, dWidth, dHeight) {
+          const sw = image.naturalWidth || image.videoWidth || image.width || 0;
+          const sh =
+            image.naturalHeight || image.videoHeight || image.height || 0;
+          if (!sw || !sh) return false;
+          const scale = Math.max(dWidth / sw, dHeight / sh);
+          const sWidth = dWidth / scale;
+          const sHeight = dHeight / scale;
+          const sx = (sw - sWidth) * 0.5;
+          const sy = (sh - sHeight) * 0.5;
+          ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+          return true;
+        }
+
+        function drawNodeLabelSnapshot(ctx, node, width, height) {
+          const projection = getNodeLabelProjection(node, width, height);
+          if (!projection) return;
+
+          const labelWidth = Math.max(
+            92,
+            Math.round(parseFloat(node.labelEl?.style.width || "") || 120),
+          );
+          const assetHeight = Math.max(
+            44,
+            Math.round(
+              parseFloat(node.labelEl?.style.getPropertyValue("--assetH") || "") ||
+                56,
+            ),
+          );
+          const imageEl = state.showImages
+            ? node.labelAssetsEl?.querySelector("img")
+            : null;
+          const hasImage = !!(
+            imageEl &&
+            imageEl.complete &&
+            imageEl.naturalWidth &&
+            imageEl.naturalHeight
+          );
+          const metaLines = [];
+          if (!hasImage && Array.isArray(node.files) && node.files.length) {
+            const first = node.files[0];
+            metaLines.push(first?.name || first?.path || "asset");
+          }
+          if (Array.isArray(node.files) && node.files.length > 1) {
+            metaLines.push(`+${node.files.length - 1} asset`);
+          }
+
+          const pad = 3;
+          const titleLineHeight = 12;
+          const metaLineHeight = 11;
+          const contentWidth = labelWidth - pad * 2;
+          const boxHeight =
+            pad * 2 +
+            titleLineHeight +
+            (hasImage ? assetHeight + 2 : 0) +
+            metaLines.length * metaLineHeight;
+          const boxX = projection.x - (labelWidth * projection.scale) * 0.5;
+          const boxY = projection.y - boxHeight * projection.scale;
+          const showBorder =
+            node.labelEl?.classList.contains("boxed") ||
+            node.labelEl?.classList.contains("selected");
+
+          ctx.save();
+          if (node.labelEl?.classList.contains("dimmed")) {
+            ctx.globalAlpha = 0.24;
+          } else if (node.labelEl?.classList.contains("faint")) {
+            ctx.globalAlpha = 0.56;
+          }
+          ctx.translate(boxX, boxY);
+          ctx.scale(projection.scale, projection.scale);
+
+          ctx.fillStyle = "rgba(255, 255, 255, 0.78)";
+          ctx.fillRect(0, 0, labelWidth, boxHeight);
+
+          if (showBorder) {
+            ctx.strokeStyle =
+              node.labelEl?.style.getPropertyValue("--nodeBorder").trim() ||
+              "#111111";
+            ctx.lineWidth = 5;
+            ctx.strokeRect(0, 0, labelWidth, boxHeight);
+          }
+
+          let cursorY = pad;
+          ctx.font = `700 10px var(--ot-font-sans)`;
+          ctx.fillStyle = "#111111";
+          ctx.textBaseline = "top";
+          ctx.fillText(
+            ellipsizeSnapshotText(ctx, node.title || "Node", contentWidth),
+            pad,
+            cursorY,
+          );
+          cursorY += titleLineHeight;
+
+          if (hasImage) {
+            drawSnapshotImageCover(
+              ctx,
+              imageEl,
+              pad,
+              cursorY,
+              contentWidth,
+              assetHeight,
+            );
+            cursorY += assetHeight + 2;
+          }
+
+          if (metaLines.length) {
+            ctx.font = `9px var(--ot-font-sans)`;
+            ctx.fillStyle = "#444444";
+            for (const line of metaLines) {
+              ctx.fillText(
+                ellipsizeSnapshotText(ctx, line, contentWidth),
+                pad,
+                cursorY,
+              );
+              cursorY += metaLineHeight;
+            }
+          }
+
+          ctx.restore();
+        }
+
+        function drawPreviewSnapshotComposite(ctx, width, height) {
+          ctx.clearRect(0, 0, width, height);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(renderer.domElement, 0, 0, width, height);
+          for (const node of state.nodes) {
+            drawNodeLabelSnapshot(ctx, node, width, height);
+          }
+        }
+
+        async function waitForPreviewAssets(timeoutMs = 2400) {
+          const images = Array.from(
+            dom.labelsLayer?.querySelectorAll("img") || [],
+          ).filter((img) => !!img.getAttribute("src"));
+          if (!images.length) return;
+          await Promise.race([
+            Promise.all(
+              images.map((img) => {
+                if (img.complete) return Promise.resolve();
+                return new Promise((resolve) => {
+                  const done = () => {
+                    img.removeEventListener("load", done);
+                    img.removeEventListener("error", done);
+                    resolve();
+                  };
+                  img.addEventListener("load", done, { once: true });
+                  img.addEventListener("error", done, { once: true });
+                });
+              }),
+            ),
+            new Promise((resolve) => window.setTimeout(resolve, timeoutMs)),
+          ]);
+        }
+
+        async function renderPreviewSnapshotCanvas() {
+          const overlayWasVisible =
+            !!dom.nodeOverlay3d &&
+            !dom.nodeOverlay3d.classList.contains("is-hidden");
+          const prev = {
+            aspect: camera.aspect,
+            pixelRatio: renderer.getPixelRatio(),
+            size: renderer.getSize(new THREE.Vector2()),
+          };
+
+          try {
+            if (document.fonts?.ready) {
+              await document.fonts.ready.catch(() => {});
+            }
+            await waitForPreviewAssets();
+            hideNodeOverlay3d();
+            renderer.setPixelRatio(1);
+            renderer.setSize(
+              PREVIEW_CAPTURE_WIDTH,
+              PREVIEW_CAPTURE_HEIGHT,
+              false,
+            );
+            camera.aspect = PREVIEW_CAPTURE_WIDTH / PREVIEW_CAPTURE_HEIGHT;
+            camera.updateProjectionMatrix();
+            updateCameraFromControls(1);
+            updateEdgeArrowRotationOnly();
+            updateAllNodeLabelPositions();
+            renderer.render(scene, camera);
+
+            const canvas = document.createElement("canvas");
+            canvas.width = PREVIEW_CAPTURE_WIDTH;
+            canvas.height = PREVIEW_CAPTURE_HEIGHT;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) throw new Error("Snapshot non supportata nel browser.");
+            drawPreviewSnapshotComposite(
+              ctx,
+              PREVIEW_CAPTURE_WIDTH,
+              PREVIEW_CAPTURE_HEIGHT,
+            );
+            return canvas;
+          } finally {
+            renderer.setPixelRatio(prev.pixelRatio);
+            renderer.setSize(prev.size.x, prev.size.y, false);
+            camera.aspect = prev.aspect;
+            camera.updateProjectionMatrix();
+            updateCameraFromControls(1);
+            updateEdgeArrowRotationOnly();
+            updateAllNodeLabelPositions();
+            renderer.render(scene, camera);
+            if (overlayWasVisible && state.selected >= 0) {
+              renderNodeOverlay3d(state.nodes[state.selected]);
+            }
+          }
+        }
+
+        async function savePreviewSnapshotBlob(blob) {
+          const fileName = "preview.jpg";
+          const writeToFolderHandle = async (dirHandle) => {
+            const fileHandle = await dirHandle.getFileHandle(fileName, {
+              create: true,
+            });
+            const writable = await fileHandle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            return { persisted: true, fileName };
+          };
+
+          try {
+            const fsContext = await window.OvertraceUI?.loadProjectFsContext?.();
+            if (fsContext?.kind === "folder" && fsContext.handle) {
+              return await writeToFolderHandle(fsContext.handle);
+            }
+          } catch (err) {
+            console.warn("Unable to persist preview snapshot", err);
+          }
+
+          try {
+            if ("showDirectoryPicker" in window) {
+              const dirHandle = await window.showDirectoryPicker({
+                mode: "readwrite",
+              });
+              if (dirHandle) {
+                return await writeToFolderHandle(dirHandle);
+              }
+            }
+          } catch (err) {
+            if (!err || err.name !== "AbortError") {
+              console.warn("Unable to persist preview snapshot via picker", err);
+            }
+          }
+
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+          return { persisted: false, fileName };
+        }
+
+        async function savePreviewSnapshot() {
+          if (state.previewCapture.active) return;
+          if (!state.nodes.length) {
+            setHint("Apri prima un progetto.", "warn");
+            return;
+          }
+          if (state.overviewMode) {
+            setHint("La preview e' disponibile solo per singoli progetti.", "warn");
+            return;
+          }
+
+          state.previewCapture.active = true;
+          syncPreviewSnapshotButton();
+          try {
+            const canvas = await renderPreviewSnapshotCanvas();
+
+            const blob = await new Promise((resolve, reject) => {
+              canvas.toBlob(
+                (out) => {
+                  if (out) resolve(out);
+                  else reject(new Error("Snapshot non riuscita."));
+                },
+                "image/jpeg",
+                0.9,
+              );
+            });
+            const result = await savePreviewSnapshotBlob(blob);
+            setHint(
+              result.persisted
+                ? "Preview snapshot salvata nel progetto."
+                : "Preview snapshot scaricata.",
+              "ok",
+            );
+          } catch (err) {
+            console.warn("Preview snapshot failed", err);
+            setHint(`Errore snapshot: ${err?.message || err}`, "warn");
+          } finally {
+            state.previewCapture.active = false;
+            syncPreviewSnapshotButton();
+          }
+        }
+
+        async function postAtlasSnapshotToParent() {
+          if (!ATLAS_SNAPSHOT_MODE || state.overviewMode || !state.nodes.length) {
+            return;
+          }
+          try {
+            const canvas = await renderPreviewSnapshotCanvas();
+            const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+            window.parent?.postMessage(
+              {
+                type: "overtrace-space-snapshot",
+                project: QUERY_PARAMS.get("project") || state.folderName || "",
+                dataUrl,
+              },
+              "*",
+            );
+          } catch (err) {
+            console.warn("Unable to post atlas snapshot", err);
+            window.parent?.postMessage(
+              {
+                type: "overtrace-space-snapshot",
+                project: QUERY_PARAMS.get("project") || state.folderName || "",
+                dataUrl: "",
+              },
+              "*",
+            );
+          }
         }
 
         function setRawProject(project) {
@@ -3501,6 +3894,7 @@
           refreshViewFilterStats();
           state.dataViewsDirty = true;
           renderAnalysisDataViews();
+          syncPreviewSnapshotButton();
         }
 
         function buildGraph(project, label) {
@@ -3715,6 +4109,7 @@
           updateAllNodeLabelPositions();
           renderDiscipline();
           renderAnalysisDataViews();
+          syncPreviewSnapshotButton();
         }
 
         function refreshProjectInfo() {
@@ -4438,7 +4833,7 @@
               console.warn("Unable to persist shared project state", err);
             }
             if (!persisted) {
-              window.location.href = "./index.html";
+              window.location.href = "./editor.html";
               return;
             }
             const qs = new URLSearchParams();
@@ -4446,11 +4841,11 @@
             const folder =
               state.folderName || inferFolderNameFromBase(state.assetBase);
             if (folder) qs.set("project", folder);
-            window.location.href = `./index.html?${qs.toString()}`;
+            window.location.href = `./editor.html?${qs.toString()}`;
           });
 
           dom.btnResearch?.addEventListener("click", () => {
-            window.location.href = "./atlas.html";
+            window.location.href = "./index.html";
           });
 
           dom.btnProcess?.addEventListener("click", () => {
@@ -4555,16 +4950,13 @@
 
           dom.btnReset.addEventListener("click", () => fitCamera(false));
 
+          dom.btnPreviewLoop?.addEventListener("click", async () => {
+            await savePreviewSnapshot();
+          });
+
           dom.btnPause.addEventListener("click", () => {
             state.paused = !state.paused;
-            dom.btnPause.classList.toggle("running", !state.paused);
-            dom.btnPause.dataset.tip = state.paused
-              ? "Start simulation"
-              : "Stop simulation";
-            dom.btnPause.setAttribute(
-              "aria-label",
-              state.paused ? "Start simulation" : "Stop simulation",
-            );
+            syncPauseButton();
             setHint(
               state.paused
                 ? "Simulation ferma (default)."
@@ -4911,7 +5303,8 @@
           dom.selMapColorMode.value = dom.selColorMode.value;
         if (dom.selViewMode) dom.selViewMode.value = "all";
         if (dom.selViewValue) dom.selViewValue.value = "__all__";
-        dom.btnPause.classList.remove("running");
+        syncPauseButton();
+        syncPreviewSnapshotButton();
         setIdleStatus();
         updateHighlightValueOptions();
         updateViewFilterValueOptions();
@@ -4933,6 +5326,11 @@
           }
           const restored = await restoreSharedProjectFromRoute();
           if (!restored) await tryAutoloadFromQuery();
+          if (ATLAS_SNAPSHOT_MODE) {
+            window.setTimeout(() => {
+              void postAtlasSnapshotToParent();
+            }, 180);
+          }
         })();
       })();
     </script>

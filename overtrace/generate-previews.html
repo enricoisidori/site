@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Generate Overtrace Previews</title>
+    <link rel="stylesheet" href="./typography.css" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #f2f2f2;
+        color: #111111;
+        font: 400 14px/1.45 var(--ot-font-sans, sans-serif);
+      }
+
+      main {
+        padding: 24px;
+        display: grid;
+        gap: 12px;
+      }
+
+      h1,
+      p,
+      pre {
+        margin: 0;
+      }
+
+      pre {
+        padding: 12px;
+        border: 1px solid rgba(17, 17, 17, 0.12);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.8);
+        white-space: pre-wrap;
+      }
+
+      iframe {
+        position: fixed;
+        left: -9999px;
+        top: -9999px;
+        width: 1080px;
+        height: 1440px;
+        border: 0;
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Generating previews</h1>
+      <p id="status">Preparing…</p>
+      <pre id="log"></pre>
+    </main>
+    <script>
+      const PROJECTS = [
+        "1_linguistic",
+        "2_media",
+        "3_cognitive",
+        "4_metric",
+        "5_symbolic",
+        "6_cultural",
+        "7_social",
+        "8_bureaucratic",
+        "9_ecological",
+        "10_infrastructural",
+      ];
+
+      const statusEl = document.getElementById("status");
+      const logEl = document.getElementById("log");
+      const results = {};
+
+      function setStatus(text) {
+        if (statusEl) statusEl.textContent = text;
+      }
+
+      function log(text) {
+        if (!logEl) return;
+        logEl.textContent += `${text}\n`;
+      }
+
+      function requestSnapshot(projectId) {
+        return new Promise((resolve) => {
+          const iframe = document.createElement("iframe");
+          let settled = false;
+
+          const cleanup = () => {
+            window.removeEventListener("message", onMessage);
+            iframe.remove();
+          };
+
+          const finish = (value) => {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(timeoutId);
+            cleanup();
+            resolve(value || "");
+          };
+
+          const onMessage = (event) => {
+            if (event.source !== iframe.contentWindow) return;
+            const data = event.data || {};
+            if (data.type !== "overtrace-space-snapshot") return;
+            if (data.project !== projectId) return;
+            finish(data.dataUrl || "");
+          };
+
+          const timeoutId = window.setTimeout(() => finish(""), 15000);
+          window.addEventListener("message", onMessage);
+          iframe.src = `./space.html?project=${encodeURIComponent(projectId)}&atlas_snapshot=1`;
+          document.body.appendChild(iframe);
+        });
+      }
+
+      async function run() {
+        setStatus("Generating previews…");
+        for (let index = 0; index < PROJECTS.length; index += 1) {
+          const projectId = PROJECTS[index];
+          setStatus(`Generating ${index + 1}/${PROJECTS.length}: ${projectId}`);
+          log(`Starting ${projectId}`);
+          const dataUrl = await requestSnapshot(projectId);
+          results[projectId] = dataUrl;
+          log(dataUrl ? `OK ${projectId}` : `FAILED ${projectId}`);
+        }
+        window.__previewResults = results;
+        setStatus("Done");
+        log("DONE");
+      }
+
+      window.__previewResults = results;
+      void run();
+    </script>
+  </body>
+</html>

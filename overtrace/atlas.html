@@ -66,16 +66,27 @@
 
       body.research-page {
         min-height: 100vh;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
 
       .research-view {
-        height: 100vh;
+        min-height: 0;
         display: grid;
         align-content: start;
         gap: 14px;
-        padding: calc(var(--ts-toolbar-safe-top) + 4px) 14px 14px;
-        overflow: auto;
+        padding: calc(var(--ts-toolbar-safe-top) + 4px) 14px 18px;
+        overflow: visible;
+      }
+
+      .atlas-wordmark {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font: 500 15px/1 var(--ot-font-sans);
+        color: #111111;
+        pointer-events: none;
       }
 
       .project-grid {
@@ -88,7 +99,7 @@
         display: grid;
         grid-template-rows: auto auto;
         border: 1px solid var(--ts-toolbar-border);
-        border-radius: calc(var(--ts-radius-panel) + 2px);
+        border-radius: var(--ts-radius-panel);
         background: rgba(255, 255, 255, 0.92);
         overflow: hidden;
         box-shadow: var(--ts-toolbar-panel-shadow);
@@ -135,6 +146,12 @@
         opacity: 1;
       }
 
+      .project-card.has-hover-images:hover .project-hover-image,
+      .project-card.has-hover-images:focus-within .project-hover-image,
+      .project-card.is-hover-active .project-hover-image {
+        opacity: 1;
+      }
+
       .project-card.has-hover-images:hover .project-still,
       .project-card.has-hover-images:focus-within .project-still,
       .project-card.is-hover-active .project-still {
@@ -171,7 +188,7 @@
         font-size: 19px;
         line-height: 1;
         font-weight: 700;
-        letter-spacing: -0.03em;
+        letter-spacing: normal;
       }
 
       .project-actions {
@@ -202,6 +219,22 @@
         font-size: 20px;
       }
 
+      .atlas-footer {
+        padding: 0 18px 16px;
+      }
+
+      .atlas-footer p,
+      .atlas-footer a {
+        margin: 0;
+        font: 400 14px/1.45 var(--ot-font-sans);
+        color: rgba(17, 17, 17, 0.62);
+        text-decoration: none;
+      }
+
+      .atlas-footer a:hover {
+        color: rgba(17, 17, 17, 0.82);
+      }
+
       @media (max-width: 1600px) {
         .project-grid {
           grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -230,23 +263,24 @@
   <body class="research-page">
     <header class="topbar ts-toolbar is-two-zone atlas-toolbar">
       <div class="nav-left">
-        <a class="toolbar-brand" href="./atlas.html" aria-label="Open Project Atlas">
+        <a class="toolbar-brand" href="./index.html" aria-label="Open Project Atlas">
           <img class="brand-logo" src="./overtrace/logo.svg" alt="" width="36" height="36" />
           <span class="brand-wordmark">Overtrace</span>
         </a>
       </div>
+      <div class="atlas-wordmark" aria-hidden="true">over trace</div>
       <div class="nav-center"></div>
       <div class="nav-right">
         <a
           class="icon-btn switch-btn section-btn is-active"
-          href="./atlas.html"
+          href="./index.html"
           data-tip="Project Atlas"
           aria-current="page"
         >
           <span class="material-symbols-outlined">explore</span>
           <span class="btn-label">Atlas</span>
         </a>
-        <a class="icon-btn switch-btn section-btn" href="./index.html" data-tip="Go to Editor">
+        <a class="icon-btn switch-btn section-btn" href="./editor.html" data-tip="Go to Editor">
           <span class="material-symbols-outlined">edit</span>
           <span class="btn-label">Editor</span>
         </a>
@@ -271,6 +305,11 @@
     <main class="research-view">
       <section id="projectGrid" class="project-grid" aria-label="Projects"></section>
     </main>
+    <footer class="atlas-footer">
+      <p>
+        Enrico Isidori · Overtrace 2026 · CC BY-NC-ND 4.0 · Open source and free to use. For collaborations, exchanges of ideas, reports, or to know more write to <a href="mailto:enrico.isidori@gmail.com">enrico.isidori@gmail.com</a> · <a href="https://enricoisidori.com" target="_blank" rel="noopener">enricoisidori.com</a>
+      </p>
+    </footer>
     <script>
       const PROJECTS = [
         "1_linguistic",
@@ -290,51 +329,18 @@
 
       const projectGrid = document.getElementById("projectGrid");
       const projectDataCache = new Map();
-      const projectSnapshotCache = new Map();
+      const ATLAS_CACHE_TOKEN = String(Date.now());
+      const STORED_PREVIEW_FILES = [
+        "preview.jpg",
+        "preview.jpeg",
+        "preview.png",
+        "preview.webp",
+      ];
 
       function nodePayload(rawNode) {
         if (!rawNode || typeof rawNode !== "object") return {};
         if (rawNode.data && typeof rawNode.data === "object") return rawNode.data;
         return rawNode;
-      }
-
-      function hash(value) {
-        let h = 2166136261;
-        const text = String(value || "");
-        for (let i = 0; i < text.length; i += 1) {
-          h ^= text.charCodeAt(i);
-          h = Math.imul(h, 16777619);
-        }
-        return h >>> 0;
-      }
-
-      function parseDateSafe(value) {
-        const time = Date.parse(String(value || ""));
-        return Number.isFinite(time) ? time : null;
-      }
-
-      function areaLaneKey(areas, fallbackId) {
-        const scores = {
-          speculative: 0,
-          communication: 0,
-          interaction: 0,
-        };
-        const list = Array.isArray(areas) ? areas : [areas];
-        for (const area of list) {
-          const text = String(area || "").toLowerCase();
-          if (!text) continue;
-          if (text.includes("specul")) scores.speculative += 1;
-          if (text.includes("comunic") || text.includes("communicat")) {
-            scores.communication += 1;
-          }
-          if (text.includes("inter")) scores.interaction += 1;
-        }
-        const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
-        if (best && best[1] > 0) return best[0];
-        const roll = hash(`${fallbackId}_lane`) % 3;
-        if (roll === 0) return "speculative";
-        if (roll === 1) return "communication";
-        return "interaction";
       }
 
       function isImageFile(file) {
@@ -353,7 +359,6 @@
         if (projectDataCache.has(projectId)) return projectDataCache.get(projectId);
         const promise = (async () => {
           const out = {
-            project: null,
             imageSources: [],
           };
           try {
@@ -368,7 +373,6 @@
               .filter((file) => isImageFile(file))
               .map((file) => resolveProjectAssetSrc(projectId, file))
               .filter(Boolean);
-            out.project = project;
             out.imageSources = [...new Set(imageSources)];
             return out;
           } catch (err) {
@@ -380,233 +384,31 @@
         return promise;
       }
 
-      function buildSnapshotModel(projectId, project) {
-        const rawNodes = Array.isArray(project?.nodes) ? project.nodes : [];
-        const rawEdges = Array.isArray(project?.edges) ? project.edges : [];
-        const parsedDates = rawNodes.map((rawNode, index) => {
-          const data = nodePayload(rawNode);
-          return parseDateSafe(data.date) ?? index;
+      function probeImage(src) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(src);
+          img.onerror = () => resolve("");
+          img.decoding = "async";
+          img.src = src;
         });
-        const minDate = parsedDates.length ? Math.min(...parsedDates) : 0;
-        const maxDate = parsedDates.length ? Math.max(...parsedDates) : 1;
-        const span = Math.max(1, maxDate - minDate);
-
-        const nodes = rawNodes.map((rawNode, index) => {
-          const data = nodePayload(rawNode);
-          const id = String(rawNode?.id || data.id || `node-${index}`);
-          const lane = areaLaneKey(data.areas, id);
-          const laneX =
-            lane === "speculative" ? -156 : lane === "communication" ? 0 : 156;
-          const seed = hash(`${projectId}:${id}`);
-          const angle = ((seed % 360) / 180) * Math.PI;
-          const ring = 26 + ((seed >>> 8) % 84);
-          const noiseX = (((seed >>> 19) % 100) / 100 - 0.5) * 42;
-          const noiseZ = (((seed >>> 25) % 100) / 100 - 0.5) * 64;
-          const when = parsedDates[index];
-          const t = span ? (when - minDate) / span : 0.5;
-          return {
-            id,
-            degree: 0,
-            type: String(data.type || ""),
-            x: laneX + Math.cos(angle) * ring * 0.92 + noiseX,
-            y: 316 - t * 632 + (((seed >>> 14) % 100) / 100 - 0.5) * 24,
-            z:
-              Math.sin(angle) * ring * 1.28 +
-              noiseZ +
-              (((hash(data.type || id) >>> 6) % 100) / 100 - 0.5) * 56,
-          };
-        });
-
-        const byId = new Map(nodes.map((node, index) => [node.id, index]));
-        const edges = [];
-        for (const rawEdge of rawEdges) {
-          const a = byId.get(String(rawEdge?.s || ""));
-          const b = byId.get(String(rawEdge?.t || ""));
-          if (a == null || b == null || a === b) continue;
-          edges.push({ a, b, dashed: !!rawEdge?.dashed });
-          nodes[a].degree += 1;
-          nodes[b].degree += 1;
-        }
-
-        for (const node of nodes) {
-          node.radius = Math.max(3.2, Math.min(12.8, 3.8 + Math.sqrt(node.degree + 1) * 1.24));
-        }
-
-        return { nodes, edges };
       }
 
-      function computeSnapshotBounds(nodes) {
-        if (!nodes.length) {
-          return { cx: 0, cy: 0, cz: 0, scale: 1, camera: 960 };
-        }
-        const xs = nodes.map((node) => node.x);
-        const ys = nodes.map((node) => node.y);
-        const zs = nodes.map((node) => node.z);
-        const minX = Math.min(...xs);
-        const maxX = Math.max(...xs);
-        const minY = Math.min(...ys);
-        const maxY = Math.max(...ys);
-        const minZ = Math.min(...zs);
-        const maxZ = Math.max(...zs);
-        const span = Math.max(maxX - minX, maxY - minY, maxZ - minZ, 1);
-        return {
-          cx: (minX + maxX) * 0.5,
-          cy: (minY + maxY) * 0.5,
-          cz: (minZ + maxZ) * 0.5,
-          scale: 2.05,
-          camera: span * 3.8 + 720,
-          depthMin: minZ,
-          depthMax: maxZ,
-        };
-      }
-
-      function projectSnapshotPoint(node, bounds, width, height) {
-        const yaw = -0.72;
-        const pitch = 0.58;
-        const px = node.x - bounds.cx;
-        const py = node.y - bounds.cy;
-        const pz = node.z - bounds.cz;
-        const cosY = Math.cos(yaw);
-        const sinY = Math.sin(yaw);
-        const cosP = Math.cos(pitch);
-        const sinP = Math.sin(pitch);
-
-        const x1 = px * cosY - pz * sinY;
-        const z1 = px * sinY + pz * cosY;
-        const y1 = py * cosP - z1 * sinP;
-        const z2 = py * sinP + z1 * cosP;
-        const perspective = bounds.camera / (bounds.camera - z2);
-
-        return {
-          x: width * 0.5 + x1 * bounds.scale * perspective,
-          y: height * 0.54 + y1 * bounds.scale * perspective,
-          z: z2,
-          perspective,
-        };
-      }
-
-      function drawSnapshotBackground(ctx, width, height, projectId) {
-        ctx.clearRect(0, 0, width, height);
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, "#f7f7f7");
-        gradient.addColorStop(1, "#ececec");
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
-
-        const glow = ctx.createRadialGradient(
-          width * 0.28,
-          height * 0.16,
-          0,
-          width * 0.28,
-          height * 0.16,
-          width * 0.7,
+      async function resolveStoredPreview(projectId) {
+        const folderPreview = await probeImage(
+          `./previews/${projectId}.jpg?v=${ATLAS_CACHE_TOKEN}`,
         );
-        glow.addColorStop(0, "rgba(0, 0, 0, 0.07)");
-        glow.addColorStop(1, "rgba(0, 0, 0, 0)");
-        ctx.fillStyle = glow;
-        ctx.fillRect(0, 0, width, height);
-
-        ctx.fillStyle = "rgba(17, 17, 17, 0.12)";
-        for (let i = 0; i < 56; i += 1) {
-          const seed = hash(`${projectId}:star:${i}`);
-          const x = ((seed % 1000) / 1000) * width;
-          const y = ((((seed >>> 10) % 1000) / 1000) * height * 0.92) + height * 0.04;
-          const size = 1 + (((seed >>> 20) % 100) / 100) * 2.2;
-          ctx.beginPath();
-          ctx.arc(x, y, size, 0, Math.PI * 2);
-          ctx.fill();
+        if (folderPreview) return folderPreview;
+        for (const fileName of STORED_PREVIEW_FILES) {
+          const src = `./${projectId}/${fileName}?v=${ATLAS_CACHE_TOKEN}`;
+          const found = await probeImage(src);
+          if (found) return found;
         }
-      }
-
-      function nodeFillColor(node) {
-        const hue = hash(node.type || node.id) % 360;
-        return `hsl(${hue} 10% 58%)`;
-      }
-
-      async function renderProjectSnapshot(projectId, project) {
-        if (projectSnapshotCache.has(projectId)) {
-          return projectSnapshotCache.get(projectId);
-        }
-        const promise = new Promise((resolve) => {
-          const width = 1080;
-          const height = 1440;
-          const canvas = document.createElement("canvas");
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) {
-            resolve("");
-            return;
-          }
-
-          drawSnapshotBackground(ctx, width, height, projectId);
-          const model = buildSnapshotModel(projectId, project);
-          const bounds = computeSnapshotBounds(model.nodes);
-          const projected = model.nodes.map((node) =>
-            projectSnapshotPoint(node, bounds, width, height),
-          );
-          const depthMin = Math.min(...projected.map((point) => point.z), 0);
-          const depthMax = Math.max(...projected.map((point) => point.z), 1);
-          const depthSpan = Math.max(1, depthMax - depthMin);
-
-          const orderedEdges = [...model.edges].sort((a, b) => {
-            const da = (projected[a.a].z + projected[a.b].z) * 0.5;
-            const db = (projected[b.a].z + projected[b.b].z) * 0.5;
-            return da - db;
-          });
-
-          ctx.lineCap = "round";
-          for (const edge of orderedEdges) {
-            const a = projected[edge.a];
-            const b = projected[edge.b];
-            const depth = ((a.z + b.z) * 0.5 - depthMin) / depthSpan;
-            ctx.setLineDash(edge.dashed ? [9, 8] : []);
-            ctx.strokeStyle = `rgba(17, 17, 17, ${0.08 + depth * 0.2})`;
-            ctx.lineWidth = 1 + ((a.perspective + b.perspective) * 0.5 - 0.6) * 1.25;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
-          ctx.setLineDash([]);
-
-          const orderedNodes = model.nodes
-            .map((node, index) => ({ node, point: projected[index] }))
-            .sort((a, b) => a.point.z - b.point.z);
-
-          for (const entry of orderedNodes) {
-            const depth = (entry.point.z - depthMin) / depthSpan;
-            const radius = entry.node.radius * entry.point.perspective;
-            ctx.beginPath();
-            ctx.arc(entry.point.x, entry.point.y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = nodeFillColor(entry.node);
-            ctx.shadowColor = "rgba(0, 0, 0, 0.12)";
-            ctx.shadowBlur = 12 * entry.point.perspective;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.lineWidth = 1.2;
-            ctx.strokeStyle = `rgba(17, 17, 17, ${0.18 + depth * 0.3})`;
-            ctx.stroke();
-          }
-
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                resolve(canvas.toDataURL("image/jpeg", 0.88));
-                return;
-              }
-              resolve(URL.createObjectURL(blob));
-            },
-            "image/jpeg",
-            0.88,
-          );
-        });
-        projectSnapshotCache.set(projectId, promise);
-        return promise;
+        return "";
       }
 
       function renderProjectCard(project) {
-        const editorHref = `./index.html?project=${encodeURIComponent(project.id)}`;
+        const editorHref = `./editor.html?project=${encodeURIComponent(project.id)}`;
         const processHref = `./process.html?project=${encodeURIComponent(project.id)}`;
         const spaceHref = `./space.html?project=${encodeURIComponent(project.id)}`;
         return `
@@ -657,12 +459,9 @@
         });
 
         try {
-          const data = await resolveProjectData(projectId);
-          let snapshotSrc = "";
-          if (data.project) {
-            snapshotSrc = await renderProjectSnapshot(projectId, data.project);
-          }
+          let snapshotSrc = await resolveStoredPreview(projectId);
           if (!snapshotSrc) {
+            const data = await resolveProjectData(projectId);
             snapshotSrc = data.imageSources[0] || "";
           }
           if (!snapshotSrc) {
