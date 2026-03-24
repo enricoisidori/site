@@ -78,14 +78,6 @@
         overflow: auto;
       }
 
-      .research-title {
-        margin: 0;
-        font-size: clamp(28px, 4vw, 42px);
-        line-height: 0.98;
-        font-weight: 700;
-        letter-spacing: -0.04em;
-      }
-
       .project-grid {
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -114,7 +106,6 @@
         text-decoration: none;
       }
 
-      .project-video,
       .project-still,
       .project-hover-image {
         position: absolute;
@@ -126,7 +117,6 @@
         transition: opacity 180ms ease;
       }
 
-      .project-card.is-preview-ready .project-video,
       .project-card.is-still-ready .project-still {
         opacity: 1;
       }
@@ -145,16 +135,12 @@
         opacity: 1;
       }
 
-      .project-card.has-hover-images:hover .project-video,
       .project-card.has-hover-images:hover .project-still,
-      .project-card.has-hover-images:focus-within .project-video,
       .project-card.has-hover-images:focus-within .project-still,
-      .project-card.is-hover-active .project-video,
       .project-card.is-hover-active .project-still {
         opacity: 0.18;
       }
 
-      .project-card.is-preview-ready .project-placeholder,
       .project-card.is-still-ready .project-placeholder {
         background: linear-gradient(180deg, rgba(17, 17, 17, 0.02), rgba(17, 17, 17, 0.18));
       }
@@ -257,7 +243,7 @@
           data-tip="Project Atlas"
           aria-current="page"
         >
-          <span class="material-symbols-outlined">category</span>
+          <span class="material-symbols-outlined">explore</span>
           <span class="btn-label">Atlas</span>
         </a>
         <a class="icon-btn switch-btn section-btn" href="./index.html" data-tip="Go to Editor">
@@ -283,10 +269,6 @@
       </div>
     </header>
     <main class="research-view">
-      <section class="research-hero">
-        <h1 class="research-title">Project Atlas</h1>
-      </section>
-
       <section id="projectGrid" class="project-grid" aria-label="Projects"></section>
     </main>
     <script>
@@ -307,12 +289,52 @@
       });
 
       const projectGrid = document.getElementById("projectGrid");
-      const projectAssetCache = new Map();
+      const projectDataCache = new Map();
+      const projectSnapshotCache = new Map();
 
       function nodePayload(rawNode) {
         if (!rawNode || typeof rawNode !== "object") return {};
         if (rawNode.data && typeof rawNode.data === "object") return rawNode.data;
         return rawNode;
+      }
+
+      function hash(value) {
+        let h = 2166136261;
+        const text = String(value || "");
+        for (let i = 0; i < text.length; i += 1) {
+          h ^= text.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return h >>> 0;
+      }
+
+      function parseDateSafe(value) {
+        const time = Date.parse(String(value || ""));
+        return Number.isFinite(time) ? time : null;
+      }
+
+      function areaLaneKey(areas, fallbackId) {
+        const scores = {
+          speculative: 0,
+          communication: 0,
+          interaction: 0,
+        };
+        const list = Array.isArray(areas) ? areas : [areas];
+        for (const area of list) {
+          const text = String(area || "").toLowerCase();
+          if (!text) continue;
+          if (text.includes("specul")) scores.speculative += 1;
+          if (text.includes("comunic") || text.includes("communicat")) {
+            scores.communication += 1;
+          }
+          if (text.includes("inter")) scores.interaction += 1;
+        }
+        const best = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+        if (best && best[1] > 0) return best[0];
+        const roll = hash(`${fallbackId}_lane`) % 3;
+        if (roll === 0) return "speculative";
+        if (roll === 1) return "communication";
+        return "interaction";
       }
 
       function isImageFile(file) {
@@ -327,14 +349,18 @@
         return `./${projectId}/${raw.replace(/^\.\//, "")}`;
       }
 
-      async function resolveProjectPreviewAssets(projectId) {
-        if (projectAssetCache.has(projectId)) return projectAssetCache.get(projectId);
-        const assets = { stillSrc: "", imageSources: [] };
-        try {
-          const res = await fetch(`./${projectId}/project.json`, {
-            cache: "no-store",
-          });
-          if (res.ok) {
+      async function resolveProjectData(projectId) {
+        if (projectDataCache.has(projectId)) return projectDataCache.get(projectId);
+        const promise = (async () => {
+          const out = {
+            project: null,
+            imageSources: [],
+          };
+          try {
+            const res = await fetch(`./${projectId}/project.json`, {
+              cache: "no-store",
+            });
+            if (!res.ok) return out;
             const project = await res.json();
             const imageSources = (Array.isArray(project?.nodes) ? project.nodes : [])
               .map(nodePayload)
@@ -342,14 +368,241 @@
               .filter((file) => isImageFile(file))
               .map((file) => resolveProjectAssetSrc(projectId, file))
               .filter(Boolean);
-            assets.imageSources = [...new Set(imageSources)];
-            assets.stillSrc = assets.imageSources[0] || "";
+            out.project = project;
+            out.imageSources = [...new Set(imageSources)];
+            return out;
+          } catch (err) {
+            console.warn(`Unable to resolve preview data for ${projectId}`, err);
+            return out;
           }
-        } catch (err) {
-          console.warn(`Unable to resolve preview assets for ${projectId}`, err);
+        })();
+        projectDataCache.set(projectId, promise);
+        return promise;
+      }
+
+      function buildSnapshotModel(projectId, project) {
+        const rawNodes = Array.isArray(project?.nodes) ? project.nodes : [];
+        const rawEdges = Array.isArray(project?.edges) ? project.edges : [];
+        const parsedDates = rawNodes.map((rawNode, index) => {
+          const data = nodePayload(rawNode);
+          return parseDateSafe(data.date) ?? index;
+        });
+        const minDate = parsedDates.length ? Math.min(...parsedDates) : 0;
+        const maxDate = parsedDates.length ? Math.max(...parsedDates) : 1;
+        const span = Math.max(1, maxDate - minDate);
+
+        const nodes = rawNodes.map((rawNode, index) => {
+          const data = nodePayload(rawNode);
+          const id = String(rawNode?.id || data.id || `node-${index}`);
+          const lane = areaLaneKey(data.areas, id);
+          const laneX =
+            lane === "speculative" ? -156 : lane === "communication" ? 0 : 156;
+          const seed = hash(`${projectId}:${id}`);
+          const angle = ((seed % 360) / 180) * Math.PI;
+          const ring = 26 + ((seed >>> 8) % 84);
+          const noiseX = (((seed >>> 19) % 100) / 100 - 0.5) * 42;
+          const noiseZ = (((seed >>> 25) % 100) / 100 - 0.5) * 64;
+          const when = parsedDates[index];
+          const t = span ? (when - minDate) / span : 0.5;
+          return {
+            id,
+            degree: 0,
+            type: String(data.type || ""),
+            x: laneX + Math.cos(angle) * ring * 0.92 + noiseX,
+            y: 316 - t * 632 + (((seed >>> 14) % 100) / 100 - 0.5) * 24,
+            z:
+              Math.sin(angle) * ring * 1.28 +
+              noiseZ +
+              (((hash(data.type || id) >>> 6) % 100) / 100 - 0.5) * 56,
+          };
+        });
+
+        const byId = new Map(nodes.map((node, index) => [node.id, index]));
+        const edges = [];
+        for (const rawEdge of rawEdges) {
+          const a = byId.get(String(rawEdge?.s || ""));
+          const b = byId.get(String(rawEdge?.t || ""));
+          if (a == null || b == null || a === b) continue;
+          edges.push({ a, b, dashed: !!rawEdge?.dashed });
+          nodes[a].degree += 1;
+          nodes[b].degree += 1;
         }
-        projectAssetCache.set(projectId, assets);
-        return assets;
+
+        for (const node of nodes) {
+          node.radius = Math.max(3.2, Math.min(12.8, 3.8 + Math.sqrt(node.degree + 1) * 1.24));
+        }
+
+        return { nodes, edges };
+      }
+
+      function computeSnapshotBounds(nodes) {
+        if (!nodes.length) {
+          return { cx: 0, cy: 0, cz: 0, scale: 1, camera: 960 };
+        }
+        const xs = nodes.map((node) => node.x);
+        const ys = nodes.map((node) => node.y);
+        const zs = nodes.map((node) => node.z);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        const minZ = Math.min(...zs);
+        const maxZ = Math.max(...zs);
+        const span = Math.max(maxX - minX, maxY - minY, maxZ - minZ, 1);
+        return {
+          cx: (minX + maxX) * 0.5,
+          cy: (minY + maxY) * 0.5,
+          cz: (minZ + maxZ) * 0.5,
+          scale: 2.05,
+          camera: span * 3.8 + 720,
+          depthMin: minZ,
+          depthMax: maxZ,
+        };
+      }
+
+      function projectSnapshotPoint(node, bounds, width, height) {
+        const yaw = -0.72;
+        const pitch = 0.58;
+        const px = node.x - bounds.cx;
+        const py = node.y - bounds.cy;
+        const pz = node.z - bounds.cz;
+        const cosY = Math.cos(yaw);
+        const sinY = Math.sin(yaw);
+        const cosP = Math.cos(pitch);
+        const sinP = Math.sin(pitch);
+
+        const x1 = px * cosY - pz * sinY;
+        const z1 = px * sinY + pz * cosY;
+        const y1 = py * cosP - z1 * sinP;
+        const z2 = py * sinP + z1 * cosP;
+        const perspective = bounds.camera / (bounds.camera - z2);
+
+        return {
+          x: width * 0.5 + x1 * bounds.scale * perspective,
+          y: height * 0.54 + y1 * bounds.scale * perspective,
+          z: z2,
+          perspective,
+        };
+      }
+
+      function drawSnapshotBackground(ctx, width, height, projectId) {
+        ctx.clearRect(0, 0, width, height);
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, "#f7f7f7");
+        gradient.addColorStop(1, "#ececec");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        const glow = ctx.createRadialGradient(
+          width * 0.28,
+          height * 0.16,
+          0,
+          width * 0.28,
+          height * 0.16,
+          width * 0.7,
+        );
+        glow.addColorStop(0, "rgba(0, 0, 0, 0.07)");
+        glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = "rgba(17, 17, 17, 0.12)";
+        for (let i = 0; i < 56; i += 1) {
+          const seed = hash(`${projectId}:star:${i}`);
+          const x = ((seed % 1000) / 1000) * width;
+          const y = ((((seed >>> 10) % 1000) / 1000) * height * 0.92) + height * 0.04;
+          const size = 1 + (((seed >>> 20) % 100) / 100) * 2.2;
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function nodeFillColor(node) {
+        const hue = hash(node.type || node.id) % 360;
+        return `hsl(${hue} 10% 58%)`;
+      }
+
+      async function renderProjectSnapshot(projectId, project) {
+        if (projectSnapshotCache.has(projectId)) {
+          return projectSnapshotCache.get(projectId);
+        }
+        const promise = new Promise((resolve) => {
+          const width = 1080;
+          const height = 1440;
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            resolve("");
+            return;
+          }
+
+          drawSnapshotBackground(ctx, width, height, projectId);
+          const model = buildSnapshotModel(projectId, project);
+          const bounds = computeSnapshotBounds(model.nodes);
+          const projected = model.nodes.map((node) =>
+            projectSnapshotPoint(node, bounds, width, height),
+          );
+          const depthMin = Math.min(...projected.map((point) => point.z), 0);
+          const depthMax = Math.max(...projected.map((point) => point.z), 1);
+          const depthSpan = Math.max(1, depthMax - depthMin);
+
+          const orderedEdges = [...model.edges].sort((a, b) => {
+            const da = (projected[a.a].z + projected[a.b].z) * 0.5;
+            const db = (projected[b.a].z + projected[b.b].z) * 0.5;
+            return da - db;
+          });
+
+          ctx.lineCap = "round";
+          for (const edge of orderedEdges) {
+            const a = projected[edge.a];
+            const b = projected[edge.b];
+            const depth = ((a.z + b.z) * 0.5 - depthMin) / depthSpan;
+            ctx.setLineDash(edge.dashed ? [9, 8] : []);
+            ctx.strokeStyle = `rgba(17, 17, 17, ${0.08 + depth * 0.2})`;
+            ctx.lineWidth = 1 + ((a.perspective + b.perspective) * 0.5 - 0.6) * 1.25;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+          ctx.setLineDash([]);
+
+          const orderedNodes = model.nodes
+            .map((node, index) => ({ node, point: projected[index] }))
+            .sort((a, b) => a.point.z - b.point.z);
+
+          for (const entry of orderedNodes) {
+            const depth = (entry.point.z - depthMin) / depthSpan;
+            const radius = entry.node.radius * entry.point.perspective;
+            ctx.beginPath();
+            ctx.arc(entry.point.x, entry.point.y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = nodeFillColor(entry.node);
+            ctx.shadowColor = "rgba(0, 0, 0, 0.12)";
+            ctx.shadowBlur = 12 * entry.point.perspective;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.lineWidth = 1.2;
+            ctx.strokeStyle = `rgba(17, 17, 17, ${0.18 + depth * 0.3})`;
+            ctx.stroke();
+          }
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                resolve(canvas.toDataURL("image/jpeg", 0.88));
+                return;
+              }
+              resolve(URL.createObjectURL(blob));
+            },
+            "image/jpeg",
+            0.88,
+          );
+        });
+        projectSnapshotCache.set(projectId, promise);
+        return promise;
       }
 
       function renderProjectCard(project) {
@@ -359,7 +612,6 @@
         return `
           <article class="project-card" data-project="${project.id}">
             <a class="project-preview" href="${spaceHref}" aria-label="Open ${project.displayName} in Space">
-              <video class="project-video" muted loop autoplay playsinline preload="metadata"></video>
               <img class="project-still" alt="" loading="lazy" />
               <div class="project-hover-preview" aria-hidden="true">
                 <img class="project-hover-image" alt="" loading="lazy" />
@@ -383,81 +635,45 @@
           </article>`;
       }
 
-      function markCardReady(card, mode) {
+      function markCardReady(card) {
         card.classList.remove("is-preview-missing");
-        card.classList.toggle("is-preview-ready", mode === "video");
-        card.classList.toggle("is-still-ready", mode === "image");
+        card.classList.add("is-still-ready");
       }
 
-      function attachPreviewMedia(card, projectId) {
-        const video = card.querySelector(".project-video");
+      function markCardMissing(card) {
+        card.classList.remove("is-still-ready");
+        card.classList.add("is-preview-missing");
+      }
+
+      async function attachSnapshotPreview(card, projectId) {
         const still = card.querySelector(".project-still");
-        if (!video || !still) return;
+        if (!still) return;
 
-        const candidates = [
-          { type: "video", src: `./${projectId}/preview.webm` },
-          { type: "video", src: `./${projectId}/preview.mp4` },
-          { type: "image", src: `./${projectId}/preview.gif` },
-          { type: "image", src: `./${projectId}/preview.jpg` },
-          { type: "image", src: `./${projectId}/preview.png` },
-        ];
-
-        let index = -1;
-        let fallbackAttempted = false;
-
-        const markMissing = () => {
-          video.pause();
-          video.removeAttribute("src");
-          still.removeAttribute("src");
-          card.classList.add("is-preview-missing");
-        };
-
-        const loadFallbackStill = async () => {
-          fallbackAttempted = true;
-          const assets = await resolveProjectPreviewAssets(projectId);
-          if (assets.stillSrc) {
-            still.src = assets.stillSrc;
-            return;
-          }
-          markMissing();
-        };
-
-        const loadNext = () => {
-          index += 1;
-          if (index >= candidates.length) {
-            void loadFallbackStill();
-            return;
-          }
-          const candidate = candidates[index];
-          if (candidate.type === "video") {
-            still.removeAttribute("src");
-            video.src = candidate.src;
-            video.load();
-            return;
-          }
-          video.pause();
-          video.removeAttribute("src");
-          video.load();
-          still.src = candidate.src;
-        };
-
-        video.addEventListener("loadeddata", () => {
-          markCardReady(card, "video");
-          video.play().catch(() => {});
-        });
-        video.addEventListener("error", loadNext);
         still.addEventListener("load", () => {
-          markCardReady(card, "image");
+          markCardReady(card);
         });
         still.addEventListener("error", () => {
-          if (fallbackAttempted) {
-            markMissing();
-            return;
-          }
-          loadNext();
+          markCardMissing(card);
         });
 
-        loadNext();
+        try {
+          const data = await resolveProjectData(projectId);
+          let snapshotSrc = "";
+          if (data.project) {
+            snapshotSrc = await renderProjectSnapshot(projectId, data.project);
+          }
+          if (!snapshotSrc) {
+            snapshotSrc = data.imageSources[0] || "";
+          }
+          if (!snapshotSrc) {
+            markCardMissing(card);
+            return;
+          }
+          still.src = snapshotSrc;
+        } catch (err) {
+          console.warn(`Unable to attach snapshot for ${projectId}`, err);
+          markCardMissing(card);
+        }
       }
 
       function shufflePreviewImages(sources) {
@@ -498,7 +714,7 @@
 
         const startHover = async () => {
           const currentToken = ++token;
-          const assets = await resolveProjectPreviewAssets(projectId);
+          const assets = await resolveProjectData(projectId);
           if (currentToken !== token) return;
           if (!assets.imageSources.length) return;
           queue = shufflePreviewImages(assets.imageSources);
@@ -525,7 +741,7 @@
         projectGrid.querySelectorAll(".project-card").forEach((card) => {
           const projectId = card.getAttribute("data-project");
           if (projectId) {
-            attachPreviewMedia(card, projectId);
+            void attachSnapshotPreview(card, projectId);
             attachHoverPreview(card, projectId);
           }
         });

@@ -813,7 +813,7 @@
             type="button"
             data-tip="Go to Project Atlas"
           >
-            <span class="material-symbols-outlined">category</span>
+            <span class="material-symbols-outlined">explore</span>
             <span class="btn-label">Atlas</span>
           </button>
           <button
@@ -1118,6 +1118,9 @@
           idleStatus: "",
           statusTimer: 0,
           openDialogPending: false,
+          previewCapture: {
+            active: false,
+          },
           paletteByMode: {},
           modeStats: {},
           dataViewsDirty: true,
@@ -1149,6 +1152,11 @@
             "Bolla = disciplina (dimensione per occorrenze). Le linee mostrano co-presenza della coppia nella stessa card.",
         };
         const DISCIPLINE_RENDER_SCALE = 1.4;
+        const PREVIEW_CAPTURE_WIDTH = 1080;
+        const PREVIEW_CAPTURE_HEIGHT = 1440;
+        const PREVIEW_CAPTURE_FPS = 24;
+        const PREVIEW_CAPTURE_SECONDS = 6;
+        const PREVIEW_CAPTURE_BITRATE = 4800000;
 
         function esc(text) {
           return String(text ?? "").replace(/[&<>"']/g, (char) => {
