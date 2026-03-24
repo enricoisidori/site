@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="it">
+ <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Overtrace Print</title>
+  <style>
+   @font-face {
+    font-family: "Times New Roman";
+    src: url("./asset/Times New Roman-Book.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+   }
+
+   * {
+    box-sizing: border-box;
+   }
+
+   html,
+   body {
+    margin: 0;
+    min-height: 100%;
+   }
+
+   body {
+    background: #f2efe9;
+    color: #111111;
+    font: 700 14px/1.4 "Times New Roman", Times, serif;
+   }
+
+   .app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+   }
+
+   .side {
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    background: #faf8f3;
+    padding: 18px 16px 24px;
+    display: grid;
+    align-content: start;
+    gap: 16px;
+   }
+
+   .side h1,
+   .side h2,
+   .side p {
+    margin: 0;
+   }
+
+   .side h1 {
+    font-size: 18px;
+   }
+
+   .meta,
+   .status,
+   .side p {
+    font-size: 12px;
+    color: #4d4d4d;
+   }
+
+   .group {
+    display: grid;
+    gap: 8px;
+   }
+
+   .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+   }
+
+   button,
+   input[type="file"] {
+    font: inherit;
+   }
+
+   button {
+    appearance: none;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    background: #ffffff;
+    color: #111111;
+    padding: 8px 10px;
+    cursor: pointer;
+   }
+
+   button:hover {
+    background: #f2f2f2;
+   }
+
+   .main {
+    padding: 22px;
+    display: grid;
+    gap: 24px;
+    align-content: start;
+   }
+
+   .board {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+   }
+
+   .board-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+   }
+
+   .board-head h2,
+   .board-head p {
+    margin: 0;
+   }
+
+   .board-head h2 {
+    font-size: 15px;
+   }
+
+   .board-head p {
+    font-size: 12px;
+    color: #5f5f5f;
+   }
+
+   .preview-wrap {
+    overflow: auto;
+    background:
+     linear-gradient(45deg, rgba(0, 0, 0, 0.035) 25%, transparent 25%) 0 0 / 18px 18px,
+     linear-gradient(-45deg, rgba(0, 0, 0, 0.035) 25%, transparent 25%) 0 0 / 18px 18px,
+     linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.035) 75%) 0 0 / 18px 18px,
+     linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.035) 75%) 0 0 / 18px 18px,
+     #ece8e0;
+    padding: 18px;
+   }
+
+   .preview-sheet {
+    display: block;
+    background: #ffffff;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+    height: auto;
+   }
+
+   .preview-sheet.small {
+    width: min(520px, 100%);
+   }
+
+   .preview-sheet.large {
+    width: min(1200px, 100%);
+   }
+
+   .hidden {
+    display: none !important;
+   }
+  </style>
+ </head>
+ <body>
+  <div class="app">
+   <aside class="side">
+    <div class="group">
+     <h1>Overtrace Print</h1>
+     <p>Preview raster e export PNG a `300 ppi` per `Space 2D`, `Process / Pallini` e `Process / Nodi`.</p>
+    </div>
+
+    <div class="group">
+     <div class="btn-row">
+      <button id="btnOpen" type="button">Apri JSON</button>
+      <button id="btnReload" type="button">Ricarica</button>
+      <input id="fileInput" class="hidden" type="file" accept=".json,application/json" />
+     </div>
+     <div id="projectMeta" class="meta">Nessun progetto caricato.</div>
+     <div id="status" class="status">Apri `project.json` oppure entra da `space/process`.</div>
+    </div>
+
+    <div class="group">
+     <h2>Formati</h2>
+     <p>`Space 2D` e `Process / Pallini`: larghezza `93 mm`.</p>
+     <p>`Process / Nodi`: larghezza `226 mm`, altezza automatica.</p>
+     <p>La preview a schermo è ingrandita per leggere bene i dettagli, ma il PNG resta alle misure di stampa.</p>
+    </div>
+   </aside>
+
+   <main class="main">
+    <section class="board">
+     <div class="board-head">
+      <div>
+       <h2>Space 2D</h2>
+       <p>Network rasterizzata in bianco e grigi, con label leggibili.</p>
+      </div>
+      <div class="btn-row">
+       <button id="btnSaveSpacePng" type="button">PNG</button>
+      </div>
+     </div>
+     <div class="preview-wrap">
+      <canvas id="spacePreview" class="preview-sheet small"></canvas>
+     </div>
+    </section>
+
+    <section class="board">
+     <div class="board-head">
+      <div>
+       <h2>Process / Pallini</h2>
+       <p>Stessa logica visiva dei pallini, resa in PNG ad alta qualità.</p>
+      </div>
+      <div class="btn-row">
+       <button id="btnSaveDotsPng" type="button">PNG</button>
+      </div>
+     </div>
+     <div class="preview-wrap">
+      <canvas id="dotsPreview" class="preview-sheet small"></canvas>
+     </div>
+    </section>
+
+    <section class="board">
+     <div class="board-head">
+      <div>
+       <h2>Process / Nodi</h2>
+       <p>Card raster con titolo bold e dettagli leggibili, più vicine possibile alla vista live.</p>
+      </div>
+      <div class="btn-row">
+       <button id="btnSaveCardsPng" type="button">PNG</button>
+      </div>
+     </div>
+     <div class="preview-wrap">
+      <canvas id="cardsPreview" class="preview-sheet large"></canvas>
+     </div>
+    </section>
+   </main>
+  </div>
+
+  <script>
+   (() => {
+    const SHARED_PROJECT_KEY = "overtrace.shared.project.v1";
+    const MM_PER_INCH = 25.4;
+    const PPI = 300;
+    const SMALL_WIDTH_MM = 93;
+    const LARGE_WIDTH_MM = 226;
+    const SMALL_WIDTH_PX = Math.round((SMALL_WIDTH_MM / MM_PER_INCH) * PPI);
+    const LARGE_WIDTH_PX = Math.round((LARGE_WIDTH_MM / MM_PER_INCH) * PPI);
+    const DOT_DIAMETER_PX = 20;
+
+    const dom = {
+     btnOpen: document.getElementById("btnOpen"),
+     btnReload: document.getElementById("btnReload"),
+     fileInput: document.getElementById("fileInput"),
+     projectMeta: document.getElementById("projectMeta"),
+     status: document.getElementById("status"),
+     spacePreview: document.getElementById("spacePreview"),
+     dotsPreview: document.getElementById("dotsPreview"),
+     cardsPreview: document.getElementById("cardsPreview"),
+     btnSaveSpacePng: document.getElementById("btnSaveSpacePng"),
+     btnSaveDotsPng: document.getElementById("btnSaveDotsPng"),
+     btnSaveCardsPng: document.getElementById("btnSaveCardsPng"),
+    };
+
+    const state = {
+     project: null,
+     label: "",
+     folderName: "",
+     assetBase: "",
+     imageCache: new Map(),
+    };
+
+    function setStatus(text) {
+     dom.status.textContent = text;
+    }
+
+    function esc(text) {
+     return String(text ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+    }
+
+    function hash(s) {
+     let h = 2166136261;
+     for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+     }
+     return h >>> 0;
+    }
+
+    function clamp(value, min, max) {
+     return Math.max(min, Math.min(max, value));
+    }
+
+    function normalizeText(value, fallback = "") {
+     const out = String(value ?? "").replace(/\s+/g, " ").trim();
+     return out || fallback;
+    }
+
+    function nodePayload(rawNode) {
+     if (!rawNode || typeof rawNode !== "object") return {};
+     if (rawNode.data && typeof rawNode.data === "object") return rawNode.data;
+     return rawNode;
+    }
+
+    function normalizeAreaName(value) {
+     return String(value ?? "").replace(/\s+/g, " ").trim();
+    }
+
+    function canonicalAreaName(value) {
+     const txt = normalizeAreaName(value);
+     if (!txt) return "";
+     const low = txt.toLowerCase();
+     if (low === "speculative" || low === "speculative design") return "Speculative Design";
+     if (low === "communication" || low === "communication design") return "Communication Design";
+     if (low === "interaction" || low === "interaction design") return "Interaction Design";
+     return txt;
+    }
+
+    function areaDedupeKey(value) {
+     return canonicalAreaName(value)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .replace(/\s+/g, " ");
+    }
+
+    function normalizeAreaList(areas) {
+     const seen = new Set();
+     const out = [];
+     const push = (raw) => {
+      const mapped = canonicalAreaName(raw);
+      if (!mapped) return;
+      const key = areaDedupeKey(mapped);
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      out.push(mapped);
+     };
+     if (Array.isArray(areas)) {
+      for (const area of areas) push(area);
+     } else {
+      push(areas);
+     }
+     return out;
+    }
+
+    function mmText(mm, px) {
+     return `${mm} mm · ${px}px @ 300ppi`;
+    }
+
+    function inferFolderNameFromBase(base) {
+     const text = String(base || "").trim().replace(/\/+$/, "");
+     if (!text) return "";
+     if (text.includes("/")) return text.split("/").pop() || "";
+     return text;
+    }
+
+    function resolveAssetUrl(fileEntry) {
+     if (!fileEntry || !fileEntry.path || !state.assetBase) return "";
+     const rel = String(fileEntry.path).replace(/^\.\//, "");
+     return `${state.assetBase}${rel}`;
+    }
+
+    function actionStrokeColor(action) {
+     const key = String(action || "").toLowerCase().trim();
+     if (key === "making") return "#333333";
+     return "#999999";
+    }
+
+    function actionEdgeColor(stronger) {
+     return stronger ? "rgba(51,51,51,0.95)" : "rgba(153,153,153,0.95)";
+    }
+
+    function processNodesFromProject(project) {
+     const rawNodes = Array.isArray(project?.nodes) ? project.nodes : [];
+     return rawNodes.map((raw, i) => {
+      const data = nodePayload(raw);
+      const filesRaw = Array.isArray(data.files) ? data.files : [];
+      const files = filesRaw.map((file) => {
+       const name = String(file?.name || "");
+       const type = String(file?.type || "");
+       const path = String(file?.path || "");
+       const isImageType = /^image\//i.test(type);
+       const isImageName = /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(name || path);
+       return {
+        ...file,
+        isImage: !!(file?.isImage || isImageType || isImageName),
+       };
+      });
+
+      return {
+       id: String(raw?.id || `node_${i}`),
+       title: normalizeText(data.title, "(senza titolo)"),
+       type: normalizeText(data.type, "-"),
+       action: normalizeText(data.action, "-"),
+       date: normalizeText(data.date, "-"),
+       areas: normalizeAreaList(data.areas),
+       desc: String(data.desc || "").trim(),
+       rawX: Number.isFinite(Number(raw?.x)) ? Number(raw.x) : i * 420,
+       rawY: Number.isFinite(Number(raw?.y)) ? Number(raw.y) : 0,
+       rawW: Number.isFinite(Number(raw?.w)) ? Math.max(140, Number(raw.w)) : 320,
+       rawH: Number.isFinite(Number(raw?.h)) ? Math.max(90, Number(raw.h)) : 180,
+       files,
+       previewFile: files.find((file) => file && file.isImage) || null,
+      };
+     });
+    }
+
+    function processEdgesFromProject(project, idToIndex) {
+     const rawEdges = Array.isArray(project?.edges) ? project.edges : [];
+     const out = [];
+     for (const rawEdge of rawEdges) {
+      const a = idToIndex.get(String(rawEdge?.s));
+      const b = idToIndex.get(String(rawEdge?.t));
+      if (a == null || b == null || a === b) continue;
+      out.push({ a, b, weak: !!rawEdge?.dashed });
+     }
+     return out;
+    }
+
+    function processBounds(nodes, pad) {
+     let minX = Infinity;
+     let minY = Infinity;
+     let maxX = -Infinity;
+     let maxY = -Infinity;
+     for (const node of nodes) {
+      minX = Math.min(minX, node.rawX);
+      minY = Math.min(minY, node.rawY);
+      maxX = Math.max(maxX, node.rawX + node.rawW);
+      maxY = Math.max(maxY, node.rawY + node.rawH);
+     }
+     return {
+      minX: minX - pad,
+      minY: minY - pad,
+      maxX: maxX + pad,
+      maxY: maxY + pad,
+     };
+    }
+
+    function makeBezierPathPoints(ax, ay, bx, by) {
+      const dx = Math.max(28, Math.abs(bx - ax) * 0.42);
+      return [ax, ay, ax + dx, ay, bx - dx, by, bx, by];
+    }
+
+    function wrapTextByMeasure(ctx, text, maxWidth, maxLines = 0) {
+     const words = String(text || "").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+     if (!words.length) return [];
+     const lines = [];
+     let current = "";
+
+     for (const word of words) {
+      const next = current ? `${current} ${word}` : word;
+      if (!current || ctx.measureText(next).width <= maxWidth) {
+       current = next;
+       continue;
+      }
+      lines.push(current);
+      current = word;
+      if (maxLines && lines.length >= maxLines) break;
+     }
+
+     if (current && (!maxLines || lines.length < maxLines)) lines.push(current);
+     if (maxLines && lines.length > maxLines) lines.length = maxLines;
+
+     if (maxLines && lines.length === maxLines) {
+      const rebuilt = lines.join(" ");
+      const original = words.join(" ");
+      if (rebuilt.length < original.length) {
+       let last = lines[maxLines - 1];
+       while (last.length > 1 && ctx.measureText(`${last}…`).width > maxWidth) {
+        last = last.slice(0, -1);
+       }
+       lines[maxLines - 1] = `${last.replace(/[ .,;:]+$/, "")}…`;
+      }
+     }
+     return lines;
+    }
+
+    function drawTextLines(ctx, lines, x, y, lineHeight) {
+     for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], x, y + i * lineHeight);
+     }
+    }
+
+    function fitCanvasToPixelSize(canvas, width, height) {
+     canvas.width = Math.max(1, Math.round(width));
+     canvas.height = Math.max(1, Math.round(height));
+    }
+
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+     const rr = Math.max(0, Math.min(r, Math.min(w, h) * 0.5));
+     ctx.beginPath();
+     ctx.moveTo(x + rr, y);
+     ctx.arcTo(x + w, y, x + w, y + h, rr);
+     ctx.arcTo(x + w, y + h, x, y + h, rr);
+     ctx.arcTo(x, y + h, x, y, rr);
+     ctx.arcTo(x, y, x + w, y, rr);
+     ctx.closePath();
+    }
+
+    async function loadImage(url) {
+     if (!url) return null;
+     if (state.imageCache.has(url)) return state.imageCache.get(url);
+     const pending = new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = url;
+     });
+     state.imageCache.set(url, pending);
+     return pending;
+    }
+
+    function renderSpace2D(project) {
+     const canvas = dom.spacePreview;
+     const ctx = canvas.getContext("2d");
+     const width = SMALL_WIDTH_PX;
+     const height = SMALL_WIDTH_PX;
+     fitCanvasToPixelSize(canvas, width, height);
+
+     const rawNodes = processNodesFromProject(project);
+     const countMap = new Map();
+     const actionCounts = new Map();
+     const pairMap = new Map();
+
+     for (const rawNode of rawNodes) {
+      const areas = normalizeAreaList(rawNode.areas);
+      if (!areas.length) continue;
+      const action = String(rawNode.action || "").toLowerCase();
+      const actionKey = action === "exploring" ? "exploring" : action === "making" ? "making" : "";
+
+      for (const area of areas) {
+       countMap.set(area, (countMap.get(area) || 0) + 1);
+       if (actionKey) {
+        const cur = actionCounts.get(area) || { exploring: 0, making: 0 };
+        cur[actionKey] += 1;
+        actionCounts.set(area, cur);
+       }
+      }
+
+      for (let i = 0; i < areas.length; i++) {
+       for (let j = i + 1; j < areas.length; j++) {
+        const a = areas[i];
+        const b = areas[j];
+        const key = a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`;
+        pairMap.set(key, (pairMap.get(key) || 0) + 1);
+       }
+      }
+     }
+
+     const entries = [...countMap.entries()].sort((a, b) => b[1] - a[1]);
+     const cx = width * 0.5;
+     const cy = height * 0.5;
+     const side = Math.min(width, height);
+     const seedRadius = side * 0.31;
+
+     const nodes = entries.map(([label, count], i) => {
+      const t = i / Math.max(1, entries.length);
+      const angle = t * Math.PI * 2 + ((hash(`${label}_a`) % 1000) / 1000) * 0.3;
+      const radiusSeed = seedRadius * (0.56 + ((hash(`${label}_r`) % 1000) / 1000) * 0.52);
+      const actions = actionCounts.get(label) || { exploring: 0, making: 0 };
+      return {
+       label,
+       count,
+       exploring: actions.exploring,
+       making: actions.making,
+       degree: 0,
+       radius: clamp(48 + Math.sqrt(count) * 8.5, 56, 96),
+       x: cx + Math.cos(angle) * radiusSeed,
+       y: cy + Math.sin(angle) * radiusSeed,
+       vx: 0,
+       vy: 0,
+       fx: 0,
+       fy: 0,
+      };
+     });
+
+     const indexById = new Map();
+     nodes.forEach((node, i) => indexById.set(node.label, i));
+     const edges = [];
+     for (const [pairKey, weight] of pairMap.entries()) {
+      const [a, b] = pairKey.split("\u0000");
+      const ai = indexById.get(a);
+      const bi = indexById.get(b);
+      if (ai == null || bi == null || ai === bi) continue;
+      edges.push({ a: ai, b: bi, weight });
+      nodes[ai].degree += 1;
+      nodes[bi].degree += 1;
+     }
+
+     const bounds = {
+      left: width * 0.12,
+      right: width * 0.88,
+      top: height * 0.12,
+      bottom: height * 0.88,
+      cx,
+      cy,
+     };
+
+     for (let step = 0; step < clamp(110 + nodes.length * 8, 120, 420); step++) {
+      for (const node of nodes) {
+       node.fx = 0;
+       node.fy = 0;
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+       const a = nodes[i];
+       for (let j = i + 1; j < nodes.length; j++) {
+        const b = nodes[j];
+        let dx = a.x - b.x;
+        let dy = a.y - b.y;
+        let distSq = dx * dx + dy * dy;
+        if (distSq < 1) {
+         dx = (Math.random() - 0.5) * 2;
+         dy = (Math.random() - 0.5) * 2;
+         distSq = dx * dx + dy * dy;
+        }
+        const dist = Math.sqrt(distSq);
+        const f = 7600 / distSq;
+        const nx = dx / dist;
+        const ny = dy / dist;
+        a.fx += nx * f;
+        a.fy += ny * f;
+        b.fx -= nx * f;
+        b.fy -= ny * f;
+       }
+      }
+
+      for (const edge of edges) {
+        const a = nodes[edge.a];
+        const b = nodes[edge.b];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dist = Math.max(0.001, Math.hypot(dx, dy));
+        const target = 42 + (a.radius + b.radius) * 1.8 - Math.min(16, edge.weight * 1.1);
+        const stretch = dist - target;
+        const strength = 0.024 * (1 + Math.log1p(edge.weight) * 0.55);
+        const fx = (dx / dist) * stretch * strength;
+        const fy = (dy / dist) * stretch * strength;
+        a.fx += fx;
+        a.fy += fy;
+        b.fx -= fx;
+        b.fy -= fy;
+      }
+
+      for (const node of nodes) {
+       node.fx += (bounds.cx - node.x) * 0.008;
+       node.fy += (bounds.cy - node.y) * 0.008;
+       node.vx = (node.vx + node.fx * 0.012) * 0.87;
+       node.vy = (node.vy + node.fy * 0.012) * 0.87;
+       const speed = Math.hypot(node.vx, node.vy);
+       if (speed > 3.1) {
+        const scale = 3.1 / speed;
+        node.vx *= scale;
+        node.vy *= scale;
+       }
+       node.x += node.vx;
+       node.y += node.vy;
+       const pad = node.radius + 18;
+       node.x = clamp(node.x, bounds.left + pad, bounds.right - pad);
+       node.y = clamp(node.y, bounds.top + pad, bounds.bottom - pad);
+      }
+     }
+
+     ctx.clearRect(0, 0, width, height);
+     ctx.fillStyle = "#ffffff";
+     ctx.fillRect(0, 0, width, height);
+
+     ctx.lineCap = "round";
+     for (const edge of edges) {
+      const a = nodes[edge.a];
+      const b = nodes[edge.b];
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = "rgba(0,0,0,0.16)";
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+     }
+
+     for (const node of nodes) {
+      const total = (node.exploring || 0) + (node.making || 0);
+      const t = total > 0 ? clamp((node.making || 0) / total, 0, 1) : 0;
+      const alpha = 0.02 + t * 0.03;
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.strokeStyle = `rgba(0,0,0,${alpha.toFixed(3)})`;
+      ctx.lineWidth = 2.6;
+      ctx.stroke();
+     }
+
+     ctx.textAlign = "center";
+     ctx.textBaseline = "middle";
+     ctx.fillStyle = "#111111";
+
+     for (const node of nodes) {
+      const maxWidth = node.radius * 1.5;
+      const fontSize = clamp(node.radius * 0.28, 15, 22);
+      ctx.font = `700 ${fontSize}px "Times New Roman", Times, serif`;
+      const lines = wrapTextByMeasure(ctx, node.label, maxWidth, 2);
+      const lineHeight = fontSize * 1.05;
+      const startY = node.y - ((lines.length - 1) * lineHeight) * 0.5;
+      drawTextLines(ctx, lines, node.x, startY, lineHeight);
+     }
+    }
+
+    function renderProcessDots(project) {
+     const canvas = dom.dotsPreview;
+     const ctx = canvas.getContext("2d");
+     const nodes = processNodesFromProject(project);
+     const idToIndex = new Map();
+     nodes.forEach((node, i) => idToIndex.set(node.id, i));
+     const edges = processEdgesFromProject(project, idToIndex);
+     const bounds = processBounds(nodes, 70);
+     const worldW = Math.max(1, bounds.maxX - bounds.minX);
+     const worldH = Math.max(1, bounds.maxY - bounds.minY);
+     const scale = SMALL_WIDTH_PX / worldW;
+     const height = Math.max(460, Math.round(worldH * scale));
+     fitCanvasToPixelSize(canvas, SMALL_WIDTH_PX, height);
+
+     ctx.clearRect(0, 0, SMALL_WIDTH_PX, height);
+     ctx.fillStyle = "#ffffff";
+     ctx.fillRect(0, 0, SMALL_WIDTH_PX, height);
+
+     const points = nodes.map((node) => {
+      const cx = (node.rawX + node.rawW * 0.5 - bounds.minX) * scale;
+      const cy = (node.rawY + node.rawH * 0.5 - bounds.minY) * scale;
+      return { cx, cy, node };
+     });
+
+     ctx.lineCap = "round";
+     for (const edge of edges) {
+      const a = points[edge.a];
+      const b = points[edge.b];
+      const [x0, y0, c1x, c1y, c2x, c2y, x1, y1] = makeBezierPathPoints(a.cx, a.cy, b.cx, b.cy);
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.bezierCurveTo(c1x, c1y, c2x, c2y, x1, y1);
+      ctx.strokeStyle = actionEdgeColor(!edge.weak);
+      ctx.lineWidth = 1;
+      if (edge.weak) ctx.setLineDash([9, 7]);
+      else ctx.setLineDash([]);
+      ctx.stroke();
+     }
+     ctx.setLineDash([]);
+
+     for (const point of points) {
+      ctx.beginPath();
+      ctx.arc(point.cx, point.cy, DOT_DIAMETER_PX * 0.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.strokeStyle = actionStrokeColor(point.node.action);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+     }
+    }
+
+    async function renderProcessCards(project) {
+     const canvas = dom.cardsPreview;
+     const ctx = canvas.getContext("2d");
+     const nodes = processNodesFromProject(project);
+     const bounds = processBounds(nodes, 120);
+     const worldW = Math.max(1, bounds.maxX - bounds.minX);
+     const worldH = Math.max(1, bounds.maxY - bounds.minY);
+     const scale = LARGE_WIDTH_PX / worldW;
+     const height = Math.max(1000, Math.round(worldH * scale));
+     fitCanvasToPixelSize(canvas, LARGE_WIDTH_PX, height);
+
+     ctx.clearRect(0, 0, LARGE_WIDTH_PX, height);
+     ctx.fillStyle = "#ffffff";
+     ctx.fillRect(0, 0, LARGE_WIDTH_PX, height);
+
+     const previewImages = await Promise.all(
+      nodes.map(async (node) => {
+       const url = resolveAssetUrl(node.previewFile);
+       const image = await loadImage(url);
+       return image;
+      })
+     );
+
+     ctx.textBaseline = "top";
+
+     for (let index = 0; index < nodes.length; index++) {
+      const node = nodes[index];
+      const image = previewImages[index];
+      const x = (node.rawX - bounds.minX) * scale;
+      const y = (node.rawY - bounds.minY) * scale;
+      const w = node.rawW * scale;
+      const h = node.rawH * scale;
+      const pad = clamp(10 * scale, 12, 28);
+      const border = actionStrokeColor(node.action);
+      const titleSize = clamp(12 * scale, 15, 28);
+      const metaSize = clamp(11 * scale, 12, 20);
+      const descSize = clamp(10 * scale, 11, 18);
+      const smallSize = clamp(10 * scale, 10, 16);
+      const dividerColor = "rgba(0,0,0,0.14)";
+      const innerX = x + pad;
+      const innerW = Math.max(40, w - pad * 2);
+      let cursorY = y + pad;
+
+      ctx.save();
+      drawRoundedRect(ctx, x, y, w, h, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = border;
+      ctx.stroke();
+
+      ctx.fillStyle = "#111111";
+      ctx.font = `700 ${titleSize}px "Times New Roman", Times, serif`;
+      const titleLines = wrapTextByMeasure(ctx, node.title, innerW, 2);
+      drawTextLines(ctx, titleLines, innerX, cursorY, titleSize * 1.14);
+      cursorY += Math.max(titleSize * 1.35, titleLines.length * titleSize * 1.14 + 4);
+
+      ctx.strokeStyle = dividerColor;
+      ctx.beginPath();
+      ctx.moveTo(innerX, cursorY);
+      ctx.lineTo(x + w - pad, cursorY);
+      ctx.stroke();
+      cursorY += clamp(6 * scale, 8, 14);
+
+      ctx.fillStyle = "#5f5f5f";
+      ctx.font = `400 ${metaSize}px "Times New Roman", Times, serif`;
+      ctx.fillText(node.date, innerX, cursorY);
+      cursorY += metaSize * 1.5;
+
+      ctx.strokeStyle = dividerColor;
+      ctx.beginPath();
+      ctx.moveTo(innerX, cursorY);
+      ctx.lineTo(x + w - pad, cursorY);
+      ctx.stroke();
+      cursorY += clamp(6 * scale, 8, 14);
+
+      ctx.fillStyle = "#666666";
+      ctx.font = `400 ${metaSize}px "Times New Roman", Times, serif`;
+      ctx.fillText("Type", innerX, cursorY);
+      ctx.fillText("Action", innerX, cursorY + metaSize * 1.45);
+      ctx.fillText("Areas", innerX, cursorY + metaSize * 2.9);
+
+      ctx.fillStyle = "#111111";
+      ctx.fillText(node.type, innerX + innerW * 0.28, cursorY);
+      ctx.fillText(node.action, innerX + innerW * 0.28, cursorY + metaSize * 1.45);
+
+      ctx.font = `400 ${smallSize}px "Times New Roman", Times, serif`;
+      const areaText = node.areas.length ? node.areas.join(", ") : "-";
+      const areaLines = wrapTextByMeasure(ctx, areaText, innerW * 0.68, 2);
+      drawTextLines(ctx, areaLines, innerX + innerW * 0.28, cursorY + metaSize * 2.9, smallSize * 1.18);
+      cursorY += metaSize * 2.9 + Math.max(metaSize, areaLines.length * smallSize * 1.18) + clamp(10 * scale, 10, 18);
+
+      if (node.desc) {
+       ctx.fillStyle = "#666666";
+       ctx.font = `400 ${smallSize}px "Times New Roman", Times, serif`;
+       ctx.fillText("Description", innerX, cursorY);
+       cursorY += smallSize * 1.25;
+
+       ctx.fillStyle = "#111111";
+       ctx.font = `400 ${descSize}px "Times New Roman", Times, serif`;
+       const descMaxLines = Math.max(2, Math.floor((h * 0.28) / (descSize * 1.22)));
+       const descLines = wrapTextByMeasure(ctx, node.desc, innerW, descMaxLines);
+       drawTextLines(ctx, descLines, innerX, cursorY, descSize * 1.22);
+       cursorY += descLines.length * descSize * 1.22 + clamp(10 * scale, 10, 18);
+      }
+
+      if (image && cursorY < y + h - pad - 30) {
+       const remaining = y + h - pad - cursorY;
+       const imgW = innerW;
+       const imgH = clamp(Math.min(remaining - 4, imgW * 0.62), 48, 180 * scale);
+       if (imgH > 32) {
+        const ratio = image.naturalWidth > 0 && image.naturalHeight > 0
+         ? image.naturalWidth / image.naturalHeight
+         : 1.6;
+        const coverH = imgH;
+        const coverW = imgW;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(innerX, cursorY, coverW, coverH);
+        ctx.clip();
+        let drawW = coverW;
+        let drawH = drawW / Math.max(0.01, ratio);
+        if (drawH < coverH) {
+         drawH = coverH;
+         drawW = drawH * ratio;
+        }
+        const dx = innerX + (coverW - drawW) * 0.5;
+        const dy = cursorY + (coverH - drawH) * 0.5;
+        ctx.drawImage(image, dx, dy, drawW, drawH);
+        ctx.restore();
+        ctx.strokeStyle = dividerColor;
+        ctx.strokeRect(innerX + 0.5, cursorY + 0.5, coverW - 1, coverH - 1);
+        cursorY += coverH + clamp(8 * scale, 8, 14);
+      }
+      }
+
+      const attachmentNames = node.files
+       .filter((file) => file && !file.isImage)
+       .map((file) => normalizeText(file.name || file.path || "file"))
+       .slice(0, 3);
+      if (attachmentNames.length && cursorY < y + h - pad - 12) {
+       ctx.fillStyle = "#111111";
+       ctx.font = `400 ${smallSize}px "Times New Roman", Times, serif`;
+       const lines = attachmentNames.map((name) => `- ${name}`);
+       drawTextLines(ctx, lines, innerX, cursorY, smallSize * 1.18);
+      }
+
+      ctx.restore();
+     }
+    }
+
+    function downloadCanvas(canvas, fileName) {
+     const a = document.createElement("a");
+     a.href = canvas.toDataURL("image/png");
+     a.download = fileName;
+     document.body.appendChild(a);
+     a.click();
+     a.remove();
+    }
+
+    function baseName(suffix) {
+     const label = (state.label || state.folderName || "overtrace")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
+     return `${label}_${suffix}`;
+    }
+
+    function updateMeta() {
+     const name = state.label || state.folderName || "Project";
+     dom.projectMeta.textContent = `${name} · Space/Dot: ${mmText(SMALL_WIDTH_MM, SMALL_WIDTH_PX)} · Cards: ${mmText(LARGE_WIDTH_MM, LARGE_WIDTH_PX)}`;
+    }
+
+    async function renderAll() {
+     if (!state.project) return;
+     renderSpace2D(state.project);
+     renderProcessDots(state.project);
+     await renderProcessCards(state.project);
+     updateMeta();
+     setStatus("Preview aggiornata. PNG pronti.");
+    }
+
+    async function loadProject(project, label, folderName = "", assetBase = "") {
+     state.project = project;
+     state.label = label || folderName || "Project";
+     state.folderName = folderName || "";
+     state.assetBase = assetBase || (folderName ? `${folderName}/` : "");
+     state.imageCache.clear();
+     await renderAll();
+    }
+
+    async function loadFromFile(file) {
+     const text = await file.text();
+     const project = JSON.parse(text);
+     await loadProject(project, file.name.replace(/\.json$/i, ""), "", "");
+    }
+
+    async function restoreFromSharedOrQuery() {
+     const params = new URLSearchParams(window.location.search);
+     const folder = params.get("project");
+
+     if (folder) {
+      try {
+       const res = await fetch(`${folder}/project.json`, { cache: "no-store" });
+       if (res.ok) {
+        const project = await res.json();
+        await loadProject(project, folder, folder, `${folder}/`);
+        setStatus(`Caricato da ${folder}/project.json`);
+        return;
+       }
+      } catch (_) {}
+     }
+
+     try {
+      const raw = localStorage.getItem(SHARED_PROJECT_KEY);
+      if (!raw) return;
+      const payload = JSON.parse(raw);
+      if (!payload || !payload.project) return;
+      const folderName =
+       payload.folderName || inferFolderNameFromBase(payload.assetBase);
+      await loadProject(
+       payload.project,
+       payload.label || folderName || "Project",
+       folderName,
+       payload.assetBase || (folderName ? `${folderName}/` : "")
+      );
+      setStatus("Progetto ripristinato dallo stato condiviso.");
+     } catch (_) {}
+    }
+
+    function wireEvents() {
+     dom.btnOpen.addEventListener("click", () => {
+      dom.fileInput.value = "";
+      dom.fileInput.click();
+     });
+
+     dom.fileInput.addEventListener("change", async () => {
+      const file = dom.fileInput.files && dom.fileInput.files[0];
+      if (!file) return;
+      try {
+       await loadFromFile(file);
+      } catch (err) {
+       setStatus(`Errore apertura JSON: ${err.message || err}`);
+      }
+     });
+
+     dom.btnReload.addEventListener("click", async () => {
+      await restoreFromSharedOrQuery();
+     });
+
+     dom.btnSaveSpacePng.addEventListener("click", () => {
+      downloadCanvas(dom.spacePreview, `${baseName("space_2d")}.png`);
+     });
+
+     dom.btnSaveDotsPng.addEventListener("click", () => {
+      downloadCanvas(dom.dotsPreview, `${baseName("process_dots")}.png`);
+     });
+
+     dom.btnSaveCardsPng.addEventListener("click", () => {
+      downloadCanvas(dom.cardsPreview, `${baseName("process_nodes")}.png`);
+     });
+    }
+
+    wireEvents();
+    restoreFromSharedOrQuery();
+   })();
+  </script>
+ </body>
+</html>

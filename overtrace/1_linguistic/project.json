@@ -422,7 +422,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -1019,7 +1018,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -1154,7 +1152,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -1461,7 +1458,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -1493,7 +1489,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -1574,7 +1569,6 @@
         "areas": [
           "Linguistics",
           "War Studies",
-          "Censorship",
           "Philosophy",
           "Speculative Design"
         ],
@@ -2149,8 +2143,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Evolution",
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -2175,8 +2167,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Evolution",
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -2201,8 +2191,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Evolution",
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -2225,8 +2213,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Evolution",
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -2251,8 +2237,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Evolution",
-          "Censorship",
           "Communication Design"
         ],
         "tags": [],
@@ -2276,7 +2260,6 @@
         "areas": [
           "Linguistics",
           "War Studies",
-          "Censorship",
           "Cognitive science",
           "Speculative Design"
         ],
@@ -2300,7 +2283,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Censorship",
           "Information studies",
           "Speculative Design"
         ],
@@ -2323,7 +2305,6 @@
         "type": "What-if",
         "action": "Exploring",
         "areas": [
-          "Censorship",
           "Information studies",
           "Linguistics",
           "War Studies",
@@ -2359,7 +2340,6 @@
         "areas": [
           "Linguistics",
           "War Studies",
-          "Censorship",
           "Informatics",
           "Speculative Design"
         ],
@@ -2422,7 +2402,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Censorship",
           "Information studies",
           "Linguistics",
           "War Studies",
@@ -2448,8 +2427,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Censorship",
-          "Evolution",
           "War Studies",
           "Speculative Design"
         ],
@@ -2554,7 +2531,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Censorship",
           "War Studies",
           "Sociology",
           "Communication Design"
@@ -2651,9 +2627,7 @@
         "type": "Feedback",
         "action": null,
         "areas": [
-          "Linguistics",
-          "Censorship",
-          "Evolution"
+          "Linguistics"
         ],
         "tags": [],
         "desc": "Provide concrete examples with sentences and transformations - e. g. , written conversation in various degrees of algospeak. We are still in the realm of hypotheses - struggling to make it concrete. Conflictual dimension must be maintained. How do I represent it? - e. g. , anger project. Imagine forms of depiction - to understand if it is credible and if it works.",
@@ -2675,7 +2649,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Censorship",
           "War Studies",
           "Sociology",
           "Communication Design"
@@ -2699,9 +2672,7 @@
         "type": "Observation",
         "action": null,
         "areas": [
-          "Linguistics",
-          "Censorship",
-          "Evolution"
+          "Linguistics"
         ],
         "tags": [],
         "desc": "The notes analyze the tension between user expression and algorithmic control. Users adopt \"algospeak\" (e. g. , using \"unalive\") to avoid censorship, but this \"sterilizes\" language, reduces the impact of reality, and destabilizes shared meaning. The author envisions a future where moderation is hyper-adaptive, forcing language to update every second like software. Two technical solutions are brainstormed: a tool that encodes messages based on the rules of the exact moment (decodable via metadata), or a user-side tool to decode the constantly shifting vocabulary of others, bypassing the platform's censorship.",
@@ -2732,7 +2703,6 @@
         "action": "Exploring",
         "areas": [
           "Linguistics",
-          "Censorship",
           "War Studies",
           "Sociology",
           "Speculative Design"
@@ -7420,8 +7390,9 @@
       "Philosophy",
       "Mental health",
       "Morphology",
-      "Censorship",
-      "Evolution"
+      "Speculative Design",
+      "Communication Design",
+      "Interaction Design"
     ],
     "tags": [
       "Engeneering",

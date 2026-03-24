@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Overtrace icon</title>
+  <desc id="desc">A rounded black square containing a white traced network with a central hub and four satellite nodes.</desc>
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="#111111"/>
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 256 L160 160" stroke-width="30"/>
+    <path d="M256 256 L352 160" stroke-width="30"/>
+    <path d="M256 256 L352 352" stroke-width="30"/>
+    <path d="M256 256 L160 352" stroke-width="30"/>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="256" cy="256" r="44"/>
+    <circle cx="160" cy="160" r="28"/>
+    <circle cx="352" cy="160" r="28"/>
+    <circle cx="352" cy="352" r="28"/>
+    <circle cx="160" cy="352" r="28"/>
+  </g>
+</svg>

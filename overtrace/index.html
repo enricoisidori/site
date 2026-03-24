@@ -4,13 +4,56 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Overtrace</title>
-    <!-- Favicons / Icons -->
+    <meta
+      name="description"
+      content="Overtrace is a tool to map, read and compare design processes through nodes, connections, spatial analysis and process analysis."
+    />
+    <meta name="application-name" content="Overtrace" />
+    <meta name="apple-mobile-web-app-title" content="Overtrace" />
+    <meta name="theme-color" content="#111111" />
+    <meta name="robots" content="index,follow" />
+    <meta property="og:site_name" content="Overtrace" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Overtrace" />
+    <meta
+      property="og:description"
+      content="Map, read and compare design processes through nodes, connections, spatial analysis and process analysis."
+    />
+    <meta
+      property="og:image"
+      content="./overtrace/android-chrome-512x512.png"
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Overtrace" />
+    <meta
+      name="twitter:description"
+      content="Map, read and compare design processes through nodes, connections, spatial analysis and process analysis."
+    />
+    <link rel="icon" type="image/svg+xml" href="./overtrace/overtrace.svg" />
+    <link rel="shortcut icon" href="./overtrace/favicon-32x32.png" />
     <link
       rel="icon"
       type="image/png"
-      sizes="1024x1024"
-      href="./overtrace/icon.png"
+      sizes="32x32"
+      href="./overtrace/favicon-32x32.png"
     />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./overtrace/favicon-16x16.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./overtrace/apple-touch-icon.png"
+    />
+    <link
+      rel="mask-icon"
+      href="./overtrace/safari-pinned-tab.svg"
+      color="#111111"
+    />
+    <link rel="manifest" href="./overtrace/site.webmanifest" />
 
     <!-- HEAD: import Material Symbols -->
     <link
@@ -194,7 +237,7 @@
 
       /* Titlebar styles removed (title now lives inside .body) */
       .title {
-        font-weight: 400;
+        font-weight: 700;
         font-size: 12px;
         color: #fff;
         min-height: 1em;
@@ -1983,6 +2026,59 @@
           return null;
         }
 
+        function buildCurrentFsContextEntry() {
+          const folderName = inferCurrentFolderName();
+          const assetBase =
+            String(projectCtx?.assetBase || "").trim() ||
+            (folderName ? `${folderName}/` : "");
+          if (projectCtx.mode === "folder" && projectCtx.dirHandle) {
+            return {
+              kind: "folder",
+              dirHandle: projectCtx.dirHandle,
+              folderName: folderName || projectCtx.dirHandle?.name || null,
+              assetBase,
+              fileName: "project.json",
+            };
+          }
+          if (projectCtx.mode === "file" && projectCtx.fileHandle) {
+            return {
+              kind: "file",
+              fileHandle: projectCtx.fileHandle,
+              fileName: projectCtx.fileHandle?.name || "project.json",
+            };
+          }
+          return null;
+        }
+
+        async function syncProjectFsContext() {
+          const entry = buildCurrentFsContextEntry();
+          if (!entry) {
+            await window.OvertraceUI?.clearProjectFsContext?.();
+            return false;
+          }
+          const fsContext = window.OvertraceUI?.buildProjectFsContext?.(entry);
+          if (!fsContext) return false;
+          return !!(await window.OvertraceUI?.saveProjectFsContext?.(fsContext));
+        }
+
+        function matchesStoredFsContext(fsContext, folderName) {
+          if (!fsContext || !fsContext.handle) return false;
+          if (fsContext.kind === "folder") {
+            if (!folderName) return false;
+            if (
+              fsContext.folderName &&
+              fsContext.folderName !== folderName
+            ) {
+              return false;
+            }
+            return true;
+          }
+          if (fsContext.kind === "file") {
+            return !folderName;
+          }
+          return false;
+        }
+
         function persistSharedProjectState(source = "editor") {
           const folderName = inferCurrentFolderName();
           const assetBase =
@@ -2011,13 +2107,41 @@
             const payload = JSON.parse(raw);
             if (!payload || !payload.project) return false;
             if (payload.source && payload.source !== from) return false;
-            projectCtx.mode = "embedded";
-            projectCtx.dirHandle = null;
-            projectCtx.folderName = payload.folderName || null;
+            const routedFolder = params.get("project") || null;
+            const requestedFolder =
+              payload.folderName ||
+              routedFolder ||
+              (payload.assetBase
+                ? payload.assetBase.replace(/\/+$/, "").split("/").pop() || null
+                : null);
+            const fsContext = await window.OvertraceUI?.loadProjectFsContext?.();
+            const matchedFsContext = matchesStoredFsContext(
+              fsContext,
+              requestedFolder,
+            )
+              ? fsContext
+              : null;
+            projectCtx.mode =
+              matchedFsContext?.kind === "folder"
+                ? "folder"
+                : matchedFsContext?.kind === "file"
+                  ? "file"
+                  : "embedded";
+            projectCtx.dirHandle =
+              matchedFsContext?.kind === "folder"
+                ? matchedFsContext.handle
+                : null;
+            projectCtx.fileHandle =
+              matchedFsContext?.kind === "file"
+                ? matchedFsContext.handle
+                : null;
+            projectCtx.folderName =
+              payload.folderName || matchedFsContext?.folderName || routedFolder;
             projectCtx.assetBase =
               String(payload.assetBase || "").trim() ||
-              (payload.folderName ? `${payload.folderName}/` : "");
-            await loadProject(payload.project, null);
+              matchedFsContext?.assetBase ||
+              (projectCtx.folderName ? `${projectCtx.folderName}/` : "");
+            await loadProject(payload.project, projectCtx.dirHandle);
             const fromLabel =
               from === "space"
                 ? "Space analysis"
@@ -2033,6 +2157,58 @@
           } catch (err) {
             console.warn("Shared-state restore failed", err);
             setStatus("Unable to restore project from linked view");
+            return false;
+          }
+        }
+
+        async function tryAutoloadProjectFromQuery() {
+          const params = new URLSearchParams(window.location.search);
+          const folder = params.get("project");
+          if (!folder) return false;
+          try {
+            const fsContext = await window.OvertraceUI?.loadProjectFsContext?.();
+            if (
+              fsContext?.kind === "folder" &&
+              fsContext.handle &&
+              fsContext.folderName === folder
+            ) {
+              const fileHandle = await fsContext.handle.getFileHandle(
+                "project.json",
+                {
+                  create: false,
+                },
+              );
+              const file = await fileHandle.getFile();
+              const project = JSON.parse(await file.text());
+              projectCtx.mode = "folder";
+              projectCtx.dirHandle = fsContext.handle;
+              projectCtx.fileHandle = null;
+              projectCtx.folderName = fsContext.folderName || folder;
+              projectCtx.assetBase =
+                fsContext.assetBase || `${projectCtx.folderName}/`;
+              await loadProject(project, fsContext.handle);
+              setStatus(`Project opened from ${folder}/project.json`);
+              return true;
+            }
+          } catch (err) {
+            console.warn("Unable to autoload project from stored folder handle", err);
+          }
+
+          try {
+            const res = await fetch(`${folder}/project.json`, {
+              cache: "no-store",
+            });
+            if (!res.ok) return false;
+            const project = await res.json();
+            projectCtx.mode = "embedded";
+            projectCtx.dirHandle = null;
+            projectCtx.fileHandle = null;
+            projectCtx.folderName = folder;
+            projectCtx.assetBase = `${folder}/`;
+            await loadProject(project, null);
+            setStatus(`Project opened from ${folder}/project.json`);
+            return true;
+          } catch (_) {
             return false;
           }
         }
@@ -5083,6 +5259,7 @@
               projectCtx.fileHandle = null;
               projectCtx.folderName = dir?.name || null;
               projectCtx.assetBase = dir?.name ? `${dir.name}/` : "";
+              await syncProjectFsContext();
               setStatus(`Project saved (new fast folder) — ${fmtTime10()}`);
               return;
             } catch (err) {
@@ -5099,6 +5276,7 @@
           projectCtx.fileHandle = null;
           projectCtx.folderName = null;
           projectCtx.assetBase = "";
+          await syncProjectFsContext();
         }
 
         // filesMode: "none" | "paths" | "embedded" (noi usiamo "paths" o "none")
@@ -5267,6 +5445,7 @@
               projectCtx.fileHandle = null;
               projectCtx.folderName = dir?.name || null;
               projectCtx.assetBase = dir?.name ? `${dir.name}/` : "";
+              await syncProjectFsContext();
               setStatus("Project opened from folder");
               return;
             } catch (err) {
@@ -5294,6 +5473,7 @@
                 projectCtx.fileHandle = fileHandle;
                 projectCtx.folderName = null;
                 projectCtx.assetBase = "";
+                await syncProjectFsContext();
                 setStatus("Project opened from JSON file (linked)");
                 return;
               }
@@ -5313,6 +5493,7 @@
             projectCtx.fileHandle = null;
             projectCtx.folderName = null;
             projectCtx.assetBase = "";
+            await syncProjectFsContext();
             setStatus("Project opened from JSON file");
             f.openFile.value = "";
           };
@@ -5337,6 +5518,7 @@
           projectCtx.fileHandle = null;
           projectCtx.folderName = null;
           projectCtx.assetBase = "";
+          await syncProjectFsContext();
           vocab.areasMRU.clear();
           vocab.tagsMRU.clear();
           vocab.typeMRU.clear();
@@ -5773,7 +5955,12 @@
         if (state.nodes.length === 0) {
           addNodeAt(80, 80, {});
         }
-        void restoreSharedProjectFromOtherView();
+        void (async () => {
+          const restored = await restoreSharedProjectFromOtherView();
+          if (!restored) {
+            await tryAutoloadProjectFromQuery();
+          }
+        })();
 
         resizeEdgeCanvasToStage();
         scheduleEdgeCanvasDraw();

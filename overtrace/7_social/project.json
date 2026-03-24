@@ -180,7 +180,6 @@
         "areas": [
           "Speculative Design",
           "Urban studies",
-          "Tourism studies",
           "Sociology",
           "Political communication"
         ],
@@ -373,7 +372,6 @@
         "areas": [
           "Speculative Design",
           "Urban studies",
-          "Tourism studies",
           "Sociology",
           "Biotechnology"
         ],
@@ -567,7 +565,6 @@
         "areas": [
           "Speculative Design",
           "Urban studies",
-          "Tourism studies",
           "Sociology",
           "Architecture"
         ],
@@ -1127,8 +1124,7 @@
           "Design research",
           "Speculative Design",
           "Critical design",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "",
@@ -1152,8 +1148,7 @@
           "Design research",
           "Speculative Design",
           "Critical design",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "In recent years, the phenomenon of overtourism has transformed many European cities, including Barcelona, Venice, and Florence. Mass tourism generates daily discomfort for residents: rising prices, loss of public spaces, and congested streets. At the same time, tourists themselves also experience an impoverished experience: endless queues, overcrowded places, and a lack of authenticity.",
@@ -1177,8 +1172,7 @@
           "Design research",
           "Speculative Design",
           "Critical design",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "The core issue is not to establish whether tourism is 'right' or 'wrong, ' but to question how sustainable the coexistence is between those who live in the city and those who pass through it. What happens when hospitality turns into exasperation? To what extent are residents willing to defend their daily lives?",
@@ -1202,8 +1196,7 @@
           "Design research",
           "Speculative Design",
           "Critical design",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "What if, one day, citizens had access to a device that allows them to identify and hit tourists with non-lethal weapons, such as BB guns or paintball guns, turning the city into a kind of gamified hunt? The scenario we imagine is one of extreme tourism, where visiting a city is no longer a cultural experience, but a challenge of survival.",
@@ -1227,8 +1220,7 @@
           "Design research",
           "Speculative Design",
           "Critical design",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "Definition and reason for the conflict The conflict arises from two opposing needs: The residents want to reclaim their spaces, defending themselves against a perceived invasion. The tourists seek authentic experiences and free access to the cities. The device exacerbates this tension, normalizing the idea that 'hunting tourists' is a legitimate act.",
@@ -1252,8 +1244,7 @@
           "Design research",
           "Speculative Design",
           "Critical design",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "The main actors are:\nThe citizens, who become armed players and defenders. The tourists, transformed into collectible targets. The city becomes an arena, where tourism fuels the very conflict that rejects it.",
@@ -1277,8 +1268,7 @@
           "Design research",
           "Speculative Design",
           "Critical design",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "In this scenario, a technology company specializing in 'playful urban defense' emerges. Its role is to provide tools that respond to the residents' need to reassert control over the city. But at the same time, it intercepts a new market: adrenaline tourism. A short circuit where protest becomes entertainment.",
@@ -1467,7 +1457,7 @@
         "areas": [
           "Interaction Design",
           "Human-computer interaction",
-          "Ux design",
+          "UX design",
           "Creative coding",
           "Speculative Design"
         ],
@@ -1527,8 +1517,7 @@
           "Communication Design",
           "Branding",
           "Political communication",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "A private company identifies an opportunity for profit in the problem of overtourism. It therefore decides to intervene, offering an exasperated citizenry a product, a game, presented as the solution to their discomfort. In this way, the company positions itself above the two conflicting groups, exploiting the tension between tourists and residents to gain an economic advantage.",
@@ -1552,8 +1541,7 @@
           "Communication Design",
           "Branding",
           "Political communication",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "In the European locations (especially large cities) most affected by this phenomenon.\n\nSome are: -Barcelona -Lisbon -Berlin -Florence -Venice -Rome\n\n*mostly large European cities.",
@@ -1710,8 +1698,7 @@
           "Communication Design",
           "Branding",
           "Political communication",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "Exploiting the citizens' discontent and the overtourism crisis to transform collective discomfort into a profitable recreational experience.\n\nInstead of solving the problem, we fuel it, converting social frustration into entertainment and profit.",
@@ -1735,8 +1722,7 @@
           "Communication Design",
           "Branding",
           "Political communication",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "The kit\nThe main product sold to citizens is a 'urban hunter' kit, composed of: A Paintball gun, with additional accessories. A Recognition Device, which allows for the identification and collection (tagging/scoring) of tourists.",
@@ -1760,8 +1746,7 @@
           "Communication Design",
           "Branding",
           "Political communication",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "Hunting seasons: the game is structured into seasons (events), determined by the peaks of tourist influx in different cities (for example, Milan in winter, Barcelona in summer).\n\nTeam play: players act in groups, collaborating to achieve common goals that determine the community's success. However, there are also individual milestones, which reward single players upon completion of specific personal achievements.\n\nScoring system: points are accumulated through the 'collection' of different categories of hit tourists, categorized by levels of rarity based on predetermined parameters.",
@@ -1784,7 +1769,6 @@
         "areas": [
           "Journalism",
           "Urban studies",
-          "Tourism studies",
           "Political communication",
           "Speculative Design"
         ],
@@ -1811,7 +1795,6 @@
         "areas": [
           "Journalism",
           "Urban studies",
-          "Tourism studies",
           "Political communication",
           "Speculative Design"
         ],
@@ -1838,7 +1821,6 @@
         "areas": [
           "Journalism",
           "Urban studies",
-          "Tourism studies",
           "Political communication",
           "Speculative Design"
         ],
@@ -1865,7 +1847,6 @@
         "areas": [
           "Journalism",
           "Urban studies",
-          "Tourism studies",
           "Political communication",
           "Speculative Design"
         ],
@@ -1892,7 +1873,6 @@
         "areas": [
           "Journalism",
           "Urban studies",
-          "Tourism studies",
           "Political communication",
           "Speculative Design"
         ],
@@ -1919,7 +1899,7 @@
         "areas": [
           "Design research",
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Speculative Design"
         ],
@@ -1944,7 +1924,7 @@
         "areas": [
           "Interaction Design",
           "Human-computer interaction",
-          "Ux design",
+          "UX design",
           "Creative coding",
           "Speculative Design"
         ],
@@ -1969,7 +1949,7 @@
         "areas": [
           "Design research",
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Physical computing"
         ],
@@ -1994,7 +1974,7 @@
         "areas": [
           "Design research",
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Speculative Design"
         ],
@@ -2019,7 +1999,7 @@
         "areas": [
           "Design research",
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -2044,7 +2024,7 @@
         "areas": [
           "Design research",
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -2068,7 +2048,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Physical computing",
           "Electronics prototyping"
@@ -2634,7 +2614,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -2699,7 +2679,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -2732,7 +2712,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -2765,7 +2745,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -2798,7 +2778,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -2830,7 +2810,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -2854,7 +2834,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -2886,7 +2866,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -2920,8 +2900,7 @@
           "Communication Design",
           "Branding",
           "Political communication",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "Transition into a DAO (Decentralized Autonomous Organization) to return control and decision-making power directly to the community.\nReclaim is a community-managed solution addressing an issue that affects all its participants, creating a product that is an actual solution to the issue of overtourism.",
@@ -2943,7 +2922,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -2992,7 +2971,7 @@
         "areas": [
           "Design research",
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Speculative Design"
         ],
@@ -3016,7 +2995,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -3049,7 +3028,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -3082,7 +3061,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -3108,8 +3087,7 @@
           "Communication Design",
           "Branding",
           "Political communication",
-          "Urban studies",
-          "Tourism studies"
+          "Urban studies"
         ],
         "tags": [],
         "desc": "We become more of a high-tech, morally grey company, looking at overtourism as an opportunity to profit off of a problem to which we give the best, most simple and most direct solution: starting an active war between citizens and tourists.",
@@ -3131,7 +3109,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -3165,7 +3143,7 @@
         "areas": [
           "Design research",
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -3189,7 +3167,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -3778,7 +3756,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Physical computing",
           "Electronics prototyping"
@@ -3812,7 +3790,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -3835,7 +3813,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4024,7 +4002,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -4057,7 +4035,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4089,7 +4067,7 @@
         "action": "Exploring",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Physical computing",
           "Electronics prototyping"
@@ -4123,7 +4101,7 @@
         "action": "Exploring",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Physical computing",
           "Electronics prototyping"
@@ -4157,7 +4135,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4189,7 +4167,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4221,7 +4199,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Physical computing",
           "Electronics prototyping"
@@ -4255,7 +4233,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4287,7 +4265,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4327,7 +4305,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4359,7 +4337,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction",
           "Creative coding"
         ],
@@ -4466,7 +4444,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4498,7 +4476,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4530,7 +4508,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4604,7 +4582,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -4644,7 +4622,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "Ux design",
+          "UX design",
           "Human-computer interaction"
         ],
         "tags": [],
@@ -5823,8 +5801,7 @@
     "areas": [
       "Visual culture",
       "Urban studies",
-      "Ux design",
-      "Tourism studies",
+      "UX design",
       "Sociology",
       "Psychology",
       "Political science",
@@ -5846,7 +5823,10 @@
       "Branding",
       "Biotechnology",
       "Bioethics",
-      "Architecture"
+      "Architecture",
+      "Speculative Design",
+      "Communication Design",
+      "Interaction Design"
     ],
     "tags": [],
     "type": [

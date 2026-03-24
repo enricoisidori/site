@@ -74,7 +74,11 @@
         "title": "Regulations, legal maps,",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Political science", "War Studies", "Cultural studies"],
+        "areas": [
+          "Political science",
+          "War Studies",
+          "Cultural studies"
+        ],
         "tags": [],
         "desc": "A legal map refers to a visual and structured representation of legal concepts, laws, or branches of law, similar to a concept map or diagram. It helps simplify and organize the complexity of the legal and bureaucratic system by showing relationships between different rules, institutions, or principles, thus supporting understanding and study. Regulations are specific rules issued by authorities to implement and enforce laws within particular contexts.",
         "links": [],
@@ -141,7 +145,10 @@
         "title": "The nature of bureaucracy",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["History", "Political science"],
+        "areas": [
+          "History",
+          "Political science"
+        ],
         "tags": [],
         "desc": "Bureaucracy is the organizational structure composed of officials and offices arranged in hierarchical levels to perform administrative functions. The term also extends to structured organizations managed through formal rules and procedures. Beyond its technical meaning, bureaucracy often carries a negative connotation, symbolizing inefficiency, rigidity, and excessive formalism. It becomes an emblem of systems where procedure prevails over purpose, illustrating the inherent tension between control, order, and adaptability within institutional structures.",
         "links": [],
@@ -169,8 +176,16 @@
         "title": "The nature of conflict",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["War Studies", "Political science", "Philosophy"],
-        "tags": ["Conflict", "Opposition", "Social tension"],
+        "areas": [
+          "War Studies",
+          "Political science",
+          "Philosophy"
+        ],
+        "tags": [
+          "Conflict",
+          "Opposition",
+          "Social tension"
+        ],
         "desc": "Conflict represents any form of clash that generates violence, whether material or symbolic. It defines a state of opposition and persists as a structural condition within society. Beyond warfare or explicit confrontation, conflict emerges in everyday spaces as friction between diverse systems, needs, and visions. It is embedded in cultural practices, social relations, and infrastructures, becoming a pervasive component of collective life. Through its diffusion, conflict reveals itself as an essential force shaping interaction, negotiation, and transformation across human environments.",
         "links": [],
         "files": []
@@ -188,8 +203,16 @@
         "title": "Emotional responses to bureaucracy",
         "type": "Collection",
         "action": "Exploring",
-        "areas": ["Sociology", "War Studies", "Communication Design"],
-        "tags": ["Emotion", "Feelings", "Conflict"],
+        "areas": [
+          "Sociology",
+          "War Studies",
+          "Communication Design"
+        ],
+        "tags": [
+          "Emotion",
+          "Feelings",
+          "Conflict"
+        ],
         "desc": "The emotional dimension of bureaucracy reveals a complex landscape of human responses shaped by institutional rigidity. Feelings such as oppression, frustration, and helplessness emerge from the system’s slowness, formality, and impersonal nature. Bureaucracy produces experiences of deadlock, misunderstanding, and disconnection, marked by paperwork, waiting, and the absence of empathy. Its cold and grey aesthetics reinforce a sense of immobility and alienation, where individuals perceive themselves as trapped in an apparatus that prioritizes procedure over care.",
         "links": [],
         "files": []
@@ -207,7 +230,10 @@
         "title": "History of bureaucracy",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["History", "Political science"],
+        "areas": [
+          "History",
+          "Political science"
+        ],
         "tags": [],
         "desc": "The historical development of bureaucracy traces a trajectory from ancient systems of centralized control to contemporary digital governance. Its roots lie in early hydraulic civilizations and empires, where administrative coordination enabled state expansion. The Roman Empire refined these principles, establishing durable models of record-keeping and hierarchical authority. With the decline of feudal fragmentation, modern states emerged, institutionalizing rational bureaucratic apparatuses as tools of legal and economic order. Across the capitalist era, bureaucracy became both a mechanism of efficiency and a site of contradiction—reformulated through administrative modernization and, more recently, through digital infrastructures and artificial intelligence, which redefine its modes of control and rationality.",
         "links": [],
@@ -226,7 +252,11 @@
         "title": "Citizen’s life marked by bureaucratic stages",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["Public administration", "Cultural studies", "Sociology"],
+        "areas": [
+          "Public administration",
+          "Cultural studies",
+          "Sociology"
+        ],
         "tags": [],
         "desc": "A citizen’s life is marked by bureaucratic stages. It begins with birth registration, tax code, health card, and identity documents, and continues with education, applications for scholarships, and certifications. Entering the workforce involves registration with INPS and INAIL, employment notifications, and opening a VAT number. Adulthood brings marriage, buying a house, changing residence, and filing income tax returns. Finally, in old age and at the end of life, one deals with pension applications, death registration, inheritance, and cadastral transfers.",
         "links": [],
@@ -245,7 +275,12 @@
         "title": "Rational system",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["Sociology", "Public administration", "Law", "War Studies"],
+        "areas": [
+          "Sociology",
+          "Public administration",
+          "Law",
+          "War Studies"
+        ],
         "tags": [],
         "desc": "Bureaucracy is a rational system designed to maintain order and ensure fairness. It follows structured procedures that must be respected, leaving little room for emotions or personal judgment. By adhering to rules and standardized processes, bureaucracy aims to prevent favoritism and guarantee that decisions are consistent and impartial.",
         "links": [],
@@ -289,7 +324,11 @@
         "title": "Biological and bureaucratic identity",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["Cultural studies", "War Studies", "Sociology"],
+        "areas": [
+          "Cultural studies",
+          "War Studies",
+          "Sociology"
+        ],
         "tags": [],
         "desc": "Biological identity: the set of physical and personal characteristics that define a person, such as the body, personal history, passions, and preferences.\n\nBureaucratic identity: the official identity recognized by the state or institutions, documented through certificates, identity documents, tax codes, passports, registry records, and other administrative acts.\n\nWhen the two do not coincide, a conflict arises between them, as the person finds themselves in a bureaucratic limbo.",
         "links": [],
@@ -308,7 +347,10 @@
         "title": "Bureaucracy as a form of power",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["Political science", "War Studies"],
+        "areas": [
+          "Political science",
+          "War Studies"
+        ],
         "tags": [],
         "desc": "Bureaucracy operates as a mechanism of control, where rules and procedures maintain authority and dependency. By linking access to rights and services to complex administrative systems, it fosters submission and compliance. Beyond its administrative role, bureaucracy functions as a subtle form of domination, shaping behavior through structure and regulation.",
         "links": [],
@@ -380,7 +422,12 @@
         "title": "Wars and struggles linked to bureaucratic borders",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["History", "War Studies", "Political science", "Law"],
+        "areas": [
+          "History",
+          "War Studies",
+          "Political science",
+          "Law"
+        ],
         "tags": [],
         "desc": "Many state borders were bureaucratically drawn at the negotiating table by political leaders, often disregarding the populations living there. This led to conflicts both between states and within nations, as communities did not identify with these imposed boundaries.\nExamples\n• India–Pakistan Wars (1947, 1965, 1971): following the Partition of British India\n• Arab–Israeli Wars (1948, 1967, 1973): borders drawn after the British Mandate and UN partition plan\n• Ethiopia–Eritrea War (1998–2000): dispute over colonial-era borders\n• Iraq–Kuwait Conflict / Gulf War (1990–1991): rooted partly in arbitrary colonial borders in the Middle East\n• Sudanese Civil Wars (1955–1972, 1983–2005): borders and ethnic-religious divisions leading to the creation of South Sudan\n• Yugoslav Wars (1991–2001): breakup of Yugoslavia along imposed federal boundaries\n• Somali Civil War (from 1991): collapse of a state built on colonial borders without regard for clan structures.",
         "links": [],
@@ -399,7 +446,11 @@
         "title": "Boundaries between people",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["War Studies", "Cultural studies", "Sociology"],
+        "areas": [
+          "War Studies",
+          "Cultural studies",
+          "Sociology"
+        ],
         "tags": [],
         "desc": "Restrictive orders, such as restraining orders or protection orders, function like material boundaries between people imposed by conflict. They legally limit interactions, define physical or social spaces, and aim to prevent harm. These orders create clear divisions in everyday life, translating interpersonal disputes into structured, enforceable rules.",
         "links": [],
@@ -418,7 +469,11 @@
         "title": "Humanized bureaucracy",
         "type": "Concept",
         "action": "Exploring",
-        "areas": ["Public administration", "War Studies", "Speculative Design"],
+        "areas": [
+          "Public administration",
+          "War Studies",
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "To humanize bureaucracy means allowing space for emotions and empathy within administrative processes. It involves introducing compassion, care, and support into interactions with rational rules and procedures. By letting kindness and humanity enter bureaucratic systems, regulations and processes can serve people more effectively, transforming rigid structures into tools that truly respond to human needs.",
         "links": [],
@@ -510,7 +565,12 @@
         "title": "Kafka’s critique of bureaucracy",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Literature", "Cultural studies", "Sociology", "War Studies"],
+        "areas": [
+          "Literature",
+          "Cultural studies",
+          "Sociology",
+          "War Studies"
+        ],
         "tags": [],
         "desc": "Key points of Kafka’s critique of bureaucracy can be summarized as follows:\n\nLabyrinth and absurdity: Kafka depicts bureaucracy as a maze of obscure rules, faceless procedures, and offices existing mainly to perpetuate themselves. In The Trial, Josef K. is arrested for a crime whose charge is never revealed, forcing him to navigate an illogical, elusive judicial system, with his lawyer moving as slowly and opaquely as the process itself.\n\nImpersonal machine: Bureaucracy is portrayed as a system where cold rationality masks a world of complex, contradictory interests. Individuals like Josef K. become mere cogs, while officials and judges appear symbolic, almost inhuman, with incomprehensible, impersonal power.\n\nContradiction and totalitarian potential: Kafka foresaw bureaucracy’s tendency to become a totalitarian instrument, permeating citizens’ lives and minds. The system enforces conformity and submission to rules that seem to exist independently, suppressing personal freedom and subjectivity.",
         "links": [],
@@ -529,7 +589,12 @@
         "title": "Stateless people",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Law", "Political science", "History", "War Studies"],
+        "areas": [
+          "Law",
+          "Political science",
+          "History",
+          "War Studies"
+        ],
         "tags": [],
         "desc": "Individuals who are not recognized as citizens by any state under its laws. This means they lack a nationality and the legal rights that come with it.\n\nStatelessness often arises from the dissolution or partition of states (e. g. breakup of Yugoslavia).",
         "links": [
@@ -550,7 +615,12 @@
         "title": "Terra nullius",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["History", "War Studies", "Political science", "Law"],
+        "areas": [
+          "History",
+          "War Studies",
+          "Political science",
+          "Law"
+        ],
         "tags": [],
         "desc": "Several territories have existed as “no man’s lands, ” disputed between states or left unclaimed due to legal, political, or practical uncertainties. These areas often sparked conflicts but were eventually addressed through bureaucratic practices such as treaties or international negotiations.\n\nTerra Nullius: a Latin term from Roman law meaning “land belonging to no one. ” It refers to territories that are not formally under the sovereignty of any state.\n\nExamples\n • Gornja Siga (on the border between Croatia and Serbia): a disputed area where both countries claim different borders, leaving small pockets of land technically unclaimed.\n • Bir Tawil (between Egypt and Sudan): a desert territory unclaimed by either country due to conflicting border demarcations.\n • Marie Byrd Land (in Antarctica): one of the few areas not claimed by any state, partly due to the Antarctic Treaty System.\n • Palestinian Territories: while not a “terra nullius” in the strict legal sense, the contested status of the land has produced decades of conflict and negotiation, with statehood and sovereignty still unresolved.",
         "links": [],
@@ -569,7 +639,11 @@
         "title": "State and nation",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["History", "War Studies", "Political science"],
+        "areas": [
+          "History",
+          "War Studies",
+          "Political science"
+        ],
         "tags": [],
         "desc": "A state is a political entity with defined territory, a population, and a government exercising sovereignty. A nation is a community united by culture, language, history, or identity. Nations and states do not always match: some nations have no state, and some states contain multiple nations.",
         "links": [],
@@ -637,7 +711,12 @@
         "title": "Consequences of being stateless",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["History", "War Studies", "Political science", "Law"],
+        "areas": [
+          "History",
+          "War Studies",
+          "Political science",
+          "Law"
+        ],
         "tags": [],
         "desc": "Living without citizenship means lacking access to fundamental rights and protections, such as:\n • Legal identity: difficulty obtaining ID cards, passports, or official documents\n • Civil rights: exclusion from voting and political participation\n • Social rights: limited access to healthcare, education, or social services\n • Work and mobility: inability to work legally, travel abroad, or own property\n • Legal protection: greater vulnerability to exploitation, detention, or deportation\n\nIn practice, many stateless people live in legal and bureaucratic limbo, relying on humanitarian organizations or informal networks, often marginalized within the societies where they reside.",
         "links": [],
@@ -725,8 +804,16 @@
         "title": "Corruption in public administration",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Political science", "War Studies", "Public administration"],
-        "tags": ["Conflict", "Corruption", "Power abuse"],
+        "areas": [
+          "Political science",
+          "War Studies",
+          "Public administration"
+        ],
+        "tags": [
+          "Conflict",
+          "Corruption",
+          "Power abuse"
+        ],
         "desc": "Public administration and healthcare systems in Italy have repeatedly been exposed to corruption scandals that reveal how bureaucratic structures can be manipulated for personal advantage. In cases such as Mafia Capitale (2014) and later investigations in Lombardy and Sicily, officials were found demanding bribes or favors to speed up permits, tax procedures, and building licenses—otherwise obstructing them for months or years. Similar mechanisms emerged in healthcare, where reports by Transparency International and ISTAT showed that 2. 4% of families were asked for money or favors to access faster services, while nearly 10% were encouraged by doctors to book private appointments to bypass waiting lists. These cases demonstrate how bureaucracy, when corrupted, ceases to act as an impartial administrative framework and instead becomes an instrument of coercion—turning citizens’ access to rights into a matter of privilege and negotiation.",
         "links": [
           "https://www.fiscal-focus.it/quotidiano/il-quotidiano/editoriali/la-burocrazia-che-uccide-senza-armi,3,59548"
@@ -746,7 +833,9 @@
         "title": "Moodboard",
         "type": "Collection",
         "action": "Making",
-        "areas": ["Communication Design"],
+        "areas": [
+          "Communication Design"
+        ],
         "tags": [],
         "desc": "Rudolf Bonvie, Dialog, 1973\nDoriane terraillon, Still Photography, 2025\nChristo, Empaquetages, 1958\n Otto Künzli, Ring für Zwei, 1980.",
         "links": [
@@ -851,7 +940,11 @@
         "title": "Possible things without official documents:",
         "type": "Observation",
         "action": "Making",
-        "areas": ["Public administration", "War Studies", "Cultural studies"],
+        "areas": [
+          "Public administration",
+          "War Studies",
+          "Cultural studies"
+        ],
         "tags": [],
         "desc": "Sleep in temporary or informal places;\nWork off the books or in untracked jobs;\nBuy food and everyday goods;\nMove around freely on foot or using public transport; Build a discreet social network;\nUse cash-based services or services that don’t require registration;\nPrepaid phones (sometimes with limitations), online services with limited identity verification.",
         "links": [],
@@ -870,7 +963,11 @@
         "title": "Things impossible or highly risky without official documents",
         "type": "Observation",
         "action": "Making",
-        "areas": ["Public administration", "Cultural studies", "War Studies"],
+        "areas": [
+          "Public administration",
+          "Cultural studies",
+          "War Studies"
+        ],
         "tags": [],
         "desc": "Open a legal bank account;\nSign official contracts\nAccess public services as public healthcare, pensions, national health insurance, and state benefits;\nDrive legally; Travel abroad or obtain a passport;\nRegister marriage, children’s births, or property;\nReceive legal correspondence or official notices;\nAttend public schools or universities as a regular student.",
         "links": [],
@@ -932,10 +1029,16 @@
         "title": "Slapps",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Political science", "War Studies", "Law"],
+        "areas": [
+          "Political science",
+          "War Studies",
+          "Law"
+        ],
         "tags": [],
         "desc": "SLAPPs (Strategic Lawsuits Against Public Participation) represent a contemporary form of bureaucratic warfare, where powerful entities use the legal system to silence dissent. These lawsuits, often lacking solid legal grounds, are designed to burden activists, journalists, or NGOs with overwhelming legal costs, procedural delays, and administrative complexity. Their effectiveness lies in exploiting the inefficiencies of judicial bureaucracy—slow timelines, financial inaccessibility, and the emotional strain of prolonged litigation. The objective is not to win in court, but to exhaust and intimidate the opposition into silence. A recent example is the lawsuit filed by an oil and gas company against Greenpeace and several activists in North Dakota, which ended with Greenpeace ordered to pay over $660 million in fines. SLAPPs reveal how bureaucratic mechanisms, when weaponized, can transform justice into a tool of coercion and control.",
-        "links": ["https://www.the-case.eu/slapps/"],
+        "links": [
+          "https://www.the-case.eu/slapps/"
+        ],
         "files": []
       }
     },
@@ -976,7 +1079,9 @@
         "title": "Feedback on the slapp concept",
         "type": "Feedback",
         "action": "Exploring",
-        "areas": ["Speculative Design"],
+        "areas": [
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "The idea of representing bureaucracy as a weapon was appreciated for its critical depth and conceptual strength. However, the physical metaphor of the slap was not well received. The comparison between legal violence and physical impact was perceived as too literal and potentially distracting from the conceptual core. The feedback suggests emphasizing the structural nature of bureaucratic aggression rather than its bodily translation.",
         "links": [],
@@ -995,7 +1100,10 @@
         "title": "Migrants",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["Law", "Political science"],
+        "areas": [
+          "Law",
+          "Political science"
+        ],
         "tags": [],
         "desc": "In many cases, migrants become trapped in international waters due to bureaucratic loopholes and delays, biologically alive yet administratively invisible.",
         "links": [],
@@ -1083,7 +1191,11 @@
         "title": "Foucault's power and biopolitics",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["History", "Philosophy", "Sociology"],
+        "areas": [
+          "History",
+          "Philosophy",
+          "Sociology"
+        ],
         "tags": [],
         "desc": "Foucault argues that modern power no longer operates solely through repression and prohibition—the “right to let die”—but productively, taking on the task of managing, optimizing, and “making live” the population. This approach directly applies to the regulation of human relationships, which cease to be purely private matters and instead become objects of expert knowledge and management. Biopower, therefore, justifies bureaucratic intervention in the intimate sphere, framing relationships as systems to be optimized to ensure social stability, individual well-being, and collective productivity.",
         "links": [
@@ -1104,7 +1216,11 @@
         "title": "Sociological analysis of commodification",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["History", "Philosophy", "Sociology"],
+        "areas": [
+          "History",
+          "Philosophy",
+          "Sociology"
+        ],
         "tags": [],
         "desc": "the process by which capitalist market logic penetrates social life, transforming goods, services, and even human relationships into commodities to be exchanged and consumed. This phenomenon is intensified by what has been called the “liquid society, ” characterized by the precariousness of social ties and the volatility of identities.",
         "links": [],
@@ -1123,7 +1239,9 @@
         "title": "Conclusions",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["History"],
+        "areas": [
+          "History"
+        ],
         "tags": [],
         "desc": "Weber’s rationalization provides the operational mechanism (bureaucracy), Foucault’s biopolitics defines the domain of application (life and relationships), and commodification supplies the driving logic (market utility). Together, they outline a society in which life itself is managed with the impersonal efficiency of a factory, and human relationships are subjected to quality-control procedures. Hyper-bureaucratization thus emerges as the operational arm of biopower, using market logic to extend rational control to the farthest reaches of human experience.",
         "links": [],
@@ -1191,7 +1309,9 @@
         "title": "Feedback on the concept of weapon",
         "type": "Feedback",
         "action": "Making",
-        "areas": ["Speculative Design"],
+        "areas": [
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "Clarify the precise type of “weapon” envisioned and map its fields of action. Specify: target(s) (who/what it affects), mode of deployment (legal, symbolic, material, procedural), intended effects (silencing, financial damage, reputational), contexts of use, and limits or legal/ethical boundaries.",
         "links": [],
@@ -1210,7 +1330,11 @@
         "title": "The ofac lists and global financial control",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Political science", "Law", "War Studies"],
+        "areas": [
+          "Political science",
+          "Law",
+          "War Studies"
+        ],
         "tags": [],
         "desc": "Albanese’s name appears on the lists issued by the OFAC — the Office of Foreign Assets Control of the U. S. Department of the Treasury. These lists were originally created to target terrorists, drug traffickers, and authoritarian regimes. Individuals or entities included are excluded from financial networks, and their assets can be frozen. The key point is that, while these lists are instruments of U. S. foreign policy, they ultimately influence the entire global banking system, demonstrating how bureaucratic mechanisms of sanction can extend beyond national borders to shape international economic behavior.",
         "links": [],
@@ -1229,7 +1353,11 @@
         "title": "The sdn list (specially designated nationals)",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Law", "Political science", "War Studies"],
+        "areas": [
+          "Law",
+          "Political science",
+          "War Studies"
+        ],
         "tags": [],
         "desc": "The Specially Designated Nationals (SDN) List includes individuals and entities operating in strategic sectors linked to, or associated with, hostile nations. Being placed on the SDN list is potentially fatal for any commercial organization, as it results in a total prohibition for U. S. and foreign subjects alike to conduct business with the listed parties or any companies directly or indirectly controlled by them. The measure functions as a powerful bureaucratic and economic tool of exclusion, transforming administrative designation into a mechanism of global control.",
         "links": [],
@@ -1273,7 +1401,11 @@
         "title": "The case of ilaria salis",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Political science", "Law", "Media studies"],
+        "areas": [
+          "Political science",
+          "Law",
+          "Media studies"
+        ],
         "tags": [],
         "desc": "Ilaria Salis, an Italian anti-fascist activist detained in Hungary for alleged involvement in an attack on neo-Nazi demonstrators, was elected to the European Parliament with strong public backing. Her election granted her parliamentary immunity, allowing her to return to Italy. Hungarian authorities later requested the waiver of her immunity, initiating a review within the European Parliament. The plenary ultimately voted to uphold it by a narrow margin, sparking widespread political debate. The case highlights the power of public opinion and the intersection between legal systems, political legitimacy, and human rights protection.",
         "links": [],
@@ -1388,7 +1520,9 @@
         "title": "Entity",
         "type": "Concept",
         "action": "Making",
-        "areas": ["Speculative Design"],
+        "areas": [
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "An organization that evaluates, coordinates, and regulates the ways in which public opinion can formally intervene, assuming an active role in influencing the outcome of judicial processes.",
         "links": [],
@@ -1407,7 +1541,9 @@
         "title": "Feedback on the speculative depth of the scenario",
         "type": "Feedback",
         "action": null,
-        "areas": ["Speculative Design"],
+        "areas": [
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "The scenario was considered insufficiently speculative, as the intrusion of public opinion into bureaucratic and judicial systems already exists in forms such as class actions.",
         "links": [],
@@ -1570,7 +1706,9 @@
         "title": "Feedback on the bureaucratic death penalty concept",
         "type": "Feedback",
         "action": "Making",
-        "areas": ["Speculative Design"],
+        "areas": [
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "The concept of the bureaucratic death penalty is to be abandoned. The feedback suggests focusing instead on the other two directions previously explored, which offer stronger conceptual and speculative potential while maintaining consistency with the project’s critical investigation of bureaucratic power.",
         "links": [],
@@ -1934,7 +2072,9 @@
         "title": "Definitive scenario",
         "type": "Concept",
         "action": "Exploring",
-        "areas": ["Speculative Design"],
+        "areas": [
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "We position ourselves in a world defined by hyper-bureaucratization, where procedures and regulations extend to every aspect of daily life.\nIn this context, bureaucracy intervenes even in interpersonal and intimate relationships, aiming to manage and regulate the ambiguities and conflicts inherent in human interaction.\nWithin this scenario, individuals can protect themselves through relationship insurance policies, which define and formalize even the smallest details of their relationships through a system entirely based on insurance mechanisms.",
         "links": [],
@@ -2141,7 +2281,10 @@
         "title": "Genetic information extracted from blood",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Science", "Cultural studies"],
+        "areas": [
+          "Science",
+          "Cultural studies"
+        ],
         "tags": [],
         "desc": "From blood (more precisely the DNA in white blood cells) it is possible to identify an individual, determine biological kinship, estimate genetic ancestry, and reveal hereditary traits or disease predispositions. The procedure involves extracting DNA from the sample and comparing it against genetic databases or other individual samples for identification, parentage, or ancestry inference. Limits include statistical uncertainty in ancestry estimates, the distinction between biological origins and cultural/national identity, and the legal and ethical requirement of informed consent—analysing someone’s DNA without permission is a privacy violation and, in jurisdictions like Italy, a criminal offence.",
         "links": [],
@@ -2296,7 +2439,11 @@
         "title": "Problem to reflect on",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Political science", "War Studies", "History"],
+        "areas": [
+          "Political science",
+          "War Studies",
+          "History"
+        ],
         "tags": [],
         "desc": "To cross borders, there are rules and complications, some can move freely, while others are constantly restrained by limitations and paperwork.\nCrossing territories is never neutral: it requires a bureaucratic process, a regulated iter of permissions, authorizations, and controls that decide who can pass and who must remain still.\nIt reflects a system built on hierarchy and regulation, where mobility itself becomes a privilege — not only for people, but for goods, data, and information as well.",
         "links": [],
@@ -2383,7 +2530,10 @@
         "title": "Unwritten rules of hospitality",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Sociology", "Environmental studies"],
+        "areas": [
+          "Sociology",
+          "Environmental studies"
+        ],
         "tags": [],
         "desc": "Across cultures, there exist unwritten social rules that dictate how guests should behave when invited into someone’s home. These norms vary from country to country, reflecting deeper cultural values related to respect, hierarchy, and social harmony. While not codified, such expectations shape interpersonal dynamics and define the invisible boundaries between host and guest, politeness and intrusion, belonging and otherness.",
         "links": [],
@@ -2427,7 +2577,9 @@
         "title": "Negative feedback",
         "type": "Feedback",
         "action": null,
-        "areas": ["Speculative Design"],
+        "areas": [
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "The concept was considered not sufficiently speculative, as the domestic threshold already implies an inherent form of selection linked to private property. The act of choosing who may enter a home is a right already guaranteed by ownership, leaving little room for critical or speculative development. To strengthen the idea, the feedback suggests exploring contexts where boundaries are less explicit or negotiable—spaces in which the notion of access, permission, or exclusion is contested rather than predetermined.",
         "links": [],
@@ -2446,7 +2598,10 @@
         "title": "Levels of conflicts",
         "type": "",
         "action": "Exploring",
-        "areas": ["War Studies", "Speculative Design"],
+        "areas": [
+          "War Studies",
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "→ Paradoxical bureaucratic conflict:\nBureaucracy embodies a fundamental contradiction: it is designed to regulate, resolve, clarify, and protect, yet in doing so it inevitably depersonalizes, constrains, obliges, and excludes.\nThis tension reveals a deeper clash between two opposing forces — on one side, the rational and impersonal nature of bureaucratic order; on the other, the spontaneous and profoundly human dimension of personal relationships.",
         "links": [],
@@ -2465,7 +2620,11 @@
         "title": "What if",
         "type": "Concept",
         "action": "Exploring",
-        "areas": ["Public administration", "Sociology", "Speculative Design"],
+        "areas": [
+          "Public administration",
+          "Sociology",
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "What if bureaucracy extended its control to the most intimate spheres of human life?",
         "links": [],
@@ -2484,7 +2643,9 @@
         "title": "Message to convey",
         "type": "",
         "action": "Exploring",
-        "areas": ["Speculative Design"],
+        "areas": [
+          "Speculative Design"
+        ],
         "tags": [],
         "desc": "What we mean is that bureaucracy is dehumanizing, but this can be seen both positively and negatively (protection vs. constraint).\nBureaucracy is dehumanizing in its attempt to judge purely human situations through the application of laws and rationality.",
         "links": [],
@@ -2571,7 +2732,11 @@
         "title": "Research objective: insurance communication & unconventional products",
         "type": "Observation",
         "action": "Exploring",
-        "areas": ["Insurance", "Law", "Administration", "Communication Design"],
+        "areas": [
+          "Law",
+          "Administration",
+          "Communication Design"
+        ],
         "tags": [],
         "desc": "Need to survey the landscape of insurance types and map the market leaders to understand how they communicate value, trust and risk. Focus on: (1) mainstream insurers — their tone, channels, visual language, and regulatory framing; (2) outlier products or insurers offering non-standard policies (e. g. , micro-insurance, parametric, reputation/identity coverage, climate-risk products) to analyse how atypical risks are narrated and sold. Aim to extract communication patterns, persuasive tropes, and positioning strategies that enable or disrupt legitimacy. Methods: desk research, comparative case studies, and semiotic analysis of campaigns and policy language.",
         "links": [],
@@ -2590,7 +2755,11 @@
         "title": "Dr. john gottman’s love lab",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Science", "Sociology", "Interaction Design"],
+        "areas": [
+          "Science",
+          "Sociology",
+          "Interaction Design"
+        ],
         "tags": [],
         "desc": "For over forty years, Dr. John Gottman, in collaboration with Dr. Robert Levenson, transformed the study of romantic relationships from an anecdotal field into a predictive science. Through longitudinal studies tracking hundreds of couples—some for decades—they identified measurable physiological and behavioral markers that differentiate thriving relationships from failing ones. Their work established the foundation of modern relationship science, demonstrating that emotional stability, empathy, and physiological regulation can be quantified and used to forecast relational outcomes with striking accuracy.",
         "links": [
@@ -2612,7 +2781,11 @@
         "title": "Research objective: bureaucracy in contemporary interpersonal relationships",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Sociology", "Law", "Public administration"],
+        "areas": [
+          "Sociology",
+          "Law",
+          "Public administration"
+        ],
         "tags": [],
         "desc": "Need to investigate how bureaucratic systems intersect with and regulate today’s interpersonal relationships. By mapping these points of insertion, the study aims to understand how bureaucracy transforms intimacy, codifies affect, and translates human connections into measurable, governable interactions.",
         "links": [],
@@ -2631,10 +2804,15 @@
         "title": "Lloyd’s of london: the market of uninsurable risks",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Law", "Insurance"],
+        "areas": [
+          "Administration",
+          "Law"
+        ],
         "tags": [],
         "desc": "Lloyd’s of London is not an insurance company but a marketplace where underwriters and brokers gather to insure risks that conventional companies avoid. Its structure allows it to cover the extraordinary: massive infrastructures like oil rigs, aircraft fleets, and global events, as well as complex modern threats such as cyberattacks, political instability, or terrorism. Yet, Lloyd’s is equally known for its eccentricity—policies insuring celebrity body parts, food critics’ taste buds, or even satellite collisions and alien abductions.",
-        "links": ["https://www.lloyds.com/"],
+        "links": [
+          "https://www.lloyds.com/"
+        ],
         "files": []
       }
     },
@@ -2650,7 +2828,10 @@
         "title": "Strategies and communication across insurances",
         "type": "Source",
         "action": null,
-        "areas": ["Insurance", "Administration", "Communication Design"],
+        "areas": [
+          "Administration",
+          "Communication Design"
+        ],
         "tags": [],
         "desc": "Traditional insurance giants such as Generali, Allianz, and AXA address an older demographic through serious, institutional communication—emphasizing reliability, stability, and expertise. Their tone conveys authority and long-standing trust. In contrast, newer players like Prima, Segugio, and NeN target younger audiences with light-hearted, ironic, and digital-first messaging. Their communication is dynamic, playful, and accessible, often using humor and informal language to demystify the bureaucratic world of insurance. This contrast reveals how tone and identity are strategically adapted to shape perceptions of security across generations.",
         "links": [],
@@ -2693,7 +2874,9 @@
         "title": "The logic of insurance contracts",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "An insurance contract functions as a mechanism for risk transfer. The policyholder faces a potential loss—such as a house fire—and seeks protection from its financial consequences. By paying a relatively small premium, the individual delegates that risk to an insurer, who promises to provide a much larger indemnity if the specified adverse event, the claim, occurs. This exchange formalizes uncertainty, transforming fear and chance into contractual language. In essence, insurance converts the unpredictable into an administratively manageable transaction, where security becomes a purchasable, bureaucratized commodity.",
         "links": [],
@@ -2712,7 +2895,11 @@
         "title": "Physiological parameters in relationship dynamics",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Sociology", "Interaction Design", "Science"],
+        "areas": [
+          "Sociology",
+          "Interaction Design",
+          "Science"
+        ],
         "tags": [],
         "desc": "The physiological foundation of Gottman and Levenson’s research lies in the concept of Diffuse Physiological Arousal (DPA)—a fight-or-flight state triggered by interpersonal stress. Couples showing sustained activation across multiple physiological channels experienced a measurable decline in marital satisfaction over time, making biological responses stronger predictors than behavior alone. Four key measures defined this model: Cardiovascular Reactivity (heart rate, IBI, HRV)—where higher rates and reduced variability indicated acute stress and poor emotional regulation; Skin Conductance (GSR/SCL)—a sensitive marker of sympathetic activation linked to emotional alertness; Blood Pressure and Pulse Transit Time (PTT)—revealing the cardiovascular cost of conflict, particularly among avoidant partners; and Somatic Activity (ACT)—restlessness reflecting anxiety and tension. The most striking insight emerged from Physiological Linkage: the moment-to-moment covariation of bodily states between partners. Paradoxically, distressed couples displayed stronger synchronization—evidence not of harmony, but of negative co-regulation, where shared stress traps both in a feedback loop of emotional contagion and physiological escalation.",
         "links": [],
@@ -2731,7 +2918,10 @@
         "title": "Literary visions of bureaucratic control",
         "type": "Collection",
         "action": "Exploring",
-        "areas": ["Literature", "Sociology"],
+        "areas": [
+          "Literature",
+          "Sociology"
+        ],
         "tags": [],
         "desc": "Across dystopian literature, bureaucracy becomes the ultimate instrument of emotional and biological governance. In Aldous Huxley’s Brave New World (1932), social stability is achieved through total biopolitical control: emotions are chemically regulated by soma, reproduction is laboratory-planned, and family bonds are eradicated to preserve productivity and obedience. In George Orwell’s 1984 (1949), bureaucratic power extends to the realm of thought—love and personal loyalty are treated as political crimes, and intimacy becomes rebellion against the omnipresent State. In Yevgeny Zamyatin’s We (1924), individuality is mathematically erased: citizens are identified by numbers, transparency replaces privacy, and existence is algorithmically scheduled. Together, these works expose the bureaucratic annihilation of intimacy—where control replaces connection, and affection becomes an act of defiance.",
         "links": [],
@@ -2750,7 +2940,10 @@
         "title": "Absurd insurance policies",
         "type": "Collection",
         "action": "Exploring",
-        "areas": ["Administration", "Law", "Insurance"],
+        "areas": [
+          "Administration",
+          "Law"
+        ],
         "tags": [],
         "desc": "1. Change of Heart Policy – Covers wedding cancellation costs, transforming emotional hesitation into financial risk.\n 2. Death by Laughter Policy – A theatre company insured against fatal laughter, quantifying humor as potential liability.\n 3. Sports Depression Policy – Scottish fans insured themselves against depression if England won the World Cup, translating rivalry into an insurable condition.\n 4. Alien Abduction & Supernatural Policies – Cover damages from alleged encounters with UFOs, ghosts, werewolves, or vampires, merging myth with administrative documentation.\n 5. Taste Bud Insurance – Protects the palate of food critics and tasters, turning sensory expertise into economic capital.\n 6. Nose Insurance – Safeguards perfumers’ noses, preserving their professional identity through policy.\n 7. Lottery Insurance – Protects employers from operational collapse if staff collectively quit after winning the lottery.\n 8. Multiple Birth Insurance – Supports parents facing unexpected financial strain after the birth of twins or more.\nTogether, these examples reveal how the bureaucratic system of insurance extends into the surreal, converting fear, luck, and emotion into calculable, contractual events.",
         "links": [],
@@ -2769,7 +2962,11 @@
         "title": "Phase 1: the love lab and data collection methodology",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Science", "Sociology", "Interaction Design"],
+        "areas": [
+          "Science",
+          "Sociology",
+          "Interaction Design"
+        ],
         "tags": [],
         "desc": "At the core of Gottman’s research was the Love Lab—a simulated apartment at the University of Washington designed to observe couples in a natural, intimate setting. Participants interacted freely while researchers collected synchronized streams of data. Behavioral data were captured through hidden cameras and analyzed via systems like Ekman’s Facial Affect Coding System, decoding facial expressions, tone, and body language. Physiological data—the study’s most groundbreaking contribution—were gathered through biometric sensors tracking heart rate, skin conductance (GSR), blood pressure, and micro-movements as indicators of stress or arousal. Self-reported data complemented these measures: couples turned a dial to rate their emotional state in real time. Together, these layers offered an unprecedented multidimensional view of relational dynamics, merging emotion, body, and perception into measurable patterns.",
         "links": [],
@@ -2788,7 +2985,11 @@
         "title": "Phase 2: the structured experimental protocol",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Science", "Sociology", "Interaction Design"],
+        "areas": [
+          "Science",
+          "Sociology",
+          "Interaction Design"
+        ],
         "tags": [],
         "desc": "To ensure consistency and comparability across participants, Gottman’s studies followed a standardized three-step conversational protocol. After spending at least eight hours apart to make their reunion more emotionally salient, couples engaged in three fifteen-minute discussions:\n1. Daily Events, a neutral exchange used to establish physiological and behavioral baselines;\n2. Conflict Discussion, the central phase, where partners debated a recurring disagreement, serving as an emotional “stress test” to reveal conflict-management patterns and physiological reactivity\n3. Positive Topic, a conversation focused on shared enjoyment or agreement, measuring each couple’s ability to de-escalate tension and repair emotional connection. This structured sequence allowed researchers to capture the full emotional cycle—stability, stress, and recovery—within controlled yet authentic relational dynamics.",
         "links": [],
@@ -2807,7 +3008,11 @@
         "title": "Phase 3: key discoveries and the predictive model",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Science", "Sociology", "Interaction Design"],
+        "areas": [
+          "Science",
+          "Sociology",
+          "Interaction Design"
+        ],
         "tags": [],
         "desc": "The extensive data collected in Gottman and Levenson’s studies led to groundbreaking discoveries that shaped the foundation of Gottman’s predictive model of relationships.\nThe Physiology of Conflict – “Flooding”: Gottman identified flooding—a diffuse physiological activation (DPA) in which stress hormones like adrenaline surge, pushing heart rate above 100 bpm. In this state, reasoning and empathy collapse; communication becomes physiologically impossible. Flooding often triggers stonewalling, the emotional withdrawal of one partner as a self-protective response. Elevated physiological arousal proved to be a stronger predictor of relational decline than observed behavior alone.\nThe Four Horsemen of the Apocalypse: Gottman isolated four toxic interaction patterns that reliably predict divorce: criticism (attacking character rather than behavior), contempt (moral superiority and ridicule, the strongest predictor), defensiveness (playing the victim or counterattacking), and stonewalling (emotional withdrawal linked to flooding).\nThe Mathematics of Stability – The “Magic Ratio”: Gottman quantified emotional balance, showing that stable couples maintain a ratio of 5 positive interactions for every negative one during conflict, and up to 20: 1 outside it. Negative exchanges carry heavier emotional weight, requiring abundant positive moments—affection, humor, empathy—to sustain relational health. Together, these findings established a measurable, physiological model for predicting the future of love.",
         "links": [],
@@ -2826,7 +3031,11 @@
         "title": "Conclusion: the measurable logic of relationships",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Science", "Sociology", "Interaction Design"],
+        "areas": [
+          "Science",
+          "Sociology",
+          "Interaction Design"
+        ],
         "tags": [],
         "desc": "Gottman’s research ultimately revealed that the fate of a relationship is not mysterious but governed by identifiable and measurable patterns of interaction and physiological reactivity. Success in love does not depend on the absence of conflict, but on a couple’s ability to navigate disagreement without falling into destructive behavioral cycles or being overwhelmed by negative physiological arousal. Emotional intelligence and regulation—rather than passion or compatibility alone—emerge as the true predictors of relational longevity, transforming intimacy into a field where even affection obeys the laws of measurable equilibrium.",
         "links": [],
@@ -2845,7 +3054,11 @@
         "title": "Phase 4: the predictive model of relationship outcomes",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Science", "Sociology", "Interaction Design"],
+        "areas": [
+          "Science",
+          "Sociology",
+          "Interaction Design"
+        ],
         "tags": [],
         "desc": "By integrating behavioral, physiological, and emotional data, Gottman synthesized his findings into a predictive model capable of forecasting divorce with over 90% accuracy across multiple studies. The model not only determined if a couple would separate but also when. Two primary trajectories emerged: Early Divorce (on average 5. 6 years after marriage), associated with the intense presence of the Four Horsemen—criticism, contempt, defensiveness, and stonewalling—marking relationships dominated by volatility and conflict; and Late Divorce (around 16. 2 years after marriage), characterized by emotional disengagement rather than open hostility, as affection and positivity fade into detachment. The model reframed relationship breakdown as a measurable process, revealing how emotional patterns and physiological regulation predict the long-term stability of human bonds.",
         "links": [],
@@ -2865,7 +3078,6 @@
         "type": "Observation",
         "action": "Exploring",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -2889,7 +3101,9 @@
         "title": "The risk triangle: the core of insurance logic",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "Every insurance system operates within the Risk Triangle, composed of three interdependent elements.\n • Risk → The uncertain, potentially harmful future event that the policy seeks to cover. It must be possible but not certain—for example, the end of a relationship, betrayal, or loss of trust.\n • Premium → The amount paid by the insured to the insurer, calculated statistically. Many pay into the system so that the few who experience loss receive compensation.\n • Payout (or Indemnity) → The insurer’s obligation if the risk occurs—typically a financial reimbursement, but it can also take the form of a service, such as emotional or psychological support.\nThis triangular structure transforms uncertainty into order, quantifying emotion, damage, and even heartbreak into contractual balance.",
         "links": [],
@@ -2908,7 +3122,9 @@
         "title": "The subjects of the insurance contract",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "An insurance contract can involve up to four distinct actors—sometimes overlapping, sometimes separate:\n • The Insurer → The company that assumes the risk and guarantees compensation.\n • The Policyholder → The individual or entity who signs the contract and pays the premium.\n • The Insured → The person whose interest is protected; the one who would suffer the loss if the event occurred.\n • The Beneficiary → The person entitled to receive the indemnity when the risk materializes.",
         "links": [],
@@ -2927,7 +3143,9 @@
         "title": "How an insurance contract is established",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "An insurance contract follows a formalized bureaucratic process that translates uncertainty into documentation and liability.\n • Pre-Contractual Phase (Proposal) → The prospective client submits a proposal form requesting coverage.\n • Anamnestic Questionnaire → The insurer collects detailed personal data—habits, history, and prior incidents—to evaluate honesty and risk. The law obliges the applicant to answer truthfully; any omission or falsehood can void the contract.\n • Risk Assessment → Based on the information provided, the insurer decides whether to accept the client and at what premium, quantifying personal traits into cost.\n • Policy Issuance → Once accepted, the insurer releases the written policy document, the tangible proof of the agreement.\n • Payment of Premium → The contract becomes active only upon payment of the first premium.",
         "links": [],
@@ -2946,7 +3164,9 @@
         "title": "Fondamental parts",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "• Premium Calculation → The premium is determined by assessing the level of risk associated with the insured subject. Factors such as age, history, lifestyle, and past incidents are statistically analyzed to translate personal probability into monetary value.\n • Bonus–Malus System → A mechanism that rewards low-risk behavior (bonus) with reduced premiums and penalizes high-risk or repeated claims (malus) with higher ones—bureaucratizing moral conduct into numbers.\n • Policy (Polizza) → The formal written document that certifies the existence, terms, and conditions of the insurance contract; the bureaucratic materialization of trust.\n • Maximum Coverage (Massimale) and Deductible (Franchigia) → The massimale sets the upper limit the insurer will pay, while the franchigia defines the portion of the loss the insured must bear—quantifying protection and vulnerability.\n • Civil Liability (Responsabilità Civile) → Covers damage caused unintentionally to others, transferring the moral weight of guilt into a compensable legal framework.\n • Exclusions → Specific situations not covered by the policy, outlining the boundaries of what can be insured and what remains beyond bureaucratic control.\n • DIP (Documento Informativo Precontrattuale) → A pre-contractual information sheet designed to ensure transparency by explaining terms, risks, and rights before signing—an administrative safeguard of informed consent.",
         "links": [],
@@ -2965,7 +3185,10 @@
         "title": "Cinematic visions of bureaucratic control",
         "type": "Collection",
         "action": "Exploring",
-        "areas": ["Cinema", "Sociology"],
+        "areas": [
+          "Cinema",
+          "Sociology"
+        ],
         "tags": [],
         "desc": "quantified bureaucracy: every interaction is rated, and one’s numerical score dictates housing, work, and relationships. The final scene—two prisoners freed from ratings—reveals the cathartic liberation found outside bureaucratic judgment. In Yorgos Lanthimos’ The Lobster (2015), love itself is institutionalized: singles are confined to a hotel where they must find a partner within 45 days or be transformed into animals. Compatibility becomes a bureaucratic algorithm—love reduced to shared defects. Finally, Terry Gilliam’s Brazil (1985) imagines a dystopia consumed by paperwork, stamps, and mechanical inefficiency. Bureaucracy crushes imagination and individuality, while power circulates meaninglessly among inept officials. Across these works, bureaucracy emerges as both absurd and tragic—a system that promises order but suffocates humanity in its own regulations.",
         "links": [],
@@ -2985,7 +3208,6 @@
         "type": "Brief",
         "action": "Exploring",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3009,7 +3231,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3033,7 +3254,6 @@
         "type": "Feedback",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3057,7 +3277,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3081,7 +3300,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3105,7 +3323,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3129,7 +3346,6 @@
         "type": "Concept",
         "action": null,
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3153,7 +3369,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3177,7 +3392,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3201,7 +3415,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3266,7 +3479,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3299,7 +3511,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3332,7 +3543,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3356,7 +3566,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3405,7 +3614,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3429,7 +3637,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3453,7 +3660,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3477,7 +3683,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3501,7 +3706,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3525,7 +3729,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3549,7 +3752,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3606,7 +3808,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3639,7 +3840,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3672,7 +3872,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3721,7 +3920,6 @@
         "type": "Feedback",
         "action": null,
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3745,7 +3943,6 @@
         "type": "Observation",
         "action": "Exploring",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3769,7 +3966,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3802,7 +3998,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3835,7 +4030,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3884,7 +4078,6 @@
         "type": "Feedback",
         "action": null,
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3908,7 +4101,6 @@
         "type": "Observation",
         "action": null,
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -3931,7 +4123,9 @@
         "title": "Contrattp",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "The final output of the experience is the insurance contract that protects the relationship.",
         "links": [],
@@ -3951,7 +4145,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -3976,7 +4169,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4001,7 +4193,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4026,7 +4217,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4051,7 +4241,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4078,7 +4267,6 @@
         "type": "Feedback",
         "action": null,
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4103,7 +4291,6 @@
         "type": "Feedback",
         "action": null,
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4128,7 +4315,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "War Studies",
           "Interaction Design",
           "Experience design"
@@ -4152,7 +4338,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4177,7 +4362,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4202,7 +4386,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4227,7 +4410,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4252,7 +4434,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -4276,7 +4457,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -4300,7 +4480,6 @@
         "type": "Concept",
         "action": null,
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -4333,7 +4512,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -4398,7 +4576,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -4431,7 +4608,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Communication Design",
           "Branding",
           "Videomaking"
@@ -4454,7 +4630,11 @@
         "title": "Ibi e scl with arduino",
         "type": "Concept",
         "action": "Making",
-        "areas": ["Science", "Electronics Prototyping", "Interaction Design"],
+        "areas": [
+          "Science",
+          "Electronics prototyping",
+          "Interaction Design"
+        ],
         "tags": [],
         "desc": "Construction of the system component responsible for capturing skin conductance and heart rate.",
         "links": [],
@@ -4483,7 +4663,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "War Studies",
           "Communication Design",
@@ -4508,7 +4687,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Interaction Design",
           "War Studies",
           "Branding",
@@ -4533,7 +4711,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "War Studies",
           "Interaction Design",
           "Experience design"
@@ -4557,7 +4734,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Videomaking",
           "Communication Design",
           "Branding"
@@ -4590,7 +4766,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Videomaking",
           "Communication Design",
           "Branding"
@@ -4623,7 +4798,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Videomaking",
           "Communication Design",
           "Branding"
@@ -4656,7 +4830,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Videomaking",
           "Communication Design",
           "Branding"
@@ -4689,7 +4862,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Videomaking",
           "Communication Design",
           "Branding"
@@ -4722,7 +4894,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Communication Design",
           "Branding",
           "Videomaking"
@@ -4754,7 +4925,11 @@
         "title": "No ibi",
         "type": "Observation",
         "action": "Making",
-        "areas": ["Science", "Electronics Prototyping", "Interaction Design"],
+        "areas": [
+          "Science",
+          "Electronics prototyping",
+          "Interaction Design"
+        ],
         "tags": [],
         "desc": "Since heart rate sensors are extremely sensitive and difficult to calibrate accurately, we decided not to use them. Any data obtained from these sensors would likely be inaccurate or, at best, approximate. For this reason, the system will focus exclusively on skin conductance measurements, which are considered more reliable and better aligned with the aims of the project.",
         "links": [],
@@ -4774,7 +4949,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4832,7 +5006,6 @@
         "type": "Observation",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "War Studies",
           "Product design",
@@ -4867,7 +5040,6 @@
         "type": "Observation",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4902,7 +5074,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4938,7 +5109,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4965,7 +5135,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -4991,7 +5160,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -5017,7 +5185,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -5068,7 +5235,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -5106,7 +5272,6 @@
         ]
       }
     },
-
     {
       "id": "nnr23qj8",
       "x": 18167.244921159963,
@@ -5120,7 +5285,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -5170,7 +5334,10 @@
         "title": "Typographic palette",
         "type": "Concept",
         "action": "Making",
-        "areas": ["Insurance", "Communication Design", "Branding"],
+        "areas": [
+          "Communication Design",
+          "Branding"
+        ],
         "tags": [],
         "desc": "Neue Haas Grotesk\nBergen Mono.",
         "links": [],
@@ -5189,7 +5356,9 @@
         "title": "Affinity percentage calculation",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5208,7 +5377,9 @@
         "title": "Risk brackets",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5227,7 +5398,9 @@
         "title": "Clausole",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5246,7 +5419,9 @@
         "title": "Parte fissa",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5265,7 +5440,9 @@
         "title": "Id",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5284,7 +5461,9 @@
         "title": "Frase",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5303,7 +5482,9 @@
         "title": "Qr code",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5322,7 +5503,9 @@
         "title": "App",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5369,7 +5552,9 @@
         "title": "Grafica",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5397,7 +5582,9 @@
         "title": "Grafica",
         "type": "Source",
         "action": "Exploring",
-        "areas": ["Administration", "Insurance"],
+        "areas": [
+          "Administration"
+        ],
         "tags": [],
         "desc": "",
         "links": [],
@@ -5434,7 +5621,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -5460,7 +5646,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -5517,7 +5702,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -5550,7 +5734,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Communication Design",
           "Branding",
           "Videomaking"
@@ -5574,7 +5757,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -5625,7 +5807,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -5651,7 +5832,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -5708,7 +5888,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Public administration",
           "Science",
           "War Studies",
@@ -5767,7 +5946,6 @@
         "type": "Concept",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Administration",
           "Communication Design",
           "Branding"
@@ -5824,7 +6002,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Communication Design",
           "Branding",
           "Videomaking"
@@ -5881,7 +6058,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Communication Design",
           "Branding",
           "Videomaking"
@@ -5915,10 +6091,9 @@
         "action": "Making",
         "areas": [
           "Administration",
-          "Insurance",
           "Communication Design",
           "Interaction Design",
-          "Electronics Prototyping"
+          "Electronics prototyping"
         ],
         "tags": [],
         "desc": "1. Arduino Firmware (main. ino)\nRole: Embedded Sensor Controller & Hardware Abstraction\nDescription: Manages hard-realtime I/O operations. It continuously polls biometric sensors (SCL), capacitive sliders, and push-buttons, streaming raw telemetry via Serial/UART to the host. It also acts as the actuator driver, controlling LED states (ON/OFF) based on received serial commands, effectively decoupling hardware timing from the high-level application logic.\n\n2. Serial Data Bridge (monitor_arduino. py)\nRole: Hardware-Software Interface & Data Ingestion\nDescription: Acts as the middleware between the embedded system and the OS. It establishes the serial connection, parses incoming byte streams into structured JSON objects, and handles error recovery. It performs dual dispatch of telemetry: persistence (appending to arduino_data. jsonl) and broadcasting (IPC/Socket) for real-time monitoring.\n\n3. Session Orchestrator (main. py)\nRole: Finite State Machine & Application Controller\nDescription: The central control unit that enforces the temporal structure of the user experience. It manages the application lifecycle, including:\n* Subprocess Management: Spawning and terminating the monitor_arduino and process_data processes.\n* Audio Sequencing: Synchronizing playback (afplay) with specific interaction phases.\n* State Transitions: Controlling time-based triggers (e. g. , transition from Phase 1 to Phase 2).\n\n4. Data Persistence Layer (arduino_data. jsonl)\nRole: Time-Series Database (Flat File)\nDescription: A line-delimited JSON log serving as the system's persistent memory. It captures the complete high-frequency sensor stream (sampling rate). This design decouples data collection (write-heavy) from data analysis (read-heavy), ensuring that the complex post-processing does not block real-time acquisition.\n\n5. Data Analysis Engine (process_data. py)\nRole: Statistical Processor & Logic Evaluator\nDescription: A batch processing module triggered at the end of the session. It ingests the full time-series data to compute derived metrics:\n* Signal Processing: Filters and segments SCL data to detect arousal events (phasic changes).\n* Compatibility Algorithms: Calculates the \"compatibility score\" (0-100%) by weighting button matches, slider synchronization, and physiological alignment.\n* Classification: Determines the \"Risk Band\" and identifies any \"Culprit\" (asymmetric arousal state).\n\n6. Visualization & Asset Generation (contract_blocks/)\nRole: Data Visualization Subsystem\nDescription: A collection of specialized modules responsible for rendering data into graphical formats for the final document:\n* Lissajous Generator: Plots the phase space relationship between the two users' SCL signals.\n* Conductance Grapher: Renders the time-domain evolution of the physiological signals.\n* Visualizer: Generates static representations of user inputs (selected buttons and slider positions).\n\n7. Monitoring Server (server. py)\nRole: Observability & Telemetry Dashboard\nDescription: A FastAPI-based web server providing a real-time window into the system's internal state. It exposes WebSocket endpoints to stream sensor data and application status to a frontend interface, allowing operators to monitor system health and session progress without interfering with the core logic.\n\n8. Document Composer & Print Spooler (contract_generator. py)\nRole: Report Generation & Physical Output\nDescription: The final output pipeline. It aggregates the computed metrics and generated assets to dynamically compose a PDF report (\"The Contract\"). It calculates the required physical media length and interfaces with the thermal printer driver to produce the hard copy, handling print queue logic and error management.",
@@ -5948,7 +6123,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Communication Design",
           "Branding",
           "Videomaking"
@@ -6005,7 +6179,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Communication Design",
           "Branding",
           "Videomaking"
@@ -6038,7 +6211,6 @@
         "type": "Collection",
         "action": "Making",
         "areas": [
-          "Insurance",
           "Communication Design",
           "Branding",
           "Videomaking"
@@ -7905,7 +8077,6 @@
       "t": "nu1qkjm1",
       "dashed": false
     },
-
     {
       "s": "nu1qkjm1",
       "t": "nnr23qj8",
@@ -8362,7 +8533,6 @@
       "Videomaking",
       "Experience design",
       "Public administration",
-      "Insurance",
       "Cultural studies",
       "Political science",
       "Law",
@@ -8378,8 +8548,9 @@
       "Product design",
       "Communication Design",
       "Interaction Design",
-      "Electronics Prototyping",
-      "Sound design"
+      "Electronics prototyping",
+      "Sound design",
+      "Speculative Design"
     ],
     "tags": [
       "Power abuse",

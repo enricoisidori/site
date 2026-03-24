@@ -4204,7 +4204,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "We built the wooden internal structure that will sit inside the machine’s outer shell, allowing us to test proportions, stability, and the mechanics of the scale-based system.",
         "links": [],
@@ -4318,7 +4318,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "We added the springs, Arduino, gyroscope, and all necessary cables (HDMI, Arduino, power), completing the core technical setup for testing the interaction.",
         "links": [],
@@ -4369,7 +4369,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "We also mounted the outer shell in forex, completing the first fully assembled version of the device.",
         "links": [],
@@ -4428,7 +4428,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "We produced a new 3D-printed internal structure to replace the wooden one, improving precision, stability, and overall integration with the outer shell.",
         "links": [],
@@ -4982,7 +4982,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "We decided to produce the machine using 3D printing, as it was the most convenient solution to achieve the slightly rounded shape we wanted for the scale’s base. Since we did not want to mix different materials between the body and the base, we chose to make the entire object using the same 3D printing process. After creating the 3D models, we tested the printing of both the base and the body. While the base was successful, the body presented several issues. To solve them, we decided to divide the body into four separate parts, making the printing process more reliable and manageable.",
         "links": [],
@@ -5032,7 +5032,7 @@
           "Interaction Design"
         ],
         "tags": [
-          "Prototype",
+          "Prototyping",
           "Scale"
         ],
         "desc": "We then printed the lid of the scale. Through an interlocking system combined with magnets, we found a solution that allowed the lid to be easily removable. This design choice made the machine fully inspectable, enabling access to the internal components when needed while keeping the structure stable and clean when closed.",
@@ -5076,7 +5076,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "We temporarily assembled all the components to check whether everything was working correctly. With this step, the preliminary shell of our machine can be considered complete. The next phase will focus on finishing: filling imperfections and sanding the surfaces carefully. After that, the different parts will be permanently glued together and finally painted, giving the machine its final appearance.",
         "links": [],
@@ -5597,7 +5597,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "The machine has been named Tally, from the English verb meaning to record and add up votes, scores, or results. Tally is activated by tapping the “Vote Now” button in the dedicated Case of the Week section of the app, and then bringing the smartphone close to the sensor. This interaction connects the digital voting phase with the physical machine, reinforcing the ritual and materiality of the decision-making process.",
         "links": [],
@@ -5632,7 +5632,7 @@
           "Interaction Design"
         ],
         "tags": [
-          "Prototype",
+          "Prototyping",
           "Scale",
           "Immediacy",
           "Speed",
@@ -5762,7 +5762,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "The 3D-printed parts were sanded and filled with putty to smooth and refine the surfaces.",
         "links": [],
@@ -5813,7 +5813,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "The machine was painted using spray paint to achieve its final surface finish.",
         "links": [],
@@ -5856,7 +5856,7 @@
         ],
         "tags": [
           "Scale",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "Cables were installed to connect the machine’s electronic components and enable full functionality.",
         "links": [],
@@ -6682,7 +6682,7 @@
           "Interaction Design"
         ],
         "tags": [
-          "Prototype",
+          "Prototyping",
           "Scale",
           "Immediacy",
           "Speed",
@@ -6714,7 +6714,7 @@
           "Interaction Design"
         ],
         "tags": [
-          "Prototype",
+          "Prototyping",
           "Scale",
           "Immediacy",
           "Speed",
@@ -6746,7 +6746,7 @@
           "Interaction Design"
         ],
         "tags": [
-          "Prototype",
+          "Prototyping",
           "Scale",
           "Immediacy",
           "Speed",
@@ -7786,7 +7786,9 @@
       "Journalism",
       "Communication Design",
       "Sociology",
-      "Design research"
+      "Design research",
+      "Speculative Design",
+      "Interaction Design"
     ],
     "tags": [
       "Teaser",
@@ -7886,7 +7888,7 @@
       "Plurality",
       "Social media",
       "Digital media",
-      "Prototype",
+      "Prototyping",
       "Scale",
       "Transparency",
       "Consistency",

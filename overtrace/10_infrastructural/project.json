@@ -800,7 +800,7 @@
         "type": "Research",
         "action": "Exploring",
         "areas": [
-          "Transport engineering"
+          "Transportation engineering"
         ],
         "tags": [],
         "desc": "Transportation infrastructure is the physical network that enables the movement of people and goods, including roads, railways, airports, and canals. It is crucial for economic growth, trade, and social well-being, requiring significant investment and planning to ensure safe, efficient, and sustainable systems.",
@@ -883,7 +883,7 @@
         "tags": [
           "Human rights",
           "Cultural loss",
-          "Protests"
+          "Protest"
         ],
         "desc": "A socio-political and ecological conflict arises when an infrastructure generates severe environmental impacts or redistributes resources in ways that harm ecosystems and livelihoods, while being presented as a driver of development. The conflict stems from the unequal distribution of costs and benefits and from inadequate decision-making processes and remedies.",
         "links": [],
@@ -1006,7 +1006,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Tourism",
           "Civil engineering"
         ],
         "tags": [
@@ -1104,7 +1103,7 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Art"
+          "Arts"
         ],
         "tags": [],
         "desc": "Foreigners Everywhere, curated by Brazilian Adriano Pedrosa, was the main art exhibition of the 60th Venice Biennale, which took place from April 20–November 24, 2024. Pedrosa's stated intention for the exhibit was to investigate the idea of living on the margins, whether as an outsider, a new arrival, or an Indigenous person.",
@@ -1135,9 +1134,7 @@
         "title": "Touristification",
         "type": "Source",
         "action": "Exploring",
-        "areas": [
-          "Touristification"
-        ],
+        "areas": [],
         "tags": [],
         "desc": "Touristification is the process by which a city or area becomes dominated by tourism. It often transforms local spaces, services, and culture to cater to visitors. This can lead to economic benefits but also social tensions, displacement, and loss of local identity.",
         "links": [],
@@ -1165,10 +1162,7 @@
         "title": "Luxury tourism",
         "type": "Source",
         "action": "Exploring",
-        "areas": [
-          "Touristification",
-          "Luxury tourism"
-        ],
+        "areas": [],
         "tags": [],
         "desc": "Luxury tourism (luxury travel) is a segment of the tourism industry dedicated to travelers seeking unique, personalized, and top-level experiences, prioritizing quality, exclusivity, comfort, privacy, and personal fulfillment.",
         "links": [],
@@ -1187,10 +1181,7 @@
         "title": "Extreme turism",
         "type": "Source",
         "action": "Exploring",
-        "areas": [
-          "Tourism",
-          "Extreme tourism"
-        ],
+        "areas": [],
         "tags": [],
         "desc": "Forms of tourism practiced in remote, dangerous contexts beyond the jurisdiction of States, such as the deep sea, polar regions, or outer space.",
         "links": [
@@ -1211,9 +1202,7 @@
         "title": "Overtourism in venice",
         "type": "Source",
         "action": "Exploring",
-        "areas": [
-          "Touristification"
-        ],
+        "areas": [],
         "tags": [],
         "desc": "The entire physical structure of the city, from its foundations to its canals, is unable to withstand the weight of mass tourism, transforming infrastructure from a resource for residents into a source of conflict.",
         "links": [],
@@ -1241,10 +1230,7 @@
         "title": "Jeff bezos wedding",
         "type": "Source",
         "action": "Exploring",
-        "areas": [
-          "Touristification",
-          "Luxury tourism"
-        ],
+        "areas": [],
         "tags": [],
         "desc": "Jeff Bezos’s wedding in Venice drew huge media attention and an exceptional influx of luxury guests. This kind of event amplifies the problems of elite and mass tourism, which already weigh heavily on the city. Residents experienced mobility issues, with difficult travel and restricted access. Venice thus risks becoming a global stage rather than a livable city for its inhabitants.",
         "links": [
@@ -1274,9 +1260,7 @@
         "title": "Spacial torusim",
         "type": "Source",
         "action": "Exploring",
-        "areas": [
-          "Touristification"
-        ],
+        "areas": [],
         "tags": [
           "Extreme tourism"
         ],
@@ -1308,9 +1292,7 @@
         "title": "Submarine tourism",
         "type": "Source",
         "action": "Exploring",
-        "areas": [
-          "Touristification"
-        ],
+        "areas": [],
         "tags": [
           "Extreme tourism"
         ],
@@ -1342,9 +1324,7 @@
         "title": "Everest mount",
         "type": "Source",
         "action": "Exploring",
-        "areas": [
-          "Touristification"
-        ],
+        "areas": [],
         "tags": [
           "Extreme tourism"
         ],
@@ -1380,7 +1360,7 @@
           "Human geography"
         ],
         "tags": [
-          "Protests",
+          "Protest",
           "Infrastructure",
           "Human rights"
         ],
@@ -1417,7 +1397,7 @@
           "Economics"
         ],
         "tags": [
-          "Protests"
+          "Protest"
         ],
         "desc": "Location: Strait of Messina (Sicily–Calabria, Italy). The project involves national governments, local administrations, construction consortia, environmental groups, and citizens, with disputes over real costs, seismic risks, and potential mafia influence. It has been repeatedly launched, suspended, and restarted. The debate remains constant, balancing promises of development against environmental, technical, and economic concerns.",
         "links": [],
@@ -1446,12 +1426,12 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Transport engineering",
+          "Transportation engineering",
           "Political science",
           "Social movements"
         ],
         "tags": [
-          "Protests"
+          "Protest"
         ],
         "desc": "The No TAV movement emerged in Val di Susa against the construction of the Turin–Lyon high-speed rail line. It brings together residents, activists, and social groups denouncing environmental, economic, and social impacts. Conflict with the government and law enforcement has led to protests, clashes, and legal proceedings. It has become a national symbol of resistance against top-down large-scale projects.",
         "links": [],
@@ -1550,7 +1530,7 @@
           "Political science"
         ],
         "tags": [
-          "Protests"
+          "Protest"
         ],
         "desc": "Dakota Access Pipeline (No DAPL / Standing Rock) Date: Main protests April 2016 – February 2017 (but broader impact). Location: North Dakota / routed through multiple US states. Actors: Standing Rock Sioux Tribe and other Native tribes, environmental activists, Energy Transfer Partners (proposer), federal government and agencies (Army Corps); ambiguity regarding consultations and respect for historic treaties. Introduction: Global mobilization against pipeline construction near sacred sites and water sources; symbolic episode of the assertion of indigenous rights against energy infrastructure.",
         "links": [],
@@ -1585,7 +1565,7 @@
           "Economics"
         ],
         "tags": [
-          "Protests"
+          "Protest"
         ],
         "desc": "Narita Airport (Sanrizuka struggle, Japan) Date: Conflict from 1966; construction and opening in 1978 (but protests continued). Location: Sanrizuka/Chiba, near Tokyo, Japan. Actors: Farmers and local residents (Sanrizuka), student and leftist groups, Japanese government and police, Narita International Airport Corporation; ambiguity regarding the radicalization of the protests and violence. Introduction: Extremely violent opposition by farmers and leftist groups against expropriations and lack of consultation: occupations, clashes, extreme acts, and years of instability during construction.",
         "links": [
@@ -1650,12 +1630,11 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Transport engineering",
-          "Development economics",
+          "Transportation engineering",
           "Political science"
         ],
         "tags": [
-          "Protests",
+          "Protest",
           "Landgrabbing"
         ],
         "desc": "Standard Gauge Railway (Kenya, Mombasa–Nairobi SGR) Date: Construction and commissioning 2013–2017 (first phase completed 2017). Location: Kenya (Mombasa–Nairobi and branches). Stakeholders: Kenyan government, Chinese companies (CPC/CRBC), port operators, local communities, environmentalists; ambiguity regarding government-to-government contractual terms, debt, and environmental impacts (including on parks). Introduction: Modern line intended to connect the port and the capital; has raised concerns regarding expropriation, land use, impacts on wildlife, and financial sustainability.",
@@ -1691,7 +1670,7 @@
         ],
         "tags": [
           "Landgrabbing",
-          "Protests",
+          "Protest",
           "Cultural loss"
         ],
         "desc": "Turkish Dams on the Tigris and Euphrates (GAP/Ilısu - Hasankeyf Projects) Date: GAP project launched in the 1970s; Ilısu and related works active 2006–2020 (impoundment 2019–2020). Location: Southeast Turkey (Turkish Kurdistan), Tigris and Euphrates basins; submerged ancient city of Hasankeyf. Stakeholders: Turkish government (energy and irrigation projects), Kurdish and local communities, archaeologists/international NGOs; ambiguity regarding the balance between water/energy security and heritage protection. Introduction: Part of a broad regional development program (GAP) that has led to expropriations, forced displacement, and the loss of millennia-old sites (Hasankeyf), sparking national and international protests.",
@@ -1758,7 +1737,7 @@
           "Social anthropology"
         ],
         "tags": [
-          "Protests"
+          "Protest"
         ],
         "desc": "Narmada Dam and Narmada Bachao Andolan (India) Date: Decision-making process and construction from 1960–2000; significant mobilizations from 1985 onwards. Location: Narmada River basin (states of Madhya Pradesh, Gujarat, Maharashtra), India. Actors: State and central governments, World Bank at some stages, movements led by Medha Patkar/Baba Amte, tribal and peasant communities; ambiguity regarding displacement figures and compensation arrangements. Introduction: A series of large dams (including Sardar Sarovar) that sparked one of India's best-known social resistance movements, echoing issues of development versus indigenous rights.",
         "links": [],
@@ -1790,8 +1769,7 @@
           "Political science",
           "International law",
           "Human geography",
-          "Security studies",
-          "Human rights"
+          "Security studies"
         ],
         "tags": [
           "Isolation"
@@ -1825,15 +1803,13 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Human rights",
           "Hydraulic engineering",
           "Environmental studies",
-          "Indigenous studies",
-          "Development economics"
+          "Indigenous studies"
         ],
         "tags": [
           "Landgrabbing",
-          "Protests",
+          "Protest",
           "Human rights"
         ],
         "desc": "Belo Monte Dam (Brazil). Date: Ten-year project phases (since the 1970s); construction intensified in the 2000s; partially operational since 2016. Location: Xingu River, Pará, Amazon, Brazil. Stakeholders: Brazilian government, energy companies, indigenous peoples and local rebels, environmental NGOs; ambiguity regarding the number of displaced people and energy balance vs. ecological impacts. Introduction: One of the most contested hydroelectric projects in the Amazon: large submerged areas, displacement of indigenous communities, and international legal and political battles.",
@@ -1865,13 +1841,13 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Transport engineering",
+          "Transportation engineering",
           "Archaeology",
           "Indigenous studies"
         ],
         "tags": [
           "Landgrabbing",
-          "Protests"
+          "Protest"
         ],
         "desc": "“Tren (or Tren) Maya” Railway Project (Mexico). Date: Planning and construction start 2018–2023; sections partially opened/operational from 2023. Location: Yucatán Peninsula (states: Quintana Roo, Yucatán, Campeche, Tabasco, Chiapas). Stakeholders: Mexican government (AMLO), construction companies, indigenous Mayan communities, environmentalists, scientists/UNESCO; ambiguity regarding effective consultation and damage to biospheres/karst cavities. Introduction: A major tourism and regional development project that has sparked protests over environmental impacts, expropriation, and the failure to protect archaeological sites and local communities.",
         "links": [
@@ -1907,7 +1883,7 @@
           "Economics"
         ],
         "tags": [
-          "Protests"
+          "Protest"
         ],
         "desc": "HS2 High-Speed ​​Rail (UK). Date: Project approved in the 2010s; intense construction and protests, especially from 2017–2024 (and beyond). Location: Great Britain (London → Midlands → North). Actors: UK government, construction companies, local communities and environmental groups (tree activists, anti-HS2 camps), local authorities; ambiguity over economic benefits vs. destruction of forests/landscapes. Introduction: Project intended to connect regions and “balance” the country; has met with strong opposition due to its impact on ancient forests, costs, and long-term benefits.",
         "links": [
@@ -1942,7 +1918,7 @@
           "Sociology of protest"
         ],
         "tags": [
-          "Protests",
+          "Protest",
           "Useless investment"
         ],
         "desc": "Montalto di Castro Nuclear Power Plant (Italy). Date: Construction began 1982; halted after 1987 referendum (Chernobyl → political decision) — never entered into operation. Location: Montalto di Castro, Lazio, Italy. Actors: ENEL (proponent), government, anti-nuclear movements, public opinion (referendum); ambiguity over economic losses vs. post-Chernobyl democratic choice. Introduction: Nearing completion, the plant was halted by the national referendum that ended Italy's nuclear expansion in the 1980s; an exemplary case of direct democracy blocking an infrastructure.",
@@ -1974,7 +1950,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Human rights",
           "Maritime engineering",
           "Economic geography",
           "International relations",
@@ -2013,8 +1988,7 @@
         "action": "Exploring",
         "areas": [
           "Hydraulic engineering",
-          "Archaeology",
-          "Development economics"
+          "Archaeology"
         ],
         "tags": [
           "Landgrabbing",
@@ -2053,7 +2027,7 @@
           "Economic geography"
         ],
         "tags": [
-          "Protests",
+          "Protest",
           "Victims"
         ],
         "desc": "Atatürk Airport / New Istanbul Airport (Turkey). Date: New airport project started 2010s; opening and relocation 2018; protests documented primarily 2017–2018. Location: Istanbul, Turkey. Actors: Turkish government (major state project), construction companies, workers (complaints about conditions), unions, and NGOs; ambiguity about actual number of accidents/deaths and transparency. Introduction: The new airport has become a symbol of modernization but also of human costs (rapid working conditions, reported fatalities) and deforestation.",
@@ -2085,13 +2059,13 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Transport engineering",
+          "Transportation engineering",
           "Development studies",
           "Anthropology"
         ],
         "tags": [
           "Landgrabbing",
-          "Protests"
+          "Protest"
         ],
         "desc": "Trans-Amazonian Highway (BR-230, Brazil). Date: Construction early 1970s (military regime), subsequent expansions; incomplete and amplifying deforestation. Location: Brazilian Amazon (various portions of BR-230). Actors: Brazilian military government, settlers, agribusiness/mining companies, indigenous peoples, environmentalists; ambiguity between development slogans and actual environmental impacts. Introduction: Colonial initiative to open up the Amazon that fueled waves of deforestation, settlements, and conflicts with indigenous peoples; symbol of an infrastructure that transformed the territory.",
         "links": [
@@ -2122,12 +2096,12 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Transport engineering",
+          "Transportation engineering",
           "Development studies",
           "Indigenous rights"
         ],
         "tags": [
-          "Protests",
+          "Protest",
           "Landgrabbing"
         ],
         "desc": "Guatemala Highway Corridor (CA-9 and related projects). Date: Various projects and construction over the past decades; recurring tensions (blockades and protests, especially 2010s–2020s). Location: Guatemala (port-inland connections). Actors: Guatemalan government, infrastructure companies, indigenous communities (Maya), social movements and land defense; ambiguity regarding consultation and respect for collective rights. Introduction: Connectivity projects often cross indigenous territories without adequate consultation: communities have organized blockades, assemblies, and protests to demand the right to consultation and land.",
@@ -2200,7 +2174,7 @@
         ],
         "tags": [
           "Structural failure",
-          "Protests",
+          "Protest",
           "Isolation"
         ],
         "desc": "The Pruitt–Igoe complex was a massive public housing project in St. Louis, Missouri, designed by architect Minoru Yamasaki and completed in 1955. It consisted of 33 eleven-story high-rise buildings with nearly 3, 000 apartments, intended to provide modern, affordable housing for low-income residents after World War II.\n\nInitially celebrated as a symbol of urban renewal, Pruitt–Igoe soon faced serious problems, including poor maintenance, crime, poverty, and social isolation, worsened by inadequate funding and flawed design. By the late 1960s, many units were abandoned, and the complex became a national example of failed public housing policy. Beginning in 1972, the buildings were systematically demolished, marking one of the most famous collapses of modernist architecture and urban planning ideals in the United States.",
@@ -2236,7 +2210,7 @@
         "tags": [
           "Structural failure",
           "Isolation",
-          "Protests"
+          "Protest"
         ],
         "desc": "The Hulme Crescents were a vast public housing development in Manchester, England, completed in 1972 as part of a postwar urban renewal plan. Consisting of four massive curved concrete blocks with deck-access walkways, they were intended to provide modern, affordable homes inspired by the elegance of Georgian architecture.\n\nDespite their ambitious design, the Crescents quickly suffered from poor construction, damp, heating problems, and rising crime, while their elevated walkways created isolation and safety concerns. Within just a few years many residents demanded rehousing, and the complex gained a reputation for neglect and danger. By the early 1990s the buildings were largely abandoned, and between 1993 and 1995 the entire development was demolished, becoming a symbol of failed modernist housing policy in the UK.",
         "links": [],
@@ -2536,7 +2510,7 @@
         ],
         "tags": [
           "War",
-          "Protests"
+          "Protest"
         ],
         "desc": "→ The EU wants to reduce dependence on Russian gas: starting in 2026, a halt to new contracts and the use of LNG terminals for Russian customers, and from 2028, long-term contracts. Each country will have to plan alternatives to avoid energy crises. But the construction of new infrastructure creates tensions: local protests, conflicts between states, and a clash between energy security and ecological transition.\n\nGas pipelines such as Nord Stream 1 and 2 have made Europe dependent on Russian supplies for approximately 40% of its gas needs, giving Russia bargaining and political power over it.",
         "links": [
@@ -2972,8 +2946,7 @@
         "type": "Observation",
         "action": "Making",
         "areas": [
-          "Civil engineering",
-          "Touristification"
+          "Civil engineering"
         ],
         "tags": [],
         "desc": "Global metropolises face a dilemma: their economic growth increasingly depends on tourism and external investment, but this development often conflicts with the needs of locals. On the one hand, tourists and mobile workers are a vital source of income, willing to spend on services that meet their needs. On the other, residents see their cities transforming and losing their identity. This creates a growing tension between those who experience the city daily and those who use it as an \"amusement park\" or investment capital.\n\nProblems:\n- Protests\n- Rising cost of living\n\nAgents:\n- Residents\n- Tourists\n\nInfrastructures:\n- Public spaces\n- Tourist attractions\n- Housing\n\nScenario:\n- Accessibility\n- Impact\n- Transformation.",
@@ -3149,7 +3122,6 @@
         "action": "Exploring",
         "areas": [
           "Human geography",
-          "Human rights",
           "Speculative Design"
         ],
         "tags": [
@@ -3186,7 +3158,6 @@
         "action": "Exploring",
         "areas": [
           "Human geography",
-          "Human rights",
           "Speculative Design"
         ],
         "tags": [
@@ -3223,7 +3194,6 @@
         "action": "Exploring",
         "areas": [
           "Human geography",
-          "Human rights",
           "Speculative Design"
         ],
         "tags": [
@@ -3305,7 +3275,6 @@
         "type": "Brief",
         "action": "Making",
         "areas": [
-          "Tourism",
           "Speculative Design"
         ],
         "tags": [
@@ -3330,7 +3299,6 @@
         "type": "Brief",
         "action": "Making",
         "areas": [
-          "Human rights",
           "Human geography",
           "Speculative Design"
         ],
@@ -3358,7 +3326,6 @@
         "action": "Exploring",
         "areas": [
           "Human geography",
-          "Human rights",
           "Speculative Design"
         ],
         "tags": [
@@ -3395,7 +3362,6 @@
         "action": "Exploring",
         "areas": [
           "Human geography",
-          "Human rights",
           "Speculative Design"
         ],
         "tags": [
@@ -3440,7 +3406,6 @@
         "action": "Exploring",
         "areas": [
           "Human geography",
-          "Human rights",
           "Speculative Design"
         ],
         "tags": [
@@ -3477,7 +3442,6 @@
         "action": "Exploring",
         "areas": [
           "Human geography",
-          "Human rights",
           "Speculative Design"
         ],
         "tags": [
@@ -3513,7 +3477,6 @@
         "type": "Observation",
         "action": "Making",
         "areas": [
-          "Legality",
           "Speculative Design"
         ],
         "tags": [
@@ -3539,7 +3502,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Human rights",
           "War Studies",
           "Human geography",
           "Speculative Design"
@@ -3617,7 +3579,7 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Art",
+          "Arts",
           "Speculative Design"
         ],
         "tags": [
@@ -3667,7 +3629,7 @@
         "type": "Research",
         "action": "Exploring",
         "areas": [
-          "Art",
+          "Arts",
           "Civil engineering",
           "Speculative Design"
         ],
@@ -3981,7 +3943,7 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Art",
+          "Arts",
           "Speculative Design"
         ],
         "tags": [
@@ -5150,7 +5112,7 @@
         ],
         "tags": [
           "Victims",
-          "Protests",
+          "Protest",
           "Human rights"
         ],
         "desc": "The case of the Three Gorges Dam in China, while not typical of land grabbing by multinational agricultural companies, represents a colossal example of state land grabbing for the construction of a large-scale infrastructure project, with comparable social consequences. The creation of the gigantic hydroelectric reservoir on the Yangtze River required the expropriation of over 1, 300, 000 people – the largest forced displacement in history – who were forced to abandon their homes, their agricultural lands, entire cities, and priceless archaeological sites, with massive long-term social and economic impacts, despite the relocation programs implemented by the Chinese government. The project is therefore an emblematic case of \"expropriation for public utility\" on an epochal scale, which has radically and irreversibly altered the ecological and demographic balance of an entire region for energy and flood control purposes.",
@@ -5186,7 +5148,7 @@
         ],
         "tags": [
           "Victims",
-          "Protests",
+          "Protest",
           "Human rights"
         ],
         "desc": "The land grabbing case involving SIAT (Société d'Investissement pour l'Agriculture Tropicale) in Côte d'Ivoire is a controversy surrounding the grabbing of vast swathes of land by the Belgian company, specializing in rubber and palm oil production, to the detriment of local and indigenous communities. SIAT is accused of acquiring the land to expand its plantations in a process that, according to complaints from NGOs and affected populations (including in Ghana and Nigeria), was conducted without due consultation or fair compensation. The consequences of this \"land theft\" include the loss of agricultural land vital to communities' livelihoods and food security, human rights violations, forced displacement, and severe environmental degradation due to intensive monocultures. Local communities, supported by organizations such as CIDSE and Focsiv, have forcefully demanded the restitution of their plots, compensation for the damages suffered, and the implementation of a transparent, rights-based dialogue process.",
@@ -6041,7 +6003,7 @@
         "action": "Making",
         "areas": [
           "Supply chain studies",
-          "UX Design",
+          "UX design",
           "Interaction Design"
         ],
         "tags": [],
@@ -6080,8 +6042,8 @@
         "type": "Design",
         "action": "Making",
         "areas": [
-          "UX Design",
-          "Electronics Prototyping",
+          "UX design",
+          "Electronics prototyping",
           "Interaction Design"
         ],
         "tags": [
@@ -6131,7 +6093,7 @@
         "action": "Making",
         "areas": [
           "Materials science",
-          "UX Design",
+          "UX design",
           "Interaction Design"
         ],
         "tags": [],
@@ -6154,7 +6116,7 @@
         "action": "Making",
         "areas": [
           "Materials science",
-          "UX Design",
+          "UX design",
           "Interaction Design"
         ],
         "tags": [],
@@ -6186,7 +6148,7 @@
         "action": "Making",
         "areas": [
           "Materials science",
-          "UX Design",
+          "UX design",
           "Interaction Design"
         ],
         "tags": [],
@@ -6218,7 +6180,7 @@
         "action": "Making",
         "areas": [
           "Materials science",
-          "UX Design",
+          "UX design",
           "Interaction Design"
         ],
         "tags": [],
@@ -6250,7 +6212,7 @@
         "action": "Making",
         "areas": [
           "Materials science",
-          "UX Design",
+          "UX design",
           "Interaction Design"
         ],
         "tags": [],
@@ -6282,7 +6244,7 @@
         "action": "Making",
         "areas": [
           "Materials science",
-          "UX Design",
+          "UX design",
           "Interaction Design"
         ],
         "tags": [],
@@ -6314,7 +6276,7 @@
         "action": "Making",
         "areas": [
           "Materials science",
-          "UX Design",
+          "UX design",
           "Interaction Design"
         ],
         "tags": [],
@@ -6522,7 +6484,7 @@
           "Interaction Design"
         ],
         "tags": [
-          "3d printing"
+          "3D printing"
         ],
         "desc": "",
         "links": [],
@@ -7445,7 +7407,7 @@
         "action": null,
         "areas": [
           "Communication Design",
-          "UX Design"
+          "UX design"
         ],
         "tags": [],
         "desc": "They represent the material: from its texture to the origins of its production process.\nThey follow the same principle as the videos: representing the most important moments through fast editing and the overlapping of construction sounds, voices, and ambient noises.\nEach material has a specific visual treatment.",
@@ -7506,7 +7468,7 @@
         "type": "Design",
         "action": "Making",
         "areas": [
-          "Electronics Prototyping",
+          "Electronics prototyping",
           "Interaction Design"
         ],
         "tags": [],
@@ -9171,8 +9133,8 @@
   "vocab": {
     "areas": [
       "Communication Design",
-      "Electronics Prototyping",
-      "UX Design",
+      "Electronics prototyping",
+      "UX design",
       "Branding",
       "Speculative Design",
       "Supply chain studies",
@@ -9182,8 +9144,7 @@
       "Biology",
       "Human geography",
       "Political science",
-      "Development economics",
-      "Transport engineering",
+      "Transportation engineering",
       "Indigenous rights",
       "Development studies",
       "History",
@@ -9205,7 +9166,6 @@
       "Energy studies",
       "Aviation engineering",
       "Economics",
-      "Transportation engineering",
       "Social anthropology",
       "Geology",
       "Geography",
@@ -9215,8 +9175,6 @@
       "Political economy",
       "Security and defense studies",
       "Infrastructure engineering",
-      "Extreme tourism",
-      "Luxury tourism",
       "Neuroscience",
       "Futures studies",
       "Design research",
@@ -9226,13 +9184,10 @@
       "Political economy and public policy",
       "Geopolitics and international relations",
       "Architecture",
-      "Touristification",
-      "Tourism",
-      "Legality",
-      "Human rights",
       "War Studies",
-      "Art",
-      "Prototyping"
+      "Arts",
+      "Prototyping",
+      "Interaction Design"
     ],
     "tags": [
       "Sensor",
@@ -9240,7 +9195,7 @@
       "Communicative artefacts",
       "Human rights",
       "Victims",
-      "Protests",
+      "Protest",
       "Danger",
       "Touchpoint",
       "Work flow",
@@ -9261,7 +9216,7 @@
       "Landgrabbing",
       "Cultural loss",
       "Denounce",
-      "3d printing",
+      "3D printing",
       "Visual coefficient",
       "European legislation",
       "Key visual",

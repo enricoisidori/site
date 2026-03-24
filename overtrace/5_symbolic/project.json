@@ -53,7 +53,7 @@
           "Media studies",
           "Semiotics",
           "Communication Design",
-          "Interface design",
+          "UI design",
           "Cultural studies"
         ],
         "tags": [
@@ -118,7 +118,7 @@
           "Human-computer interaction",
           "Biopolitics",
           "Cyberpsychology",
-          "Critical technology studies"
+          "Science and technology studies"
         ],
         "tags": [
           "Neurocontrol",
@@ -272,7 +272,6 @@
           "Legal studies",
           "Political geography",
           "Bureaucracy studies",
-          "Governance",
           "Critical urbanism"
         ],
         "tags": [
@@ -336,7 +335,7 @@
           "Environmental studies",
           "Sustainability studies",
           "Geography",
-          "Climate justice"
+          "Environmental studies"
         ],
         "tags": [
           "Geoengineering",
@@ -395,9 +394,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Symbolic alignment",
-          "Identity",
-          "Group dynamics",
           "War Studies",
           "Speculative Design"
         ],
@@ -423,9 +419,7 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Symbolic meaning",
           "War Studies",
-          "Debate",
           "Speculative Design"
         ],
         "tags": [
@@ -450,9 +444,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Ideation",
-          "Abstract conflict",
-          "Ideology",
           "Speculative Design"
         ],
         "tags": [
@@ -477,8 +468,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic alignment",
-          "Identity",
           "Speculative Design"
         ],
         "tags": [
@@ -533,7 +522,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic meaning",
           "Cultural studies",
           "Sociology",
           "Religion",
@@ -568,9 +556,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic meaning",
-          "Historical memory",
-          "Iconoclasm",
           "Speculative Design"
         ],
         "tags": [
@@ -622,9 +607,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic alignment",
-          "Ideology",
-          "Power dynamics",
           "Speculative Design"
         ],
         "tags": [
@@ -663,11 +645,7 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic alignment",
-          "Group dynamics",
           "Sociology",
-          "Identity",
-          "Youth culture",
           "Speculative Design"
         ],
         "tags": [
@@ -698,9 +676,7 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic meaning",
           "Cultural studies",
-          "Appropriation",
           "Transculturation",
           "Speculative Design"
         ],
@@ -714,7 +690,7 @@
           "Semiotics",
           "Culture",
           "Historical memory",
-          "Symbols"
+          "Symbolism"
         ],
         "desc": "Appropriation occurs when a group adopts symbols from another culture, or when a symbol shifts away from its original meaning and becomes associated with a new one.",
         "links": [],
@@ -743,7 +719,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Ideation",
           "Cultural studies",
           "Speculative Design"
         ],
@@ -777,11 +752,8 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic meaning",
           "Cultural studies",
-          "Identity",
           "Sociology",
-          "Product symbolism",
           "Speculative Design"
         ],
         "tags": [
@@ -812,7 +784,6 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic meaning",
           "Cultural studies",
           "Religion",
           "Speculative Design"
@@ -827,7 +798,7 @@
           "Culture",
           "Tradition",
           "Legacy",
-          "Symbols"
+          "Symbolism"
         ],
         "desc": "Set of signs that highlight the core aspects of faith, encompassing identity, belonging, and values. Because they convey deep meanings, religious symbols have also become a ground for conflict.",
         "links": [],
@@ -856,12 +827,8 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Symbolic alignment",
           "Cultural studies",
           "Sociology",
-          "Identity",
-          "Youth culture",
-          "Group dynamics",
           "Speculative Design"
         ],
         "tags": [
@@ -895,8 +862,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Symbolic transformation",
-          "Appropriation",
           "Cultural studies",
           "Speculative Design"
         ],
@@ -934,10 +899,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Youth culture",
-          "Style",
-          "Identity",
-          "Group dynamics",
           "Speculative Design"
         ],
         "tags": [
@@ -977,8 +938,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Fanaticism",
-          "Symbolic devotion",
           "Radicalization",
           "Speculative Design"
         ],
@@ -1056,9 +1015,7 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Symbolic transformation",
           "Transculturation",
-          "Appropriation",
           "Speculative Design"
         ],
         "tags": [
@@ -1095,9 +1052,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Belonging",
-          "Identity",
-          "Symbolic alignment",
           "War Studies",
           "Speculative Design"
         ],
@@ -1136,8 +1090,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Fanaticism",
-          "Symbolic devotion",
           "Radicalization",
           "Speculative Design"
         ],
@@ -1178,9 +1130,7 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Transculturation",
-          "Prohibition",
           "Speculative Design"
         ],
         "tags": [
@@ -1206,10 +1156,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Belonging",
-          "Identity",
-          "Symbolic alignment",
           "War Studies",
           "Speculative Design"
         ],
@@ -1236,10 +1182,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Fanaticism",
-          "Extremism",
-          "Symbolic devotion",
           "Identity politics",
           "Speculative Design"
         ],
@@ -1266,8 +1208,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Identity",
-          "Symbolic alignment",
           "War Studies",
           "Speculative Design"
         ],
@@ -1298,11 +1238,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Belonging",
-          "Identity",
-          "Conformity",
-          "Censorship",
           "Communication Design",
           "Speculative Design"
         ],
@@ -1329,9 +1264,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Power dynamics",
-          "Hierarchy",
-          "Unconscious influence",
           "Cultural studies",
           "Speculative Design"
         ],
@@ -1362,10 +1294,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Symbolic awareness",
-          "Autonomy",
-          "Power dynamics",
           "Speculative Design"
         ],
         "tags": [
@@ -1391,8 +1319,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Symbolic saturation",
-          "Meaning loss",
           "Cultural studies",
           "Speculative Design"
         ],
@@ -1420,15 +1346,13 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Semiotics",
-          "Universal meaning",
           "Speculative Design"
         ],
         "tags": [
           "What if?",
           "Semiotic inflation",
-          "Symbols",
+          "Symbolism",
           "Universal language"
         ],
         "desc": "What if it were possible to assign one single, official meaning to every sign?\n-\nWHO: An international organization\nWHAT: The creation of a universal dictionary/database of symbols — a reduced, official repertoire of signs shared and accepted by all\nWHEN: Present day\nWHERE: Europe\nWHY: To test whether simplifying and stabilizing meaning could restore symbolic depth, or instead suffocate it further by removing ambiguity, multiplicity, and interpretation.",
@@ -1449,10 +1373,7 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Monuments",
-          "Historical memory",
           "Ethics",
-          "Censorship",
           "Speculative Design"
         ],
         "tags": [
@@ -1480,9 +1401,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Censorship",
-          "Historical memory",
           "Sociology",
           "Ethics",
           "Speculative Design"
@@ -1490,7 +1408,7 @@
         "tags": [
           "What if?",
           "Historical memory",
-          "Symbols",
+          "Symbolism",
           "Public space",
           "History",
           "Society",
@@ -1514,8 +1432,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Product symbolism",
-          "Perception",
           "Sociology",
           "Healthcare",
           "Cultural studies",
@@ -1546,11 +1462,8 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Sociology",
           "Healthcare",
-          "Product symbolism",
-          "Perception",
           "Speculative Design"
         ],
         "tags": [
@@ -1577,9 +1490,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Identity",
-          "Symbolic affiliation",
-          "Conformity",
           "Representation",
           "Speculative Design"
         ],
@@ -1607,11 +1517,7 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Social ranking",
           "Ethics",
-          "Power dynamics",
-          "Identity",
           "Speculative Design"
         ],
         "tags": [
@@ -1638,8 +1544,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Symbolic saturation",
-          "Meaning loss",
           "Ethics",
           "Speculative Design"
         ],
@@ -1678,9 +1582,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Symbolic saturation",
-          "Meaning loss",
           "Sociology",
           "Speculative Design"
         ],
@@ -1688,7 +1589,7 @@
           "What if?",
           "Semiotic inflation",
           "Neutralization",
-          "Symbols",
+          "Symbolism",
           "Ethics",
           "Society"
         ],
@@ -1710,7 +1611,6 @@
         "type": "Collection",
         "action": "Exploring",
         "areas": [
-          "Symbolic conflict",
           "Medicine",
           "Religion",
           "Ethics",
@@ -1745,8 +1645,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Symbolic affiliation",
           "Religion",
           "Sociology",
           "Medicine",
@@ -1895,9 +1793,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Identity",
-          "Reputation",
-          "Rebranding",
           "Religion",
           "Speculative Design"
         ],
@@ -1935,10 +1830,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Symbolic redefinition",
-          "Institutional identity",
-          "Trust recovery",
           "Speculative Design"
         ],
         "tags": [
@@ -2006,9 +1897,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Historical memory",
-          "Iconoclasm",
-          "Debate",
           "Speculative Design"
         ],
         "tags": [
@@ -2064,9 +1952,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Gamification",
-          "Historical memory",
           "Sociology",
           "Cultural studies",
           "Speculative Design"
@@ -2194,16 +2079,12 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Language",
-          "Ideology",
-          "Censorship",
-          "Identity",
           "Speculative Design"
         ],
         "tags": [
           "What if?",
-          "Symbols",
+          "Symbolism",
           "Linguistics",
           "Prohibition",
           "Ideology"
@@ -2226,10 +2107,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Historical memory",
-          "Democracy",
-          "Monuments",
           "Cultural studies",
           "Sociology",
           "Speculative Design"
@@ -2264,10 +2141,7 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Cultural studies",
-          "Historical memory",
-          "Multiverse",
           "Speculative Design"
         ],
         "tags": [
@@ -2294,9 +2168,7 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Economy",
-          "Historical memory",
           "Cultural studies",
           "Speculative Design"
         ],
@@ -2324,11 +2196,7 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Ethics",
-          "Randomness",
-          "Power dynamics",
-          "Neutrality",
           "Speculative Design"
         ],
         "tags": [
@@ -2374,7 +2242,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Semiotics",
           "Morphology",
           "Cultural studies",
@@ -2438,11 +2305,7 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Semiotics",
-          "Historical memory",
-          "Power dynamics",
-          "Appropriation",
           "Speculative Design"
         ],
         "tags": [
@@ -2483,12 +2346,9 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Psychology",
           "Ethics",
           "Communication Design",
-          "Symbolic saturation",
-          "Perception",
           "Semiotics",
           "Speculative Design"
         ],
@@ -2532,8 +2392,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
-          "Perception",
           "Psychology",
           "Graphic design",
           "Semiotics",
@@ -2575,7 +2433,6 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Ethics",
           "Semiotics",
           "Speculative Design"
@@ -2614,12 +2471,10 @@
         "type": "Concept",
         "action": "Exploring",
         "areas": [
-          "Scenarios",
           "Sociology",
           "Religion",
           "Cultural studies",
           "Politics",
-          "Social critique",
           "Speculative Design"
         ],
         "tags": [
@@ -2680,7 +2535,6 @@
           "Psychology",
           "Semiotics",
           "Interpretation",
-          "Perception",
           "Graphic design",
           "Communication Design"
         ],
@@ -2730,8 +2584,7 @@
         "action": "Exploring",
         "areas": [
           "Branding",
-          "Semiotics",
-          "Social critique"
+          "Semiotics"
         ],
         "tags": [
           "Research",
@@ -2786,7 +2639,7 @@
         ],
         "tags": [
           "What if?",
-          "Symbols",
+          "Symbolism",
           "Language",
           "Control",
           "Communication",
@@ -2810,8 +2663,7 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Communication Design",
-          "Symbolic saturation"
+          "Communication Design"
         ],
         "tags": [
           "Research",
@@ -2864,9 +2716,7 @@
         "areas": [
           "Sociology",
           "Social media",
-          "Semiotics",
-          "Meme culture",
-          "Symbolic saturation"
+          "Semiotics"
         ],
         "tags": [
           "Research",
@@ -2908,10 +2758,7 @@
         "type": "Source",
         "action": "Exploring",
         "areas": [
-          "Branding",
-          "Adbusting",
-          "Social critique",
-          "Symbolic saturation"
+          "Branding"
         ],
         "tags": [
           "Research",
@@ -2954,9 +2801,8 @@
         ],
         "tags": [
           "What if?",
-          "Symbols",
-          "Control",
           "Symbolism",
+          "Control",
           "Communication",
           "Emotion"
         ],
@@ -3020,7 +2866,7 @@
         ],
         "tags": [
           "What if?",
-          "Symbols",
+          "Symbolism",
           "Language",
           "Branding"
         ],
@@ -3051,10 +2897,9 @@
         ],
         "tags": [
           "What if?",
-          "Symbols",
+          "Symbolism",
           "Language",
           "Branding",
-          "Symbolism",
           "Identity",
           "Power"
         ],
@@ -3130,7 +2975,6 @@
           "Semiotics",
           "Design theory",
           "Linguistics",
-          "Governance",
           "Communication Design"
         ],
         "tags": [
@@ -3311,7 +3155,7 @@
         ],
         "tags": [
           "Device",
-          "Translator",
+          "Translation",
           "Lexicon"
         ],
         "desc": "LexICON is an interactive device that automatically translates written text into the symbols defined in the ICON Dictionary. Users can explore the evolution of communication through a slider, observing how language gradually reduces to essential visual signs. At the end of the experience, the translation can be printed or sent to personal devices, providing a record of the linguistic transformation. The device’s aesthetic resembles a calculator, featuring a monitor and keyboard, emphasizing precision and formal interaction.",
@@ -3839,7 +3683,6 @@
         "areas": [
           "Visual language",
           "Branding",
-          "Institutional identity",
           "Design theory",
           "Communication Design"
         ],
@@ -3922,7 +3765,6 @@
         "areas": [
           "Visual language",
           "Branding",
-          "Institutional identity",
           "Design theory",
           "Communication Design"
         ],
@@ -4005,7 +3847,6 @@
         "areas": [
           "Semiotics",
           "Algorithmic system",
-          "Sorting system",
           "Communication Design"
         ],
         "tags": [
@@ -4059,7 +3900,6 @@
         "action": "Making",
         "areas": [
           "User research",
-          "Data collection",
           "Interaction Design"
         ],
         "tags": [
@@ -4540,8 +4380,7 @@
           "Web design",
           "Interaction Design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -4720,7 +4559,7 @@
           "Speculative Design"
         ],
         "tags": [
-          "Symbols",
+          "Symbolism",
           "Language",
           "Branding"
         ],
@@ -5356,7 +5195,7 @@
           "Arduino",
           "Nfc",
           "Testing",
-          "Prototype"
+          "Prototyping"
         ],
         "desc": "Preliminary tests were conducted using Arduino boards and NFC sensors to verify the technical feasibility of the detection system required by the ICON Starter Kit. The experiment focused on confirming the stability of tag recognition, the responsiveness of the reading process, and the consistency of signal detection when physical tiles were placed on a surface.",
         "links": [],
@@ -5394,7 +5233,7 @@
         ],
         "tags": [
           "Icon starter kit",
-          "Prototype",
+          "Prototyping",
           "Testing"
         ],
         "desc": "A paper prototype of the ICON Starter Kit device was produced to test its physical proportions and explore the tangible qualities of the interaction. The mock-up replicates the structure, layout and tile-placement system of the envisioned machine, allowing an early evaluation of scale, ergonomics and visual presence.",
@@ -5434,8 +5273,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -5603,7 +5441,7 @@
         ],
         "tags": [
           "Icon starter kit",
-          "Prototype",
+          "Prototyping",
           "Testing"
         ],
         "desc": "Paper prototypes were tested by integrating components such as Arduino, breadboards, and sensors to verify spatial dimensions and functionality.",
@@ -5651,7 +5489,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -5843,7 +5681,7 @@
         "action": "Making",
         "areas": [
           "Interaction Design",
-          "UX Design",
+          "UX design",
           "Algorithmic system"
         ],
         "tags": [
@@ -6029,7 +5867,7 @@
           "Interaction Design",
           "Visual communication",
           "Product design",
-          "UX Design"
+          "UX design"
         ],
         "tags": [
           "Icon starter kit",
@@ -6308,7 +6146,6 @@
           "Design theory",
           "Interaction Design",
           "Communication studies",
-          "Digital platform",
           "Prototyping"
         ],
         "tags": [
@@ -6568,7 +6405,7 @@
         "areas": [
           "Interaction Design",
           "Visual communication",
-          "UX Design",
+          "UX design",
           "Motion graphics"
         ],
         "tags": [
@@ -6657,7 +6494,7 @@
         "areas": [
           "Interaction Design",
           "Visual communication",
-          "UX Design",
+          "UX design",
           "Motion graphics"
         ],
         "tags": [
@@ -6777,8 +6614,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -6950,7 +6786,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -7095,7 +6931,7 @@
         "areas": [
           "Interaction Design",
           "Visual communication",
-          "UX Design"
+          "UX design"
         ],
         "tags": [
           "Icon starter kit",
@@ -7390,8 +7226,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -7486,8 +7321,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -7623,7 +7457,6 @@
           "Design theory",
           "Interaction Design",
           "Communication studies",
-          "Digital platform",
           "Prototyping"
         ],
         "tags": [
@@ -7654,7 +7487,6 @@
           "Design theory",
           "Interaction Design",
           "Communication studies",
-          "Digital platform",
           "Prototyping"
         ],
         "tags": [
@@ -7918,7 +7750,6 @@
           "Design theory",
           "Interaction Design",
           "Communication studies",
-          "Digital platform",
           "Prototyping"
         ],
         "tags": [
@@ -8640,8 +8471,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -8980,7 +8810,7 @@
         "areas": [
           "Interaction Design",
           "Visual communication",
-          "UX Design"
+          "UX design"
         ],
         "tags": [
           "Icon starter kit",
@@ -9090,7 +8920,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -9175,7 +9005,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -9250,7 +9080,6 @@
           "Design theory",
           "Interaction Design",
           "Communication studies",
-          "Digital platform",
           "Prototyping"
         ],
         "tags": [
@@ -9292,7 +9121,6 @@
           "Design theory",
           "Interaction Design",
           "Communication studies",
-          "Digital platform",
           "Prototyping"
         ],
         "tags": [
@@ -9412,8 +9240,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -9510,8 +9337,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -9574,8 +9400,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -9631,7 +9456,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -9960,7 +9785,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -10082,7 +9907,7 @@
         "areas": [
           "Interaction Design",
           "Visual communication",
-          "UX Design"
+          "UX design"
         ],
         "tags": [
           "Icon starter kit",
@@ -10151,7 +9976,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -10237,7 +10062,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -10327,7 +10152,7 @@
         "areas": [
           "Visual communication",
           "Design theory",
-          "UX Design",
+          "UX design",
           "Publishing",
           "Communication Design"
         ],
@@ -10911,8 +10736,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -10995,8 +10819,7 @@
         "areas": [
           "Web design",
           "Visual communication",
-          "Digital platform",
-          "UX Design",
+          "UX design",
           "Communication Design"
         ],
         "tags": [
@@ -13406,8 +13229,7 @@
       "Media studies",
       "Videomaking",
       "Visual culture",
-      "UX Design",
-      "Digital platform",
+      "UX design",
       "Web design",
       "Branding",
       "Prototyping",
@@ -13419,86 +13241,34 @@
       "Algorithmic system",
       "Educational technology",
       "Visual language",
-      "Data collection",
       "User research",
-      "Sorting system",
-      "Institutional identity",
-      "Group dynamics",
-      "Youth culture",
-      "Identity",
       "Sociology",
       "Cultural studies",
-      "Historical memory",
       "Religion",
-      "Product symbolism",
       "Transculturation",
-      "Appropriation",
-      "Power dynamics",
-      "Ideology",
-      "Iconoclasm",
-      "Symbolic saturation",
-      "Social critique",
       "Communication Design",
-      "Perception",
-      "Multiverse",
-      "Monuments",
-      "Debate",
       "Ethics",
-      "Censorship",
-      "Conformity",
-      "Meaning loss",
-      "Symbolic transformation",
       "Healthcare",
       "Representation",
       "Medicine",
-      "Adbusting",
-      "Meme culture",
       "Social media",
       "Graphic design",
       "Interpretation",
       "Psychology",
       "Politics",
       "Morphology",
-      "Scenarios",
-      "Neutrality",
-      "Randomness",
       "Economy",
-      "Democracy",
       "Language",
       "Critical design",
       "Political science",
       "Design research",
       "Critical theory",
-      "Symbolic meaning",
-      "Ideation",
-      "Abstract conflict",
       "Radicalization",
-      "Style",
-      "Prohibition",
-      "Fanaticism",
-      "Extremism",
-      "Symbolic devotion",
       "Identity politics",
-      "Hierarchy",
-      "Unconscious influence",
-      "Symbolic alignment",
-      "Symbolic awareness",
-      "Autonomy",
-      "Belonging",
       "War Studies",
-      "Universal meaning",
-      "Social ranking",
-      "Symbolic conflict",
-      "Symbolic affiliation",
-      "Reputation",
-      "Rebranding",
-      "Symbolic redefinition",
-      "Trust recovery",
-      "Gamification",
       "Consumer culture",
       "Emotional capitalism",
       "Linguistics",
-      "Governance",
       "Media theory",
       "Language learning",
       "Human-computer interaction",
@@ -13508,7 +13278,9 @@
       "Data visualization",
       "Publishing",
       "Visual communication",
-      "Design theory"
+      "Design theory",
+      "Speculative Design",
+      "Science and technology studies"
     ],
     "tags": [
       "Tutorial",
@@ -13663,12 +13435,10 @@
       "Vision",
       "Mission",
       "Device",
-      "Translator",
       "Posters",
-      "Symbols",
+      "Symbolism",
       "Golden circle",
       "Branding",
-      "Symbolism",
       "Language system",
       "Interactive device",
       "Learning",
@@ -13684,7 +13454,7 @@
       "Teaser",
       "Layout",
       "Bookmark",
-      "Prototype",
+      "Prototyping",
       "Tile",
       "Tile holder",
       "Exercise cards",
@@ -13694,7 +13464,6 @@
       "Cover design",
       "Identity",
       "Storyboard",
-      "Prototyping",
       "Icon starter kit",
       "Experience video",
       "Interaction",
