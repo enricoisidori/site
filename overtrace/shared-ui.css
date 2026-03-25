@@ -15,7 +15,7 @@
   --ts-toolbar-tip-fg: #111111;
   --ts-toolbar-tip-border: #d4d4d4;
   --ts-toolbar-tip-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
-  --ts-toolbar-icon-weight: 260;
+  --ts-toolbar-icon-weight: 200;
   --ts-toolbar-panel-shadow: 0 12px 32px rgba(17, 17, 17, 0.08);
   --ts-radius-panel: 18px;
   --ts-radius-control: 10px;
@@ -164,7 +164,6 @@
 .ts-toolbar .icon-btn:active,
 .ts-toolbar .switch-btn:active {
   background: var(--ts-toolbar-active);
-  transform: translateY(0.5px);
 }
 
 .ts-toolbar button:focus-visible,

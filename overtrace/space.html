@@ -59,16 +59,8 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
     />
     <style>
-      @font-face {
-        font-family: "Times New Roman";
-        src: url("./asset/Times New Roman-Book.woff2") format("woff2");
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-      }
-
       :root {
-        --bg: #f5f5f5;
+        --bg: #ffffff;
         --panel: #ffffff;
         --ink: #111111;
         --muted: #6f6f6f;
@@ -94,10 +86,7 @@
       body {
         background: var(--bg);
         color: var(--ink);
-        font:
-          700 14px/1.4 "Times New Roman",
-          Times,
-          serif;
+        font: 400 14px/1.4 var(--ot-font-sans);
         overflow: hidden;
       }
 
@@ -108,29 +97,17 @@
         grid-template-rows: auto minmax(0, 1fr);
       }
 
-      #btnPause .icon-pause {
-        display: none;
-      }
-
-      #btnPause.running .icon-play {
-        display: none;
-      }
-
-      #btnPause.running .icon-pause {
-        display: block;
-      }
-
       .layout {
         min-height: 0;
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr) minmax(420px, 50vw);
       }
 
       #viewWrap {
         position: relative;
         min-width: 0;
         min-height: 0;
-        border-right: 1px solid var(--line);
+        border-right: none;
       }
 
       #viewWrap.drop {
@@ -163,7 +140,9 @@
         border-radius: 0;
         background: transparent;
         box-shadow: none;
-        padding: 0;
+        padding: 4px;
+        pointer-events: auto;
+        cursor: pointer;
       }
 
       .node-label.selected {
@@ -185,6 +164,7 @@
       .node-label .title {
         font-size: 10px;
         font-weight: 700;
+        font-family: "Times New Roman", Times, serif;
         line-height: 1.2;
         color: #111;
         word-break: break-word;
@@ -206,6 +186,7 @@
 
       .node-label .assets .meta {
         font-size: 9px;
+        font-family: "Times New Roman", Times, serif;
         line-height: 1.2;
         color: #444;
         word-break: break-word;
@@ -217,11 +198,10 @@
       }
 
       .node-label.boxed {
-        border: 5px solid var(--nodeBorder, #111111);
+        border: 2px solid var(--nodeBorder, #111111);
         border-radius: 2px;
         padding: 3px;
-        background: rgba(255, 255, 255, 0.78);
-        backdrop-filter: blur(0.5px);
+        background: #ffffff;
       }
 
       .node-label.dimmed {
@@ -240,19 +220,35 @@
         display: none !important;
       }
 
+      body.hide-text .node-label .title,
+      body.hide-text .node-label .assets .meta {
+        display: none !important;
+      }
+
       #side {
         min-height: 0;
-        background: var(--panel);
-        display: block;
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: #ffffff;
+        border: 1px solid var(--ts-toolbar-border);
+        border-radius: var(--ts-radius-panel);
+        box-shadow: var(--ts-toolbar-panel-shadow);
+        margin: calc(var(--ts-toolbar-safe-top) + 4px) 14px 14px 0;
+        height: calc(100vh - var(--ts-toolbar-safe-top) - 18px);
+        align-self: start;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #projectPane {
+        padding: 12px 14px;
       }
 
       #disciplinePane {
         min-height: 0;
-        padding: 10px;
-        border-bottom: 1px solid var(--line);
-        display: grid;
-        grid-template-rows: auto auto auto;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
         gap: 8px;
       }
 
@@ -278,12 +274,13 @@
       #disciplineWrap {
         position: relative;
         min-width: 0;
-        min-height: 160px;
+        min-height: 260px;
         width: 100%;
+        max-width: none;
         aspect-ratio: 1 / 1;
         height: auto;
-        border: 1px solid var(--line);
-        border-radius: 8px;
+        border: none;
+        border-radius: 0;
         overflow: hidden;
         background: #ffffff;
       }
@@ -302,12 +299,18 @@
       }
 
       #disciplineList {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: #fff;
+        border: none;
+        border-radius: 0;
+        background: transparent;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
+        flex: 0 0 auto;
+      }
+
+      #disciplineListBody {
+        display: flex;
+        flex-direction: column;
       }
 
       #disciplineListHead,
@@ -318,12 +321,12 @@
         align-items: center;
         padding: 6px 8px;
         font-size: 12px;
+        font-family: var(--ot-font-sans);
+        font-weight: 400;
       }
 
       #disciplineListHead {
-        position: sticky;
-        top: 0;
-        z-index: 1;
+        position: static;
         background: #ffffff;
         color: var(--muted);
         border-bottom: 1px solid var(--line);
@@ -342,7 +345,6 @@
 
       .discipline-row .num {
         text-align: right;
-        font-variant-numeric: tabular-nums;
       }
 
       #disciplineListEmpty {
@@ -350,6 +352,29 @@
         padding: 8px;
         font-size: 12px;
         color: var(--muted);
+      }
+
+      .discipline-legend {
+        display: grid;
+        gap: 6px;
+      }
+
+      .discipline-legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--muted);
+        font-family: var(--ot-font-sans);
+        font-weight: 400;
+      }
+
+      .discipline-legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        flex: 0 0 auto;
       }
 
       #viewFilters {
@@ -486,15 +511,10 @@
         cursor: grabbing;
       }
 
-      #detailsPane {
-        padding: 10px;
-        overflow: visible;
-      }
-
       #projectName {
         margin: 0;
-        font-size: 15px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 500;
       }
 
       #stats {
@@ -604,18 +624,17 @@
 
       #nodeOverlay3d {
         position: absolute;
-        top: 12px;
-        right: 12px;
+        top: calc(var(--ts-toolbar-safe-top) + 4px);
+        right: 14px;
         z-index: 6;
-        width: min(420px, calc(100% - 24px));
-        max-height: calc(100% - 24px);
+        width: min(360px, calc(100% - 28px));
+        max-height: calc(100% - var(--ts-toolbar-safe-top) - 18px);
         overflow: auto;
         background: rgba(255, 255, 255, 0.96);
-        border: 1px solid rgba(0, 0, 0, 0.12);
-        border-radius: 10px;
-        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
-        padding: 10px;
-        backdrop-filter: blur(4px);
+        border: 1px solid var(--ts-toolbar-border);
+        border-radius: var(--ts-radius-panel);
+        box-shadow: var(--ts-toolbar-panel-shadow);
+        padding: 12px 14px 14px;
       }
 
       #nodeOverlay3d.is-hidden {
@@ -632,8 +651,15 @@
 
       #nodeOverlay3dTitle {
         margin: 0;
-        font-size: 14px;
+        font-size: 12px;
+        font-weight: 700;
         line-height: 1.2;
+      }
+
+      #nodeOverlay3dMeta {
+        margin: 0;
+        font-size: 12px;
+        color: var(--muted);
       }
 
       #btnCloseNodeOverlay3d {
@@ -652,28 +678,60 @@
       }
 
       #nodeOverlay3dInfo {
-        margin-bottom: 6px;
+        margin: 0;
+        grid-template-columns: 110px 1fr;
+        gap: 4px 8px;
+      }
+
+      #nodeOverlay3dDivider {
+        height: 1px;
+        margin: 6px 0;
+        background: rgba(0, 0, 0, 0.14);
       }
 
       #nodeOverlay3dDesc {
-        margin-top: 6px;
-        margin-bottom: 6px;
+        margin-top: 10px;
+        margin-bottom: 0;
+      }
+
+      .node-overlay-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .node-overlay-badge {
+        display: inline-block;
+        border: none;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        background: #ececec;
+        color: #111111;
+      }
+
+      .node-overlay-desc-title {
+        font-size: 12px;
+        color: #777;
+        margin-bottom: 4px;
       }
 
       #nodeOverlay3dMedia {
+        margin-top: 10px;
         display: grid;
         gap: 8px;
       }
 
       #nodeOverlay3dMedia img {
         width: 100%;
-        border-radius: 6px;
-        border: none;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
       }
 
       #nodeOverlay3dMedia a {
-        color: #17407b;
+        color: var(--ink);
         font-size: 12px;
+        text-decoration: underline;
       }
 
       .ok {
@@ -711,8 +769,17 @@
         }
 
         #viewWrap {
-          border-right: none;
           border-bottom: 1px solid var(--line);
+        }
+
+        #side {
+          margin: 0;
+          height: auto;
+          border-radius: 0;
+          border-left: none;
+          border-right: none;
+          border-bottom: none;
+          box-shadow: none;
         }
       }
     </style>
@@ -740,8 +807,8 @@
             id="btnOpen"
             class="icon-btn"
             type="button"
-            aria-label="Open project folder"
-            data-tip="Open project folder (Cmd/Ctrl+O)"
+            aria-label="Open project (⌘O)"
+            data-tip="Open project (⌘O)"
           >
             <span class="material-symbols-outlined">file_open</span>
           </button>
@@ -758,51 +825,38 @@
             id="btnPreviewLoop"
             class="icon-btn"
             type="button"
-            aria-label="Save preview snapshot"
-            data-tip="Save preview snapshot"
+            aria-label="Screenshot"
+            data-tip="Screenshot"
           >
             <span class="material-symbols-outlined">photo_camera</span>
           </button>
           <button
-            id="btnPause"
+            id="btnToggleFilter"
             class="icon-btn"
             type="button"
-            aria-label="Start simulation"
-            data-tip="Start simulation"
+            aria-label="Action outline"
+            data-tip="Action outline"
           >
-            <span class="material-symbols-outlined icon-play">play_arrow</span>
-            <span class="material-symbols-outlined icon-pause">pause</span>
+            <span class="material-symbols-outlined">filter_alt</span>
           </button>
-          <select
-            id="selColorMode"
-            class="nav-select"
-            aria-label="Color mode"
-            data-tip="Color mode"
+          <button
+            id="btnToggleImages"
+            class="icon-btn"
+            type="button"
+            aria-label="Hide images"
+            data-tip="Hide images"
           >
-            <option value="none">Colori: nessuno</option>
-            <option value="action">Colori: action</option>
-            <option value="macro">Colori: macro area</option>
-            <option value="type">Colori: type</option>
-            <option value="areas">Colori: areas</option>
-            <option value="tags">Colori: tags</option>
-          </select>
-          <select
-            id="selColorValue"
-            class="nav-select"
-            aria-label="Highlight value"
-            data-tip="Highlight value"
+            <span class="material-symbols-outlined">hide_image</span>
+          </button>
+          <button
+            id="btnToggleText"
+            class="icon-btn"
+            type="button"
+            aria-label="Hide text"
+            data-tip="Hide text"
           >
-            <option value="__all__">Evidenzia: tutti</option>
-          </select>
-          <select
-            id="selImages"
-            class="nav-select"
-            aria-label="Image visibility"
-            data-tip="Image visibility"
-          >
-            <option value="on">Immagini: on</option>
-            <option value="off">Immagini: off</option>
-          </select>
+            <span class="material-symbols-outlined">text_ad_off</span>
+          </button>
           <div id="navStatus" class="toolbar-status" aria-live="polite"></div>
         </div>
 
@@ -859,34 +913,61 @@
           <div id="labelsLayer"></div>
           <div id="nodeOverlay3d" class="is-hidden" aria-live="polite">
             <div id="nodeOverlay3dHead">
-              <h3 id="nodeOverlay3dTitle">Node</h3>
+              <div>
+                <h3 id="nodeOverlay3dTitle">Node</h3>
+                <p id="nodeOverlay3dMeta"></p>
+              </div>
               <button
                 id="btnCloseNodeOverlay3d"
                 type="button"
-                aria-label="Chiudi dettaglio nodo"
+                aria-label="Close node details"
               >
-                ×
+                <span class="material-symbols-outlined">close</span>
               </button>
             </div>
             <div id="nodeOverlay3dInfo" class="kv"></div>
+            <div id="nodeOverlay3dDivider"></div>
             <div id="nodeOverlay3dDesc" class="desc"></div>
             <div id="nodeOverlay3dMedia"></div>
           </div>
         </section>
 
         <aside id="side">
+          <section id="projectPane">
+            <h2 id="projectName">No project loaded</h2>
+            <p id="stats">0 nodes · 0 edges</p>
+          </section>
+
           <section id="disciplinePane">
-            <div id="disciplineHead">
-              <h2>Discipline network 2D</h2>
-              <p id="disciplineStats">0 aree · 0 connessioni</p>
-            </div>
+            <p id="disciplineStats">0 areas · 0 connections</p>
             <div id="disciplineWrap">
               <canvas id="disciplineView"></canvas>
             </div>
             <p id="disciplineHint">
-              Bolla = disciplina (dimensione per occorrenze). Le linee mostrano
-              co-presenza della coppia nella stessa card.
+              Bubble = discipline (size by occurrences). Lines show co-presence
+              of the pair within the same card.
             </p>
+            <div
+              id="disciplineLegend"
+              class="discipline-legend"
+              aria-label="Action legend"
+              hidden
+            >
+              <div class="discipline-legend-item">
+                <span
+                  class="discipline-legend-dot"
+                  style="background: #00ffff"
+                ></span>
+                <span>Exploring</span>
+              </div>
+              <div class="discipline-legend-item">
+                <span
+                  class="discipline-legend-dot"
+                  style="background: #45250d"
+                ></span>
+                <span>Making</span>
+              </div>
+            </div>
             <div id="disciplineList" aria-live="polite">
               <div id="disciplineListHead">
                 <div>Area</div>
@@ -894,33 +975,7 @@
                 <div style="text-align: right">MK</div>
               </div>
               <div id="disciplineListBody"></div>
-              <p id="disciplineListEmpty">Nessuna area disponibile.</p>
-            </div>
-          </section>
-
-          <section id="detailsPane">
-            <h2 id="projectName">Nessun progetto caricato</h2>
-            <p id="stats">0 nodes · 0 edges</p>
-
-            <div class="card">
-              <h3>Node details</h3>
-              <div id="nodeInfo" class="kv">
-                <div class="k">info</div>
-                <div>Seleziona un nodo nella rete.</div>
-              </div>
-              <div id="nodeDesc" class="desc"></div>
-              <div id="nodeMedia"></div>
-            </div>
-
-            <div class="card">
-              <h3>Color panel</h3>
-              <p id="colorPanelMeta">
-                Personalizza i colori del campo attivo nella navbar.
-              </p>
-              <div id="colorEditor"></div>
-              <button id="btnResetPalette" type="button">
-                Reset colori campo attivo
-              </button>
+              <p id="disciplineListEmpty">No areas available.</p>
             </div>
           </section>
         </aside>
@@ -987,6 +1042,7 @@
           labelsLayer: document.getElementById("labelsLayer"),
           nodeOverlay3d: document.getElementById("nodeOverlay3d"),
           nodeOverlay3dTitle: document.getElementById("nodeOverlay3dTitle"),
+          nodeOverlay3dMeta: document.getElementById("nodeOverlay3dMeta"),
           nodeOverlay3dInfo: document.getElementById("nodeOverlay3dInfo"),
           nodeOverlay3dDesc: document.getElementById("nodeOverlay3dDesc"),
           nodeOverlay3dMedia: document.getElementById("nodeOverlay3dMedia"),
@@ -998,6 +1054,7 @@
           disciplineWrap: document.getElementById("disciplineWrap"),
           disciplineStats: document.getElementById("disciplineStats"),
           disciplineHint: document.getElementById("disciplineHint"),
+          disciplineLegend: document.getElementById("disciplineLegend"),
           disciplineListBody: document.getElementById("disciplineListBody"),
           disciplineListEmpty: document.getElementById("disciplineListEmpty"),
           selViewMode: document.getElementById("selViewMode"),
@@ -1011,9 +1068,9 @@
           miniMap: document.getElementById("miniMapAnalysis"),
           timelineMeta: document.getElementById("timelineMeta"),
           miniMapMeta: document.getElementById("miniMapMeta"),
-          selColorMode: document.getElementById("selColorMode"),
-          selColorValue: document.getElementById("selColorValue"),
-          selImages: document.getElementById("selImages"),
+          btnToggleFilter: document.getElementById("btnToggleFilter"),
+          btnToggleImages: document.getElementById("btnToggleImages"),
+          btnToggleText: document.getElementById("btnToggleText"),
           colorEditor: document.getElementById("colorEditor"),
           colorPanelMeta: document.getElementById("colorPanelMeta"),
           btnResetPalette: document.getElementById("btnResetPalette"),
@@ -1023,7 +1080,6 @@
           btnOpen: document.getElementById("btnOpen"),
           btnReset: document.getElementById("btnReset"),
           btnPreviewLoop: document.getElementById("btnPreviewLoop"),
-          btnPause: document.getElementById("btnPause"),
           fileInput: document.getElementById("fileInput"),
           projectName: document.getElementById("projectName"),
           stats: document.getElementById("stats"),
@@ -1114,7 +1170,9 @@
           colorValue: "__all__",
           viewMode: "all",
           viewValue: "__all__",
+          actionOutlineEnabled: false,
           showImages: true,
+          showText: true,
           overviewMode: OVERVIEW_MODE,
           idleStatus: "",
           statusTimer: 0,
@@ -1150,7 +1208,7 @@
           worldByAreaLower: new Map(),
           worldBounds: { sizeX: 360, sizeZ: 360 },
           defaultHint:
-            "Bolla = disciplina (dimensione per occorrenze). Le linee mostrano co-presenza della coppia nella stessa card.",
+            "Bubble = discipline (size by occurrences). Lines show co-presence of the pair within the same card.",
         };
         const DISCIPLINE_RENDER_SCALE = 1.4;
         const PREVIEW_CAPTURE_WIDTH = 1080;
@@ -1193,18 +1251,6 @@
           }, timeout);
         }
 
-        function syncPauseButton() {
-          if (!dom.btnPause) return;
-          dom.btnPause.classList.toggle("running", !state.paused);
-          dom.btnPause.dataset.tip = state.paused
-            ? "Start simulation"
-            : "Stop simulation";
-          dom.btnPause.setAttribute(
-            "aria-label",
-            state.paused ? "Start simulation" : "Stop simulation",
-          );
-        }
-
         function syncPreviewSnapshotButton() {
           if (!dom.btnPreviewLoop) return;
           const busy = !!state.previewCapture.active;
@@ -1212,11 +1258,11 @@
           dom.btnPreviewLoop.disabled = busy || !enabled;
           dom.btnPreviewLoop.classList.toggle("is-active", busy);
           dom.btnPreviewLoop.dataset.tip = busy
-            ? "Saving preview snapshot"
-            : "Save preview snapshot";
+            ? "Saving screenshot"
+            : "Screenshot";
           dom.btnPreviewLoop.setAttribute(
             "aria-label",
-            busy ? "Saving preview snapshot" : "Save preview snapshot",
+            busy ? "Saving screenshot" : "Screenshot",
           );
         }
 
@@ -1297,16 +1343,21 @@
             imageEl.naturalHeight
           );
           const metaLines = [];
-          if (!hasImage && Array.isArray(node.files) && node.files.length) {
+          if (
+            state.showText &&
+            !hasImage &&
+            Array.isArray(node.files) &&
+            node.files.length
+          ) {
             const first = node.files[0];
             metaLines.push(first?.name || first?.path || "asset");
           }
-          if (Array.isArray(node.files) && node.files.length > 1) {
+          if (state.showText && Array.isArray(node.files) && node.files.length > 1) {
             metaLines.push(`+${node.files.length - 1} asset`);
           }
 
           const pad = 3;
-          const titleLineHeight = 12;
+          const titleLineHeight = state.showText ? 12 : 0;
           const metaLineHeight = 11;
           const contentWidth = labelWidth - pad * 2;
           const boxHeight =
@@ -1341,15 +1392,18 @@
           }
 
           let cursorY = pad;
-          ctx.font = `700 10px var(--ot-font-sans)`;
-          ctx.fillStyle = "#111111";
-          ctx.textBaseline = "top";
-          ctx.fillText(
-            ellipsizeSnapshotText(ctx, node.title || "Node", contentWidth),
-            pad,
-            cursorY,
-          );
-          cursorY += titleLineHeight;
+          if (state.showText) {
+            ctx.font =
+              '700 10px "Times New Roman", Times, serif';
+            ctx.fillStyle = "#111111";
+            ctx.textBaseline = "top";
+            ctx.fillText(
+              ellipsizeSnapshotText(ctx, node.title || "Node", contentWidth),
+              pad,
+              cursorY,
+            );
+            cursorY += titleLineHeight;
+          }
 
           if (hasImage) {
             drawSnapshotImageCover(
@@ -1364,7 +1418,8 @@
           }
 
           if (metaLines.length) {
-            ctx.font = `9px var(--ot-font-sans)`;
+            ctx.font =
+              '9px "Times New Roman", Times, serif';
             ctx.fillStyle = "#444444";
             for (const line of metaLines) {
               ctx.fillText(
@@ -1687,6 +1742,8 @@
             }
           }
 
+          if (!state.showText) return;
+
           if (node.labelAssetsEl.children.length === 0) {
             const first = node.files[0];
             const meta = document.createElement("div");
@@ -1810,9 +1867,9 @@
         }
 
         function macroLabel(value) {
-          if (value === "speculative") return "speculazione";
-          if (value === "communication") return "comunicazione";
-          if (value === "interaction") return "interazione";
+          if (value === "speculative") return "speculative";
+          if (value === "communication") return "communication";
+          if (value === "interaction") return "interaction";
           return normValue(value);
         }
 
@@ -1822,7 +1879,7 @@
           if (mode === "macro") return "macro area";
           if (mode === "areas") return "areas";
           if (mode === "tags") return "tags";
-          return "nessuno";
+          return "none";
         }
 
         function colorByCategory(mode, value) {
@@ -1836,6 +1893,12 @@
         }
 
         function defaultColorHex(mode, value) {
+          if (mode === "action") {
+            const normalized = normValue(value, "").toLowerCase();
+            if (normalized === "exploring") return "#00FFFF";
+            if (normalized === "making") return "#45250D";
+            return "";
+          }
           return `#${colorByCategory(mode, value).getHexString()}`;
         }
 
@@ -1845,6 +1908,7 @@
         }
 
         function colorHexFor(mode, value) {
+          if (mode === "action") return defaultColorHex(mode, value);
           const map = paletteForMode(mode);
           if (!map.has(value)) map.set(value, defaultColorHex(mode, value));
           return map.get(value);
@@ -1905,36 +1969,51 @@
         }
 
         function updateHighlightValueOptions() {
-          const mode = dom.selColorMode?.value || "none";
-          const previous = dom.selColorValue?.value || "__all__";
+          return;
+        }
 
-          if (!dom.selColorValue) return;
-          const options = [{ value: "__all__", label: "Evidenzia: tutti" }];
+        function activeColorMode() {
+          return state.actionOutlineEnabled ? "action" : "none";
+        }
 
-          if (mode !== "none") {
-            const stats = collectModeStats(mode);
-            const sorted = [...stats.entries()]
-              .sort((a, b) => {
-                if (a[1] !== b[1]) return b[1] - a[1];
-                return a[0].localeCompare(b[0], "it");
-              })
-              .map(([value]) => value);
-            for (const value of sorted) {
-              options.push({
-                value,
-                label: `Evidenzia: ${categoryLabel(mode, value)}`,
-              });
-            }
+        function syncToolbarToggleButtons() {
+          if (dom.btnToggleImages) {
+            const icon = dom.btnToggleImages.querySelector(
+              ".material-symbols-outlined",
+            );
+            const tip = state.showImages ? "Hide images" : "Images";
+            if (icon) icon.textContent = state.showImages ? "hide_image" : "image";
+            dom.btnToggleImages.setAttribute("data-tip", tip);
+            dom.btnToggleImages.setAttribute("aria-label", tip);
+            dom.btnToggleImages.disabled = !!state.overviewMode;
           }
-
-          dom.selColorValue.innerHTML = options
-            .map(
-              (o) => `<option value="${esc(o.value)}">${esc(o.label)}</option>`,
-            )
-            .join("");
-          dom.selColorValue.value = options.some((o) => o.value === previous)
-            ? previous
-            : "__all__";
+          if (dom.btnToggleText) {
+            const icon = dom.btnToggleText.querySelector(
+              ".material-symbols-outlined",
+            );
+            const tip = state.showText ? "Hide text" : "Text";
+            if (icon) icon.textContent = state.showText ? "text_ad_off" : "text_ad";
+            dom.btnToggleText.setAttribute("data-tip", tip);
+            dom.btnToggleText.setAttribute("aria-label", tip);
+          }
+          if (dom.btnToggleFilter) {
+            const icon = dom.btnToggleFilter.querySelector(
+              ".material-symbols-outlined",
+            );
+            const tip = state.actionOutlineEnabled
+              ? "Action outline off"
+              : "Action outline";
+            if (icon) {
+              icon.textContent = state.actionOutlineEnabled
+                ? "filter_alt_off"
+                : "filter_alt";
+            }
+            dom.btnToggleFilter.setAttribute("data-tip", tip);
+            dom.btnToggleFilter.setAttribute("aria-label", tip);
+          }
+          if (dom.disciplineLegend) {
+            dom.disciplineLegend.hidden = !state.actionOutlineEnabled;
+          }
         }
 
         function nodeValuesForViewMode(node, mode) {
@@ -1965,7 +2044,7 @@
           if (!dom.selViewMode || !dom.selViewValue) return;
           const mode = dom.selViewMode.value || "all";
           const previous = dom.selViewValue.value || "__all__";
-          const options = [{ value: "__all__", label: "Valore: tutti" }];
+          const options = [{ value: "__all__", label: "Value: all" }];
 
           if (mode !== "all") {
             const stats = collectViewFilterStats(mode);
@@ -2022,7 +2101,7 @@
           if (!dom.viewFilterStats) return;
           const visibleNodes = countVisibleNodes();
           const visibleEdges = countVisibleEdges();
-          dom.viewFilterStats.textContent = `Visibili ${visibleNodes}/${state.nodes.length} nodi · ${visibleEdges}/${state.edges.length} archi`;
+          dom.viewFilterStats.textContent = `Visible ${visibleNodes}/${state.nodes.length} nodes · ${visibleEdges}/${state.edges.length} edges`;
         }
 
         function applyViewFilter() {
@@ -2081,7 +2160,7 @@
           ctx.strokeRect(0.5, 0.5, width - 1, height - 1);
           ctx.fillStyle = "#7b7b7b";
           ctx.font =
-            "12px \"Times New Roman\", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            '12px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(text, width * 0.5, height * 0.5);
@@ -2094,9 +2173,7 @@
         }
 
         function mapColorModeValue() {
-          return (
-            dom.selMapColorMode?.value || dom.selColorMode?.value || "none"
-          );
+          return dom.selMapColorMode?.value || activeColorMode();
         }
 
         function mapNodeGrayFill(mode, value) {
@@ -2238,10 +2315,10 @@
           if (!dom.editorMapInfo) return;
           if (state.selected >= 0 && state.nodes[state.selected]) {
             const n = state.nodes[state.selected];
-            dom.editorMapInfo.textContent = `Selezionato: ${n.title} · ${visibleNodes} nodi visibili · ${visibleEdges} archi visibili`;
+            dom.editorMapInfo.textContent = `Selected: ${n.title} · ${visibleNodes} visible nodes · ${visibleEdges} visible edges`;
             return;
           }
-          dom.editorMapInfo.textContent = `${visibleNodes} nodi visibili · ${visibleEdges} archi visibili`;
+          dom.editorMapInfo.textContent = `${visibleNodes} visible nodes · ${visibleEdges} visible edges`;
         }
 
         function computeFilteredActionSeries() {
@@ -2298,19 +2375,19 @@
           const series = computeFilteredActionSeries();
 
           if (!series.labels.length) {
-            if (dom.timelineMeta) dom.timelineMeta.textContent = "0 settimane";
+            if (dom.timelineMeta) dom.timelineMeta.textContent = "0 weeks";
             drawChartPlaceholder(
               ctx,
               width,
               height,
-              "Nessun nodo filtrato con data",
+              "No filtered nodes with dates",
             );
             return;
           }
 
           const totalNodes = series.total.reduce((sum, v) => sum + v, 0);
           if (dom.timelineMeta) {
-            dom.timelineMeta.textContent = `${series.labels.length} settimane · ${totalNodes} nodi`;
+            dom.timelineMeta.textContent = `${series.labels.length} weeks · ${totalNodes} nodes`;
           }
 
           const m = { l: 38, r: 14, t: 14, b: 26 };
@@ -2341,7 +2418,7 @@
 
           ctx.fillStyle = "#666";
           ctx.font =
-            "10px \"Times New Roman\", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            '10px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
           ctx.textAlign = "right";
           ctx.textBaseline = "middle";
           for (let i = 0; i <= 4; i++) {
@@ -2399,13 +2476,13 @@
           ctx.textAlign = "left";
           ctx.textBaseline = "top";
           ctx.font =
-            "11px \"Times New Roman\", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+            '11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
           ctx.fillStyle = "#0b9bb8";
           ctx.fillText("Exploring", m.l + 4, 6);
           ctx.fillStyle = "#8a5a2b";
           ctx.fillText("Making", m.l + 82, 6);
           ctx.fillStyle = "#111111";
-          ctx.fillText("Totale", m.l + 144, 6);
+          ctx.fillText("Total", m.l + 144, 6);
         }
 
         function renderTotalsChart() {
@@ -2425,14 +2502,14 @@
           const total = visible.length;
 
           if (!total) {
-            drawChartPlaceholder(ctx, width, height, "Nessun nodo visibile");
+            drawChartPlaceholder(ctx, width, height, "No visible nodes");
             return;
           }
 
           const data = [
             { label: "Exploring", value: exploring, color: "#0b9bb8" },
             { label: "Making", value: making, color: "#8a5a2b" },
-            { label: "Totale", value: total, color: "#111111" },
+            { label: "Total", value: total, color: "#111111" },
           ];
           const max = Math.max(1, ...data.map((d) => d.value));
           const m = { l: 22, r: 14, t: 10, b: 24 };
@@ -2455,7 +2532,7 @@
             ctx.fillRect(bx, by, bw, bh);
             ctx.fillStyle = "#4e4e4e";
             ctx.font =
-              "10px \"Times New Roman\", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+              '10px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
             ctx.textAlign = "center";
             ctx.textBaseline = "top";
             ctx.fillText(entry.label, bx + bw * 0.5, m.t + ph + 6);
@@ -2475,7 +2552,7 @@
             if (dom.miniMapMeta)
               dom.miniMapMeta.textContent = "Editor navigator";
             updateEditorMapInfo(0, 0);
-            drawChartPlaceholder(ctx, width, height, "Nessun dato editor");
+            drawChartPlaceholder(ctx, width, height, "No editor data");
             return;
           }
 
@@ -2501,12 +2578,12 @@
           }
 
           if (dom.miniMapMeta) {
-            dom.miniMapMeta.textContent = `Editor navigator · ${visibleNodes}/${editorNodes.length} nodi`;
+            dom.miniMapMeta.textContent = `Editor navigator · ${visibleNodes}/${editorNodes.length} nodes`;
           }
           updateEditorMapInfo(visibleNodes, visibleEdges);
 
           if (!visibleNodes) {
-            drawChartPlaceholder(ctx, width, height, "Nessun nodo visibile");
+            drawChartPlaceholder(ctx, width, height, "No visible nodes");
             return;
           }
 
@@ -2566,16 +2643,16 @@
 
         function renderColorEditor() {
           if (!dom.colorEditor || !dom.colorPanelMeta) return;
-          const mode = dom.selColorMode?.value || "none";
+          const mode = activeColorMode();
           if (mode === "none") {
             dom.colorPanelMeta.textContent =
-              "Seleziona un campo colore nella navbar per personalizzare ogni valore.";
+              "Turn on the action outline to show Exploring and Making.";
             dom.colorEditor.innerHTML = "";
             return;
           }
 
           const stats = collectModeStats(mode);
-          dom.colorPanelMeta.textContent = `Campo attivo: ${modeLabel(mode)} (${stats.size} valori).`;
+          dom.colorPanelMeta.textContent = `Action outline (${stats.size} values).`;
 
           const rows = [...stats.entries()].sort((a, b) => {
             if (a[1] !== b[1]) return b[1] - a[1];
@@ -2584,7 +2661,7 @@
 
           if (!rows.length) {
             dom.colorEditor.innerHTML =
-              '<div class="meta">Nessun valore disponibile.</div>';
+              '<div class="meta">No values available.</div>';
             return;
           }
 
@@ -2592,19 +2669,19 @@
             .map(([value, count]) => {
               const hex = colorHexFor(mode, value);
               return `
- <label class="color-row">
- <input type="color" data-value="${esc(value)}" value="${esc(hex)}" />
+ <div class="color-row">
+ <span style="width:24px;height:24px;border-radius:4px;background:${esc(hex || "#ffffff")};border:1px solid rgba(0,0,0,0.08);display:block;"></span>
  <span class="name">${esc(categoryLabel(mode, value))}</span>
  <span class="count">${count}</span>
- </label>
+ </div>
  `;
             })
             .join("");
         }
 
         function applyNodeHighlighting() {
-          const mode = dom.selColorMode?.value || "none";
-          const value = dom.selColorValue?.value || "__all__";
+          const mode = activeColorMode();
+          const value = "__all__";
           state.colorMode = mode;
           state.colorValue = value;
           const stats = mode === "none" ? new Map() : collectModeStats(mode);
@@ -2612,16 +2689,9 @@
           for (let i = 0; i < state.nodes.length; i++) {
             const n = state.nodes[i];
             const values = nodeValuesForMode(n, mode);
-            const selected =
-              state.selected >= 0 && state.nodes[state.selected] === n;
-            const matchAll = value === "__all__";
-            const matched =
-              mode === "none" || matchAll || values.includes(value);
-            const strong = matched || selected;
-
             n.material.color.setHex(0x000000);
-            n.material.opacity = strong ? 0.95 : 0.15;
-            n.material.transparent = n.material.opacity < 0.99;
+            n.material.opacity = 1;
+            n.material.transparent = false;
 
             if (mode === "none") {
               n.labelEl?.classList.remove("boxed");
@@ -2630,37 +2700,42 @@
               continue;
             }
 
-            const chosenValue = matchAll
-              ? pickPrimaryNodeValue(values, stats)
-              : value;
-            const borderHex = chosenValue
-              ? colorHexFor(mode, chosenValue)
-              : "#8b8b8b";
+            const chosenValue = pickPrimaryNodeValue(values, stats);
+            const borderHex = chosenValue ? colorHexFor(mode, chosenValue) : "";
+            if (!borderHex) {
+              n.labelEl?.classList.remove("boxed");
+              n.labelEl?.classList.remove("dimmed");
+              n.labelEl?.style.removeProperty("--nodeBorder");
+              continue;
+            }
             n.labelEl?.classList.add("boxed");
-            n.labelEl?.classList.toggle("dimmed", !matched && !selected);
-            n.labelEl?.style.setProperty(
-              "--nodeBorder",
-              strong ? borderHex : "#c6c6c6",
-            );
+            n.labelEl?.classList.remove("dimmed");
+            n.labelEl?.style.setProperty("--nodeBorder", borderHex);
           }
         }
 
         function applyImagesVisibility() {
-          state.showImages = (dom.selImages?.value || "on") !== "off";
+          if (state.overviewMode) state.showImages = false;
           document.body.classList.toggle("hide-images", !state.showImages);
           updateAllNodeLabelAssets();
           if (state.selected >= 0) renderNodeMedia(state.nodes[state.selected]);
+          syncToolbarToggleButtons();
+        }
+
+        function applyTextVisibility() {
+          document.body.classList.toggle("hide-text", !state.showText);
+          updateAllNodeLabelAssets();
+          syncToolbarToggleButtons();
         }
 
         function refreshToolbarOptions() {
-          updateHighlightValueOptions();
-          renderColorEditor();
           applyNodeHighlighting();
           updateViewFilterValueOptions();
           refreshViewFilterStats();
           if (dom.selMapColorMode) {
-            dom.selMapColorMode.value = dom.selColorMode?.value || "none";
+            dom.selMapColorMode.value = activeColorMode();
           }
+          syncToolbarToggleButtons();
           state.dataViewsDirty = true;
         }
 
@@ -2755,8 +2830,8 @@
           return out;
         }
 
-        const DISCIPLINE_EXPLORING_HEX = "#00bcd4";
-        const DISCIPLINE_MAKING_HEX = "#8a5a2b";
+        const DISCIPLINE_EXPLORING_HEX = "#00FFFF";
+        const DISCIPLINE_MAKING_HEX = "#45250D";
         const DISCIPLINE_NEUTRAL_HEX = "#b8b8b8";
 
         function mixHex(a, b, t) {
@@ -2771,27 +2846,13 @@
             ? exploringCount
             : 0;
           const making = Number.isFinite(makingCount) ? makingCount : 0;
-          const knownTotal = exploring + making;
-
-          if (knownTotal <= 0 || exploring === making) {
-            return mixHex("#ffffff", DISCIPLINE_NEUTRAL_HEX, 0.72);
-          }
-
-          const diff = making - exploring;
-          const intensity = THREE.MathUtils.clamp(
-            Math.abs(diff) / knownTotal,
-            0,
-            1,
-          );
-          const target =
-            diff > 0 ? DISCIPLINE_MAKING_HEX : DISCIPLINE_EXPLORING_HEX;
-          const accent = mixHex(DISCIPLINE_NEUTRAL_HEX, target, intensity);
-          const fillMix = 0.62 + intensity * 0.25;
-          return mixHex("#ffffff", accent, fillMix);
+          if (exploring > making) return DISCIPLINE_EXPLORING_HEX;
+          if (making > exploring) return DISCIPLINE_MAKING_HEX;
+          return DISCIPLINE_NEUTRAL_HEX;
         }
 
         function refreshDisciplineInfo() {
-          dom.disciplineStats.textContent = `${discipline.nodes.length} aree · ${discipline.edges.length} connessioni`;
+          dom.disciplineStats.textContent = `${discipline.nodes.length} areas · ${discipline.edges.length} connections`;
         }
 
         function renderDisciplineAreaList() {
@@ -3419,7 +3480,9 @@
             disciplineCtx.arc(sx, sy, sr, 0, Math.PI * 2);
             disciplineCtx.fillStyle = "#ffffff";
             disciplineCtx.fill();
-            disciplineCtx.strokeStyle = "hsl(0 0% 60%)";
+            disciplineCtx.strokeStyle = state.actionOutlineEnabled
+              ? n.color || DISCIPLINE_NEUTRAL_HEX
+              : DISCIPLINE_NEUTRAL_HEX;
             disciplineCtx.lineWidth = 1.3;
             disciplineCtx.stroke();
           }
@@ -3428,8 +3491,7 @@
           disciplineCtx.save();
           disciplineCtx.textAlign = "center";
           disciplineCtx.textBaseline = "middle";
-          disciplineCtx.font =
-            "11px \"Times New Roman\", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+          disciplineCtx.font = '700 11px "Times New Roman", Times, serif';
           const placedTextRects = [];
           const intersectsTextRect = (a, b) =>
             a.x < b.x + b.w &&
@@ -3520,8 +3582,7 @@
           );
           const paddingX = 9;
           const paddingY = 5;
-          const fontFamily =
-            "\"Times New Roman\", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+          const fontFamily = '"Times New Roman", Times, serif';
 
           const canvas = document.createElement("canvas");
           const ctx = canvas.getContext("2d");
@@ -3887,10 +3948,12 @@
           state.editorMap.view.moved = false;
           state.selected = -1;
           clearDisciplineGraph();
-          dom.nodeInfo.innerHTML =
-            '<div class="k">info</div><div>Seleziona un nodo nella rete.</div>';
-          dom.nodeDesc.textContent = "";
-          dom.nodeMedia.innerHTML = "";
+          if (dom.nodeInfo) {
+            dom.nodeInfo.innerHTML =
+              '<div class="k">info</div><div>Seleziona un nodo nella rete.</div>';
+          }
+          if (dom.nodeDesc) dom.nodeDesc.textContent = "";
+          if (dom.nodeMedia) dom.nodeMedia.innerHTML = "";
           refreshViewFilterStats();
           state.dataViewsDirty = true;
           renderAnalysisDataViews();
@@ -3900,7 +3963,6 @@
         function buildGraph(project, label) {
           clearGraph();
           setRawProject(project);
-
           const rawNodes = Array.isArray(project?.nodes) ? project.nodes : [];
           const rawEdges = Array.isArray(project?.edges) ? project.edges : [];
           if (!rawNodes.length) throw new Error("JSON senza nodi");
@@ -3968,8 +4030,8 @@
               color: 0x000000,
               roughness: 0.36,
               metalness: 0.12,
-              transparent: true,
-              opacity: 0.95,
+              transparent: false,
+              opacity: 1,
               emissive: 0x000000,
               emissiveIntensity: 0,
             });
@@ -4005,11 +4067,23 @@
 
             const labelEl = document.createElement("div");
             labelEl.className = "node-label";
+            labelEl.dataset.index = String(i);
             const titleEl = document.createElement("div");
             titleEl.className = "title";
             titleEl.textContent = node.title;
             const assetsEl = document.createElement("div");
             assetsEl.className = "assets";
+            labelEl.addEventListener("pointerdown", (event) => {
+              event.stopPropagation();
+              state.pointerDown.active = false;
+              controls.isRotating = false;
+              controls.isPanning = false;
+            });
+            labelEl.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              selectNode(i);
+            });
             labelEl.append(titleEl, assetsEl);
             dom.labelsLayer.appendChild(labelEl);
             node.labelEl = labelEl;
@@ -4128,6 +4202,7 @@
         function hideNodeOverlay3d() {
           if (!dom.nodeOverlay3d) return;
           dom.nodeOverlay3d.classList.add("is-hidden");
+          if (dom.nodeOverlay3dMeta) dom.nodeOverlay3dMeta.textContent = "";
           if (dom.nodeOverlay3dInfo) dom.nodeOverlay3dInfo.innerHTML = "";
           if (dom.nodeOverlay3dDesc) dom.nodeOverlay3dDesc.textContent = "";
           if (dom.nodeOverlay3dMedia) dom.nodeOverlay3dMedia.innerHTML = "";
@@ -4135,25 +4210,34 @@
 
         function renderNodeOverlay3d(node) {
           if (!dom.nodeOverlay3d || !node) return;
-          const areaText = node.areas.length ? node.areas.join(", ") : "-";
-          const tagText = node.tags.length ? node.tags.join(", ") : "-";
+          const renderBadges = (values) =>
+            values && values.length
+              ? `<div class="node-overlay-badges">${values
+                  .map(
+                    (value) =>
+                      `<span class="node-overlay-badge">${esc(value)}</span>`,
+                  )
+                  .join("")}</div>`
+              : "-";
           dom.nodeOverlay3d.classList.remove("is-hidden");
           if (dom.nodeOverlay3dTitle) {
-            dom.nodeOverlay3dTitle.textContent = node.title || "Nodo";
+            dom.nodeOverlay3dTitle.textContent = node.title || "Node";
+          }
+          if (dom.nodeOverlay3dMeta) {
+            dom.nodeOverlay3dMeta.textContent = node.date || "";
           }
           if (dom.nodeOverlay3dInfo) {
             dom.nodeOverlay3dInfo.innerHTML = `
- <div class="k">id</div><div>${esc(node.id)}</div>
- <div class="k">title</div><div>${esc(node.title)}</div>
  <div class="k">type</div><div>${esc(node.type)}</div>
  <div class="k">action</div><div>${esc(node.action)}</div>
- <div class="k">date</div><div>${esc(node.date)}</div>
- <div class="k">areas</div><div>${esc(areaText)}</div>
- <div class="k">tags</div><div>${esc(tagText)}</div>
+ <div class="k">areas</div><div>${renderBadges(node.areas)}</div>
+ <div class="k">tags</div><div>${renderBadges(node.tags)}</div>
  `;
           }
           if (dom.nodeOverlay3dDesc) {
-            dom.nodeOverlay3dDesc.textContent = node.desc || "";
+            dom.nodeOverlay3dDesc.innerHTML = node.desc
+              ? `<div class="node-overlay-desc-title">Description</div>${esc(node.desc)}`
+              : "";
           }
           renderNodeMedia(node, dom.nodeOverlay3dMedia);
         }
@@ -4236,10 +4320,12 @@
           }
           if (index < 0 || index >= state.nodes.length) {
             state.selected = -1;
-            dom.nodeInfo.innerHTML =
-              '<div class="k">info</div><div>Seleziona un nodo nella rete.</div>';
-            dom.nodeDesc.textContent = "";
-            dom.nodeMedia.innerHTML = "";
+            if (dom.nodeInfo) {
+              dom.nodeInfo.innerHTML =
+                '<div class="k">info</div><div>Seleziona un nodo nella rete.</div>';
+            }
+            if (dom.nodeDesc) dom.nodeDesc.textContent = "";
+            if (dom.nodeMedia) dom.nodeMedia.innerHTML = "";
             hideNodeOverlay3d();
             for (const n of state.nodes) {
               n.material.emissive.setHex(0x000000);
@@ -4274,8 +4360,8 @@
           const areaText = n.areas.length ? n.areas.join(", ") : "-";
           const tagText = n.tags.length ? n.tags.join(", ") : "-";
 
-          dom.nodeInfo.innerHTML = `
- <div class="k">id</div><div>${esc(n.id)}</div>
+          if (dom.nodeInfo) {
+            dom.nodeInfo.innerHTML = `
  <div class="k">title</div><div>${esc(n.title)}</div>
  <div class="k">type</div><div>${esc(n.type)}</div>
  <div class="k">action</div><div>${esc(n.action)}</div>
@@ -4283,9 +4369,9 @@
  <div class="k">areas</div><div>${esc(areaText)}</div>
  <div class="k">tags</div><div>${esc(tagText)}</div>
  `;
-
-          dom.nodeDesc.textContent = n.desc || "";
-          renderNodeMedia(n);
+          }
+          if (dom.nodeDesc) dom.nodeDesc.textContent = n.desc || "";
+          if (dom.nodeMedia) renderNodeMedia(n);
           renderNodeOverlay3d(n);
           state.dataViewsDirty = true;
           renderAnalysisDataViews();
@@ -4674,10 +4760,7 @@
           buildGraph(mergedProject, `Overview · ${entries.length} progetti`);
           state.assetBase = "";
           state.folderName = null;
-          if (dom.selImages) {
-            dom.selImages.value = "off";
-            dom.selImages.disabled = true;
-          }
+          state.showImages = false;
           applyImagesVisibility();
           setHint(
             `Overview caricata: ${entries.length} progetti · ${mergedProject.nodes.length} nodi · ${mergedProject.edges.length} archi`,
@@ -4873,16 +4956,6 @@
             selectNode(-1);
           });
 
-          dom.selColorMode?.addEventListener("change", () => {
-            refreshToolbarOptions();
-          });
-
-          dom.selColorValue?.addEventListener("change", () => {
-            applyNodeHighlighting();
-            state.dataViewsDirty = true;
-            renderAnalysisDataViews();
-          });
-
           dom.selViewMode?.addEventListener("change", () => {
             updateViewFilterValueOptions();
             applyViewFilter();
@@ -4893,9 +4966,8 @@
           });
 
           dom.selMapColorMode?.addEventListener("change", () => {
-            if (dom.selColorMode) {
-              dom.selColorMode.value = dom.selMapColorMode.value || "none";
-            }
+            state.actionOutlineEnabled =
+              (dom.selMapColorMode.value || "none") !== "none";
             refreshToolbarOptions();
             state.dataViewsDirty = true;
             renderAnalysisDataViews();
@@ -4909,7 +4981,7 @@
             const target = e.target;
             if (!(target instanceof HTMLInputElement)) return;
             if (target.type !== "color") return;
-            const mode = dom.selColorMode?.value || "none";
+            const mode = activeColorMode();
             if (mode === "none") return;
             const value = target.dataset.value || "";
             if (!value) return;
@@ -4920,7 +4992,7 @@
           });
 
           dom.btnResetPalette?.addEventListener("click", () => {
-            const mode = dom.selColorMode?.value || "none";
+            const mode = activeColorMode();
             if (mode === "none") return;
             resetPaletteForMode(mode);
             renderColorEditor();
@@ -4930,12 +5002,27 @@
             setHint(`Colori reset per ${modeLabel(mode)}.`, "ok");
           });
 
-          dom.selImages?.addEventListener("change", () => {
+          dom.btnToggleImages?.addEventListener("click", () => {
+            if (state.overviewMode) return;
+            state.showImages = !state.showImages;
             applyImagesVisibility();
             setHint(
-              state.showImages ? "Immagini visibili." : "Immagini nascoste.",
+              state.showImages ? "Images visible." : "Images hidden.",
               "ok",
             );
+          });
+
+          dom.btnToggleText?.addEventListener("click", () => {
+            state.showText = !state.showText;
+            applyTextVisibility();
+            setHint(state.showText ? "Text visible." : "Text hidden.", "ok");
+          });
+
+          dom.btnToggleFilter?.addEventListener("click", () => {
+            state.actionOutlineEnabled = !state.actionOutlineEnabled;
+            refreshToolbarOptions();
+            state.dataViewsDirty = true;
+            renderAnalysisDataViews();
           });
 
           dom.fileInput.addEventListener("change", async () => {
@@ -4952,17 +5039,6 @@
 
           dom.btnPreviewLoop?.addEventListener("click", async () => {
             await savePreviewSnapshot();
-          });
-
-          dom.btnPause.addEventListener("click", () => {
-            state.paused = !state.paused;
-            syncPauseButton();
-            setHint(
-              state.paused
-                ? "Simulation ferma (default)."
-                : "Simulation attiva.",
-              "ok",
-            );
           });
 
           window.addEventListener(
@@ -5065,7 +5141,7 @@
             controls.isPanning = false;
           });
 
-          dom.canvas.addEventListener(
+          dom.viewWrap.addEventListener(
             "wheel",
             (e) => {
               e.preventDefault();
@@ -5074,7 +5150,7 @@
             { passive: false },
           );
 
-          dom.canvas.addEventListener(
+          dom.viewWrap.addEventListener(
             "touchstart",
             (e) => {
               if (e.touches.length !== 2) return;
@@ -5090,7 +5166,7 @@
             { passive: false },
           );
 
-          dom.canvas.addEventListener(
+          dom.viewWrap.addEventListener(
             "touchmove",
             (e) => {
               if (!state.pinch.active || e.touches.length !== 2) return;
@@ -5117,7 +5193,7 @@
             { passive: false },
           );
 
-          dom.canvas.addEventListener(
+          dom.viewWrap.addEventListener(
             "touchend",
             () => {
               state.pinch.active = false;
@@ -5295,21 +5371,20 @@
           }
         }
 
-        dom.selColorMode.value = "none";
-        dom.selColorValue.value = "__all__";
-        dom.selImages.value = state.overviewMode ? "off" : "on";
-        if (dom.selImages) dom.selImages.disabled = !!state.overviewMode;
+        state.actionOutlineEnabled = false;
+        state.showImages = !state.overviewMode;
+        state.showText = true;
         if (dom.selMapColorMode)
-          dom.selMapColorMode.value = dom.selColorMode.value;
+          dom.selMapColorMode.value = activeColorMode();
         if (dom.selViewMode) dom.selViewMode.value = "all";
         if (dom.selViewValue) dom.selViewValue.value = "__all__";
-        syncPauseButton();
         syncPreviewSnapshotButton();
+        syncToolbarToggleButtons();
         setIdleStatus();
-        updateHighlightValueOptions();
         updateViewFilterValueOptions();
         refreshViewFilterStats();
         applyImagesVisibility();
+        applyTextVisibility();
         onResize();
         clearDisciplineGraph();
         renderAnalysisDataViews();
