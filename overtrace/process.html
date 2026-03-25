@@ -2882,6 +2882,10 @@ function fixedWorldSize(mode) {
  dom.nodePopover.classList.add("is-visible");
  }
 
+ function hideNodePopover() {
+ selectNode(-1);
+ }
+
  function selectNode(index) {
  state.selected = index;
  for (let i = 0; i < state.nodes.length; i++) {

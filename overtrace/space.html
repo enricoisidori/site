@@ -5712,8 +5712,8 @@
         }
 
         state.actionOutlineEnabled = false;
-        state.showImages = !state.overviewMode;
-        state.showText = true;
+        state.showImages = !state.overviewMode && !MOBILE_APP_MODE;
+        state.showText = !MOBILE_APP_MODE;
         if (dom.selMapColorMode) dom.selMapColorMode.value = activeColorMode();
         if (dom.selViewMode) dom.selViewMode.value = "all";
         if (dom.selViewValue) dom.selViewValue.value = "__all__";
