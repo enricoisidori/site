@@ -79,17 +79,6 @@
         overflow: visible;
       }
 
-      .atlas-wordmark {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        font: 400 13px/1 var(--ot-font-sans);
-        letter-spacing: normal;
-        color: #111111;
-        pointer-events: none;
-      }
-
       .project-grid {
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -258,6 +247,32 @@
           grid-template-columns: 1fr;
         }
       }
+
+      @media (max-width: 900px) {
+        body.research-page {
+          --ts-toolbar-safe-top: 62px;
+        }
+
+        .atlas-toolbar .nav-right {
+          display: none;
+        }
+
+        .atlas-toolbar {
+          justify-content: flex-start;
+        }
+
+        .research-view {
+          padding-top: calc(var(--ts-toolbar-safe-top) + 4px);
+        }
+
+        .project-actions {
+          display: none;
+        }
+
+        .project-meta-panel {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body class="research-page">
@@ -268,7 +283,6 @@
           <span class="brand-wordmark">Overtrace</span>
         </a>
       </div>
-      <div class="atlas-wordmark" aria-hidden="true">Overtrace</div>
       <div class="nav-center"></div>
       <div class="nav-right">
         <a
@@ -311,6 +325,9 @@
       </p>
     </footer>
     <script>
+      const MOBILE_APP_MODE = !!window.OvertraceUI?.isMobileAppMode?.();
+      if (MOBILE_APP_MODE) document.body.classList.add("mobile-atlas");
+
       const PROJECTS = [
         "1_linguistic",
         "2_media",
@@ -414,6 +431,23 @@
         const editorHref = `./editor.html?project=${encodeURIComponent(project.id)}`;
         const processHref = `./process.html?project=${encodeURIComponent(project.id)}`;
         const spaceHref = `./space.html?project=${encodeURIComponent(project.id)}`;
+        const actionsHtml = MOBILE_APP_MODE
+          ? `
+                <a class="project-action" href="${spaceHref}" aria-label="Open ${title} in Space" title="Open in Space">
+                  <span class="material-symbols-outlined">view_in_ar</span>
+                </a>
+            `
+          : `
+                <a class="project-action" href="${editorHref}" aria-label="Open ${title} in Editor" title="Open in Editor">
+                  <span class="material-symbols-outlined">edit</span>
+                </a>
+                <a class="project-action" href="${processHref}" aria-label="Open ${title} in Process" title="Open in Process">
+                  <span class="material-symbols-outlined">timeline</span>
+                </a>
+                <a class="project-action" href="${spaceHref}" aria-label="Open ${title} in Space" title="Open in Space">
+                  <span class="material-symbols-outlined">view_in_ar</span>
+                </a>
+            `;
         return `
           <article class="project-card" data-project="${project.id}">
             <a class="project-preview" href="${spaceHref}" aria-label="Open ${project.displayName} in Space">
@@ -426,15 +460,7 @@
             <div class="project-meta-panel">
               <h2 class="project-name">${title}</h2>
               <nav class="project-actions" aria-label="Open ${title}">
-                <a class="project-action" href="${editorHref}" aria-label="Open ${title} in Editor" title="Open in Editor">
-                  <span class="material-symbols-outlined">edit</span>
-                </a>
-                <a class="project-action" href="${processHref}" aria-label="Open ${title} in Process" title="Open in Process">
-                  <span class="material-symbols-outlined">timeline</span>
-                </a>
-                <a class="project-action" href="${spaceHref}" aria-label="Open ${title} in Space" title="Open in Space">
-                  <span class="material-symbols-outlined">view_in_ar</span>
-                </a>
+${actionsHtml}
               </nav>
             </div>
           </article>`;

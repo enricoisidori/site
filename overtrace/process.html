@@ -871,7 +871,7 @@
 
  <aside id="side">
  <section id="panelProject" class="panel">
- <h2 id="projectName">Nessun progetto caricato</h2>
+ <h2 id="projectName">No project loaded</h2>
 </section>
 
  <section id="panelVisual" class="panel">
@@ -946,7 +946,7 @@
  <div class="mini-grid">
  <div class="field">
  <label for="inpDotExploring">Exploring fill</label>
- <input id="inpDotExploring" class="side-select" type="color" value="#29EEEE" />
+ <input id="inpDotExploring" class="side-select" type="color" value="#28F7F7" />
  </div>
  <div class="field">
  <label for="inpDotMaking">Making fill</label>
@@ -1004,7 +1004,7 @@
  <svg id="trendSvg" viewBox="0 0 620 155" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Process timeline"></svg>
  <p id="trendHint">A valid date is required to populate the chart.</p>
  <div class="trend-legend" aria-label="Timeline legend">
- <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#29EEEE"></span><span>Exploring</span></div>
+ <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#28F7F7"></span><span>Exploring</span></div>
  <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#572F10"></span><span>Making</span></div>
  <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#d2d2d2"></span><span>–</span></div>
  </div>
@@ -1013,8 +1013,12 @@
  </main>
  </div>
 
- <script>
- (() => {
+<script>
+(() => {
+ if (window.OvertraceUI?.isMobileAppMode?.()) {
+ window.location.replace("./index.html");
+ return;
+ }
  const KNOWN_FOLDERS = [
  "1_linguistic",
  "2_media",
@@ -1032,11 +1036,12 @@
  const DOT_SIZE_PX = 6;
  const PREVIEW_WIDTH_PX = 144;
  const PREVIEW_HEIGHT_PX = 110;
- const EDGE_NORMAL_WIDTH = 0.5;
- const EDGE_DOT_MULTIPLIER = 2;
- const FALLBACK_CATEGORY_COLOR = "#9a9a9a";
- const ZOOM_MIN = 0.002;
- const ZOOM_MAX = 12;
+const EDGE_NORMAL_WIDTH = 0.5;
+const EDGE_DOT_MULTIPLIER = 2;
+const FALLBACK_CATEGORY_COLOR = "#9a9a9a";
+const ACTION_NEUTRAL_COLOR = "#d2d2d2";
+const ZOOM_MIN = 0.002;
+const ZOOM_MAX = 12;
  const METRIC_HELP = {
  interlacing_index:
  "Share of time windows in which Exploring and Making coexist. Higher values indicate overlapping processes rather than isolated phases.",
@@ -1171,7 +1176,7 @@
  downOnNode: false,
  },
  visual: {
- dotExploringFill: "#29EEEE",
+ dotExploringFill: "#28F7F7",
  dotMakingFill: "#572F10",
  dotScale: 1.7,
  dotStrokeWidth: 0,
@@ -1418,7 +1423,7 @@
  const k = String(value || "")
  .toLowerCase()
  .trim();
- if (k === "exploring") return "#29eeee";
+ if (k === "exploring") return "#28f7f7";
  if (k === "making") return "#572F10";
  return FALLBACK_CATEGORY_COLOR;
  }
@@ -1437,9 +1442,9 @@ function actionDotFillColor(action) {
  .toLowerCase()
  .trim();
  if (state.visual.dotAllBlack) return "#000000";
- if (key === "exploring") return state.visual.dotExploringFill || "#29EEEE";
+ if (key === "exploring") return state.visual.dotExploringFill || "#28F7F7";
  if (key === "making") return state.visual.dotMakingFill || "#572F10";
- return state.visual.dotExploringFill || "#29EEEE";
+ return ACTION_NEUTRAL_COLOR;
 }
 
 function actionDotStrokeColor(action) {
@@ -1447,9 +1452,9 @@ function actionDotStrokeColor(action) {
  const key = String(action || "")
  .toLowerCase()
  .trim();
- if (key === "exploring") return "#29EEEE";
+ if (key === "exploring") return "#28F7F7";
  if (key === "making") return "#572F10";
- return "#29EEEE";
+ return ACTION_NEUTRAL_COLOR;
 }
 
  function nodeAccentColor(node, chosen) {
@@ -1464,7 +1469,7 @@ function actionDotStrokeColor(action) {
 function nodeDotFillColor(node, chosen) {
  if (state.visual.dotAllBlack) return "#000000";
  if (state.colorMode === "action") return actionDotFillColor(node.action);
- if (state.colorMode === "none" || !chosen) return state.visual.dotExploringFill || "#29EEEE";
+ if (state.colorMode === "none" || !chosen) return state.visual.dotExploringFill || "#28F7F7";
  return colorByCategory(state.colorMode, chosen);
 }
 
@@ -1940,7 +1945,7 @@ function drawTrendSeries(svg, labels, series) {
  if (plotW <= 8 || plotH <= 8) return;
 
  const chosen = [];
- if (state.trend.showExploring) chosen.push({ key: "exploring", color: "#29EEEE" });
+ if (state.trend.showExploring) chosen.push({ key: "exploring", color: "#28F7F7" });
  if (state.trend.showMaking) chosen.push({ key: "making", color: "#572F10" });
  if (state.trend.showTotal) chosen.push({ key: "total", color: "#111111" });
  if (!chosen.length || !labels.length) return;

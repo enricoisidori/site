@@ -1920,6 +1920,10 @@
 
     <script>
       (() => {
+        if (window.OvertraceUI?.isMobileAppMode?.()) {
+          window.location.replace("./index.html");
+          return;
+        }
         const GRID = 24,
           NODE_W = 320,
           NODE_H = 180,

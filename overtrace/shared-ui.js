@@ -106,6 +106,14 @@
     return raw || fallback;
   }
 
+  function isMobileAppMode() {
+    try {
+      return !!window.matchMedia("(max-width: 900px)").matches;
+    } catch (_) {
+      return window.innerWidth <= 900;
+    }
+  }
+
   function resolveToolbar(toolbarOrSelector) {
     if (!toolbarOrSelector) {
       return (
@@ -355,6 +363,7 @@
   NS.clearProjectFsContext = clearProjectFsContext;
   NS.formatProjectDisplayName = formatProjectDisplayName;
   NS.getProjectDisplayMeta = getProjectDisplayMeta;
+  NS.isMobileAppMode = isMobileAppMode;
   NS.loadProjectFsContext = loadProjectFsContext;
   NS.openProjectFolder = openProjectFolder;
   NS.openProjectJsonFile = openProjectJsonFile;

@@ -886,6 +886,75 @@
           box-shadow: none;
         }
       }
+
+      body.mobile-space .nav-right,
+      body.mobile-space #side {
+        display: none;
+      }
+
+      body.mobile-space .topbar.ts-toolbar {
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      body.mobile-space .nav-left {
+        width: calc(var(--ts-brand-size) + var(--ts-panel-padding) * 2);
+        min-width: calc(var(--ts-brand-size) + var(--ts-panel-padding) * 2);
+        flex-wrap: nowrap;
+      }
+
+      body.mobile-space .nav-center {
+        justify-self: end;
+        width: max-content;
+        max-width: calc(100vw - 84px);
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      body.mobile-space .nav-center::-webkit-scrollbar {
+        display: none;
+      }
+
+      body.mobile-space #navStatus,
+      body.mobile-space #btnOpen,
+      body.mobile-space #btnPreviewLoop {
+        display: none;
+      }
+
+      body.mobile-space .layout {
+        display: block;
+        height: 100dvh;
+      }
+
+      body.mobile-space,
+      body.mobile-space .app {
+        height: 100dvh;
+      }
+
+      body.mobile-space #viewWrap {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100dvh;
+        border-right: none;
+        border-bottom: none;
+        touch-action: none;
+        overscroll-behavior: none;
+      }
+
+      body.mobile-space #view,
+      body.mobile-space #labelsLayer,
+      body.mobile-space .node-label {
+        touch-action: none;
+      }
+
+      body.mobile-space #nodeOverlay3d {
+        top: calc(var(--ts-toolbar-safe-top) + 2px);
+        right: 10px;
+        width: calc(100% - 20px);
+        max-width: 420px;
+        max-height: calc(100% - var(--ts-toolbar-safe-top) - 12px);
+      }
     </style>
     <link rel="stylesheet" href="./typography.css" />
     <link rel="stylesheet" href="./shared-ui.css" />
@@ -1074,7 +1143,7 @@
                 <div class="discipline-legend-item">
                   <span
                     class="discipline-legend-dot"
-                    style="background: #29eeee"
+                    style="background: #28f7f7"
                   ></span>
                   <span>Exploring</span>
                 </div>
@@ -1150,6 +1219,8 @@
         const OVERVIEW_MODE = QUERY_PARAMS.get("mode") === "overview";
         const ATLAS_SNAPSHOT_MODE = QUERY_PARAMS.get("atlas_snapshot") === "1";
         const SHARED_PROJECT_KEY = "overtrace.shared.project.v1";
+        const MOBILE_APP_MODE = !!window.OvertraceUI?.isMobileAppMode?.();
+        if (MOBILE_APP_MODE) document.body.classList.add("mobile-space");
 
         const TYPE_COLORS = [
           "#57d2b7",
@@ -1325,7 +1396,7 @@
             lastCenterX: 0,
             lastCenterY: 0,
           },
-          sideCollapsed: false,
+          sideCollapsed: MOBILE_APP_MODE,
         };
 
         const discipline = {
@@ -2047,7 +2118,7 @@
         function defaultColorHex(mode, value) {
           if (mode === "action") {
             const normalized = normValue(value, "").toLowerCase();
-            if (normalized === "exploring") return "#29EEEE";
+            if (normalized === "exploring") return "#28F7F7";
             if (normalized === "making") return "#572F10";
             return "#d2d2d2";
           }
@@ -3011,7 +3082,7 @@
           return out;
         }
 
-        const DISCIPLINE_EXPLORING_HEX = "#29EEEE";
+        const DISCIPLINE_EXPLORING_HEX = "#28F7F7";
         const DISCIPLINE_MAKING_HEX = "#572F10";
         const DISCIPLINE_NEUTRAL_HEX = "#b8b8b8";
 
@@ -5352,7 +5423,6 @@
           dom.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 
           dom.canvas.addEventListener("pointerdown", (e) => {
-            if (e.pointerType === "touch") return;
             state.pointerDown.labelIndex = -1;
             beginScenePointerInteraction(e.clientX, e.clientY, e.button);
           });
@@ -5427,6 +5497,16 @@
             },
             { passive: false },
           );
+
+          for (const eventName of ["gesturestart", "gesturechange", "gestureend"]) {
+            dom.viewWrap.addEventListener(
+              eventName,
+              (e) => {
+                e.preventDefault();
+              },
+              { passive: false },
+            );
+          }
 
           dom.viewWrap.addEventListener(
             "touchmove",
@@ -5648,6 +5728,14 @@
         applyImagesVisibility();
         applyTextVisibility();
         onResize();
+        if (MOBILE_APP_MODE && window.visualViewport) {
+          window.visualViewport.addEventListener("resize", onResize, {
+            passive: true,
+          });
+          window.visualViewport.addEventListener("scroll", onResize, {
+            passive: true,
+          });
+        }
         clearDisciplineGraph();
         renderAnalysisDataViews();
         wireEvents();
