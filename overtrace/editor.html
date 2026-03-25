@@ -352,9 +352,9 @@
       .out::after {
         content: "";
         position: absolute;
-        width: 14px;
-        height: 14px;
-        right: 13px;
+        width: 12.6px;
+        height: 12.6px;
+        right: 13.7px;
         top: 50%;
         transform: translateY(-50%);
         background: #fff;
@@ -364,23 +364,14 @@
       .in::after {
         content: "";
         position: absolute;
-        width: 14px;
-        height: 14px;
-        left: 13px;
+        width: 12.6px;
+        height: 12.6px;
+        left: 15.7px;
         top: 50%;
         transform: translateY(-50%);
         background: #fff;
         border: 1px solid #000;
-        clip-path: polygon(
-          0% 18%,
-          58% 18%,
-          58% 0%,
-          100% 50%,
-          58% 100%,
-          58% 82%,
-          0% 82%,
-          24% 50%
-        );
+        clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
       }
 
       /* Edges: già ottimizzati altrove; qui solo colori */
@@ -1075,9 +1066,9 @@
       .out::after {
         content: "";
         position: absolute;
-        width: 14px;
-        height: 14px;
-        right: 13px;
+        width: 12.6px;
+        height: 12.6px;
+        right: 13.7px;
         top: 50%;
         transform: translateY(-50%);
         background: #fff;
@@ -1087,9 +1078,9 @@
       .in::after {
         content: "";
         position: absolute;
-        width: 14px;
-        height: 14px;
-        left: 13px;
+        width: 12.6px;
+        height: 12.6px;
+        left: 15.7px;
         top: 50%;
         transform: translateY(-50%);
         background: #fff;
@@ -1405,8 +1396,22 @@
           linear-gradient(90deg, #dddddd 1px, transparent 1px) !important;
       }
       aside {
-        background: var(--panel-soft) !important;
-        border-left: var(--line-w) solid var(--line) !important;
+        background: #ffffff !important;
+        border: 1px solid var(--ts-toolbar-border) !important;
+        border-radius: var(--ts-radius-panel) !important;
+        box-shadow: var(--ts-toolbar-panel-shadow) !important;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        margin: calc(var(--ts-toolbar-safe-top) + 4px) 14px 14px 0;
+        height: calc(100vh - var(--ts-toolbar-safe-top) - 18px);
+        min-height: 0;
+        align-self: start;
+        position: relative;
+        z-index: 1;
+      }
+      .ts-toolbar .nav-right .section-btn.is-active,
+      .ts-toolbar .nav-right [aria-current="page"] {
+        background: var(--btn-hover) !important;
       }
       .node {
         background: var(--panel) !important;
@@ -1460,7 +1465,7 @@
       input[type="text"],
       input[type="date"],
       textarea {
-        background: var(--field) !important;
+        background: var(--field-hover) !important;
         color: var(--ink) !important;
         border: none !important;
       }
@@ -1472,7 +1477,8 @@
       input:focus-visible,
       textarea:focus,
       textarea:focus-visible {
-        box-shadow: 0 0 0 2px var(--field-focus-ring) !important;
+        background: var(--field-hover) !important;
+        box-shadow: none !important;
       }
       input::placeholder,
       textarea::placeholder {
@@ -1480,6 +1486,14 @@
       }
       input[type="date"] {
         caret-color: var(--ink) !important;
+      }
+      input[type="date"]::-webkit-datetime-edit,
+      input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+      input[type="date"]::-webkit-datetime-edit-text,
+      input[type="date"]::-webkit-datetime-edit-month-field,
+      input[type="date"]::-webkit-datetime-edit-day-field,
+      input[type="date"]::-webkit-datetime-edit-year-field {
+        color: var(--ink) !important;
       }
 
       .chip,
@@ -1509,8 +1523,8 @@
 
       .out::after,
       .in::after {
-        background: #4c4c4c !important;
-        border-color: #4c4c4c !important;
+        background: #6f6f6f !important;
+        border-color: #6f6f6f !important;
       }
       .node.selected .out::after,
       .node.selected .in::after {
@@ -1565,19 +1579,58 @@
       }
 
       #helpOverlay {
-        background: rgba(0, 0, 0, 0.24) !important;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 14px !important;
+        background: rgba(255, 255, 255, 0.6) !important;
       }
       #helpOverlay .doc-box {
         background: #ffffff !important;
-        border: var(--line-w) solid var(--line) !important;
-        box-shadow: 0 16px 44px rgba(0, 0, 0, 0.2) !important;
+        border: 1px solid var(--ts-toolbar-border) !important;
+        border-radius: var(--ts-radius-panel) !important;
+        box-shadow: var(--ts-toolbar-panel-shadow) !important;
+        width: min(920px, calc(100vw - 28px));
+        max-width: 920px;
+        max-height: calc(100vh - 28px);
+        overflow: hidden;
       }
       #helpOverlay .doc-box-header {
-        background: #f5f5f5 !important;
-        border-bottom: var(--line-w) solid var(--line) !important;
+        display: none;
       }
       #helpOverlay .doc-box-body {
         color: var(--ink) !important;
+        position: relative;
+        max-height: calc(100vh - 28px);
+        overflow: auto;
+        padding: 16px 16px 18px;
+        overscroll-behavior: contain;
+      }
+      #helpOverlay .doc-section {
+        margin-bottom: 16px;
+      }
+      #helpOverlay .doc-section:last-child {
+        margin-bottom: 0;
+      }
+      #helpOverlay .doc-section h3 {
+        margin-bottom: 10px;
+      }
+      #helpOverlay .icon-btn {
+        color: var(--ink) !important;
+        border-radius: var(--ts-radius-control);
+      }
+      #helpClose {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: inline-flex;
+        z-index: 1;
+      }
+      #helpOverlay .icon-btn:hover {
+        background: var(--btn-hover) !important;
+      }
+      #helpOverlay .icon-btn:active {
+        background: var(--btn-active) !important;
       }
 
       #edgeForm input[type="checkbox"]#eDashed {
@@ -1901,25 +1954,18 @@
         // Build Help content (English, icon bullets, no separate Connect section)
         if (helpPanel) {
           helpPanel.innerHTML = `
-          <h2>Overtrace — Documentation</h2>
           <div class="doc-section open">
             <h3><span class="material-symbols-outlined">lightbulb</span> Concept and Purpose</h3>
             <div class="doc-body">
               <ul>
                 <li><span class="material-symbols-outlined">info</span>
-                  <span>Overtrace is a tool to map and reflect on design processes. It is designed to capture the often nonlinear flow of ideas and materials that emerge while working on a project.</span>
+                  <span>Overtrace is based on the progressive construction of a graph of connectable nodes. Each node represents a project atom: any meaningful element that contributes to shaping the project.</span>
                 </li>
                 <li><span class="material-symbols-outlined">account_tree</span>
-                  <span>Each node represents a design atom — not simply a chronological step, but any meaningful element that shapes the project: a concept, an artefact, a reference, an insight, and more. The map shows how these elements branch and merge, making visible the structure and logic of the process.</span>
+                  <span>The meaning of the connections between nodes is not succession but correlation. The resulting graph shows how these elements branch out and relate to one another, returning a form of the process.</span>
                 </li>
                 <li><span class="material-symbols-outlined">schedule</span>
-                  <span><strong>During a project</strong>, to clarify what is happening, explore alternatives, and make sense of complex progressions.</span>
-                </li>
-                <li><span class="material-symbols-outlined">history_edu</span>
-                  <span><strong>After a project</strong>, to analyse its structure, conduct research on design processes, and communicate the underlying decisions and sources.</span>
-                </li>
-                <li><span class="material-symbols-outlined">lock_open_right</span>
-                  <span>It promotes open documentation and shared understanding of design work. All data is stored locally and can be freely modified or shared.</span>
+                  <span>Each project can define its own system of types. The examples below are useful references, but they are neither exhaustive nor prescriptive.</span>
                 </li>
               </ul>
             </div>
@@ -1930,37 +1976,32 @@
             <div class="doc-body">
               <p>Each node can represent any meaningful element of a design process, such as:</p>
               <ul>
-                <li><span class="chip type">Brief</span><br>the initial framing of the project, the question or design challenge that triggers it (project goal, starting hypothesis, constraint)</li>
-                <li><span class="chip type">Source</span><br>external material used as input and inspiration (case study, reference, article, artwork, dataset, book, website)</li>
-                <li><span class="chip type">Finding</span><br>evidence or discovery that emerges from research or inquiry, providing new knowledge about the context, users, or problem (interview insight, collected data, observed pattern)</li>
-                <li><span class="chip type">Collection</span><br>curated group of references organised around a theme, showing a first layer of interpretation (moodboard, image set, text set)</li>
-                <li><span class="chip type">Concept</span><br>the core idea or proposition that drives exploration</li>
-                <li><span class="chip type">Sketch</span><br>embryonic design attempt, rough and provisional, not yet fully articulated (drawing, wireframe, doodle, draft)</li>
-                <li><span class="chip type">Artefact</span><br>tangible outcome produced during the process, with a degree of autonomy or completeness (prototype, installation, poster, website, editorial, app, gadget)</li>
-                <li><span class="chip type">Observation</span><br>reflection, analysis, and learning from the process, including when things don’t work (note, failure, discovery, insight)</li>
-                <li><span class="chip type">Feedback</span><br>external response and evaluation from others (peer comment, critique, review)</li>
-                <li><span class="chip type">Decision</span><br>moment where something is defined or chosen, shaping the direction (design choice, milestone, strategic shift)</li>
-                <li><span class="chip type">Output</span><br>the final, consolidated result</li>
+                <li><span class="chip type">Brief</span><br>the initial framing of the project, the question or design challenge that activates it, such as a project goal, an initial hypothesis, a constraint, or a brief</li>
+                <li><span class="chip type">Source</span><br>external material used as input and inspiration, such as a case study, visual reference, dataset, book, or website</li>
+                <li><span class="chip type">Finding</span><br>evidence or discovery emerging from research or investigation, providing new knowledge about the context, users, or problem</li>
+                <li><span class="chip type">Collection</span><br>a curated group of references organised around a theme, showing a first level of interpretation</li>
+                <li><span class="chip type">Concept</span><br>an idea or proposition</li>
+                <li><span class="chip type">Sketch</span><br>an embryonic design attempt, rough and provisional, not yet fully articulated</li>
+                <li><span class="chip type">Artefact</span><br>a tangible outcome produced during the process, with a certain degree of autonomy or completeness</li>
+                <li><span class="chip type">Observation</span><br>reflection, analysis, and learning derived from the process</li>
+                <li><span class="chip type">Feedback</span><br>external response and evaluation from others, such as comments, critique, review, or conversation</li>
+                <li><span class="chip type">Decision</span><br>a moment in which something is defined or chosen, orienting the direction of the project</li>
+                <li><span class="chip type">Output</span><br>the final consolidated and refined results</li>
               </ul>
 
-              <h4 style="margin-top:18px; color:#bbb; font-size:12px; font-weight:600;">Node fields</h4>
-              <p>These fields describe the content of each node (all optional):</p>
+              <h4 style="margin-top:18px; color:#666; font-size:12px; font-weight:500;">Node fields</h4>
+              <p>Each node is described by a set of fields:</p>
 
               <ul>
-                <li><strong>Title</strong><br>name of the element, summarising the node content</li>
-                <li><strong>Date</strong><br>key date for the element (automatically set to the current date but editable and backdatable)</li>
-                <li><strong>Type</strong><br>choose or write a category (e.g. Concept, Artefact, Feedback...)</li>
-                <li><strong>Action</strong><br>the attitude involved, e.g. Exploring or Making</li>
-                <li><strong>Areas</strong><br>specific areas explored (comma-separated keywords)</li>
-                <li><strong>Tags</strong><br>free keywords for filtering; useful for recurring typologies, transversal, thematic, structural or methodological elements</li>
-                <li><strong>Description</strong><br>explanatory text (200–1000 characters including spaces)</li>
-                <li><strong>Links</strong><br>one link per line</li>
-                <li><strong>Files</strong><br>upload images or PDFs (they are stored and compressed automatically in the assets folder)</li>
-              </ul>
-
-              <ul style="margin-top:10px;">
-                <li><strong>Areas</strong> are multiple free-form keywords describing domains, themes or contexts (e.g., “biology, interaction design, performance”).</li>
-                <li><strong>Suggestions</strong> reuse previously used Types, Areas, and Tags to speed up data entry.</li>
+                <li><strong>Title</strong><br>the name of the element, summarising the node content</li>
+                <li><strong>Date</strong><br>the key date of the element, automatically set to the current date at creation but editable and backdatable</li>
+                <li><strong>Type</strong><br>the category of the node, such as Concept, Artefact, or Feedback; you can add your own classes</li>
+                <li><strong>Action</strong><br>the type of action: Exploring or Making</li>
+                <li><strong>Areas</strong><br>fields or domains crossed approximately, with multiple areas selectable at the same time</li>
+                <li><strong>Tags</strong><br>free keywords for filtering, useful for recurring typologies and transversal, thematic, structural, or methodological elements</li>
+                <li><strong>Description</strong><br>an explanatory text</li>
+                <li><strong>Links</strong><br>relevant external web links</li>
+                <li><strong>Files</strong><br>upload images, PDFs, or other file types; images are saved and compressed automatically in the assets folder</li>
               </ul>
             </div>
           </div>
@@ -1994,6 +2035,17 @@
                 <li><span class="material-symbols-outlined">download_done</span><span>No need to place files manually into <code>assets</code>.</span></li>
                 <li><span class="material-symbols-outlined">folder_open</span><span><strong>Open</strong>: select the project folder — Overtrace loads <code>project.json</code>.</span></li>
                 <li><span class="material-symbols-outlined">data_object</span><span>Lightweight JSON export (without files) is available for quick sharing.</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="doc-section">
+            <h3><span class="material-symbols-outlined">widgets</span> Main Sections</h3>
+            <div class="doc-body">
+              <ul>
+                <li><span class="material-symbols-outlined">edit</span><span><strong>Editor</strong> is where the graph of the design path is built.</span></li>
+                <li><span class="material-symbols-outlined">timeline</span><span><strong>Process</strong> is where the process is analysed according to how it has been arranged in space by the subjects.</span></li>
+                <li><span class="material-symbols-outlined">view_in_ar</span><span><strong>Space</strong> is where the process is analysed in relation to project space.</span></li>
               </ul>
             </div>
           </div>
@@ -3625,7 +3677,7 @@
                 : "";
               return `<div class="file-row"><div class="file-left">${thumb}<div class="name">• ${name}${
                 size ? " — " + esc(size) : ""
-              }</div></div><div class="remove" data-idx="${i}">Remove</div></div>`;
+              }</div></div><div class="remove" data-idx="${i}" role="button" aria-label="Delete file"><span class="material-symbols-outlined">delete</span></div></div>`;
             })
             .join("");
         }
@@ -4296,7 +4348,7 @@
           { id: "btnSave", text: "Save project" },
           { id: "btnProcessAnalysis", text: "Process analysis" },
           { id: "btnAnalysis", text: "Space analysis" },
-          { id: "btnResearch", text: "Research" },
+          { id: "btnResearch", text: "Atlas" },
           { id: "btnNew", text: "New project" },
           { id: "btnUndo", text: "Undo" },
           { id: "btnRedo", text: "Redo" },
@@ -4427,7 +4479,7 @@
               const sensitivity = 0.012,
                 d = -e.deltaY * sensitivity,
                 old = state.zoom;
-              const z = Math.min(3, Math.max(0.25, old * (1 + d)));
+              const z = Math.min(3, Math.max(0.01, old * (1 + d)));
               const r = stage.getBoundingClientRect();
               const mx = e.clientX - r.left,
                 my = e.clientY - r.top;
@@ -4489,7 +4541,7 @@
             m = 80;
           const zx = (vw - m) / bw,
             zy = (vh - m) / bh;
-          state.zoom = Math.min(3, Math.max(0.25, Math.min(zx, zy)));
+          state.zoom = Math.min(3, Math.max(0.01, Math.min(zx, zy)));
           const cx = (minX + maxX) / 2,
             cy = (minY + maxY) / 2;
           state.pan.x = vw / 2 - cx * state.zoom;
@@ -6337,7 +6389,7 @@
         { id: "btnAuto", label: "Auto layout (⇧A)" },
         { id: "btnProcessAnalysis", label: "Process analysis" },
         { id: "btnAnalysis", label: "Space analysis" },
-        { id: "btnResearch", label: "Research" },
+        { id: "btnResearch", label: "Atlas" },
         { id: "btnOpen", label: "Open project (⌘O)" },
         { id: "btnSave", label: "Save project (⌘S)" },
         { id: "btnNew", label: "New project" },
@@ -6387,7 +6439,7 @@
                 content.dataset.filled = "1";
               }
             }
-            overlay.style.display = "block";
+            overlay.style.display = "flex";
           }
 
           function closeHelp() {
@@ -6438,14 +6490,12 @@
     </script>
     <div id="helpOverlay" style="display: none">
       <div class="doc-box">
-        <div class="doc-box-header">
-          <span class="material-symbols-outlined">help</span>
-          <div class="doc-title">Overtrace — Documentation</div>
+        <div class="doc-box-header"></div>
+        <div class="doc-box-body" id="helpContent">
           <button id="helpClose" class="icon-btn" aria-label="Close">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-        <div class="doc-box-body" id="helpContent"></div>
       </div>
     </div>
   </body>
