@@ -58,15 +58,8 @@
  rel="stylesheet"
  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
  />
+ <link rel="stylesheet" href="./typography.css" />
  <style>
- @font-face {
- font-family: "Times New Roman";
- src: url("./asset/Times New Roman-Book.woff2") format("woff2");
- font-weight: 400;
- font-style: normal;
- font-display: swap;
- }
-
  :root {
  --bg: #f5f5f5;
  --panel: #ffffff;
@@ -76,8 +69,6 @@
  --btn-hover: rgba(0, 0, 0, 0.06);
  --btn-active: rgba(0, 0, 0, 0.1);
  --focus-ring: rgba(0, 0, 0, 0.24);
- --ok: #2f8f52;
- --warn: #a66a12;
  }
 
  * {
@@ -94,7 +85,7 @@
  body {
  background: var(--bg);
  color: var(--ink);
- font: 700 14px/1.4 "Times New Roman", Times, serif;
+ font: 400 14px/1.4 var(--ot-font-sans);
  overflow: hidden;
  }
 
@@ -108,7 +99,7 @@
  .layout {
  min-height: 0;
  display: grid;
- grid-template-columns: minmax(0, 1fr) 360px;
+ grid-template-columns: minmax(0, 1fr) 500px;
  }
 
  #viewWrap {
@@ -116,8 +107,7 @@
  min-width: 0;
  min-height: 0;
  overflow: hidden;
- border-right: 1px solid var(--line);
- background: #ffffff;
+ background: var(--bg);
  touch-action: none;
  }
 
@@ -381,31 +371,46 @@
  #side {
  min-height: 0;
  overflow: auto;
- background: var(--panel);
+ background: #ffffff;
+ border: 1px solid var(--ts-toolbar-border);
+ border-radius: var(--ts-radius-panel);
+ box-shadow: var(--ts-toolbar-panel-shadow);
+ margin: calc(var(--ts-toolbar-safe-top) + 4px) 14px 14px 0;
+ height: calc(100vh - var(--ts-toolbar-safe-top) - 18px);
+ align-self: start;
+ display: flex;
+ flex-direction: column;
  }
 
- .panel {
- border-bottom: 1px solid var(--line);
- padding: 10px;
- }
+ #panelProject { order: 1; }
+ #panelTimeline { order: 2; }
+ #panelStatsWrap { order: 3; }
+ #panelVisual,
+ #panelLegend,
+ #panelDot {
+    display: none;
+  }
+
+.panel {
+ padding: 12px 14px;
+}
 
  .panel h2,
  .panel h3 {
  margin: 0 0 8px;
- font-size: 14px;
- font-weight: 600;
+ font-size: 12px;
+ font-weight: 500;
  }
 
  .panel h3 {
- font-size: 12px;
  color: var(--muted);
  font-weight: 500;
  }
 
  #projectName {
  margin: 0;
- font-size: 15px;
- font-weight: 600;
+ font-size: 14px;
+ font-weight: 500;
  }
 
  #stats {
@@ -431,7 +436,7 @@
  }
 
  .field label {
- font-size: 11px;
+ font-size: 12px;
  color: #707070;
  }
 
@@ -442,7 +447,7 @@
  }
 
  .mini-grid .field output {
- font-size: 11px;
+ font-size: 12px;
  color: #6d6d6d;
  justify-self: end;
  }
@@ -450,19 +455,19 @@
  .side-select,
  .side-btn {
  width: 100%;
- min-height: 30px;
- border: 1px solid var(--line);
- border-radius: 7px;
- background: #fff;
+ min-height: 36px;
+ border: none;
+ border-radius: 10px;
+ background: #f4f4f4;
  color: var(--ink);
  font: inherit;
- padding: 5px 8px;
+ padding: 6px 10px;
  }
 
  .side-select:focus-visible,
  .side-btn:focus-visible {
  outline: none;
- box-shadow: 0 0 0 2px var(--focus-ring);
+ box-shadow: 0 0 0 1px var(--focus-ring);
  }
 
  .side-btn {
@@ -470,7 +475,7 @@
  }
 
  .side-btn:hover {
- background: var(--btn-hover);
+ background: #ececec;
  }
 
  .check-row {
@@ -524,10 +529,10 @@
  }
 
  .stat-box {
- border: 1px solid var(--line);
- border-radius: 7px;
+ border: none;
+ border-radius: 10px;
  padding: 7px;
- background: #fafafa;
+ background: #f6f6f6;
  }
 
  .stat-box.metric {
@@ -541,23 +546,22 @@
  }
 
  .stat-box.metric:hover {
- background: #f3f3f3;
- }
-
- .stat-box.metric.active {
- box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15) inset;
  background: #efefef;
  }
 
+ .stat-box.metric.active {
+ background: #ebebeb;
+ }
+
  .stat-k {
- font-size: 11px;
+ font-size: 12px;
  color: #777;
  }
 
  .stat-v {
  margin-top: 2px;
- font-size: 16px;
- font-weight: 600;
+ font-size: 14px;
+ font-weight: 500;
  line-height: 1.1;
  }
 
@@ -573,14 +577,14 @@
  }
 
  .check-grid .check-row {
- font-size: 11px;
+ font-size: 12px;
  }
 
  #trendSvg {
  width: 100%;
- height: 155px;
- border: 1px solid var(--line);
- border-radius: 8px;
+ height: 182px;
+ border: none;
+ border-radius: 10px;
  background: #fff;
  display: block;
  shape-rendering: geometricPrecision;
@@ -590,80 +594,166 @@
  #trendHint {
  margin: 6px 0 0;
  color: var(--muted);
- font-size: 11px;
+ font-size: 12px;
  }
 
  .metric-help {
  margin-top: 8px;
- border: 1px solid var(--line);
- border-radius: 7px;
+ border: none;
+ border-radius: 10px;
  padding: 8px;
- background: #fcfcfc;
+ background: transparent;
  font-size: 12px;
  line-height: 1.35;
  }
 
+ .trend-legend {
+ display: grid;
+ gap: 6px;
+ margin-top: 8px;
+ }
+
+ .trend-legend-item {
+ display: inline-flex;
+ align-items: center;
+ gap: 8px;
+ font-size: 12px;
+ color: var(--muted);
+ }
+
+ .trend-legend-dot {
+ width: 8px;
+ height: 8px;
+ border-radius: 50%;
+ display: inline-block;
+ flex: 0 0 auto;
+ }
+
  .metric-help .help-k {
  color: #6b6b6b;
- font-size: 11px;
+ font-size: 12px;
  margin-bottom: 4px;
+ }
+
+ #inpHubThreshold:focus,
+ #inpHubThreshold:focus-visible {
+ outline: none;
+ box-shadow: none;
  }
 
  .metric-help .help-v {
  color: #222;
  }
 
- #heatmapSvg {
- width: 100%;
- height: 220px;
- border: 1px solid var(--line);
- border-radius: 8px;
- background: #fff;
+ #nodePopover {
+ position: absolute;
+ right: 14px;
+ top: calc(var(--ts-toolbar-safe-top) + 4px);
+ width: min(360px, calc(100% - 28px));
+ max-height: calc(100% - var(--ts-toolbar-safe-top) - 18px);
+ overflow: auto;
+ background: rgba(255,255,255,0.96);
+ border: 1px solid var(--ts-toolbar-border);
+ border-radius: var(--ts-radius-panel);
+ box-shadow: var(--ts-toolbar-panel-shadow);
+ padding: 12px 14px 14px;
+ z-index: 12;
+ display: none;
+ }
+
+ #nodePopover.is-visible {
  display: block;
- shape-rendering: geometricPrecision;
- text-rendering: geometricPrecision;
  }
 
- #heatmapHint {
- margin: 6px 0 0;
- color: var(--muted);
- font-size: 11px;
- }
-
- .kv {
+ .node-popover-head {
  display: grid;
- grid-template-columns: 74px 1fr;
- gap: 6px;
+ gap: 4px;
+ margin-bottom: 0;
+ }
+
+ .node-popover-title {
+ margin: 0;
+ font-size: 12px;
+ font-weight: 700;
+ color: var(--ink);
+ min-height: 1em;
+ }
+
+ .node-popover-meta {
+ margin: 0;
+ font-size: 12px;
+ color: var(--muted);
+ }
+
+ .node-popover-kv {
+ display: grid;
+ grid-template-columns: 110px 1fr;
+ gap: 4px 8px;
  font-size: 12px;
  }
 
- .k {
+ .node-popover-kv .k {
  color: #777;
  }
 
- #nodeDesc {
- margin-top: 8px;
+ .node-popover-divider {
+ height: 1px;
+ margin: 6px 0;
+ background: rgba(0, 0, 0, 0.14);
+ }
+
+ .node-popover-desc-title {
+ font-size: 12px;
+ color: #777;
+ margin-bottom: 4px;
+ }
+
+ #nodePopoverDesc {
+ margin-top: 10px;
  white-space: pre-wrap;
  font-size: 12px;
  line-height: 1.4;
+ overflow-wrap: break-word;
+ word-break: break-word;
  }
 
- #nodeMedia {
- margin-top: 8px;
+ #nodePopoverMedia {
+ margin-top: 10px;
  }
 
- #nodeMedia img {
+ #nodePopoverMedia img {
  width: 100%;
- border: 1px solid var(--line);
- border-radius: 6px;
+ height: auto;
+ border: 1px solid rgba(0, 0, 0, 0.08);
+ border-radius: 10px;
+ display: block;
  }
 
- .ok {
- color: var(--ok) !important;
+ #nodePopoverAttachments {
+ margin-top: 10px;
+ font-size: 12px;
  }
 
- .warn {
- color: var(--warn) !important;
+ #nodePopoverAttachments a {
+ color: var(--ink);
+ text-decoration: underline;
+ margin-right: 10px;
+ }
+
+ .node-popover-badges {
+ display: flex;
+ flex-wrap: wrap;
+ gap: 6px;
+ }
+
+ .node-popover-badge {
+ display: inline-block;
+ border: none;
+ border-radius: 999px;
+ padding: 4px 10px;
+ font-size: 12px;
+ background: #ececec;
+ color: #111111;
  }
 
  @media (max-width: 1080px) {
@@ -674,11 +764,23 @@
  .layout {
  grid-template-columns: 1fr;
  grid-template-rows: minmax(0, 1fr) minmax(320px, 46vh);
+ padding: calc(var(--ts-toolbar-safe-top) + 4px) 12px 12px;
  }
 
  #viewWrap {
  border-right: none;
  border-bottom: 1px solid var(--line);
+ }
+
+ #side {
+ margin: 0;
+ height: auto;
+ }
+
+ #nodePopover {
+ width: calc(100% - 24px);
+ right: 12px;
+ top: calc(var(--ts-toolbar-safe-top) + 4px);
  }
  }
  </style>
@@ -696,14 +798,14 @@
  </a>
  </div>
  <div class="nav-center">
- <button id="btnOpen" class="icon-btn" type="button" data-tip="Open project folder (Cmd/Ctrl+O)">
+ <button id="btnOpen" class="icon-btn" type="button" data-tip="Open project (Cmd/Ctrl+O)">
  <span class="material-symbols-outlined">file_open</span>
  </button>
- <button id="btnSnapshot" class="icon-btn" type="button" data-tip="Snapshot view">
+ <button id="btnSnapshot" class="icon-btn" type="button" data-tip="Screenshot">
  <span class="material-symbols-outlined">photo_camera</span>
  </button>
- <button id="btnFit" class="icon-btn" type="button" data-tip="Fit view">
- <span class="material-symbols-outlined">fit_screen</span>
+ <button id="btnFit" class="icon-btn" type="button" data-tip="Fit view (0)">
+ <span class="material-symbols-outlined">fullscreen</span>
  </button>
  <div id="navStatus" class="toolbar-status" aria-live="polite"></div>
  </div>
@@ -716,7 +818,7 @@
  <span class="material-symbols-outlined">edit</span>
  <span class="btn-label">Editor</span>
  </button>
- <button class="icon-btn switch-btn section-btn is-active" type="button" data-tip="Process Analysis" aria-current="page">
+ <button class="icon-btn switch-btn section-btn is-active" type="button" data-tip="Process analysis" aria-current="page">
  <span class="material-symbols-outlined">timeline</span>
  <span class="btn-label">Process</span>
  </button>
@@ -734,50 +836,62 @@
  <svg id="edges"></svg>
  <div id="nodesLayer"></div>
  </div>
+ <div id="nodePopover" aria-live="polite">
+ <div class="node-popover-head">
+ <h3 id="nodePopoverTitle" class="node-popover-title">Select a node</h3>
+ <p id="nodePopoverMeta" class="node-popover-meta">Node details appear here.</p>
+ </div>
+ <div class="node-popover-divider"></div>
+ <div id="nodePopoverInfo" class="node-popover-kv"></div>
+ <div class="node-popover-divider"></div>
+ <div id="nodePopoverDesc"></div>
+ <div id="nodePopoverMedia"></div>
+ <div id="nodePopoverAttachments"></div>
+ </div>
  </section>
 
  <aside id="side">
- <section class="panel">
+ <section id="panelProject" class="panel">
  <h2 id="projectName">Nessun progetto caricato</h2>
  <p id="stats">0 nodes · 0 edges</p>
  </section>
 
- <section class="panel">
+ <section id="panelVisual" class="panel">
  <h3>Visualization controls</h3>
  <div class="ctrl-grid">
  <div class="row">
  <div class="field">
- <label for="selNodeStyle">Mostra come</label>
+ <label for="selNodeStyle">Display as</label>
  <select id="selNodeStyle" class="side-select">
- <option value="card">Nodo</option>
- <option value="preview">Anteprima</option>
- <option value="dot">Pallino</option>
- <option value="square">Quadrato</option>
+ <option value="card">Node</option>
+ <option value="preview">Preview</option>
+ <option value="dot">Dot</option>
+ <option value="square">Square</option>
  </select>
  </div>
  <div class="field">
- <label for="selFilterMode">Filtro</label>
+ <label for="selFilterMode">Filter</label>
  <select id="selFilterMode" class="side-select">
- <option value="all">Nodi: tutti</option>
- <option value="type">Nodi per type</option>
- <option value="action">Nodi per action</option>
- <option value="areas">Nodi per areas</option>
- <option value="tags">Nodi per tags</option>
+ <option value="all">Nodes: all</option>
+ <option value="type">Nodes by type</option>
+ <option value="action">Nodes by action</option>
+ <option value="areas">Nodes by areas</option>
+ <option value="tags">Nodes by tags</option>
  </select>
  </div>
  </div>
 
  <div class="row">
  <div class="field">
- <label for="selFilterValue">Valore filtro</label>
+ <label for="selFilterValue">Filter value</label>
  <select id="selFilterValue" class="side-select">
- <option value="__all__">Tutti</option>
+ <option value="__all__">All</option>
  </select>
  </div>
  <div class="field">
- <label for="selColorMode">Colori</label>
+ <label for="selColorMode">Colors</label>
  <select id="selColorMode" class="side-select">
- <option value="none">Nessuno</option>
+ <option value="none">None</option>
  <option value="action">Action</option>
  <option value="macro">Macro area</option>
  <option value="type">Type</option>
@@ -789,143 +903,94 @@
 
  <div class="row">
  <div class="field">
- <label for="selColorValue">Valore colore</label>
+ <label for="selColorValue">Color value</label>
  <select id="selColorValue" class="side-select">
- <option value="__all__">Tutti</option>
+ <option value="__all__">All</option>
  </select>
  </div>
  <div class="field">
  <label>&nbsp;</label>
- <button id="btnFitSide" class="side-btn" type="button">Fit mappa</button>
+ <button id="btnFitSide" class="side-btn" type="button">Fit map</button>
  </div>
  </div>
 
  <label class="check-row">
  <input id="chkPreview" type="checkbox" checked />
- Mostra anteprima immagine nei nodi
+ Show image preview inside nodes
  </label>
 
- <p id="summary">Visibili 0/0 nodi · 0/0 archi</p>
+ <p id="summary">Visible 0/0 nodes · 0/0 edges</p>
  </div>
  </section>
 
- <section class="panel">
+ <section id="panelDot" class="panel">
  <h3>Dot tuning</h3>
  <div class="mini-grid">
  <div class="field">
- <label for="inpDotExploring">Fill exploring</label>
+ <label for="inpDotExploring">Exploring fill</label>
  <input id="inpDotExploring" class="side-select" type="color" value="#999999" />
  </div>
  <div class="field">
- <label for="inpDotMaking">Fill making</label>
+ <label for="inpDotMaking">Making fill</label>
  <input id="inpDotMaking" class="side-select" type="color" value="#333333" />
  </div>
  <div class="field" style="grid-column: 1 / -1;">
- <label class="check-row"><input id="chkDotAllBlack" type="checkbox" /> Tutto nero (fill + edge)</label>
+ <label class="check-row"><input id="chkDotAllBlack" type="checkbox" /> All black (fill + edge)</label>
  </div>
  <div class="field">
- <label for="inpDotScale">Scala pallini</label>
+ <label for="inpDotScale">Dot scale</label>
  <input id="inpDotScale" class="side-select" type="range" min="0.5" max="2" step="0.05" value="1" />
  <output id="outDotScale">100%</output>
  </div>
  <div class="field">
- <label for="inpDotStroke">Stroke pallini</label>
+ <label for="inpDotStroke">Dot stroke</label>
  <input id="inpDotStroke" class="side-select" type="range" min="0" max="10" step="0.1" value="0" />
  <output id="outDotStroke">0.0px</output>
  </div>
  <div class="field">
- <label for="inpDotEdgeStrong">Linee forti</label>
- <input id="inpDotEdgeStrong" class="side-select" type="range" min="0.5" max="5" step="0.1" value="1.5" />
- <output id="outDotEdgeStrong">1.5px</output>
+ <label for="inpDotEdgeStrong">Strong lines</label>
+ <input id="inpDotEdgeStrong" class="side-select" type="range" min="0.5" max="5" step="0.1" value="0.5" />
+ <output id="outDotEdgeStrong">0.5px</output>
  </div>
  <div class="field">
- <label for="inpDotEdgeWeak">Linee deboli</label>
- <input id="inpDotEdgeWeak" class="side-select" type="range" min="0.5" max="4" step="0.1" value="1.5" />
- <output id="outDotEdgeWeak">1.5px</output>
+ <label for="inpDotEdgeWeak">Weak lines</label>
+ <input id="inpDotEdgeWeak" class="side-select" type="range" min="0.5" max="4" step="0.1" value="0.5" />
+ <output id="outDotEdgeWeak">0.5px</output>
  </div>
  </div>
  </section>
 
- <section class="panel">
+ <section id="panelLegend" class="panel">
  <h3>Color legend</h3>
  <div id="legendList" class="legend-list">
- <div class="muted">Nessuna legenda disponibile.</div>
+ <div class="muted">No legend available.</div>
  </div>
  </section>
 
- <section class="panel">
+ <section id="panelStatsWrap" class="panel">
  <h3>Network stats</h3>
  <div class="ctrl-grid">
  <div class="row">
  <div class="field">
- <label for="inpHubThreshold">Soglia hub (&gt;=)</label>
+ <label for="inpHubThreshold">Hub threshold (&gt;=)</label>
  <input id="inpHubThreshold" class="side-select" type="number" min="1" step="1" value="4" />
- </div>
- <div class="field">
- <label for="selStatsScope">Scope</label>
- <select id="selStatsScope" class="side-select">
- <option value="visible">Visibili</option>
- <option value="all">Tutti</option>
- </select>
  </div>
  </div>
  <div id="statsGrid" class="stats-grid"></div>
  <div id="metricExplain" class="metric-help">
- <div class="help-k">Metrica</div>
- <div class="help-v">Clicca una metrica per vedere definizione e lettura.</div>
- </div>
+ <div class="help-k">Metric</div>
+ <div class="help-v">Click a metric to read its definition.</div>
  </div>
  </section>
 
- <section class="panel">
+ <section id="panelTimeline" class="panel">
  <h3>Process timeline</h3>
- <div class="chart-toolbar">
- <div class="check-grid">
- <label class="check-row"><input id="chkSeriesExploring" type="checkbox" checked /> Exploring</label>
- <label class="check-row"><input id="chkSeriesMaking" type="checkbox" checked /> Making</label>
- <label class="check-row"><input id="chkSeriesTotal" type="checkbox" /> Totali</label>
- </div>
- <div class="row">
- <div class="field">
- <label for="selTimelineScale">Scala</label>
- <select id="selTimelineScale" class="side-select">
- <option value="absolute">Assoluta</option>
- <option value="relative">Relativa (%)</option>
- </select>
- </div>
- <div class="field">
- <label for="selTimelineBucket">Raggruppamento</label>
- <select id="selTimelineBucket" class="side-select">
- <option value="week">Settimana</option>
- <option value="month">Mese</option>
- </select>
- </div>
- </div>
- <div class="row">
- <div class="field">
- <label>&nbsp;</label>
- <button id="btnDownloadTrendSvg" class="side-btn" type="button">Scarica SVG</button>
- </div>
- </div>
  <svg id="trendSvg" viewBox="0 0 620 155" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Process timeline"></svg>
- <p id="trendHint">Serve una data valida nei nodi per popolare il grafico.</p>
+ <p id="trendHint">A valid date is required to populate the chart.</p>
+ <div class="trend-legend" aria-label="Timeline legend">
+ <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#999999"></span><span>Exploring</span></div>
+ <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#333333"></span><span>Making</span></div>
  </div>
- </section>
-
- <section class="panel">
- <h3>Interlacing heatmap</h3>
- <svg id="heatmapSvg" viewBox="0 0 620 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Interlacing heatmap"></svg>
- <p id="heatmapHint">Ciano = prevale exploring, Marrone = prevale making, piu' saturo = piu' eventi.</p>
- </section>
-
- <section class="panel">
- <h3>Node details</h3>
- <div id="nodeInfo" class="kv">
- <div class="k">info</div>
- <div>Seleziona un nodo.</div>
- </div>
- <div id="nodeDesc"></div>
- <div id="nodeMedia"></div>
  </section>
  </aside>
  </main>
@@ -947,47 +1012,47 @@
  ];
  const SHARED_PROJECT_KEY = "overtrace.shared.project.v1";
  const SVG_NS = "http://www.w3.org/2000/svg";
- const DOT_SIZE_PX = 20;
- const PREVIEW_WIDTH_PX = 240;
- const PREVIEW_HEIGHT_PX = 184;
- const EDGE_NORMAL_WIDTH = 3.2;
+ const DOT_SIZE_PX = 6;
+ const PREVIEW_WIDTH_PX = 144;
+ const PREVIEW_HEIGHT_PX = 110;
+ const EDGE_NORMAL_WIDTH = 0.5;
  const EDGE_DOT_MULTIPLIER = 2;
  const FALLBACK_CATEGORY_COLOR = "#9a9a9a";
  const ZOOM_MIN = 0.002;
  const ZOOM_MAX = 12;
  const METRIC_HELP = {
  interlacing_index:
- "Quota di finestre temporali in cui Exploring e Making coesistono. Valori alti indicano processi sovrapposti, non a fasi isolate.",
+ "Share of time windows in which Exploring and Making coexist. Higher values indicate overlapping processes rather than isolated phases.",
  overlap_intensity:
- "Quanto Exploring e Making sono bilanciati nelle finestre sovrapposte (min/max medio). Alto = compresenza forte, basso = una fase domina.",
+ "How balanced Exploring and Making are within overlapping windows. Higher values mean stronger coexistence; lower values mean one phase dominates.",
  scc_participation:
- "Percentuale di nodi dentro componenti fortemente connesse (cicli direzionati). Misura quanto il processo ritorna su se stesso.",
+ "Percentage of nodes inside strongly connected components, or directed cycles. It measures how much the process loops back on itself.",
  scc_count:
- "Numero di cluster ciclici (SCC con almeno 2 nodi). Più cluster = più zone iterative autonome.",
+ "Number of cyclic clusters, meaning SCCs with at least two nodes. More clusters indicate more autonomous iterative zones.",
  largest_scc:
- "Dimensione della componente ciclica più grande. Indica la scala massima di iterazione intrecciata.",
+ "Size of the largest cyclic component. It indicates the maximum scale of intertwined iteration.",
  conversion_em:
- "Quota di nodi Exploring che hanno almeno un arco verso Making. Legge la capacità del processo di materializzare ricerca.",
+ "Share of Exploring nodes that have at least one edge toward Making. It reads the process' capacity to materialize research.",
  feedback_ratio:
- "Rapporto M→E rispetto a E→M. Alto = più ritorni/rework dal fare verso nuova esplorazione.",
+ "Ratio of M→E over E→M. Higher values mean more returns or rework from making back into exploration.",
  cross_interlacing:
- "Quota di archi interlacing (E↔M) che attraversano macro-aree diverse. Misura movimenti orizzontali/off-disciplinary.",
+ "Share of interlacing edges that cross different macro areas. It measures horizontal or off-disciplinary movements.",
  multi_area_share:
- "Percentuale di nodi classificati in più aree. Segnale di attraversamento disciplinare nel singolo episodio progettuale.",
+ "Percentage of nodes classified in multiple areas. It signals disciplinary crossing within a single project episode.",
  leadtime_em:
- "Tempo mediano (giorni) tra nodo Exploring e nodo Making connessi da arco E→M. Valuta il ritmo di concretizzazione.",
+ "Median time in days between an Exploring node and a Making node connected by an E→M edge. It measures the pace of concretization.",
  reciprocity:
- "Numero di coppie A↔B bidirezionali. Indica dialogo o rimbalzo tra gli stessi passaggi.",
+ "Number of bidirectional A↔B pairs. It indicates dialogue or bouncing between the same steps.",
  convergent:
- "Nodi con molti archi entranti (soglia hub). Punti dove convergono decisioni/informazioni.",
+ "Nodes with many incoming edges, based on the hub threshold. They mark points where decisions or information converge.",
  divergent:
- "Nodi con molti archi uscenti (soglia hub). Punti che aprono ramificazioni o nuove direzioni.",
+ "Nodes with many outgoing edges, based on the hub threshold. They mark points that open branches or new directions.",
  cross_area:
- "Percentuale di tutti gli archi che collegano macro-aree diverse. Misura mescolanza strutturale del processo.",
+ "Percentage of all edges connecting different macro areas. It measures the structural mixing of the process.",
  avg_areas:
- "Numero medio di aree per nodo. Più è alto, più il dataset descrive episodi ibridi.",
+ "Average number of areas per node. Higher values mean the dataset describes more hybrid episodes.",
  density:
- "Densita' del grafo direzionato (archi osservati su archi possibili). Utile solo come confronto relativo tra cohort/project.",
+ "Density of the directed graph, meaning observed edges over possible edges. Useful mainly as a relative comparison across projects or cohorts.",
  exploring:
  "Numero di nodi etichettati Exploring nello scope corrente.",
  making:
@@ -1030,22 +1095,17 @@
  summary: document.getElementById("summary"),
  legendList: document.getElementById("legendList"),
  inpHubThreshold: document.getElementById("inpHubThreshold"),
- selStatsScope: document.getElementById("selStatsScope"),
  statsGrid: document.getElementById("statsGrid"),
  metricExplain: document.getElementById("metricExplain"),
- chkSeriesExploring: document.getElementById("chkSeriesExploring"),
- chkSeriesMaking: document.getElementById("chkSeriesMaking"),
- chkSeriesTotal: document.getElementById("chkSeriesTotal"),
- selTimelineScale: document.getElementById("selTimelineScale"),
- selTimelineBucket: document.getElementById("selTimelineBucket"),
  trendSvg: document.getElementById("trendSvg"),
- btnDownloadTrendSvg: document.getElementById("btnDownloadTrendSvg"),
  trendHint: document.getElementById("trendHint"),
- heatmapSvg: document.getElementById("heatmapSvg"),
- heatmapHint: document.getElementById("heatmapHint"),
- nodeInfo: document.getElementById("nodeInfo"),
- nodeDesc: document.getElementById("nodeDesc"),
- nodeMedia: document.getElementById("nodeMedia"),
+ nodePopover: document.getElementById("nodePopover"),
+ nodePopoverTitle: document.getElementById("nodePopoverTitle"),
+ nodePopoverMeta: document.getElementById("nodePopoverMeta"),
+ nodePopoverInfo: document.getElementById("nodePopoverInfo"),
+ nodePopoverDesc: document.getElementById("nodePopoverDesc"),
+ nodePopoverMedia: document.getElementById("nodePopoverMedia"),
+ nodePopoverAttachments: document.getElementById("nodePopoverAttachments"),
  };
 
  const state = {
@@ -1098,8 +1158,8 @@
  dotMakingFill: "#333333",
  dotScale: 1,
  dotStrokeWidth: 0,
- dotEdgeStrongWidth: 1.5,
- dotEdgeWeakWidth: 1.5,
+ dotEdgeStrongWidth: 0.5,
+ dotEdgeWeakWidth: 0.5,
  dotAllBlack: false,
  },
  };
@@ -1226,8 +1286,6 @@
  }
  dom.navStatus.textContent = message;
  dom.navStatus.classList.remove("ok", "warn");
- if (level === "ok") dom.navStatus.classList.add("ok");
- if (level === "warn") dom.navStatus.classList.add("warn");
  state.statusTimer = window.setTimeout(() => {
  setIdleStatus();
  }, 3000);
@@ -1285,14 +1343,6 @@
  payload.assetBase || "",
  payload.folderName || null
  );
-
- const fromLabel =
- from === "editor"
- ? "Editor"
- : from === "space"
- ? "Space Analysis"
- : "altra vista";
- setHint(`Progetto ripristinato da ${fromLabel}.`, "ok");
 
  params.delete("from");
  const qs = params.toString();
@@ -1709,10 +1759,10 @@ function edgeAppearance(edge) {
  if (!dom.metricExplain) return;
  if (!metricKey) {
  dom.metricExplain.innerHTML =
- '<div class="help-k">Metrica</div><div class="help-v">Clicca una metrica per vedere definizione e lettura.</div>';
+ '<div class="help-k">Metric</div><div class="help-v">Click a metric to read its definition.</div>';
  return;
  }
- const desc = METRIC_HELP[metricKey] || "Nessuna descrizione disponibile.";
+ const desc = METRIC_HELP[metricKey] || "No description available.";
  dom.metricExplain.innerHTML = `<div class="help-k">${esc(
  label || metricKey
  )}</div><div class="help-v">${esc(desc)}</div>`;
@@ -1727,18 +1777,14 @@ function edgeAppearance(edge) {
  { key: "overlap_intensity", label: "Overlap intensity", value: `${s.overlapIntensity.toFixed(1)}%` },
  { key: "scc_participation", label: "Cycle participation", value: `${s.sccParticipation.toFixed(1)}%` },
  { key: "cross_interlacing", label: "Cross-area interlacing", value: `${s.crossInterlacingShare.toFixed(1)}%` },
- { key: "conversion_em", label: "Conversione E→M", value: `${s.conversionRate.toFixed(1)}%` },
- { key: "feedback_ratio", label: "Ritorni M→E", value: `${s.reworkRatio.toFixed(1)}%` },
- { key: "leadtime_em", label: "Tempo mediano E→M", value: leadTime },
- { key: "scc_count", label: "Cluster ciclici (SCC)", value: `${s.sccCount}` },
- { key: "largest_scc", label: "Largest SCC", value: `${s.largestScc}` },
- { key: "cross_area", label: "Archi cross-area", value: `${s.crossMacroShare.toFixed(1)}%` },
- { key: "multi_area_share", label: "Nodi multi-area", value: `${s.multiAreaShare.toFixed(1)}%` },
- { key: "avg_areas", label: "Aree per nodo", value: `${s.avgAreas.toFixed(2)}` },
- { key: "convergent", label: "Convergenti", value: `${s.convergent}` },
- { key: "divergent", label: "Divergenti", value: `${s.divergent}` },
- { key: "reciprocity", label: "Loop reciproci", value: `${s.reciprocalPairs}` },
- { key: "density", label: "Densita'", value: `${(s.density * 100).toFixed(1)}%` },
+ { key: "conversion_em", label: "E→M conversion", value: `${s.conversionRate.toFixed(1)}%` },
+ { key: "feedback_ratio", label: "M→E returns", value: `${s.reworkRatio.toFixed(1)}%` },
+ { key: "leadtime_em", label: "Median E→M lead time", value: leadTime },
+ { key: "cross_area", label: "Cross-area edges", value: `${s.crossMacroShare.toFixed(1)}%` },
+ { key: "multi_area_share", label: "Multi-area nodes", value: `${s.multiAreaShare.toFixed(1)}%` },
+ { key: "avg_areas", label: "Areas per node", value: `${s.avgAreas.toFixed(2)}` },
+ { key: "convergent", label: "Convergent nodes", value: `${s.convergent}` },
+ { key: "divergent", label: "Divergent nodes", value: `${s.divergent}` },
  { key: "exploring", label: "Exploring", value: `${s.actions.exploring}` },
  { key: "making", label: "Making", value: `${s.actions.making}` },
  ];
@@ -1808,10 +1854,7 @@ function edgeAppearance(edge) {
  }
 
  function formatBucketLabel(date) {
- if (state.trend.bucket === "month") {
- return date.toLocaleDateString("it-IT", { month: "short", year: "2-digit" });
- }
- return date.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" });
+ return "";
  }
 
  function computeTrendSeries() {
@@ -1842,8 +1885,8 @@ function edgeAppearance(edge) {
  row.total += 1;
  }
  const rows = [...map.values()].sort((a, b) => a.date - b.date);
- rows.forEach((r) => {
- r.label = formatBucketLabel(r.date);
+ rows.forEach((r, index) => {
+ r.label = `${index + 1}°`;
  });
  return {
  labels: rows.map((r) => r.label),
@@ -1871,10 +1914,10 @@ function drawTrendSeries(svg, labels, series) {
  return el;
  };
  const snap = (value) => Math.round(value) + 0.5;
- const padL = 44;
- const padR = 14;
- const padT = 14;
- const padB = 22;
+ const padL = 58;
+ const padR = 28;
+ const padT = 18;
+ const padB = 34;
  const plotW = width - padL - padR;
  const plotH = height - padT - padB;
  if (plotW <= 8 || plotH <= 8) return;
@@ -1915,7 +1958,7 @@ function drawTrendSeries(svg, labels, series) {
  y: y + 4,
  "text-anchor": "end",
  "font-size": 12,
- "font-family": "Times New Roman, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+ "font-family": "var(--ot-font-sans)",
  fill: "#666",
  },
  label
@@ -1929,18 +1972,52 @@ function drawTrendSeries(svg, labels, series) {
  const val = normalize ? (v / Math.max(1, rawMax)) * 100 : v;
  return padT + plotH - (val / yTop) * plotH;
  };
+ const curvePath = (values) => {
+ if (!values.length) return "";
+ if (values.length === 1) return `M ${xAt(0)} ${yAt(values[0])}`;
+ const pts = values.map((v, i) => ({ x: xAt(i), y: yAt(v) }));
+ let d = `M ${pts[0].x} ${pts[0].y}`;
+ for (let i = 0; i < pts.length - 1; i++) {
+ const p0 = pts[i - 1] || pts[i];
+ const p1 = pts[i];
+ const p2 = pts[i + 1];
+ const p3 = pts[i + 2] || p2;
+ const cp1x = p1.x + (p2.x - p0.x) / 6;
+ const cp1y = p1.y + (p2.y - p0.y) / 6;
+ const cp2x = p2.x - (p3.x - p1.x) / 6;
+ const cp2y = p2.y - (p3.y - p1.y) / 6;
+ d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+ }
+ return d;
+ };
+
+ for (let i = 0; i < labels.length; i++) {
+ const exploringValue = series.exploring?.[i] || 0;
+ const makingValue = series.making?.[i] || 0;
+ if (!(exploringValue > 0 && makingValue > 0)) continue;
+ const left = i === 0 ? padL : xAt(i) - xStep * 0.5;
+ const widthBand = labels.length > 1 ? xStep : plotW;
+ svg.appendChild(
+ make("rect", {
+ x: Math.max(padL, left),
+ y: padT,
+ width: Math.max(1, Math.min(widthBand, padL + plotW - Math.max(padL, left))),
+ height: plotH,
+ fill: "rgba(17,17,17,0.06)",
+ })
+ );
+ }
 
  for (const s of chosen) {
  const values = series[s.key];
- const points = values.map((v, i) => `${xAt(i)},${yAt(v)}`).join(" ");
  svg.appendChild(
- make("polyline", {
- points,
+ make("path", {
+ d: curvePath(values),
  fill: "none",
  stroke: s.color,
- "stroke-width": 1,
- "stroke-linejoin": "miter",
- "stroke-linecap": "butt",
+ "stroke-width": 3,
+ "stroke-linejoin": "round",
+ "stroke-linecap": "round",
  "vector-effect": "non-scaling-stroke",
  })
  );
@@ -1958,7 +2035,7 @@ function drawTrendSeries(svg, labels, series) {
  y: height - 8,
  "text-anchor": "middle",
  "font-size": 12,
- "font-family": "Times New Roman, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+ "font-family": "var(--ot-font-sans)",
  fill: "#666",
  },
  labels[i]
@@ -1975,7 +2052,7 @@ function drawTrendSeries(svg, labels, series) {
  y: height - 8,
  "text-anchor": "end",
  "font-size": 12,
- "font-family": "Times New Roman, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+ "font-family": "var(--ot-font-sans)",
  fill: "#666",
  },
  labels[i]
@@ -1989,17 +2066,13 @@ function drawTrendSeries(svg, labels, series) {
  const series = computeTrendSeries();
  if (!series) {
  dom.trendSvg.innerHTML = "";
- if (dom.trendHint) dom.trendHint.textContent = "Serve una data valida nei nodi per popolare il grafico.";
+ if (dom.trendHint) dom.trendHint.textContent = "A valid date is required to populate the chart.";
  return;
  }
  drawTrendSeries(dom.trendSvg, series.labels, series);
  if (dom.trendHint) {
  const inter = computeInterlacingFromRows(series.rows || []);
- dom.trendHint.textContent = `${series.labels.length} periodi · scala ${
- state.trend.scale === "relative" ? "relativa" : "assoluta"
- } · bucket ${state.trend.bucket === "month" ? "mensile" : "settimanale"} · overlap ${
- inter.overlapBuckets
- }/${inter.activeBuckets}`;
+ dom.trendHint.textContent = `Number of nodes per week (overlap of ${inter.overlapBuckets} out of ${inter.activeBuckets} weeks)`;
  }
  }
 
@@ -2108,7 +2181,7 @@ function drawTrendSeries(svg, labels, series) {
  y: y + cellH * 0.6,
  "text-anchor": "end",
  "font-size": 12,
- "font-family": "Times New Roman, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+ "font-family": "var(--ot-font-sans)",
  fill: "#666",
  },
  data.rows[r].label
@@ -2137,7 +2210,7 @@ function drawTrendSeries(svg, labels, series) {
  y: y + cellH * 0.58,
  "text-anchor": "middle",
  "font-size": 11,
- "font-family": "Times New Roman, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+ "font-family": "var(--ot-font-sans)",
  fill: "#222",
  },
  String(cell.total)
@@ -2159,7 +2232,7 @@ function drawTrendSeries(svg, labels, series) {
  y: height - 9,
  "text-anchor": "middle",
  "font-size": 11,
- "font-family": "Times New Roman, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+ "font-family": "var(--ot-font-sans)",
  fill: "#666",
  },
  data.cols[c].label
@@ -2185,7 +2258,7 @@ function drawTrendSeries(svg, labels, series) {
  x: lx + sw + 5,
  y: lgY,
  "font-size": 11,
- "font-family": "Times New Roman, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+ "font-family": "var(--ot-font-sans)",
  fill: "#666",
  },
  item.label
@@ -2196,20 +2269,7 @@ function drawTrendSeries(svg, labels, series) {
  }
 
  function updateHeatmapChart() {
- if (!dom.heatmapSvg) return;
- const data = computeHeatmapData();
- if (!data) {
- dom.heatmapSvg.innerHTML = "";
- if (dom.heatmapHint) {
- dom.heatmapHint.textContent =
- "Serve una data valida nei nodi per costruire la heatmap.";
- }
  return;
- }
- drawHeatmap(dom.heatmapSvg, data);
- if (dom.heatmapHint) {
- dom.heatmapHint.textContent = `${data.cols.length} periodi × ${data.rows.length} aree · colore = bilanciamento Exploring/Making`;
- }
  }
 
  function downloadTrendSvg() {
@@ -2241,7 +2301,6 @@ function drawTrendSeries(svg, labels, series) {
  updateLegend();
  updateStatsPanel();
  updateTrendChart();
- updateHeatmapChart();
  }
 
  function ensureSelectValue(select, value) {
@@ -2254,7 +2313,7 @@ function drawTrendSeries(svg, labels, series) {
  if (!dom.selFilterMode || !dom.selFilterValue) return;
  const mode = dom.selFilterMode.value || "all";
  const prev = dom.selFilterValue.value || "__all__";
- const options = [{ value: "__all__", label: "Tutti" }];
+ const options = [{ value: "__all__", label: "All" }];
  if (mode !== "all") {
  const stats = collectModeStats(mode);
  const sorted = [...stats.entries()].sort((a, b) => {
@@ -2278,7 +2337,7 @@ function drawTrendSeries(svg, labels, series) {
  if (!dom.selColorMode || !dom.selColorValue) return;
  const mode = dom.selColorMode.value || "none";
  const prev = dom.selColorValue.value || "__all__";
- const options = [{ value: "__all__", label: "Tutti" }];
+ const options = [{ value: "__all__", label: "All" }];
  if (mode !== "none") {
  const stats = collectModeStats(mode);
  const sorted = [...stats.entries()].sort((a, b) => {
@@ -2343,9 +2402,7 @@ function drawTrendSeries(svg, labels, series) {
  state.worldHeight = 1;
  dom.world.style.width = "1px";
  dom.world.style.height = "1px";
- dom.nodeInfo.innerHTML = '<div class="k">info</div><div>Seleziona un nodo.</div>';
- dom.nodeDesc.textContent = "";
- dom.nodeMedia.innerHTML = "";
+ updateNodeDetails(-1);
  refreshSummary();
  refreshAnalyticsPanels();
  }
@@ -2381,8 +2438,8 @@ function drawTrendSeries(svg, labels, series) {
  files,
  rawX: Number.isFinite(Number(raw?.x)) ? Number(raw.x) : i * 420,
  rawY: Number.isFinite(Number(raw?.y)) ? Number(raw.y) : 0,
- rawW: Number.isFinite(Number(raw?.w)) ? Math.max(140, Number(raw.w)) : 320,
- rawH: Number.isFinite(Number(raw?.h)) ? Math.max(90, Number(raw.h)) : 180,
+ rawW: Number.isFinite(Number(raw?.w)) ? Math.max(84, Number(raw.w) * 0.6) : 192,
+ rawH: Number.isFinite(Number(raw?.h)) ? Math.max(54, Number(raw.h) * 0.6) : 108,
  x: 0,
  y: 0,
  w: 0,
@@ -2468,7 +2525,10 @@ function drawTrendSeries(svg, labels, series) {
  state.nodes = nodes;
  state.edges = edges;
  state.byId = byId;
- state.projectName = label || "Project";
+ state.projectName =
+ (window.OvertraceUI?.formatProjectDisplayName?.(label, label || "Project")) ||
+ label ||
+ "Project";
  state.selected = -1;
 
  layoutNodes();
@@ -2682,7 +2742,7 @@ function fixedWorldSize(mode) {
  const b = state.nodes[e.b];
  if (a?.visible && b?.visible) visibleEdges += 1;
  }
- dom.summary.textContent = `Visibili ${visibleNodes}/${state.nodes.length} nodi · ${visibleEdges}/${state.edges.length} archi`;
+ dom.summary.textContent = `Visible ${visibleNodes}/${state.nodes.length} nodes · ${visibleEdges}/${state.edges.length} edges`;
  }
 
  function applyFiltersAndStyles() {
@@ -2740,38 +2800,65 @@ function fixedWorldSize(mode) {
  }
 
  function updateNodeDetails(index) {
+ if (!dom.nodePopover) return;
  if (index < 0 || index >= state.nodes.length) {
- dom.nodeInfo.innerHTML = '<div class="k">info</div><div>Seleziona un nodo.</div>';
- dom.nodeDesc.textContent = "";
- dom.nodeMedia.innerHTML = "";
+ dom.nodePopover.classList.remove("is-visible");
+ if (dom.nodePopoverTitle) dom.nodePopoverTitle.textContent = "Select a node";
+ if (dom.nodePopoverMeta) dom.nodePopoverMeta.textContent = "Node details appear here.";
+ if (dom.nodePopoverInfo) dom.nodePopoverInfo.innerHTML = "";
+ if (dom.nodePopoverDesc) dom.nodePopoverDesc.textContent = "";
+ if (dom.nodePopoverMedia) dom.nodePopoverMedia.innerHTML = "";
+ if (dom.nodePopoverAttachments) dom.nodePopoverAttachments.innerHTML = "";
  return;
  }
 
  const n = state.nodes[index];
- const areaText = n.areas.length ? n.areas.join(", ") : "-";
- const tagText = n.tags.length ? n.tags.join(", ") : "-";
+ const areaHtml = n.areas.length
+ ? `<div class="node-popover-badges">${n.areas
+ .map((area) => `<span class="node-popover-badge">${esc(area)}</span>`)
+ .join("")}</div>`
+ : "-";
+ const tagHtml = n.tags.length
+ ? `<div class="node-popover-badges">${n.tags
+ .map((tag) => `<span class="node-popover-badge">${esc(tag)}</span>`)
+ .join("")}</div>`
+ : "-";
 
- dom.nodeInfo.innerHTML = `
- <div class="k">id</div><div>${esc(n.id)}</div>
- <div class="k">title</div><div>${esc(n.title)}</div>
+ if (dom.nodePopoverTitle) dom.nodePopoverTitle.textContent = n.title || "Untitled";
+ if (dom.nodePopoverMeta) dom.nodePopoverMeta.textContent = normValue(n.date);
+ dom.nodePopoverInfo.innerHTML = `
  <div class="k">type</div><div>${esc(normValue(n.type))}</div>
  <div class="k">action</div><div>${esc(normValue(n.action))}</div>
- <div class="k">date</div><div>${esc(normValue(n.date))}</div>
- <div class="k">areas</div><div>${esc(areaText)}</div>
- <div class="k">tags</div><div>${esc(tagText)}</div>
+ <div class="k">areas</div><div>${areaHtml}</div>
+ <div class="k">tags</div><div>${tagHtml}</div>
  `;
 
- dom.nodeDesc.textContent = n.desc || "";
+ dom.nodePopoverDesc.innerHTML = n.desc
+ ? `<div class="node-popover-desc-title">Description</div>${esc(n.desc)}`
+ : "";
 
- dom.nodeMedia.innerHTML = "";
+ dom.nodePopoverMedia.innerHTML = "";
+ dom.nodePopoverAttachments.innerHTML = "";
  const url = n.previewUrl || resolveAssetUrl(n.previewFile);
  if (url) {
  const img = document.createElement("img");
  img.src = url;
  img.alt = n.title;
  img.loading = "lazy";
- dom.nodeMedia.appendChild(img);
+ dom.nodePopoverMedia.appendChild(img);
  }
+ const attachments = (n.files || [])
+ .filter((file) => file && !file.isImage)
+ .map((file) => {
+ const url = resolveAssetUrl(file);
+ if (!url) return "";
+ const label = normValue(file.name || file.path || "file");
+ return `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`;
+ })
+ .filter(Boolean)
+ .join("");
+ if (attachments) dom.nodePopoverAttachments.innerHTML = attachments;
+ dom.nodePopover.classList.add("is-visible");
  }
 
  function selectNode(index) {
@@ -2973,7 +3060,7 @@ function refreshDotTuningOutputs() {
  )
  )
  );
- zoom = Math.max(ZOOM_MIN, zoom * 0.7);
+ zoom = Math.max(ZOOM_MIN, zoom * 0.9);
  state.view.zoom = zoom;
  state.view.panX = wrapRect.width * 0.5 - ((minX + maxX) * 0.5) * zoom;
  state.view.panY = wrapRect.height * 0.5 - ((minY + maxY) * 0.5) * zoom;
@@ -2995,7 +3082,10 @@ function refreshDotTuningOutputs() {
  const bh = Math.max(1, maxY - minY);
  const zoom = Math.max(
  ZOOM_MIN,
- Math.min(ZOOM_MAX, Math.min((wrapRect.width - pad) / bw, (wrapRect.height - pad) / bh))
+ Math.min(
+ ZOOM_MAX,
+ Math.min((wrapRect.width - pad) / bw, (wrapRect.height - pad) / bh) * 0.9
+ )
  );
 
  state.view.zoom = zoom;
@@ -3039,14 +3129,18 @@ function refreshDotTuningOutputs() {
 
  async function loadFromFolderContext(entry) {
  const folderName = entry?.folderName || entry?.dirHandle?.name || "";
- const label = folderName || entry?.fileName?.replace(/\.json$/i, "") || "Project";
+ const label =
+ window.OvertraceUI?.formatProjectDisplayName?.(
+ folderName || entry?.fileName?.replace(/\.json$/i, "") || "Project",
+ folderName || entry?.fileName?.replace(/\.json$/i, "") || "Project"
+ ) || folderName || entry?.fileName?.replace(/\.json$/i, "") || "Project";
  const assetBase = entry?.assetBase || (folderName ? `${folderName}/` : "");
  await loadProjectData(entry.project, label, assetBase, folderName || null);
  const fsContext = window.OvertraceUI?.buildProjectFsContext?.(entry);
  if (fsContext) {
  await window.OvertraceUI?.saveProjectFsContext?.(fsContext);
  }
- setHint(`Progetto caricato: ${folderName || "project"}/project.json`, "ok");
+ setHint(`Project loaded: ${label}`, "ok");
  }
 
 async function openJsonDialog() {
@@ -3241,13 +3335,13 @@ dom.inpDotStroke?.addEventListener("input", () => {
 });
 
  dom.inpDotEdgeStrong?.addEventListener("input", () => {
- state.visual.dotEdgeStrongWidth = Number(dom.inpDotEdgeStrong.value) || 1.5;
+ state.visual.dotEdgeStrongWidth = Number(dom.inpDotEdgeStrong.value) || 0.5;
  refreshDotTuningOutputs();
  renderEdges();
  });
 
  dom.inpDotEdgeWeak?.addEventListener("input", () => {
- state.visual.dotEdgeWeakWidth = Number(dom.inpDotEdgeWeak.value) || 1.5;
+ state.visual.dotEdgeWeakWidth = Number(dom.inpDotEdgeWeak.value) || 0.5;
  refreshDotTuningOutputs();
  renderEdges();
  });
@@ -3257,39 +3351,6 @@ dom.inpDotStroke?.addEventListener("input", () => {
  state.hubThreshold = value;
  dom.inpHubThreshold.value = String(value);
  updateStatsPanel();
- });
-
- dom.selStatsScope?.addEventListener("change", () => {
- state.statsScope = dom.selStatsScope.value || "visible";
- refreshAnalyticsPanels();
- });
-
- dom.chkSeriesExploring?.addEventListener("change", () => {
- state.trend.showExploring = !!dom.chkSeriesExploring.checked;
- updateTrendChart();
- });
-
- dom.chkSeriesMaking?.addEventListener("change", () => {
- state.trend.showMaking = !!dom.chkSeriesMaking.checked;
- updateTrendChart();
- });
-
- dom.chkSeriesTotal?.addEventListener("change", () => {
- state.trend.showTotal = !!dom.chkSeriesTotal.checked;
- updateTrendChart();
- });
-
- dom.selTimelineScale?.addEventListener("change", () => {
- state.trend.scale = dom.selTimelineScale.value || "absolute";
- updateTrendChart();
- });
-
- dom.selTimelineBucket?.addEventListener("change", () => {
- state.trend.bucket = dom.selTimelineBucket.value || "week";
- updateTrendChart();
- });
- dom.btnDownloadTrendSvg?.addEventListener("click", () => {
- downloadTrendSvg();
  });
 
  dom.viewWrap.addEventListener("pointerdown", (e) => {
@@ -3382,6 +3443,11 @@ dom.inpDotStroke?.addEventListener("input", () => {
  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
  const k = e.key.toLowerCase();
+ if (!e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey && k === "0") {
+ e.preventDefault();
+ fitView(true);
+ return;
+ }
  const cmdOpen = (e.metaKey || e.ctrlKey) && k === "o";
  const plainOpen = !e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey && k === "o";
  if (!cmdOpen && !plainOpen) return;
@@ -3454,12 +3520,6 @@ dom.inpDotStroke?.addEventListener("input", () => {
  if (dom.inpDotEdgeStrong) dom.inpDotEdgeStrong.value = String(state.visual.dotEdgeStrongWidth);
  if (dom.inpDotEdgeWeak) dom.inpDotEdgeWeak.value = String(state.visual.dotEdgeWeakWidth);
  dom.inpHubThreshold.value = String(state.hubThreshold);
- dom.selStatsScope.value = state.statsScope;
- dom.chkSeriesExploring.checked = state.trend.showExploring;
- dom.chkSeriesMaking.checked = state.trend.showMaking;
- dom.chkSeriesTotal.checked = state.trend.showTotal;
- dom.selTimelineScale.value = state.trend.scale;
- dom.selTimelineBucket.value = state.trend.bucket;
  refreshDotTuningOutputs();
  setIdleStatus();
  wireEvents();
