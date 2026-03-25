@@ -29,31 +29,24 @@
       name="twitter:description"
       content="Three-dimensional spatial analysis of an Overtrace project, with nodes, links, discipline networks and visual filters."
     />
-    <link rel="icon" type="image/svg+xml" href="./overtrace/overtrace.svg" />
-    <link rel="shortcut icon" href="./overtrace/favicon-32x32.png" />
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="./overtrace/favicon-32x32.png"
+      href="./overtrace/logo.png?v=2"
     />
     <link
       rel="icon"
       type="image/png"
-      sizes="16x16"
-      href="./overtrace/favicon-16x16.png"
+      sizes="192x192"
+      href="./overtrace/logo.png?v=2"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="./overtrace/apple-touch-icon.png"
+      rel="shortcut icon"
+      type="image/png"
+      href="./overtrace/logo.png?v=2"
     />
-    <link
-      rel="mask-icon"
-      href="./overtrace/safari-pinned-tab.svg"
-      color="#111111"
-    />
-    <link rel="manifest" href="./overtrace/site.webmanifest" />
+    <link rel="apple-touch-icon" href="./overtrace/logo.png?v=2" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -109,7 +102,8 @@
       }
 
       body.side-collapsed .layout {
-        grid-template-columns: minmax(0, 1fr)
+        grid-template-columns:
+          minmax(0, 1fr)
           calc(
             var(--space-side-rail-size) + var(--space-side-rail-extra) +
               var(--space-side-gap)
@@ -277,7 +271,9 @@
         min-width: calc(
           var(--space-side-rail-size) + var(--space-side-rail-extra)
         );
-        height: calc(var(--space-side-rail-size) + var(--space-side-rail-extra));
+        height: calc(
+          var(--space-side-rail-size) + var(--space-side-rail-extra)
+        );
         min-height: calc(
           var(--space-side-rail-size) + var(--space-side-rail-extra)
         );
@@ -383,6 +379,7 @@
 
       #disciplineHint {
         margin: 0;
+        padding-left: 8px;
         font-size: 12px;
         color: var(--muted);
       }
@@ -606,14 +603,9 @@
 
       #projectName {
         margin: 0;
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      #stats {
-        margin: 6px 0 0;
-        color: var(--muted);
         font-size: 12px;
+        font-weight: 400;
+        line-height: 1.2;
       }
 
       .card {
@@ -728,6 +720,9 @@
         border-radius: var(--ts-radius-panel);
         box-shadow: var(--ts-toolbar-panel-shadow);
         padding: 12px 14px 14px;
+        pointer-events: auto;
+        touch-action: pan-y;
+        overscroll-behavior: contain;
       }
 
       #nodeOverlay3d.is-hidden {
@@ -760,14 +755,30 @@
         background: transparent;
         color: #333;
         cursor: pointer;
-        font-size: 18px;
-        line-height: 1;
-        padding: 2px 6px;
-        border-radius: 6px;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
+        padding: 0;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
 
       #btnCloseNodeOverlay3d:hover {
         background: rgba(0, 0, 0, 0.08);
+      }
+
+      #btnCloseNodeOverlay3d .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" var(--ts-toolbar-icon-weight),
+          "opsz" 24;
+        font-size: 18px;
+        line-height: 1;
+        display: block;
+        pointer-events: none;
       }
 
       #nodeOverlay3dInfo {
@@ -884,7 +895,11 @@
     <div class="app">
       <header class="topbar ts-toolbar">
         <div class="nav-left">
-          <a class="toolbar-brand" href="./index.html" aria-label="Open Project Atlas">
+          <a
+            class="toolbar-brand"
+            href="./index.html"
+            aria-label="Open Project Atlas"
+          >
             <img
               class="brand-logo"
               src="./overtrace/logo.svg"
@@ -1039,7 +1054,6 @@
           <div id="sideContent">
             <section id="projectPane">
               <h2 id="projectName">No project loaded</h2>
-              <p id="stats">0 nodes · 0 edges</p>
             </section>
 
             <section id="disciplinePane">
@@ -1048,8 +1062,8 @@
                 <canvas id="disciplineView"></canvas>
               </div>
               <p id="disciplineHint">
-                Bubble = discipline (size by occurrences). Lines show co-presence
-                of the pair within the same card.
+                Bubble = discipline (size by occurrences). Lines show
+                co-presence of the pair within the same card.
               </p>
               <div
                 id="disciplineLegend"
@@ -1060,16 +1074,23 @@
                 <div class="discipline-legend-item">
                   <span
                     class="discipline-legend-dot"
-                    style="background: #00ffff"
+                    style="background: #29eeee"
                   ></span>
                   <span>Exploring</span>
                 </div>
                 <div class="discipline-legend-item">
                   <span
                     class="discipline-legend-dot"
-                    style="background: #45250d"
+                    style="background: #572f10"
                   ></span>
                   <span>Making</span>
+                </div>
+                <div class="discipline-legend-item">
+                  <span
+                    class="discipline-legend-dot"
+                    style="background: #d2d2d2"
+                  ></span>
+                  <span>–</span>
                 </div>
               </div>
               <div id="disciplineList" aria-live="polite">
@@ -1190,7 +1211,6 @@
           btnPreviewLoop: document.getElementById("btnPreviewLoop"),
           fileInput: document.getElementById("fileInput"),
           projectName: document.getElementById("projectName"),
-          stats: document.getElementById("stats"),
           nodeInfo: document.getElementById("nodeInfo"),
           nodeDesc: document.getElementById("nodeDesc"),
           nodeMedia: document.getElementById("nodeMedia"),
@@ -1406,7 +1426,9 @@
         }
 
         function ellipsizeSnapshotText(ctx, text, maxWidth) {
-          const value = String(text || "").replace(/\s+/g, " ").trim();
+          const value = String(text || "")
+            .replace(/\s+/g, " ")
+            .trim();
           if (!value) return "";
           if (ctx.measureText(value).width <= maxWidth) return value;
           let out = value;
@@ -1429,7 +1451,17 @@
           const sHeight = dHeight / scale;
           const sx = (sw - sWidth) * 0.5;
           const sy = (sh - sHeight) * 0.5;
-          ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+          ctx.drawImage(
+            image,
+            sx,
+            sy,
+            sWidth,
+            sHeight,
+            dx,
+            dy,
+            dWidth,
+            dHeight,
+          );
           return true;
         }
 
@@ -1444,8 +1476,9 @@
           const assetHeight = Math.max(
             44,
             Math.round(
-              parseFloat(node.labelEl?.style.getPropertyValue("--assetH") || "") ||
-                56,
+              parseFloat(
+                node.labelEl?.style.getPropertyValue("--assetH") || "",
+              ) || 56,
             ),
           );
           const imageEl = state.showImages
@@ -1467,7 +1500,11 @@
             const first = node.files[0];
             metaLines.push(first?.name || first?.path || "asset");
           }
-          if (state.showText && Array.isArray(node.files) && node.files.length > 1) {
+          if (
+            state.showText &&
+            Array.isArray(node.files) &&
+            node.files.length > 1
+          ) {
             metaLines.push(`+${node.files.length - 1} asset`);
           }
 
@@ -1480,7 +1517,7 @@
             titleLineHeight +
             (hasImage ? assetHeight + 2 : 0) +
             metaLines.length * metaLineHeight;
-          const boxX = projection.x - (labelWidth * projection.scale) * 0.5;
+          const boxX = projection.x - labelWidth * projection.scale * 0.5;
           const boxY = projection.y - boxHeight * projection.scale;
           const showBorder =
             node.labelEl?.classList.contains("boxed") ||
@@ -1508,8 +1545,7 @@
 
           let cursorY = pad;
           if (state.showText) {
-            ctx.font =
-              '700 10px "Times New Roman", Times, serif';
+            ctx.font = '700 10px "Times New Roman", Times, serif';
             ctx.fillStyle = "#111111";
             ctx.textBaseline = "top";
             ctx.fillText(
@@ -1533,8 +1569,7 @@
           }
 
           if (metaLines.length) {
-            ctx.font =
-              '9px "Times New Roman", Times, serif';
+            ctx.font = '9px "Times New Roman", Times, serif';
             ctx.fillStyle = "#444444";
             for (const line of metaLines) {
               ctx.fillText(
@@ -1651,7 +1686,8 @@
           };
 
           try {
-            const fsContext = await window.OvertraceUI?.loadProjectFsContext?.();
+            const fsContext =
+              await window.OvertraceUI?.loadProjectFsContext?.();
             if (fsContext?.kind === "folder" && fsContext.handle) {
               return await writeToFolderHandle(fsContext.handle);
             }
@@ -1670,7 +1706,10 @@
             }
           } catch (err) {
             if (!err || err.name !== "AbortError") {
-              console.warn("Unable to persist preview snapshot via picker", err);
+              console.warn(
+                "Unable to persist preview snapshot via picker",
+                err,
+              );
             }
           }
 
@@ -1728,7 +1767,11 @@
         }
 
         async function postAtlasSnapshotToParent() {
-          if (!ATLAS_SNAPSHOT_MODE || state.overviewMode || !state.nodes.length) {
+          if (
+            !ATLAS_SNAPSHOT_MODE ||
+            state.overviewMode ||
+            !state.nodes.length
+          ) {
             return;
           }
           try {
@@ -2004,9 +2047,9 @@
         function defaultColorHex(mode, value) {
           if (mode === "action") {
             const normalized = normValue(value, "").toLowerCase();
-            if (normalized === "exploring") return "#00FFFF";
-            if (normalized === "making") return "#45250D";
-            return "";
+            if (normalized === "exploring") return "#29EEEE";
+            if (normalized === "making") return "#572F10";
+            return "#d2d2d2";
           }
           return `#${colorByCategory(mode, value).getHexString()}`;
         }
@@ -2091,7 +2134,8 @@
               ".material-symbols-outlined",
             );
             const tip = state.showImages ? "Hide images" : "Images";
-            if (icon) icon.textContent = state.showImages ? "hide_image" : "image";
+            if (icon)
+              icon.textContent = state.showImages ? "hide_image" : "image";
             dom.btnToggleImages.setAttribute("data-tip", tip);
             dom.btnToggleImages.setAttribute("aria-label", tip);
             dom.btnToggleImages.disabled = !!state.overviewMode;
@@ -2101,7 +2145,8 @@
               ".material-symbols-outlined",
             );
             const tip = state.showText ? "Hide text" : "Text";
-            if (icon) icon.textContent = state.showText ? "text_ad_off" : "text_ad";
+            if (icon)
+              icon.textContent = state.showText ? "text_ad_off" : "text_ad";
             dom.btnToggleText.setAttribute("data-tip", tip);
             dom.btnToggleText.setAttribute("aria-label", tip);
           }
@@ -2129,7 +2174,10 @@
 
         function syncSideCollapseButton() {
           if (!dom.btnToggleSide) return;
-          document.body.classList.toggle("side-collapsed", !!state.sideCollapsed);
+          document.body.classList.toggle(
+            "side-collapsed",
+            !!state.sideCollapsed,
+          );
           const icon = dom.btnToggleSide.querySelector(
             ".material-symbols-outlined",
           );
@@ -2588,7 +2636,7 @@
           };
 
           drawSeries(series.exploring, "#0b9bb8");
-          drawSeries(series.making, "#8a5a2b");
+          drawSeries(series.making, "#572F10");
           drawSeries(series.total, "#111111", 2.2);
 
           const tickIdx = [
@@ -2612,7 +2660,7 @@
             '11px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
           ctx.fillStyle = "#0b9bb8";
           ctx.fillText("Exploring", m.l + 4, 6);
-          ctx.fillStyle = "#8a5a2b";
+          ctx.fillStyle = "#572F10";
           ctx.fillText("Making", m.l + 82, 6);
           ctx.fillStyle = "#111111";
           ctx.fillText("Total", m.l + 144, 6);
@@ -2641,7 +2689,7 @@
 
           const data = [
             { label: "Exploring", value: exploring, color: "#0b9bb8" },
-            { label: "Making", value: making, color: "#8a5a2b" },
+            { label: "Making", value: making, color: "#572F10" },
             { label: "Total", value: total, color: "#111111" },
           ];
           const max = Math.max(1, ...data.map((d) => d.value));
@@ -2963,8 +3011,8 @@
           return out;
         }
 
-        const DISCIPLINE_EXPLORING_HEX = "#00FFFF";
-        const DISCIPLINE_MAKING_HEX = "#45250D";
+        const DISCIPLINE_EXPLORING_HEX = "#29EEEE";
+        const DISCIPLINE_MAKING_HEX = "#572F10";
         const DISCIPLINE_NEUTRAL_HEX = "#b8b8b8";
 
         function disciplineRenderScale() {
@@ -2984,7 +3032,10 @@
           }
           const availableX = Math.max(24, cx - 10);
           const availableY = Math.max(24, cy - 10);
-          const fit = Math.min(availableX / maxOffsetX, availableY / maxOffsetY);
+          const fit = Math.min(
+            availableX / maxOffsetX,
+            availableY / maxOffsetY,
+          );
           return Math.max(0.22, Math.min(base, base * fit));
         }
 
@@ -3010,11 +3061,17 @@
         }
 
         function disciplineSelectionHintText() {
-          if (discipline.selected < 0 || discipline.selected >= discipline.nodes.length) {
+          if (
+            discipline.selected < 0 ||
+            discipline.selected >= discipline.nodes.length
+          ) {
             return discipline.defaultHint;
           }
           const node = discipline.nodes[discipline.selected];
-          const neighbors = disciplineNeighbors(discipline.selected).slice(0, 4);
+          const neighbors = disciplineNeighbors(discipline.selected).slice(
+            0,
+            4,
+          );
           const linked = neighbors.length
             ? neighbors.map((n) => `${n.label} (${n.weight})`).join(", ")
             : "none";
@@ -4363,15 +4420,6 @@
             state.projectName ||
             "Project";
           dom.projectName.textContent = displayName;
-          const totalNodes = state.nodes.length;
-          const totalEdges = state.edges.length;
-          const visibleNodes = countVisibleNodes();
-          const visibleEdges = countVisibleEdges();
-          const filtering =
-            visibleNodes !== totalNodes || visibleEdges !== totalEdges;
-          dom.stats.textContent = filtering
-            ? `${visibleNodes}/${totalNodes} nodes · ${visibleEdges}/${totalEdges} edges`
-            : `${totalNodes} nodes · ${totalEdges} edges`;
         }
 
         function hideNodeOverlay3d() {
@@ -4847,9 +4895,7 @@
         async function loadFromFolderContext(entry) {
           const folderName = entry?.folderName || entry?.dirHandle?.name || "";
           const label =
-            folderName ||
-            entry?.fileName?.replace(/\.json$/i, "") ||
-            "Project";
+            folderName || entry?.fileName?.replace(/\.json$/i, "") || "Project";
           const assetBase =
             entry?.assetBase || (folderName ? `${folderName}/` : "");
           await loadProjectSource(entry.project, label, assetBase);
@@ -4925,10 +4971,7 @@
 
           const entries = loaded.filter(Boolean);
           if (!entries.length) {
-            setHint(
-              "Overview unavailable: no project.json found.",
-              "warn",
-            );
+            setHint("Overview unavailable: no project.json found.", "warn");
             return false;
           }
 
@@ -4937,10 +4980,7 @@
             !Array.isArray(mergedProject.nodes) ||
             mergedProject.nodes.length === 0
           ) {
-            setHint(
-              "Overview unavailable: no valid nodes found.",
-              "warn",
-            );
+            setHint("Overview unavailable: no valid nodes found.", "warn");
             return false;
           }
 
@@ -4960,47 +5000,54 @@
           if (state.openDialogPending) return;
           state.openDialogPending = true;
           try {
-          if ("showDirectoryPicker" in window && window.OvertraceUI?.openProjectFolder) {
-            try {
-              const entry = await window.OvertraceUI.openProjectFolder({
-                mode: "readwrite",
-              });
-              await loadFromFolderContext(entry);
-              return;
-            } catch (err) {
-              if (err && err.name === "AbortError") return;
-              if (err && err.name === "NotFoundError") {
-                setHint(
-                  "project.json not found in the selected folder.",
-                  "warn",
-                );
+            if (
+              "showDirectoryPicker" in window &&
+              window.OvertraceUI?.openProjectFolder
+            ) {
+              try {
+                const entry = await window.OvertraceUI.openProjectFolder({
+                  mode: "readwrite",
+                });
+                await loadFromFolderContext(entry);
+                return;
+              } catch (err) {
+                if (err && err.name === "AbortError") return;
+                if (err && err.name === "NotFoundError") {
+                  setHint(
+                    "project.json not found in the selected folder.",
+                    "warn",
+                  );
+                  return;
+                }
+                console.warn("Folder open failed in Space view", err);
+                setHint("Unable to open the project folder.", "warn");
                 return;
               }
-              console.warn("Folder open failed in Space view", err);
-              setHint("Unable to open the project folder.", "warn");
-              return;
             }
-          }
 
-          if ("showOpenFilePicker" in window && window.OvertraceUI?.openProjectJsonFile) {
-            try {
-              const entry = await window.OvertraceUI.openProjectJsonFile({
-                description: "JSON",
-              });
-              if (!entry) return;
-              await loadFromJsonFile(entry.file, entry.fileName || "");
-              const fsContext = window.OvertraceUI?.buildProjectFsContext?.(entry);
-              if (fsContext) {
-                await window.OvertraceUI?.saveProjectFsContext?.(fsContext);
+            if (
+              "showOpenFilePicker" in window &&
+              window.OvertraceUI?.openProjectJsonFile
+            ) {
+              try {
+                const entry = await window.OvertraceUI.openProjectJsonFile({
+                  description: "JSON",
+                });
+                if (!entry) return;
+                await loadFromJsonFile(entry.file, entry.fileName || "");
+                const fsContext =
+                  window.OvertraceUI?.buildProjectFsContext?.(entry);
+                if (fsContext) {
+                  await window.OvertraceUI?.saveProjectFsContext?.(fsContext);
+                }
+                return;
+              } catch (err) {
+                if (err && err.name === "AbortError") return;
               }
-              return;
-            } catch (err) {
-              if (err && err.name === "AbortError") return;
             }
-          }
 
-          dom.fileInput.value = "";
-          dom.fileInput.click();
+            dom.fileInput.value = "";
+            dom.fileInput.click();
           } finally {
             state.openDialogPending = false;
           }
@@ -5154,6 +5201,26 @@
             selectNode(-1);
           });
 
+          dom.nodeOverlay3d?.addEventListener(
+            "wheel",
+            (e) => {
+              e.stopPropagation();
+            },
+            { passive: true },
+          );
+
+          dom.nodeOverlay3d?.addEventListener("pointerdown", (e) => {
+            e.stopPropagation();
+          });
+
+          dom.nodeOverlay3d?.addEventListener("pointermove", (e) => {
+            e.stopPropagation();
+          });
+
+          dom.nodeOverlay3d?.addEventListener("pointerup", (e) => {
+            e.stopPropagation();
+          });
+
           dom.selViewMode?.addEventListener("change", () => {
             updateViewFilterValueOptions();
             applyViewFilter();
@@ -5286,16 +5353,8 @@
 
           dom.canvas.addEventListener("pointerdown", (e) => {
             if (e.pointerType === "touch") return;
-            state.pointerDown.x = e.clientX;
-            state.pointerDown.y = e.clientY;
-            state.pointerDown.active = true;
-
-            controls.lastX = e.clientX;
-            controls.lastY = e.clientY;
-
-            if (e.button === 2 || state.spaceDown) controls.isPanning = true;
-            else controls.isRotating = true;
-            state.pointerDown.wasPan = controls.isPanning;
+            state.pointerDown.labelIndex = -1;
+            beginScenePointerInteraction(e.clientX, e.clientY, e.button);
           });
 
           window.addEventListener("pointermove", (e) => {
@@ -5331,10 +5390,15 @@
               moved < 5 &&
               !state.pointerDown.wasPan
             ) {
-              pickAt(e.clientX, e.clientY);
+              if (state.pointerDown.labelIndex >= 0) {
+                selectNode(state.pointerDown.labelIndex);
+              } else {
+                pickAt(e.clientX, e.clientY);
+              }
             }
             state.pointerDown.active = false;
             state.pointerDown.wasPan = false;
+            state.pointerDown.labelIndex = -1;
             controls.isRotating = false;
             controls.isPanning = false;
           });
@@ -5572,8 +5636,7 @@
         state.actionOutlineEnabled = false;
         state.showImages = !state.overviewMode;
         state.showText = true;
-        if (dom.selMapColorMode)
-          dom.selMapColorMode.value = activeColorMode();
+        if (dom.selMapColorMode) dom.selMapColorMode.value = activeColorMode();
         if (dom.selViewMode) dom.selViewMode.value = "all";
         if (dom.selViewValue) dom.selViewValue.value = "__all__";
         syncPreviewSnapshotButton();

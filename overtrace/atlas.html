@@ -38,14 +38,6 @@
     <link rel="stylesheet" href="./shared-ui.css" />
     <script src="./shared-ui.js"></script>
     <style>
-      @font-face {
-        font-family: "Times NR Seven MT Std";
-        src: url("./asset/TimesNRSevenMTStd-Bold.otf") format("opentype");
-        font-weight: 700;
-        font-style: normal;
-        font-display: swap;
-      }
-
       :root {
         --bg: #f2f2f2;
         --panel: #ffffff;
@@ -92,8 +84,8 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        font: 700 15px/1 "Times NR Seven MT Std", serif;
-        letter-spacing: -0.02em;
+        font: 400 13px/1 var(--ot-font-sans);
+        letter-spacing: normal;
         color: #111111;
         pointer-events: none;
       }
@@ -185,14 +177,15 @@
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 12px;
         align-items: center;
-        padding: 14px 16px 16px;
+        min-height: calc(var(--ts-control-size) + var(--ts-panel-padding) * 2);
+        padding: 5px 14px;
       }
 
       .project-name {
         margin: 0;
-        font-size: 15px;
-        line-height: 1;
-        font-weight: 500;
+        font-size: 12px;
+        line-height: 1.1;
+        font-weight: 400;
         letter-spacing: normal;
       }
 

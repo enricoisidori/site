@@ -29,31 +29,10 @@
  name="twitter:description"
  content="Temporal and structural analysis of an Overtrace project, focused on sequences, transitions, overlaps and process metrics."
  />
- <link rel="icon" type="image/svg+xml" href="./overtrace/overtrace.svg" />
- <link rel="shortcut icon" href="./overtrace/favicon-32x32.png" />
- <link
- rel="icon"
- type="image/png"
- sizes="32x32"
- href="./overtrace/favicon-32x32.png"
- />
- <link
- rel="icon"
- type="image/png"
- sizes="16x16"
- href="./overtrace/favicon-16x16.png"
- />
- <link
- rel="apple-touch-icon"
- sizes="180x180"
- href="./overtrace/apple-touch-icon.png"
- />
- <link
- rel="mask-icon"
- href="./overtrace/safari-pinned-tab.svg"
- color="#111111"
- />
- <link rel="manifest" href="./overtrace/site.webmanifest" />
+ <link rel="icon" type="image/png" sizes="32x32" href="./overtrace/logo.png?v=2" />
+ <link rel="icon" type="image/png" sizes="192x192" href="./overtrace/logo.png?v=2" />
+ <link rel="shortcut icon" type="image/png" href="./overtrace/logo.png?v=2" />
+ <link rel="apple-touch-icon" href="./overtrace/logo.png?v=2" />
  <link
  rel="stylesheet"
  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -131,7 +110,7 @@
 
  #edges path {
  fill: none;
- stroke: rgba(16, 16, 16, 0.62);
+ stroke: #d2d2d2;
  stroke-width: 1.8;
  vector-effect: non-scaling-stroke;
  }
@@ -409,17 +388,12 @@
 
  #projectName {
  margin: 0;
- font-size: 14px;
- font-weight: 500;
- }
-
- #stats {
- margin: 5px 0 0;
- color: var(--muted);
  font-size: 12px;
+ font-weight: 400;
+ line-height: 1.2;
  }
 
- .ctrl-grid {
+.ctrl-grid {
  display: grid;
  gap: 8px;
  }
@@ -659,6 +633,9 @@
  padding: 12px 14px 14px;
  z-index: 12;
  display: none;
+ pointer-events: auto;
+ touch-action: pan-y;
+ overscroll-behavior: contain;
  }
 
  #nodePopover.is-visible {
@@ -666,9 +643,15 @@
  }
 
  .node-popover-head {
- display: grid;
- gap: 4px;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 8px;
  margin-bottom: 0;
+ }
+
+ .node-popover-head-main {
+ min-width: 0;
  }
 
  .node-popover-title {
@@ -683,6 +666,37 @@
  margin: 0;
  font-size: 12px;
  color: var(--muted);
+ }
+
+ #btnCloseNodePopover {
+ border: none;
+ background: transparent;
+ color: #333;
+ cursor: pointer;
+ width: 28px;
+ height: 28px;
+ min-width: 28px;
+ min-height: 28px;
+ padding: 0;
+ border-radius: 8px;
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ }
+
+ #btnCloseNodePopover:hover {
+ background: rgba(0, 0, 0, 0.08);
+ }
+
+ #btnCloseNodePopover .material-symbols-outlined {
+ font-variation-settings:
+ "FILL" 0,
+ "wght" var(--ts-toolbar-icon-weight),
+ "opsz" 24;
+ font-size: 18px;
+ line-height: 1;
+ display: block;
+ pointer-events: none;
  }
 
  .node-popover-kv {
@@ -838,8 +852,13 @@
  </div>
  <div id="nodePopover" aria-live="polite">
  <div class="node-popover-head">
+ <div class="node-popover-head-main">
  <h3 id="nodePopoverTitle" class="node-popover-title">Select a node</h3>
  <p id="nodePopoverMeta" class="node-popover-meta">Node details appear here.</p>
+ </div>
+ <button id="btnCloseNodePopover" type="button" aria-label="Close node details">
+ <span class="material-symbols-outlined">close</span>
+ </button>
  </div>
  <div class="node-popover-divider"></div>
  <div id="nodePopoverInfo" class="node-popover-kv"></div>
@@ -853,8 +872,7 @@
  <aside id="side">
  <section id="panelProject" class="panel">
  <h2 id="projectName">Nessun progetto caricato</h2>
- <p id="stats">0 nodes · 0 edges</p>
- </section>
+</section>
 
  <section id="panelVisual" class="panel">
  <h3>Visualization controls</h3>
@@ -928,19 +946,19 @@
  <div class="mini-grid">
  <div class="field">
  <label for="inpDotExploring">Exploring fill</label>
- <input id="inpDotExploring" class="side-select" type="color" value="#999999" />
+ <input id="inpDotExploring" class="side-select" type="color" value="#29EEEE" />
  </div>
  <div class="field">
  <label for="inpDotMaking">Making fill</label>
- <input id="inpDotMaking" class="side-select" type="color" value="#333333" />
+ <input id="inpDotMaking" class="side-select" type="color" value="#572F10" />
  </div>
  <div class="field" style="grid-column: 1 / -1;">
  <label class="check-row"><input id="chkDotAllBlack" type="checkbox" /> All black (fill + edge)</label>
  </div>
  <div class="field">
  <label for="inpDotScale">Dot scale</label>
- <input id="inpDotScale" class="side-select" type="range" min="0.5" max="2" step="0.05" value="1" />
- <output id="outDotScale">100%</output>
+ <input id="inpDotScale" class="side-select" type="range" min="0.5" max="2" step="0.05" value="1.7" />
+ <output id="outDotScale">170%</output>
  </div>
  <div class="field">
  <label for="inpDotStroke">Dot stroke</label>
@@ -949,13 +967,13 @@
  </div>
  <div class="field">
  <label for="inpDotEdgeStrong">Strong lines</label>
- <input id="inpDotEdgeStrong" class="side-select" type="range" min="0.5" max="5" step="0.1" value="0.5" />
- <output id="outDotEdgeStrong">0.5px</output>
+ <input id="inpDotEdgeStrong" class="side-select" type="range" min="0.5" max="5" step="0.1" value="1" />
+ <output id="outDotEdgeStrong">1.0px</output>
  </div>
  <div class="field">
  <label for="inpDotEdgeWeak">Weak lines</label>
- <input id="inpDotEdgeWeak" class="side-select" type="range" min="0.5" max="4" step="0.1" value="0.5" />
- <output id="outDotEdgeWeak">0.5px</output>
+ <input id="inpDotEdgeWeak" class="side-select" type="range" min="0.5" max="4" step="0.1" value="1" />
+ <output id="outDotEdgeWeak">1.0px</output>
  </div>
  </div>
  </section>
@@ -968,7 +986,6 @@
  </section>
 
  <section id="panelStatsWrap" class="panel">
- <h3>Network stats</h3>
  <div class="ctrl-grid">
  <div class="row">
  <div class="field">
@@ -984,12 +1001,12 @@
  </section>
 
  <section id="panelTimeline" class="panel">
- <h3>Process timeline</h3>
  <svg id="trendSvg" viewBox="0 0 620 155" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Process timeline"></svg>
  <p id="trendHint">A valid date is required to populate the chart.</p>
  <div class="trend-legend" aria-label="Timeline legend">
- <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#999999"></span><span>Exploring</span></div>
- <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#333333"></span><span>Making</span></div>
+ <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#29EEEE"></span><span>Exploring</span></div>
+ <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#572F10"></span><span>Making</span></div>
+ <div class="trend-legend-item"><span class="trend-legend-dot" style="background:#d2d2d2"></span><span>–</span></div>
  </div>
  </section>
  </aside>
@@ -1074,7 +1091,6 @@
  btnResearch: document.getElementById("btnResearch"),
  fileInput: document.getElementById("fileInput"),
  projectName: document.getElementById("projectName"),
- stats: document.getElementById("stats"),
  selNodeStyle: document.getElementById("selNodeStyle"),
  selFilterMode: document.getElementById("selFilterMode"),
  selFilterValue: document.getElementById("selFilterValue"),
@@ -1106,6 +1122,7 @@
  nodePopoverDesc: document.getElementById("nodePopoverDesc"),
  nodePopoverMedia: document.getElementById("nodePopoverMedia"),
  nodePopoverAttachments: document.getElementById("nodePopoverAttachments"),
+ btnCloseNodePopover: document.getElementById("btnCloseNodePopover"),
  };
 
  const state = {
@@ -1154,12 +1171,12 @@
  downOnNode: false,
  },
  visual: {
- dotExploringFill: "#999999",
- dotMakingFill: "#333333",
- dotScale: 1,
+ dotExploringFill: "#29EEEE",
+ dotMakingFill: "#572F10",
+ dotScale: 1.7,
  dotStrokeWidth: 0,
- dotEdgeStrongWidth: 0.5,
- dotEdgeWeakWidth: 0.5,
+ dotEdgeStrongWidth: 1,
+ dotEdgeWeakWidth: 1,
  dotAllBlack: false,
  },
  };
@@ -1401,8 +1418,8 @@
  const k = String(value || "")
  .toLowerCase()
  .trim();
- if (k === "exploring") return "#00ffff";
- if (k === "making") return "#512F18";
+ if (k === "exploring") return "#29eeee";
+ if (k === "making") return "#572F10";
  return FALLBACK_CATEGORY_COLOR;
  }
  if (mode === "macro") {
@@ -1420,9 +1437,9 @@ function actionDotFillColor(action) {
  .toLowerCase()
  .trim();
  if (state.visual.dotAllBlack) return "#000000";
- if (key === "exploring") return state.visual.dotExploringFill || "#ffffff";
- if (key === "making") return state.visual.dotMakingFill || "#ffffff";
- return state.visual.dotExploringFill || "#ffffff";
+ if (key === "exploring") return state.visual.dotExploringFill || "#29EEEE";
+ if (key === "making") return state.visual.dotMakingFill || "#572F10";
+ return state.visual.dotExploringFill || "#29EEEE";
 }
 
 function actionDotStrokeColor(action) {
@@ -1430,9 +1447,9 @@ function actionDotStrokeColor(action) {
  const key = String(action || "")
  .toLowerCase()
  .trim();
- if (key === "exploring") return "#999999";
- if (key === "making") return "#000000";
- return "#999999";
+ if (key === "exploring") return "#29EEEE";
+ if (key === "making") return "#572F10";
+ return "#29EEEE";
 }
 
  function nodeAccentColor(node, chosen) {
@@ -1447,7 +1464,7 @@ function actionDotStrokeColor(action) {
 function nodeDotFillColor(node, chosen) {
  if (state.visual.dotAllBlack) return "#000000";
  if (state.colorMode === "action") return actionDotFillColor(node.action);
- if (state.colorMode === "none" || !chosen) return state.visual.dotExploringFill || "#777777";
+ if (state.colorMode === "none" || !chosen) return state.visual.dotExploringFill || "#29EEEE";
  return colorByCategory(state.colorMode, chosen);
 }
 
@@ -1457,15 +1474,15 @@ function edgeAppearance(edge) {
  color: state.visual.dotAllBlack
  ? "rgba(0,0,0,0.95)"
  : edge.weak
- ? "rgba(153,153,153,0.95)"
- : "rgba(51,51,51,0.95)",
+ ? "#dddddd"
+ : "#d2d2d2",
  width: edge.weak ? state.visual.dotEdgeWeakWidth : state.visual.dotEdgeStrongWidth,
  };
  }
 
  const edgeScale = state.nodeStyle === "square" ? EDGE_DOT_MULTIPLIER : 1;
  return {
- color: edge.weak ? "rgba(16,16,16,0.36)" : "rgba(16,16,16,0.62)",
+ color: edge.weak ? "#dddddd" : "#d2d2d2",
  width: edge.weak
  ? Math.max(1, EDGE_NORMAL_WIDTH * 0.72 * edgeScale)
  : EDGE_NORMAL_WIDTH * edgeScale,
@@ -1480,7 +1497,7 @@ function edgeAppearance(edge) {
  function updateLegend() {
  if (!dom.legendList) return;
  if (state.colorMode === "none") {
- dom.legendList.innerHTML = '<div class="muted">Colore non attivo.</div>';
+ dom.legendList.innerHTML = '<div class="muted">Color mode inactive.</div>';
  return;
  }
  const nodes = nodesInStatsScope();
@@ -1493,7 +1510,7 @@ function edgeAppearance(edge) {
  }
  }
  if (!stats.size) {
- dom.legendList.innerHTML = '<div class="muted">Nessun dato disponibile.</div>';
+ dom.legendList.innerHTML = '<div class="muted">No data available.</div>';
  return;
  }
  const rows = [...stats.entries()].sort((a, b) => {
@@ -1923,8 +1940,8 @@ function drawTrendSeries(svg, labels, series) {
  if (plotW <= 8 || plotH <= 8) return;
 
  const chosen = [];
- if (state.trend.showExploring) chosen.push({ key: "exploring", color: "#999999" });
- if (state.trend.showMaking) chosen.push({ key: "making", color: "#333333" });
+ if (state.trend.showExploring) chosen.push({ key: "exploring", color: "#29EEEE" });
+ if (state.trend.showMaking) chosen.push({ key: "making", color: "#572F10" });
  if (state.trend.showTotal) chosen.push({ key: "total", color: "#111111" });
  if (!chosen.length || !labels.length) return;
 
@@ -2719,10 +2736,9 @@ function fixedWorldSize(mode) {
  const pb = anchorPoint(b, "in");
  edge.el.setAttribute("d", bezierPath(pa, pb));
  const appearance = edgeAppearance(edge);
- edge.el.style.stroke = appearance.color;
- edge.el.style.strokeWidth = `${state.nodeStyle === "dot" ? appearance.width / zoom : appearance.width}px`;
-
  const linkedSelected = selectedId && (a.id === selectedId || b.id === selectedId);
+ edge.el.style.stroke = linkedSelected ? "#6f6f6f" : appearance.color;
+ edge.el.style.strokeWidth = `${state.nodeStyle === "dot" ? appearance.width / zoom : appearance.width}px`;
  edge.el.classList.toggle("dim", !!selectedId && !linkedSelected);
  }
  }
@@ -2881,10 +2897,7 @@ function fixedWorldSize(mode) {
  }
  const filtering =
  visibleNodes !== state.nodes.length || visibleEdges !== state.edges.length;
- dom.stats.textContent = filtering
- ? `${visibleNodes}/${state.nodes.length} nodes · ${visibleEdges}/${state.edges.length} edges`
- : `${state.nodes.length} nodes · ${state.edges.length} edges`;
- }
+}
 
  function updateWorldTransform() {
  dom.world.style.transform = `translate(${state.view.panX}px, ${state.view.panY}px) scale(${state.view.zoom})`;
@@ -3208,6 +3221,27 @@ async function openJsonDialog() {
  dom.btnSnapshot.addEventListener("click", () => exportViewSnapshot());
  dom.btnFit.addEventListener("click", () => fitView(true));
  dom.btnFitSide.addEventListener("click", () => fitView(true));
+ dom.btnCloseNodePopover?.addEventListener("click", () => hideNodePopover());
+
+ dom.nodePopover?.addEventListener(
+ "wheel",
+ (e) => {
+ e.stopPropagation();
+ },
+ { passive: true },
+ );
+
+ dom.nodePopover?.addEventListener("pointerdown", (e) => {
+ e.stopPropagation();
+ });
+
+ dom.nodePopover?.addEventListener("pointermove", (e) => {
+ e.stopPropagation();
+ });
+
+ dom.nodePopover?.addEventListener("pointerup", (e) => {
+ e.stopPropagation();
+ });
 
  dom.btnEditor?.addEventListener("click", () => {
  let persisted = false;
