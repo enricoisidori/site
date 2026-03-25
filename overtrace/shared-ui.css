@@ -201,8 +201,8 @@
 .ts-toolbar button.is-active,
 .ts-toolbar .icon-btn.is-active,
 .ts-toolbar [aria-current="page"] {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--ts-toolbar-border-strong);
+  background: var(--ts-toolbar-hover);
+  box-shadow: none;
   cursor: default;
 }
 
@@ -211,7 +211,7 @@
 .ts-toolbar button.is-active:hover,
 .ts-toolbar .icon-btn.is-active:hover,
 .ts-toolbar [aria-current="page"]:hover {
-  background: transparent;
+  background: var(--ts-toolbar-hover);
 }
 
 .ts-toolbar .switch-btn.is-active:active,
@@ -219,6 +219,7 @@
 .ts-toolbar button.is-active:active,
 .ts-toolbar .icon-btn.is-active:active,
 .ts-toolbar [aria-current="page"]:active {
+  background: var(--ts-toolbar-hover);
   transform: none;
 }
 

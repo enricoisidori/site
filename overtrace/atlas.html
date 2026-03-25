@@ -102,7 +102,7 @@
         border-radius: var(--ts-radius-panel);
         background: rgba(255, 255, 255, 0.92);
         overflow: hidden;
-        box-shadow: var(--ts-toolbar-panel-shadow);
+        box-shadow: none;
       }
 
       .project-preview {
@@ -110,9 +110,7 @@
         display: block;
         aspect-ratio: 3 / 4;
         overflow: hidden;
-        background:
-          radial-gradient(circle at top left, rgba(0, 0, 0, 0.08), transparent 44%),
-          linear-gradient(180deg, #f7f7f7, #ececec);
+        background: #f1f1f1;
         color: inherit;
         text-decoration: none;
       }
@@ -159,19 +157,17 @@
       }
 
       .project-card.is-still-ready .project-placeholder {
-        background: linear-gradient(180deg, rgba(17, 17, 17, 0.02), rgba(17, 17, 17, 0.18));
+        background: transparent;
       }
 
       .project-card.is-preview-missing .project-placeholder {
-        background:
-          linear-gradient(160deg, rgba(17, 17, 17, 0.07), rgba(17, 17, 17, 0.14)),
-          linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(245, 245, 245, 0.96));
+        background: #ececec;
       }
 
       .project-placeholder {
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.36));
+        background: transparent;
         transition: background-color 180ms ease, color 180ms ease;
       }
 
@@ -185,9 +181,9 @@
 
       .project-name {
         margin: 0;
-        font-size: 19px;
+        font-size: 15px;
         line-height: 1;
-        font-weight: 700;
+        font-weight: 500;
         letter-spacing: normal;
       }
 
@@ -202,17 +198,15 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid var(--line);
         border-radius: var(--ts-radius-control);
-        background: rgba(255, 255, 255, 0.76);
+        background: transparent;
         color: #111111;
         text-decoration: none;
-        transition: background-color 120ms ease, border-color 120ms ease;
+        transition: background-color 120ms ease;
       }
 
       .project-action:hover {
         background: var(--hover);
-        border-color: rgba(17, 17, 17, 0.18);
       }
 
       .project-action .material-symbols-outlined {
@@ -408,6 +402,9 @@
       }
 
       function renderProjectCard(project) {
+        const title = String(project.displayName || project.name || project.id || "")
+          .replace(/^\s*\d+\s*[\.\-_]?\s*/, "")
+          .trim();
         const editorHref = `./editor.html?project=${encodeURIComponent(project.id)}`;
         const processHref = `./process.html?project=${encodeURIComponent(project.id)}`;
         const spaceHref = `./space.html?project=${encodeURIComponent(project.id)}`;
@@ -421,15 +418,15 @@
               <div class="project-placeholder" aria-hidden="true"></div>
             </a>
             <div class="project-meta-panel">
-              <h2 class="project-name">${project.displayName}</h2>
-              <nav class="project-actions" aria-label="Open ${project.displayName}">
-                <a class="project-action" href="${editorHref}" aria-label="Open ${project.displayName} in Editor" title="Open in Editor">
+              <h2 class="project-name">${title}</h2>
+              <nav class="project-actions" aria-label="Open ${title}">
+                <a class="project-action" href="${editorHref}" aria-label="Open ${title} in Editor" title="Open in Editor">
                   <span class="material-symbols-outlined">edit</span>
                 </a>
-                <a class="project-action" href="${processHref}" aria-label="Open ${project.displayName} in Process" title="Open in Process">
+                <a class="project-action" href="${processHref}" aria-label="Open ${title} in Process" title="Open in Process">
                   <span class="material-symbols-outlined">timeline</span>
                 </a>
-                <a class="project-action" href="${spaceHref}" aria-label="Open ${project.displayName} in Space" title="Open in Space">
+                <a class="project-action" href="${spaceHref}" aria-label="Open ${title} in Space" title="Open in Space">
                   <span class="material-symbols-outlined">view_in_ar</span>
                 </a>
               </nav>
@@ -459,11 +456,7 @@
         });
 
         try {
-          let snapshotSrc = await resolveStoredPreview(projectId);
-          if (!snapshotSrc) {
-            const data = await resolveProjectData(projectId);
-            snapshotSrc = data.imageSources[0] || "";
-          }
+          const snapshotSrc = await resolveStoredPreview(projectId);
           if (!snapshotSrc) {
             markCardMissing(card);
             return;

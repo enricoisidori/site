@@ -371,7 +371,16 @@
         transform: translateY(-50%);
         background: #fff;
         border: 1px solid #000;
-        clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+        clip-path: polygon(
+          0% 18%,
+          58% 18%,
+          58% 0%,
+          100% 50%,
+          58% 100%,
+          58% 82%,
+          0% 82%,
+          24% 50%
+        );
       }
 
       /* Edges: già ottimizzati altrove; qui solo colori */
@@ -836,14 +845,6 @@
       }
     </style>
     <style>
-      @font-face {
-        font-family: "Times New Roman";
-        src: url("./asset/Times New Roman-Book.woff2") format("woff2");
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-      }
-
       :root {
         --bg: #0e0e0e;
         --panel: #151515;
@@ -868,10 +869,7 @@
         margin: 0;
         background: var(--bg);
         color: #eee;
-        font:
-          700 14px/1.4 "Times New Roman",
-          Times,
-          serif;
+        font: 400 14px/1.4 var(--ot-font-sans);
         -webkit-tap-highlight-color: transparent;
       }
       header {
@@ -1355,6 +1353,17 @@
       body {
         background: var(--bg) !important;
         color: var(--ink) !important;
+        letter-spacing: normal !important;
+        word-spacing: normal !important;
+      }
+      .app {
+        grid-template-rows: minmax(0, 1fr) !important;
+      }
+      .app > #stage,
+      .app > aside,
+      .app > #dataPane {
+        grid-row: 1 / -1 !important;
+        min-height: 0;
       }
       header {
         background: var(--panel-soft) !important;
@@ -1419,6 +1428,11 @@
       #status {
         color: var(--muted) !important;
       }
+      h3#panelTitle,
+      .data-toolbar h2 {
+        letter-spacing: normal !important;
+        word-spacing: normal !important;
+      }
       .divider,
       .file-row {
         border-color: var(--line) !important;
@@ -1448,7 +1462,7 @@
       textarea {
         background: var(--field) !important;
         color: var(--ink) !important;
-        border: var(--line-w) solid var(--line) !important;
+        border: none !important;
       }
       input:hover,
       textarea:hover {
@@ -1459,7 +1473,6 @@
       textarea:focus,
       textarea:focus-visible {
         box-shadow: 0 0 0 2px var(--field-focus-ring) !important;
-        border-color: #8f8f8f !important;
       }
       input::placeholder,
       textarea::placeholder {
@@ -1473,19 +1486,17 @@
       .badge {
         background: var(--chip) !important;
         color: var(--ink) !important;
-        border: var(--line-w) solid var(--line) !important;
+        border: none !important;
       }
       .chip:hover,
       #actionChips .chip:hover {
         background: var(--chip-hover) !important;
-        border-color: #8f8f8f !important;
         color: var(--ink) !important;
       }
       .chip.active,
       .chip:active,
       #actionChips .chip.active {
         background: var(--chip-active) !important;
-        border-color: #7f7f7f !important;
         color: var(--ink) !important;
       }
       #actionChips .chip.active:not(:hover),
@@ -1494,7 +1505,6 @@
       }
       .chip.radio:not(.active) {
         background: var(--chip) !important;
-        border-color: var(--line) !important;
       }
 
       .out::after,
@@ -5981,6 +5991,10 @@
         pushHistory();
         if (state.nodes.length === 0) {
           addNodeAt(80, 80, {});
+          clearAllSelection();
+        } else {
+          updateSidebarSelectionLabel();
+          refreshSidebarForms();
         }
         void (async () => {
           const restored = await restoreSharedProjectFromOtherView();
