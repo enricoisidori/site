@@ -838,12 +838,9 @@
         text-decoration: underline;
       }
 
-      .ok {
-        color: var(--ok) !important;
-      }
-
+      .ok,
       .warn {
-        color: var(--warn) !important;
+        color: var(--muted) !important;
       }
 
       @media (max-width: 1000px) {
@@ -929,6 +926,7 @@
       body.mobile-space,
       body.mobile-space .app {
         height: 100dvh;
+        --ts-toolbar-safe-top: 62px;
       }
 
       body.mobile-space #viewWrap {

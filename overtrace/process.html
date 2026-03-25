@@ -1076,9 +1076,9 @@ const ZOOM_MAX = 12;
  density:
  "Density of the directed graph, meaning observed edges over possible edges. Useful mainly as a relative comparison across projects or cohorts.",
  exploring:
- "Numero di nodi etichettati Exploring nello scope corrente.",
+ "Number of nodes labeled Exploring in the current scope.",
  making:
- "Numero di nodi etichettati Making nello scope corrente.",
+ "Number of nodes labeled Making in the current scope.",
  };
 
  const dom = {
@@ -1373,7 +1373,7 @@ const ZOOM_MAX = 12;
  return true;
  } catch (err) {
  console.warn("Shared-state restore failed", err);
- setHint("Ripristino progetto non riuscito.", "warn");
+ setHint("Restore from another view failed.", "warn");
  return false;
  }
  }
@@ -2296,7 +2296,7 @@ function drawTrendSeries(svg, labels, series) {
 
  function downloadTrendSvg() {
  if (!dom.trendSvg || !dom.trendSvg.innerHTML.trim()) {
- setHint("Nessun grafico disponibile da scaricare.", "warn");
+ setHint("No chart available to download.", "warn");
  return;
  }
  const clone = dom.trendSvg.cloneNode(true);
@@ -2316,7 +2316,7 @@ function drawTrendSeries(svg, labels, series) {
  a.click();
  a.remove();
  URL.revokeObjectURL(url);
- setHint("Timeline SVG scaricata.", "ok");
+ setHint("Timeline SVG downloaded.", "ok");
  }
 
  function refreshAnalyticsPanels() {
@@ -2948,7 +2948,7 @@ function fixedWorldSize(mode) {
  const width = Math.max(1, Math.round(rect.width));
  const height = Math.max(1, Math.round(rect.height));
  if (!width || !height) {
- setHint("View non disponibile per snapshot.", "warn");
+ setHint("View unavailable for screenshot.", "warn");
  return;
  }
 
@@ -2957,7 +2957,7 @@ function fixedWorldSize(mode) {
  canvas.height = height;
  const ctx = canvas.getContext("2d");
  if (!ctx) {
- setHint("Snapshot non supportato nel browser.", "warn");
+ setHint("Screenshot is not supported in this browser.", "warn");
  return;
  }
 
@@ -3005,7 +3005,7 @@ function fixedWorldSize(mode) {
 
  canvas.toBlob((blob) => {
  if (!blob) {
- setHint("Snapshot non riuscita.", "warn");
+ setHint("Screenshot failed.", "warn");
  return;
  }
  const url = URL.createObjectURL(blob);
@@ -3018,7 +3018,7 @@ function fixedWorldSize(mode) {
  a.click();
  a.remove();
  URL.revokeObjectURL(url);
- setHint("Snapshot scaricata.", "ok");
+ setHint("Screenshot downloaded.", "ok");
  }, "image/png");
  }
 
@@ -3132,9 +3132,9 @@ function refreshDotTuningOutputs() {
  persistSharedProjectState("process");
 
  if (state.assetBase) {
- setHint(`Progetto caricato · assets base: ${state.assetBase}`, "ok");
+ setHint(`Project loaded · asset base: ${state.assetBase}`, "ok");
  } else {
- setHint("Progetto caricato. Base assets non trovata automaticamente.", "warn");
+ setHint("Project loaded. Asset base could not be detected automatically.", "warn");
  }
  }
 
@@ -3175,11 +3175,11 @@ async function openJsonDialog() {
  } catch (err) {
  if (err && err.name === "AbortError") return;
  if (err && err.name === "NotFoundError") {
- setHint("project.json non trovato nella cartella selezionata.", "warn");
+ setHint("project.json not found in the selected folder.", "warn");
  return;
  }
  console.warn("Folder open failed in Process view", err);
- setHint("Impossibile aprire la cartella progetto.", "warn");
+ setHint("Unable to open the project folder.", "warn");
  return;
  }
  }
@@ -3214,7 +3214,7 @@ async function openJsonDialog() {
  if (!res.ok) return false;
  const project = await res.json();
  await loadProjectData(project, folder, `${folder}/`, folder);
- setHint(`Caricato default: ${folder}/project.json`, "ok");
+ setHint(`Default load: ${folder}/project.json`, "ok");
  return true;
  } catch (_) {
  return false;
@@ -3296,7 +3296,7 @@ dom.btnResearch?.addEventListener("click", () => {
  try {
  await loadFromJsonFile(file);
  } catch (err) {
- setHint(`Errore apertura JSON: ${err.message || err}`, "warn");
+ setHint(`JSON open error: ${err.message || err}`, "warn");
  }
  });
 
@@ -3515,7 +3515,7 @@ dom.inpDotStroke?.addEventListener("input", () => {
 
  const enter = (e) => {
  e.preventDefault();
- setHint("Rilascia il file project.json", "ok");
+ setHint("Drop the project.json file", "ok");
  };
  const over = (e) => {
  e.preventDefault();
@@ -3530,13 +3530,13 @@ dom.inpDotStroke?.addEventListener("input", () => {
  const file = files && files[0];
  if (!file) return;
  if (!/\.json$/i.test(file.name)) {
- setHint("Il file trascinato non e' un JSON.", "warn");
+ setHint("The dropped file is not a JSON file.", "warn");
  return;
  }
  try {
  await loadFromJsonFile(file);
  } catch (err) {
- setHint(`Errore apertura JSON: ${err.message || err}`, "warn");
+ setHint(`JSON open error: ${err.message || err}`, "warn");
  }
  };
  dom.viewWrap.addEventListener("dragenter", enter);
