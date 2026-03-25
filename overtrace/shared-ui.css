@@ -19,10 +19,10 @@
   --ts-toolbar-panel-shadow: 0 12px 32px rgba(17, 17, 17, 0.08);
   --ts-radius-panel: 18px;
   --ts-radius-control: 10px;
-  --ts-panel-padding: 6px;
-  --ts-control-size: 40px;
-  --ts-brand-size: 40px;
-  --ts-toolbar-safe-top: 68px;
+  --ts-panel-padding: 5px;
+  --ts-control-size: 36px;
+  --ts-brand-size: 36px;
+  --ts-toolbar-safe-top: 62px;
 }
 
 .ts-toolbar {
@@ -65,7 +65,7 @@
   width: max-content;
   max-width: 100%;
   min-width: 0;
-  min-height: 52px;
+  min-height: calc(var(--ts-control-size) + var(--ts-panel-padding) * 2);
   padding: var(--ts-panel-padding);
   border: 1px solid var(--ts-toolbar-border);
   border-radius: var(--ts-radius-panel);
@@ -106,7 +106,7 @@
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: 6px;
+  padding: 5px;
   margin-right: 0;
   text-decoration: none;
   color: var(--ts-toolbar-fg);
@@ -120,8 +120,8 @@
 
 .ts-toolbar .brand-logo {
   display: block;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
 }
 
 .ts-toolbar .brand-wordmark {
@@ -178,7 +178,7 @@
     "FILL" 0,
     "wght" var(--ts-toolbar-icon-weight),
     "opsz" 24;
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1;
   display: block;
   vertical-align: middle;

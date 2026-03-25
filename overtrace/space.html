@@ -70,6 +70,11 @@
         --focus-ring: rgba(0, 0, 0, 0.24);
         --ok: #2f8f52;
         --warn: #a66a12;
+        --space-side-gap: 14px;
+        --space-side-rail-size: calc(
+          var(--ts-control-size) + var(--ts-panel-padding) * 2
+        );
+        --space-side-rail-extra: 2px;
       }
 
       * {
@@ -103,11 +108,21 @@
         grid-template-columns: minmax(0, 1fr) minmax(420px, 50vw);
       }
 
+      body.side-collapsed .layout {
+        grid-template-columns: minmax(0, 1fr)
+          calc(
+            var(--space-side-rail-size) + var(--space-side-rail-extra) +
+              var(--space-side-gap)
+          );
+      }
+
       #viewWrap {
         position: relative;
         min-width: 0;
         min-height: 0;
         border-right: none;
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       #viewWrap.drop {
@@ -127,6 +142,8 @@
         inset: 0;
         z-index: 3;
         pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       .node-label {
@@ -143,6 +160,13 @@
         padding: 4px;
         pointer-events: auto;
         cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      .node-label * {
+        user-select: none;
+        -webkit-user-select: none;
       }
 
       .node-label.selected {
@@ -182,6 +206,10 @@
         object-fit: cover;
         border-radius: 0;
         border: none;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
       }
 
       .node-label .assets .meta {
@@ -226,6 +254,7 @@
       }
 
       #side {
+        position: relative;
         min-height: 0;
         overflow-y: auto;
         overflow-x: hidden;
@@ -233,11 +262,85 @@
         border: 1px solid var(--ts-toolbar-border);
         border-radius: var(--ts-radius-panel);
         box-shadow: var(--ts-toolbar-panel-shadow);
-        margin: calc(var(--ts-toolbar-safe-top) + 4px) 14px 14px 0;
+        margin: calc(var(--ts-toolbar-safe-top) + 4px) var(--space-side-gap)
+          var(--space-side-gap) 0;
         height: calc(100vh - var(--ts-toolbar-safe-top) - 18px);
         align-self: start;
         display: flex;
         flex-direction: column;
+      }
+
+      body.side-collapsed #side {
+        overflow: hidden;
+        padding-top: 0;
+        width: calc(var(--space-side-rail-size) + var(--space-side-rail-extra));
+        min-width: calc(
+          var(--space-side-rail-size) + var(--space-side-rail-extra)
+        );
+        height: calc(var(--space-side-rail-size) + var(--space-side-rail-extra));
+        min-height: calc(
+          var(--space-side-rail-size) + var(--space-side-rail-extra)
+        );
+      }
+
+      #btnToggleSide {
+        position: absolute;
+        top: var(--ts-panel-padding);
+        right: var(--ts-panel-padding);
+        z-index: 2;
+        appearance: none;
+        -webkit-appearance: none;
+        border: none;
+        background: transparent;
+        color: var(--ts-toolbar-fg);
+        width: var(--ts-control-size);
+        height: var(--ts-control-size);
+        min-width: var(--ts-control-size);
+        min-height: var(--ts-control-size);
+        padding: 0;
+        border-radius: var(--ts-radius-control);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+          background-color 120ms ease,
+          opacity 120ms ease,
+          transform 60ms ease;
+      }
+
+      #btnToggleSide:hover {
+        background: var(--ts-toolbar-hover);
+      }
+
+      #btnToggleSide:active {
+        background: var(--ts-toolbar-active);
+      }
+
+      #btnToggleSide:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--ts-toolbar-focus);
+      }
+
+      #btnToggleSide .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" var(--ts-toolbar-icon-weight),
+          "opsz" 24;
+        font-size: 20px;
+        line-height: 1;
+        display: block;
+        pointer-events: none;
+      }
+
+      #sideContent {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      body.side-collapsed #sideContent {
+        display: none;
       }
 
       #projectPane {
@@ -252,33 +355,19 @@
         gap: 8px;
       }
 
-      #disciplineHead {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 8px;
-      }
-
-      #disciplineHead h2 {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 600;
-      }
-
       #disciplineStats {
-        margin: 0;
-        font-size: 12px;
-        color: var(--muted);
+        display: none;
       }
 
       #disciplineWrap {
         position: relative;
         min-width: 0;
-        min-height: 260px;
         width: 100%;
-        max-width: none;
+        min-height: 0;
         aspect-ratio: 1 / 1;
         height: auto;
+        align-self: stretch;
+        flex: 0 0 auto;
         border: none;
         border-radius: 0;
         overflow: hidden;
@@ -357,6 +446,10 @@
       .discipline-legend {
         display: grid;
         gap: 6px;
+      }
+
+      .discipline-legend[hidden] {
+        display: none !important;
       }
 
       .discipline-legend-item {
@@ -933,51 +1026,63 @@
         </section>
 
         <aside id="side">
-          <section id="projectPane">
-            <h2 id="projectName">No project loaded</h2>
-            <p id="stats">0 nodes · 0 edges</p>
-          </section>
+          <button
+            id="btnToggleSide"
+            class="icon-btn"
+            type="button"
+            aria-label="Collapse sidebar"
+            data-tip="Collapse sidebar"
+            aria-expanded="true"
+          >
+            <span class="material-symbols-outlined">dock_to_left</span>
+          </button>
+          <div id="sideContent">
+            <section id="projectPane">
+              <h2 id="projectName">No project loaded</h2>
+              <p id="stats">0 nodes · 0 edges</p>
+            </section>
 
-          <section id="disciplinePane">
-            <p id="disciplineStats">0 areas · 0 connections</p>
-            <div id="disciplineWrap">
-              <canvas id="disciplineView"></canvas>
-            </div>
-            <p id="disciplineHint">
-              Bubble = discipline (size by occurrences). Lines show co-presence
-              of the pair within the same card.
-            </p>
-            <div
-              id="disciplineLegend"
-              class="discipline-legend"
-              aria-label="Action legend"
-              hidden
-            >
-              <div class="discipline-legend-item">
-                <span
-                  class="discipline-legend-dot"
-                  style="background: #00ffff"
-                ></span>
-                <span>Exploring</span>
+            <section id="disciplinePane">
+              <p id="disciplineStats" hidden>0 areas · 0 connections</p>
+              <div id="disciplineWrap">
+                <canvas id="disciplineView"></canvas>
               </div>
-              <div class="discipline-legend-item">
-                <span
-                  class="discipline-legend-dot"
-                  style="background: #45250d"
-                ></span>
-                <span>Making</span>
+              <p id="disciplineHint">
+                Bubble = discipline (size by occurrences). Lines show co-presence
+                of the pair within the same card.
+              </p>
+              <div
+                id="disciplineLegend"
+                class="discipline-legend"
+                aria-label="Action legend"
+                hidden
+              >
+                <div class="discipline-legend-item">
+                  <span
+                    class="discipline-legend-dot"
+                    style="background: #00ffff"
+                  ></span>
+                  <span>Exploring</span>
+                </div>
+                <div class="discipline-legend-item">
+                  <span
+                    class="discipline-legend-dot"
+                    style="background: #45250d"
+                  ></span>
+                  <span>Making</span>
+                </div>
               </div>
-            </div>
-            <div id="disciplineList" aria-live="polite">
-              <div id="disciplineListHead">
-                <div>Area</div>
-                <div style="text-align: right">EX</div>
-                <div style="text-align: right">MK</div>
+              <div id="disciplineList" aria-live="polite">
+                <div id="disciplineListHead">
+                  <div>Area</div>
+                  <div style="text-align: right">EX</div>
+                  <div style="text-align: right">MK</div>
+                </div>
+                <div id="disciplineListBody"></div>
+                <p id="disciplineListEmpty">No areas available.</p>
               </div>
-              <div id="disciplineListBody"></div>
-              <p id="disciplineListEmpty">No areas available.</p>
-            </div>
-          </section>
+            </section>
+          </div>
         </aside>
       </main>
     </div>
@@ -1002,7 +1107,7 @@
           const navStatus = document.getElementById("navStatus");
           if (navStatus) {
             navStatus.textContent =
-              "Three.js locale non trovato (provati: ./vendor/three.module.js, ../three.module.js)";
+              "Local Three.js not found (tried: ./vendor/three.module.js, ../three.module.js)";
             navStatus.classList.add("warn");
           }
           return;
@@ -1049,6 +1154,9 @@
           btnCloseNodeOverlay3d: document.getElementById(
             "btnCloseNodeOverlay3d",
           ),
+          side: document.getElementById("side"),
+          sideContent: document.getElementById("sideContent"),
+          btnToggleSide: document.getElementById("btnToggleSide"),
           navStatus: document.getElementById("navStatus"),
           disciplineCanvas: document.getElementById("disciplineView"),
           disciplineWrap: document.getElementById("disciplineWrap"),
@@ -1164,7 +1272,13 @@
           rawProject: null,
           folderName: null,
           assetBase: "",
-          pointerDown: { x: 0, y: 0, active: false, wasPan: false },
+          pointerDown: {
+            x: 0,
+            y: 0,
+            active: false,
+            wasPan: false,
+            labelIndex: -1,
+          },
           spaceDown: false,
           colorMode: "none",
           colorValue: "__all__",
@@ -1191,6 +1305,7 @@
             lastCenterX: 0,
             lastCenterY: 0,
           },
+          sideCollapsed: false,
         };
 
         const discipline = {
@@ -1210,7 +1325,7 @@
           defaultHint:
             "Bubble = discipline (size by occurrences). Lines show co-presence of the pair within the same card.",
         };
-        const DISCIPLINE_RENDER_SCALE = 1.4;
+        const DISCIPLINE_RENDER_SCALE = 1.0;
         const PREVIEW_CAPTURE_WIDTH = 1080;
         const PREVIEW_CAPTURE_HEIGHT = 1440;
         const PREVIEW_CAPTURE_FPS = 24;
@@ -1573,11 +1688,11 @@
         async function savePreviewSnapshot() {
           if (state.previewCapture.active) return;
           if (!state.nodes.length) {
-            setHint("Apri prima un progetto.", "warn");
+            setHint("Open a project first.", "warn");
             return;
           }
           if (state.overviewMode) {
-            setHint("La preview e' disponibile solo per singoli progetti.", "warn");
+            setHint("Preview is available only for single projects.", "warn");
             return;
           }
 
@@ -1590,7 +1705,7 @@
               canvas.toBlob(
                 (out) => {
                   if (out) resolve(out);
-                  else reject(new Error("Snapshot non riuscita."));
+                  else reject(new Error("Snapshot failed."));
                 },
                 "image/jpeg",
                 0.9,
@@ -1599,13 +1714,13 @@
             const result = await savePreviewSnapshotBlob(blob);
             setHint(
               result.persisted
-                ? "Preview snapshot salvata nel progetto."
-                : "Preview snapshot scaricata.",
+                ? "Preview snapshot saved in the project."
+                : "Preview snapshot downloaded.",
               "ok",
             );
           } catch (err) {
             console.warn("Preview snapshot failed", err);
-            setHint(`Errore snapshot: ${err?.message || err}`, "warn");
+            setHint(`Snapshot error: ${err?.message || err}`, "warn");
           } finally {
             state.previewCapture.active = false;
             syncPreviewSnapshotButton();
@@ -1704,13 +1819,6 @@
             updateAllNodeLabelAssets();
             refreshToolbarOptions();
             applyImagesVisibility();
-            const fromLabel =
-              from === "editor"
-                ? "Editor"
-                : from === "process"
-                  ? "Process Analysis"
-                  : "altra vista";
-            setHint(`Progetto ripristinato da ${fromLabel}.`, "ok");
 
             params.delete("from");
             const qs = params.toString();
@@ -1719,7 +1827,7 @@
             return true;
           } catch (err) {
             console.warn("Shared-state restore failed", err);
-            setHint("Ripristino da Editor non riuscito.", "warn");
+            setHint("Restore from another view failed.", "warn");
             return false;
           }
         }
@@ -1738,6 +1846,7 @@
               img.src = url;
               img.alt = firstImage.name || "asset";
               img.loading = "lazy";
+              img.draggable = false;
               node.labelAssetsEl.appendChild(img);
             }
           }
@@ -1749,7 +1858,7 @@
             const meta = document.createElement("div");
             meta.className = "meta";
             if (!state.showImages && node.files.some((f) => f && f.isImage)) {
-              meta.textContent = "img off";
+              meta.textContent = "images off";
             } else {
               meta.textContent = first?.name || first?.path || "asset";
             }
@@ -2012,8 +2121,32 @@
             dom.btnToggleFilter.setAttribute("aria-label", tip);
           }
           if (dom.disciplineLegend) {
-            dom.disciplineLegend.hidden = !state.actionOutlineEnabled;
+            const showLegend = !!state.actionOutlineEnabled;
+            dom.disciplineLegend.hidden = !showLegend;
+            dom.disciplineLegend.style.display = showLegend ? "grid" : "none";
           }
+        }
+
+        function syncSideCollapseButton() {
+          if (!dom.btnToggleSide) return;
+          document.body.classList.toggle("side-collapsed", !!state.sideCollapsed);
+          const icon = dom.btnToggleSide.querySelector(
+            ".material-symbols-outlined",
+          );
+          const label = state.sideCollapsed
+            ? "Expand sidebar"
+            : "Collapse sidebar";
+          if (icon) {
+            icon.textContent = state.sideCollapsed
+              ? "dock_to_right"
+              : "dock_to_left";
+          }
+          dom.btnToggleSide.setAttribute("aria-label", label);
+          dom.btnToggleSide.setAttribute("data-tip", label);
+          dom.btnToggleSide.setAttribute(
+            "aria-expanded",
+            state.sideCollapsed ? "false" : "true",
+          );
         }
 
         function nodeValuesForViewMode(node, mode) {
@@ -2834,6 +2967,27 @@
         const DISCIPLINE_MAKING_HEX = "#45250D";
         const DISCIPLINE_NEUTRAL_HEX = "#b8b8b8";
 
+        function disciplineRenderScale() {
+          const base = DISCIPLINE_RENDER_SCALE;
+          if (!discipline.nodes.length) return base;
+          const cx = discipline.width * 0.5;
+          const cy = discipline.height * 0.5;
+          const padX = 52;
+          const padY = 28;
+          let maxOffsetX = 1;
+          let maxOffsetY = 1;
+          for (const n of discipline.nodes) {
+            const extraX = n.radius + padX;
+            const extraY = n.radius + padY;
+            maxOffsetX = Math.max(maxOffsetX, Math.abs(n.x - cx) + extraX);
+            maxOffsetY = Math.max(maxOffsetY, Math.abs(n.y - cy) + extraY);
+          }
+          const availableX = Math.max(24, cx - 10);
+          const availableY = Math.max(24, cy - 10);
+          const fit = Math.min(availableX / maxOffsetX, availableY / maxOffsetY);
+          return Math.max(0.22, Math.min(base, base * fit));
+        }
+
         function mixHex(a, b, t) {
           const clamped = THREE.MathUtils.clamp(t ?? 0, 0, 1);
           const color = new THREE.Color(a);
@@ -2851,8 +3005,36 @@
           return DISCIPLINE_NEUTRAL_HEX;
         }
 
+        function disciplineStatsText() {
+          return `${discipline.nodes.length} areas · ${discipline.edges.length} connections`;
+        }
+
+        function disciplineSelectionHintText() {
+          if (discipline.selected < 0 || discipline.selected >= discipline.nodes.length) {
+            return discipline.defaultHint;
+          }
+          const node = discipline.nodes[discipline.selected];
+          const neighbors = disciplineNeighbors(discipline.selected).slice(0, 4);
+          const linked = neighbors.length
+            ? neighbors.map((n) => `${n.label} (${n.weight})`).join(", ")
+            : "none";
+          return `${node.label}: ${node.count} occurrences · connected to ${linked}`;
+        }
+
+        function setDisciplineHintText(text) {
+          if (!dom.disciplineHint) return;
+          const base = String(text || "")
+            .trim()
+            .replace(/\s*\.\s*$/, "");
+          const stats = disciplineStatsText();
+          dom.disciplineHint.textContent = base ? `${base} · ${stats}` : stats;
+        }
+
         function refreshDisciplineInfo() {
-          dom.disciplineStats.textContent = `${discipline.nodes.length} areas · ${discipline.edges.length} connections`;
+          if (dom.disciplineStats) {
+            dom.disciplineStats.textContent = disciplineStatsText();
+          }
+          setDisciplineHintText(disciplineSelectionHintText());
         }
 
         function renderDisciplineAreaList() {
@@ -2860,7 +3042,7 @@
           dom.disciplineListBody.innerHTML = "";
           const rows = [...discipline.nodes].sort((a, b) => {
             if (b.count !== a.count) return b.count - a.count;
-            return a.label.localeCompare(b.label, "it");
+            return a.label.localeCompare(b.label, "en");
           });
           if (!rows.length) {
             dom.disciplineListEmpty.style.display = "";
@@ -2893,9 +3075,6 @@
           discipline.worldBounds = { sizeX: 360, sizeZ: 360 };
           refreshDisciplineInfo();
           renderDisciplineAreaList();
-          if (dom.disciplineHint) {
-            dom.disciplineHint.textContent = discipline.defaultHint;
-          }
         }
 
         function updateDisciplineWorldMap() {
@@ -3123,10 +3302,6 @@
           }
           updateDisciplineWorldMap();
           refreshDisciplineInfo();
-
-          if (dom.disciplineHint) {
-            dom.disciplineHint.textContent = discipline.defaultHint;
-          }
         }
 
         function buildDisciplineKeywords(rawNodes) {
@@ -3306,17 +3481,7 @@
 
         function selectDiscipline(index) {
           discipline.selected = index;
-          if (index < 0 || index >= discipline.nodes.length) {
-            dom.disciplineHint.textContent = discipline.defaultHint;
-            return;
-          }
-
-          const node = discipline.nodes[index];
-          const neighbors = disciplineNeighbors(index).slice(0, 4);
-          const linked = neighbors.length
-            ? neighbors.map((n) => `${n.label} (${n.weight})`).join(", ")
-            : "nessuna";
-          dom.disciplineHint.textContent = `${node.label}: ${node.count} occorrenze · collegata a ${linked}`;
+          refreshDisciplineInfo();
         }
 
         function pickDisciplineAt(clientX, clientY) {
@@ -3326,13 +3491,14 @@
           const y = clientY - rect.top;
           const cx = discipline.width * 0.5;
           const cy = discipline.height * 0.5;
+          const renderScale = disciplineRenderScale();
           let best = -1;
           let bestScore = Infinity;
           for (let i = 0; i < discipline.nodes.length; i++) {
             const n = discipline.nodes[i];
-            const sx = cx + (n.x - cx) * DISCIPLINE_RENDER_SCALE;
-            const sy = cy + (n.y - cy) * DISCIPLINE_RENDER_SCALE;
-            const sr = n.radius * DISCIPLINE_RENDER_SCALE;
+            const sx = cx + (n.x - cx) * renderScale;
+            const sy = cy + (n.y - cy) * renderScale;
+            const sr = n.radius * renderScale;
             const dx = x - sx;
             const dy = y - sy;
             const dist = Math.hypot(dx, dy);
@@ -3448,6 +3614,7 @@
           disciplineCtx.fillRect(0, 0, width, height);
 
           if (!discipline.nodes.length) return;
+          const renderScale = disciplineRenderScale();
           const hoverIndex =
             discipline.hovered >= 0 &&
             discipline.hovered < discipline.nodes.length
@@ -3458,10 +3625,10 @@
           for (const e of discipline.edges) {
             const a = discipline.nodes[e.a];
             const b = discipline.nodes[e.b];
-            const ax = cx + (a.x - cx) * DISCIPLINE_RENDER_SCALE;
-            const ay = cy + (a.y - cy) * DISCIPLINE_RENDER_SCALE;
-            const bx = cx + (b.x - cx) * DISCIPLINE_RENDER_SCALE;
-            const by = cy + (b.y - cy) * DISCIPLINE_RENDER_SCALE;
+            const ax = cx + (a.x - cx) * renderScale;
+            const ay = cy + (a.y - cy) * renderScale;
+            const bx = cx + (b.x - cx) * renderScale;
+            const by = cy + (b.y - cy) * renderScale;
             disciplineCtx.beginPath();
             disciplineCtx.moveTo(ax, ay);
             disciplineCtx.lineTo(bx, by);
@@ -3472,17 +3639,20 @@
 
           for (let i = 0; i < discipline.nodes.length; i++) {
             const n = discipline.nodes[i];
-            const sx = cx + (n.x - cx) * DISCIPLINE_RENDER_SCALE;
-            const sy = cy + (n.y - cy) * DISCIPLINE_RENDER_SCALE;
-            const sr = n.radius * DISCIPLINE_RENDER_SCALE;
+            const sx = cx + (n.x - cx) * renderScale;
+            const sy = cy + (n.y - cy) * renderScale;
+            const sr = n.radius * renderScale;
 
             disciplineCtx.beginPath();
             disciplineCtx.arc(sx, sy, sr, 0, Math.PI * 2);
             disciplineCtx.fillStyle = "#ffffff";
             disciplineCtx.fill();
-            disciplineCtx.strokeStyle = state.actionOutlineEnabled
-              ? n.color || DISCIPLINE_NEUTRAL_HEX
-              : DISCIPLINE_NEUTRAL_HEX;
+            disciplineCtx.strokeStyle =
+              hasHover && i !== hoverIndex
+                ? DISCIPLINE_NEUTRAL_HEX
+                : state.actionOutlineEnabled
+                  ? n.color || DISCIPLINE_NEUTRAL_HEX
+                  : DISCIPLINE_NEUTRAL_HEX;
             disciplineCtx.lineWidth = 1.3;
             disciplineCtx.stroke();
           }
@@ -3501,10 +3671,9 @@
           const clampY = (y, h) =>
             Math.max(h * 0.5, Math.min(height - h * 0.5, y));
           for (let i = 0; i < discipline.nodes.length; i++) {
-            if (hasHover && i !== hoverIndex) continue;
             const n = discipline.nodes[i];
-            const sx = cx + (n.x - cx) * DISCIPLINE_RENDER_SCALE;
-            const sy = cy + (n.y - cy) * DISCIPLINE_RENDER_SCALE;
+            const sx = cx + (n.x - cx) * renderScale;
+            const sy = cy + (n.y - cy) * renderScale;
             const shortLabel =
               n.label.length > 26 ? `${n.label.slice(0, 24)}..` : n.label;
             const metrics = disciplineCtx.measureText(shortLabel);
@@ -3548,7 +3717,8 @@
                 break;
               }
             }
-            disciplineCtx.fillStyle = "#111111";
+            disciplineCtx.fillStyle =
+              hasHover && i !== hoverIndex ? DISCIPLINE_NEUTRAL_HEX : "#111111";
             disciplineCtx.fillText(shortLabel, sx, drawY);
           }
           disciplineCtx.restore();
@@ -3950,7 +4120,7 @@
           clearDisciplineGraph();
           if (dom.nodeInfo) {
             dom.nodeInfo.innerHTML =
-              '<div class="k">info</div><div>Seleziona un nodo nella rete.</div>';
+              '<div class="k">info</div><div>Select a node in the network.</div>';
           }
           if (dom.nodeDesc) dom.nodeDesc.textContent = "";
           if (dom.nodeMedia) dom.nodeMedia.innerHTML = "";
@@ -3965,7 +4135,7 @@
           setRawProject(project);
           const rawNodes = Array.isArray(project?.nodes) ? project.nodes : [];
           const rawEdges = Array.isArray(project?.edges) ? project.edges : [];
-          if (!rawNodes.length) throw new Error("JSON senza nodi");
+          if (!rawNodes.length) throw new Error("JSON has no nodes");
           const parsedDates = rawNodes.map((n) =>
             parseDateSafe(nodePayload(n)?.date),
           );
@@ -3991,7 +4161,7 @@
                 : [];
             return {
               id: String(n.id || `node_${i}`),
-              title: data.title || "(senza titolo)",
+              title: data.title || "(untitled)",
               type: data.type || "Unknown",
               action: data.action || "-",
               date: data.date || "-",
@@ -4074,15 +4244,13 @@
             const assetsEl = document.createElement("div");
             assetsEl.className = "assets";
             labelEl.addEventListener("pointerdown", (event) => {
-              event.stopPropagation();
-              state.pointerDown.active = false;
-              controls.isRotating = false;
-              controls.isPanning = false;
-            });
-            labelEl.addEventListener("click", (event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              selectNode(i);
+              if (event.pointerType === "touch") return;
+              state.pointerDown.labelIndex = i;
+              beginScenePointerInteraction(
+                event.clientX,
+                event.clientY,
+                event.button,
+              );
             });
             labelEl.append(titleEl, assetsEl);
             dom.labelsLayer.appendChild(labelEl);
@@ -4187,7 +4355,14 @@
         }
 
         function refreshProjectInfo() {
-          dom.projectName.textContent = state.projectName || "Project";
+          const displayName =
+            window.OvertraceUI?.formatProjectDisplayName?.(
+              state.folderName || state.projectName || "",
+              state.projectName || "Project",
+            ) ||
+            state.projectName ||
+            "Project";
+          dom.projectName.textContent = displayName;
           const totalNodes = state.nodes.length;
           const totalEdges = state.edges.length;
           const visibleNodes = countVisibleNodes();
@@ -4322,7 +4497,7 @@
             state.selected = -1;
             if (dom.nodeInfo) {
               dom.nodeInfo.innerHTML =
-                '<div class="k">info</div><div>Seleziona un nodo nella rete.</div>';
+                '<div class="k">info</div><div>Select a node in the network.</div>';
             }
             if (dom.nodeDesc) dom.nodeDesc.textContent = "";
             if (dom.nodeMedia) dom.nodeMedia.innerHTML = "";
@@ -4406,12 +4581,13 @@
               img.src = url;
               img.alt = file.name || "image";
               img.loading = "lazy";
+              img.draggable = false;
               img.onerror = () => {
                 img.remove();
                 const p = document.createElement("div");
                 p.style.fontSize = "12px";
                 p.style.color = "#777";
-                p.textContent = `asset non trovato: ${file.path || file.name || "file"}`;
+                p.textContent = `asset not found: ${file.path || file.name || "file"}`;
                 frag.appendChild(p);
               };
               frag.appendChild(img);
@@ -4434,7 +4610,7 @@
             const p = document.createElement("div");
             p.style.fontSize = "12px";
             p.style.color = "#777";
-            p.textContent = `${hiddenImages} immagini nascoste (toggle immagini = off).`;
+            p.textContent = `${hiddenImages} hidden images (image toggle = off).`;
             frag.appendChild(p);
           }
 
@@ -4442,7 +4618,7 @@
             const p = document.createElement("div");
             p.style.fontSize = "12px";
             p.style.color = "#777";
-            p.textContent = `${unresolved} asset non risolti (base cartella non trovata).`;
+            p.textContent = `${unresolved} unresolved assets (project folder base not found).`;
             frag.appendChild(p);
           }
 
@@ -4495,6 +4671,17 @@
             camera.position.lerp(targetPos, 0.2);
           }
           camera.lookAt(controls.target);
+        }
+
+        function beginScenePointerInteraction(clientX, clientY, button = 0) {
+          state.pointerDown.x = clientX;
+          state.pointerDown.y = clientY;
+          state.pointerDown.active = true;
+          controls.lastX = clientX;
+          controls.lastY = clientY;
+          if (button === 2 || state.spaceDown) controls.isPanning = true;
+          else controls.isRotating = true;
+          state.pointerDown.wasPan = controls.isPanning;
         }
 
         function simulate() {
@@ -4642,12 +4829,12 @@
 
           if (state.assetBase) {
             setHint(
-              `Progetto caricato: ${file.name} · assets base: ${state.assetBase}`,
+              `Project loaded: ${file.name} · asset base: ${state.assetBase}`,
               "ok",
             );
           } else {
             setHint(
-              "Progetto caricato. Base assets non trovata automaticamente.",
+              "Project loaded. Asset base could not be detected automatically.",
               "warn",
             );
           }
@@ -4671,7 +4858,7 @@
             await window.OvertraceUI?.saveProjectFsContext?.(fsContext);
           }
           setHint(
-            `Progetto caricato: ${folderName || "project"}/project.json`,
+            `Project loaded: ${folderName || "project"}/project.json`,
             "ok",
           );
         }
@@ -4739,7 +4926,7 @@
           const entries = loaded.filter(Boolean);
           if (!entries.length) {
             setHint(
-              "Overview non disponibile: nessun project.json trovato.",
+              "Overview unavailable: no project.json found.",
               "warn",
             );
             return false;
@@ -4751,19 +4938,19 @@
             mergedProject.nodes.length === 0
           ) {
             setHint(
-              "Overview non disponibile: nessun nodo valido trovato.",
+              "Overview unavailable: no valid nodes found.",
               "warn",
             );
             return false;
           }
 
-          buildGraph(mergedProject, `Overview · ${entries.length} progetti`);
+          buildGraph(mergedProject, `Overview · ${entries.length} projects`);
           state.assetBase = "";
           state.folderName = null;
           state.showImages = false;
           applyImagesVisibility();
           setHint(
-            `Overview caricata: ${entries.length} progetti · ${mergedProject.nodes.length} nodi · ${mergedProject.edges.length} archi`,
+            `Overview loaded: ${entries.length} projects · ${mergedProject.nodes.length} nodes · ${mergedProject.edges.length} edges`,
             "ok",
           );
           return true;
@@ -4784,13 +4971,13 @@
               if (err && err.name === "AbortError") return;
               if (err && err.name === "NotFoundError") {
                 setHint(
-                  "project.json non trovato nella cartella selezionata.",
+                  "project.json not found in the selected folder.",
                   "warn",
                 );
                 return;
               }
               console.warn("Folder open failed in Space view", err);
-              setHint("Impossibile aprire la cartella progetto.", "warn");
+              setHint("Unable to open the project folder.", "warn");
               return;
             }
           }
@@ -4820,9 +5007,11 @@
         }
 
         function resizeDisciplineCanvas() {
-          const w = dom.disciplineWrap.clientWidth;
-          const h = dom.disciplineWrap.clientHeight;
-          if (!w || !h) return;
+          const side = Math.round(dom.disciplineWrap.clientWidth || 0);
+          if (!side) return;
+          dom.disciplineWrap.style.height = `${side}px`;
+          const w = side;
+          const h = side;
           const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
           discipline.width = w;
           discipline.height = h;
@@ -4870,7 +5059,7 @@
           const enter = (e) => {
             e.preventDefault();
             dom.viewWrap.classList.add("drop");
-            setHint("Rilascia il file project.json", "ok");
+            setHint("Drop the project.json file", "ok");
           };
           const leave = (e) => {
             e.preventDefault();
@@ -4887,13 +5076,13 @@
             const file = files && files[0];
             if (!file) return;
             if (!/\.json$/i.test(file.name)) {
-              setHint("Il file trascinato non e' un JSON.", "warn");
+              setHint("The dropped file is not a JSON file.", "warn");
               return;
             }
             try {
               await loadFromJsonFile(file);
             } catch (err) {
-              setHint(`Errore apertura JSON: ${err.message || err}`, "warn");
+              setHint(`JSON open error: ${err.message || err}`, "warn");
             }
           };
 
@@ -4904,6 +5093,15 @@
         }
 
         function wireEvents() {
+          dom.btnToggleSide?.addEventListener("click", () => {
+            state.sideCollapsed = !state.sideCollapsed;
+            syncSideCollapseButton();
+            window.requestAnimationFrame(() => {
+              onResize();
+              renderDiscipline();
+            });
+          });
+
           dom.btnOpen.addEventListener("click", () => {
             openJsonDialog();
           });
@@ -4999,7 +5197,7 @@
             applyNodeHighlighting();
             state.dataViewsDirty = true;
             renderAnalysisDataViews();
-            setHint(`Colori reset per ${modeLabel(mode)}.`, "ok");
+            setHint(`Colors reset for ${modeLabel(mode)}.`, "ok");
           });
 
           dom.btnToggleImages?.addEventListener("click", () => {
@@ -5031,7 +5229,7 @@
             try {
               await loadFromJsonFile(file);
             } catch (err) {
-              setHint(`Errore apertura JSON: ${err.message || err}`, "warn");
+              setHint(`JSON open error: ${err.message || err}`, "warn");
             }
           });
 
@@ -5365,7 +5563,7 @@
             state.folderName = folder;
             updateAllNodeLabelAssets();
             persistSharedProjectState("space");
-            setHint(`Caricato default: ${folder}/project.json`, "ok");
+            setHint(`Default load: ${folder}/project.json`, "ok");
           } catch (_) {
             // keep manual flow
           }
@@ -5380,6 +5578,7 @@
         if (dom.selViewValue) dom.selViewValue.value = "__all__";
         syncPreviewSnapshotButton();
         syncToolbarToggleButtons();
+        syncSideCollapseButton();
         setIdleStatus();
         updateViewFilterValueOptions();
         refreshViewFilterStats();
