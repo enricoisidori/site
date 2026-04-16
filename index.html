@@ -42,13 +42,44 @@ para-disciplinary design, unbounded design, design approaches"
           })
       );
     </script>
+    <script>
+      (function () {
+        const setViewportHeight = () => {
+          const viewportHeight =
+            window.visualViewport?.height || window.innerHeight;
+          document.documentElement.style.setProperty(
+            "--app-viewport-height",
+            `${viewportHeight}px`
+          );
+        };
+
+        setViewportHeight();
+        window.addEventListener("resize", setViewportHeight, { passive: true });
+        window.addEventListener("orientationchange", setViewportHeight, {
+          passive: true,
+        });
+        window.visualViewport?.addEventListener("resize", setViewportHeight, {
+          passive: true,
+        });
+      })();
+    </script>
     <style>
+      :root {
+        --app-viewport-height: 100vh;
+      }
+
+      @supports (height: 100dvh) {
+        :root {
+          --app-viewport-height: 100dvh;
+        }
+      }
+
       #aleph-stage {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        height: 100lvh;
+        height: var(--app-viewport-height);
         z-index: 0;
         background: #fff;
       }
@@ -162,6 +193,9 @@ para-disciplinary design, unbounded design, design approaches"
 </p>
       <p class="outdent">
         Publications <br />
+           2026 <br />
+Antidisciplinary Communication Design: A case of studio-based practice for producing embodied, explicit, and discursive knowledge, SID
+        <br />
         2026 <br />
         Antidisciplinary design as epistemic resistance: Critical and political
         agency in communication design education, Progetto Grafico
