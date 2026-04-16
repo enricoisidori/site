@@ -21,7 +21,10 @@ para-disciplinary design, unbounded design, design approaches"
 
     <meta name="author" content="Enrico Isidori" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <title>Enrico Isidori</title>
     <link rel="icon" type="image/png" href="asset/svg/cyan.png" />
     <link rel="shortcut icon" type="image/png" href="asset/svg/cyan.png" />
@@ -66,6 +69,10 @@ para-disciplinary design, unbounded design, design approaches"
     <style>
       :root {
         --app-viewport-height: 100vh;
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-right: env(safe-area-inset-right, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left: env(safe-area-inset-left, 0px);
       }
 
       @supports (height: 100dvh) {
@@ -76,10 +83,9 @@ para-disciplinary design, unbounded design, design approaches"
 
       #aleph-stage {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: var(--app-viewport-height);
+        inset: 0;
+        width: 100vw;
+        min-height: var(--app-viewport-height);
         z-index: 0;
         background: #fff;
       }

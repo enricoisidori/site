@@ -21,7 +21,11 @@ html {
 
 body {
   margin: 0;
-  padding: 2.5px;
+  padding:
+    calc(var(--safe-top, 0px) + 2.5px)
+    calc(var(--safe-right, 0px) + 2.5px)
+    calc(var(--safe-bottom, 0px) + 2.5px)
+    calc(var(--safe-left, 0px) + 2.5px);
   background-color: white;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
