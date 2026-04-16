@@ -24,7 +24,7 @@ para-disciplinary design, unbounded design, design approaches"
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
     />
     <title>Enrico Isidori</title>
     <link rel="icon" type="image/png" href="asset/svg/cyan.png" />
@@ -34,7 +34,7 @@ para-disciplinary design, unbounded design, design approaches"
       rel="stylesheet"
       href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow"
     />
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="index.css?v=11" />
     <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
     <script>
       window.__alephPrefetch = fetch(
@@ -46,66 +46,64 @@ para-disciplinary design, unbounded design, design approaches"
           })
       );
     </script>
-    <script>
-      (function () {
-        const setViewportHeight = () => {
-          const viewportHeight =
-            window.visualViewport?.height || window.innerHeight;
-          document.documentElement.style.setProperty(
-            "--app-viewport-height",
-            `${viewportHeight}px`
-          );
-        };
-
-        setViewportHeight();
-        window.addEventListener("resize", setViewportHeight, { passive: true });
-        window.addEventListener("orientationchange", setViewportHeight, {
-          passive: true,
-        });
-        window.visualViewport?.addEventListener("resize", setViewportHeight, {
-          passive: true,
-        });
-      })();
-    </script>
     <style>
       :root {
-        --app-viewport-height: 100vh;
-        --safe-top: env(safe-area-inset-top, 0px);
-        --safe-right: env(safe-area-inset-right, 0px);
-        --safe-bottom: env(safe-area-inset-bottom, 0px);
-        --safe-left: env(safe-area-inset-left, 0px);
+        --content-top-offset: calc(env(safe-area-inset-top, 0px) + 2.5px);
       }
 
-      @supports (height: 100dvh) {
-        :root {
-          --app-viewport-height: 100dvh;
-        }
-      }
-
+      /* Sfondo: position fixed + inset 0.
+         Il browser calcola le dimensioni da tutte e 4 le direzioni,
+         senza dipendere da unità vh/lvh/dvh che cambiano con la toolbar.
+         Con viewport-fit=cover copre fisicamente tutto lo schermo. */
       #aleph-stage {
         position: fixed;
         inset: 0;
-        width: 100vw;
-        min-height: var(--app-viewport-height);
         z-index: 0;
         background: #fff;
-      }
-      #aleph-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
+        overflow: hidden;
         pointer-events: none;
       }
-      body > .col-12 {
-        position: relative;
+
+      /* Il canvas riempie lo stage con 2px di overscan per evitare
+         micro-gap di sub-pixel rendering sui bordi. */
+      #aleph-canvas {
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        width: calc(100% + 4px);
+        height: calc(100% + 4px);
+        display: block;
+        pointer-events: none;
+        transform: translateZ(0);
+      }
+
+      /* Contenuto: inset 0 + overflow-y auto.
+         Scorre solo il testo, lo sfondo rimane fermo. */
+      #content-scroll {
+        position: fixed;
+        inset: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+        touch-action: pan-y;
         z-index: 10;
+        padding:
+          var(--content-top-offset)
+          2.5px
+          2.5px
+          2.5px;
+      }
+
+      #content-scroll > .col-12 {
+        position: relative;
         text-shadow:
           0 0 2px #fff,
           0 0 4px #fff,
           0 0 12px #fff;
         user-select: none;
       }
-      body > .col-12 * {
+      #content-scroll > .col-12 * {
         user-select: text;
       }
 
@@ -125,6 +123,7 @@ para-disciplinary design, unbounded design, design approaches"
       <canvas id="aleph-canvas"></canvas>
     </div>
 
+    <div id="content-scroll">
     <div class="col-12">
       <span>Enrico Isidori</span><br />
       <a href="https://www.instagram.com/enrico.isidori/" target="_blank"
@@ -304,23 +303,38 @@ Environmental Design 4th International Conference, Ginosa
       </p>
  
       <div style="display: block; float: left; width: 100%; height: 50vh"></div>
-    </div>
-
-    
-
     <div style="display: block; float: left; height: 10px; width: 100%"></div>
+    </div>
+    </div>
     <!-- <script src="script.js"></script> -->
 
     <script>
       (function () {
         // ── Toggle sfondo bianco / speciale ─────────────────────────
         const stage = document.getElementById("aleph-stage");
+        const contentScroll = document.getElementById("content-scroll");
+        const root = document.documentElement;
         let whiteBg = false;
         document.body.addEventListener("click", (e) => {
           if (e.target.closest("a")) return;
           whiteBg = !whiteBg;
           stage.style.display = whiteBg ? "none" : "";
+          root.style.setProperty(
+            "--root-bg-image",
+            whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`
+          );
         });
+
+        function getScrollY() {
+          return contentScroll?.scrollTop || 0;
+        }
+
+        function syncRootBackgroundImage(img) {
+          root.style.setProperty(
+            "--root-bg-image",
+            img?.src ? `url("${img.src}")` : "none"
+          );
+        }
         // ─────────────────────────────────────────────────────────────
 
         // ── Canvas setup ────────────────────────────────────────────
@@ -473,8 +487,23 @@ Environmental Design 4th International Conference, Ginosa
         let lastScrollY = 0;
         let rafPending = false;
 
+        function drawImageCover(targetCtx, img, width, height) {
+          const sourceWidth = img.naturalWidth || img.width;
+          const sourceHeight = img.naturalHeight || img.height;
+          if (!sourceWidth || !sourceHeight) return;
+
+          const scale = Math.max(width / sourceWidth, height / sourceHeight);
+          const drawWidth = sourceWidth * scale;
+          const drawHeight = sourceHeight * scale;
+          const offsetX = (width - drawWidth) / 2;
+          const offsetY = (height - drawHeight) / 2;
+
+          targetCtx.clearRect(0, 0, width, height);
+          targetCtx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+        }
+
         function getPixData(img) {
-          offCtx.drawImage(img, 0, 0, CW, CH);
+          drawImageCover(offCtx, img, CW, CH);
           return offCtx.getImageData(0, 0, CW, CH);
         }
 
@@ -484,7 +513,7 @@ Environmental Design 4th International Conference, Ginosa
           if (!imgCurrent) return;
 
           if (!imgNext || transitionProgress <= 0) {
-            ctx.drawImage(imgCurrent, 0, 0, CW, CH);
+            drawImageCover(ctx, imgCurrent, CW, CH);
             return;
           }
 
@@ -519,6 +548,7 @@ Environmental Design 4th International Conference, Ginosa
           if (transitionProgress >= 1) {
             imgCurrent = imgNext;
             saveCached(imgCurrent);
+            if (!whiteBg) syncRootBackgroundImage(imgCurrent);
             pixA = pixB;
             imgNext = null;
             pixB = null;
@@ -570,8 +600,9 @@ Environmental Design 4th International Conference, Ginosa
             if (!imgCurrent) {
               imgCurrent = frame.img;
               pixA = getPixData(imgCurrent);
-              ctx.drawImage(imgCurrent, 0, 0, CW, CH);
+              drawImageCover(ctx, imgCurrent, CW, CH);
               saveCached(imgCurrent);
+              if (!whiteBg) syncRootBackgroundImage(imgCurrent);
             } else {
               imgNext = frame.img;
               pixB = getPixData(imgNext);
@@ -586,7 +617,7 @@ Environmental Design 4th International Conference, Ginosa
 
         // ── Scroll → luma key ────────────────────────────────────────
         function onScroll() {
-          const sy = document.body.scrollTop || window.scrollY || 0;
+          const sy = getScrollY();
           const delta = Math.abs(sy - lastScrollY);
           lastScrollY = sy;
           if (!imgCurrent) return;
@@ -649,8 +680,8 @@ requestAnimationFrame(lumaIntro);
 
 })();
 
-        document.body.addEventListener("scroll", onScroll, { passive: true });
-        window.addEventListener("scroll", onScroll, { passive: true });
+        lastScrollY = getScrollY();
+        contentScroll?.addEventListener("scroll", onScroll, { passive: true });
 
         document.addEventListener("visibilitychange", () => {
           if (!document.hidden) scheduleRender();
