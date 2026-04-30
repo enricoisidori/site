@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
+    <meta charset="UTF-8" />
+    <meta name="description" content="Corpo Macchina — Enrico Isidori" />
+    <meta name="author" content="Enrico Isidori" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Corpo Macchina — Enrico Isidori</title>
+    <link rel="icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="shortcut icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="apple-touch-icon" href="../asset/svg/cyan.png" />
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
+    <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query", generator: "random", grnnamespace: "6",
+            grnlimit: "50", prop: "imageinfo", iiprop: "url|mime",
+            iiurlwidth: "64", format: "json", origin: "*",
+          })
+      );
+    </script>
+  </head>
+  <body class="has-canvas">
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
+    </div>
+
+    <div id="content-scroll">
+
+          <!--HEADER-->
+          <header id="topnav">
+            <div class="col-12">
+              <a class="btn closebtn" href="../home.html">Close</a><br />
+              Corpo Macchina <br />
+              2023
+              <br />
+            </div>
+          </header>
+
+          <div class="info col-4">
+            <p class="description">
+              <br />
+            </p>
+
+            <p>
+              "Corpo (Body) Macchina (Camera/Machine)" consists of two works: one
+              includes three photos taken across the entire Milan area, while the
+              other consists of six photos within a defined square perimeter. The
+              photographs were taken precisely at random, with coordinates, time,
+              height, orientation, rotations, and camera settings all randomly
+              generated. Once the data was produced, I went to the corresponding
+              location, positioned the tripod according to the specified height,
+              orientation, and rotations, set the aperture, shutter speed, and ISO as
+              specified, and shot at the assigned time. I became a passive operator of
+              the camera, who becomes a photographer, author, body. Following the
+              instructions, I became a machine. The photo’s metadata was generated
+              before the shot was taken. It was not the aesthetic intention that
+              dictated the data the machine produced, but was the data that the
+              machine produced that dictated the aesthetic will.
+            </p>
+            <br />
+            <p class="outdent">
+              Links<br />
+              <a href="../f.html" target="_blank">f.html (Generator)</a>
+            </p>
+          </div>
+
+          <div class="col-4"></div>
+          <div class="col-8">
+            <img class="imgpro" src="../asset/corpomacchina/cm1.jpg" /><br />
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="../asset/corpomacchina/f.mp4" type="video/mp4" />
+            </video>
+
+            <img class="imgpro" src="../asset/corpomacchina/1a.jpg" /><br />
+            <p class="fluxtext">Corpo Macchina I (1) 14:41</p>
+            <img class="imgpro" src="../asset/corpomacchina/2a.jpg" /><br />
+            <p class="fluxtext">Corpo Macchina I (1) 14:41</p>
+            <img class="imgpro" src="../asset/corpomacchina/3a.jpg" /><br />
+            <p class="fluxtext">Corpo Macchina I (1) 14:41</p>
+
+            <img class="imgpro" src="../asset/corpomacchina/4a.jpg" /><br />
+            <p class="fluxtext">Corpo Macchina I (1) 14:41</p>
+            <img class="imgpro" src="../asset/corpomacchina/5a.jpg" /><br />
+            <p class="fluxtext">Corpo Macchina I (1) 14:41</p>
+            <img class="imgpro" src="../asset/corpomacchina/6a.jpg" /><br />
+            <p class="fluxtext">Corpo Macchina I (1) 14:41</p>
+            <img class="imgpro" src="../asset/corpomacchina/1.jpg" />
+            <p class="fluxtext">Corpo Macchina II (1) 14:41</p>
+            <img class="imgpro" src="../asset/corpomacchina/2.jpg" />
+            <p class="fluxtext">Corpo Macchina II (2) 19:39</p>
+            <img class="imgpro" src="../asset/corpomacchina/3.jpg" />
+            <p class="fluxtext">Corpo Macchina II (3) 22:17</p>
+            <img class="imgpro" src="../asset/corpomacchina/med.jpg" />
+
+            <img class="imgpro" src="../asset/corpomacchina/cm2.jpg" /><br />
+
+            <img class="imgpro" src="../asset/corpomacchina/z.jpg" /><br />
+            <p class="fluxtext">
+              Aerial view of the central square area of Piazza Duca d'Aosta.
+            </p>
+          </div>
+          <div class="col-4"></div>
+          <img class="col-4" src="../asset/corpomacchina/z2.jpg" /><br />
+          <img class="col-4" src="../asset/corpomacchina/z3.jpg" /><br />
+          <div class="col-4"></div>
+          <div class="col-8 imgpro-container">
+            <img class="imgpro" src="../asset/corpomacchina/i.jpg" /><br />
+          </div>
+    
+    
+  
+      <div class="spacer5"></div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script src="../aleph.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (sessionStorage.getItem("allowAutoplay")) {
+          document.querySelectorAll("video").forEach((v) => v.play().catch(() => {}));
+          sessionStorage.removeItem("allowAutoplay");
+        }
+      });
+    </script>
+  </body>
+</html>

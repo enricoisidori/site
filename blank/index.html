@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
+    <meta charset="UTF-8" />
+    <meta name="description" content="Blank — Enrico Isidori" />
+    <meta name="author" content="Enrico Isidori" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Blank — Enrico Isidori</title>
+    <link rel="icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="shortcut icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="apple-touch-icon" href="../asset/svg/cyan.png" />
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
+    <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query", generator: "random", grnnamespace: "6",
+            grnlimit: "50", prop: "imageinfo", iiprop: "url|mime",
+            iiurlwidth: "64", format: "json", origin: "*",
+          })
+      );
+    </script>
+  </head>
+  <body class="has-canvas">
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
+    </div>
+
+    <div id="content-scroll">
+
+          <!--HEADER-->
+          <header id="topnav">
+            <div class="col-12">
+              <a class="btn closebtn" href="../home.html">Close</a><br />
+              Blank
+              <br />
+       
+            </div>
+          </header>
+
+          <div class="info col-4">
+            <p class="description">
+              2023<br>
+              30 x 40 cm (x3) <br>
+        
+
+        
+              Immagini generate per errore dall’AI Adobe Photoshop alla richiesta di riempire una selezione del foglio di bianco (prompt: “blank”) ha risposto con tre interpretazioni diverse. <br>
+              [da sistemare]
+        
+        
+        
+    
+           </p>
+   
+  
+          </div>
+          <div class="col-4"></div>
+          <div class="col-8 imgpro-container">
+            <img class="imgpro" src="../asset/blank/med.jpg" /><br />
+            <img class="imgpro" src="../asset/blank/med.jpg" /><br />
+            <img class="imgpro" src="../asset/blank/med.jpg" /><br />
+     
+
+    
+    
+  
+      <div class="spacer5"></div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script src="../aleph.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (sessionStorage.getItem("allowAutoplay")) {
+          document.querySelectorAll("video").forEach((v) => v.play().catch(() => {}));
+          sessionStorage.removeItem("allowAutoplay");
+        }
+      });
+    </script>
+  </body>
+</html>

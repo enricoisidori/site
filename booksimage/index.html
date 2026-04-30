@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
+    <meta charset="UTF-8" />
+    <meta name="description" content="Immagine fisica di un libro — Enrico Isidori" />
+    <meta name="author" content="Enrico Isidori" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Immagine fisica di un libro — Enrico Isidori</title>
+    <link rel="icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="shortcut icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="apple-touch-icon" href="../asset/svg/cyan.png" />
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
+    <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query", generator: "random", grnnamespace: "6",
+            grnlimit: "50", prop: "imageinfo", iiprop: "url|mime",
+            iiurlwidth: "64", format: "json", origin: "*",
+          })
+      );
+    </script>
+  </head>
+  <body class="has-canvas">
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
+    </div>
+
+    <div id="content-scroll">
+
+          <!--HEADER-->
+          <header id="topnav">
+            <div class="col-12">
+              <a class="btn closebtn" href="../home.html">Close</a><br />
+             Immagine fisica di un libro 
+              <br />
+       
+            </div>
+          </header>
+
+          <div class="info col-4">
+            <p class="description">
+              2024 <br />
+            è un libro fatto di immagini di testo, generato con Stable Diffusion.
+       Immagini di un libro illeggibile ma visibile e riconoscibile in quanto tale.
+       [da sistemare]
+       [macano img]
+ 
+    
+     
+   
+  
+          </div>
+          <div class="col-4"></div>
+          <div class="col-8 imgpro-container">
+            <img class="imgpro" src="../asset/booksimage/a1.jpg" /><br />
+            <img class="imgpro" src="../asset/booksimage/a6.jpg" /><br />
+            <img class="imgpro" src="../asset/booksimage/a3.jpg" /><br />
+
+            <!-- <img class="imgpro" src="../asset/booksimage/start.jpg" /><br />
+            <img class="imgpro" src="../asset/booksimage/end.jpg" /><br /> -->
+            <img class="imgpro" src="../asset/booksimage/detail.jpg" /><br />
+
+     
+
+    
+    
+  
+      <div class="spacer5"></div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script src="../aleph.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (sessionStorage.getItem("allowAutoplay")) {
+          document.querySelectorAll("video").forEach((v) => v.play().catch(() => {}));
+          sessionStorage.removeItem("allowAutoplay");
+        }
+      });
+    </script>
+  </body>
+</html>

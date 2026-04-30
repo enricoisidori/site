@@ -1,5 +1,9 @@
 /* Resto del CSS */
 @import url("https://fonts.cdnfonts.com/css/helvetica-lt-narrow");
+
+:root {
+  --content-top-offset: calc(env(safe-area-inset-top, 0px) + 2.5px);
+}
 /* .info,
 .topnav,
 header,
@@ -80,6 +84,7 @@ body {
 .btn.active {
   color: black;
 }
+
 
 video::-webkit-media-controls {
   display: none;
@@ -453,6 +458,110 @@ sup {
 
 .mobile {
   display: none;
+}
+
+/* ── Pagine con canvas Wikipedia di sfondo (home, about) ────────── */
+body.has-canvas {
+  margin: 0;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.has-canvas #aleph-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #fff;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body.has-canvas #aleph-canvas {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  display: block;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+body.has-canvas #content-scroll {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  z-index: 10;
+  padding: var(--content-top-offset) 2.5px 2.5px 2.5px;
+}
+
+/* Testo sopra il canvas: alone bianco per leggibilità */
+body.has-canvas #content-scroll {
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff;
+}
+
+body.white-bg #content-scroll,
+body.white-bg #content-scroll * {
+  text-shadow: none !important;
+}
+
+body.has-canvas #content-scroll a,
+body.has-canvas #content-scroll p {
+  user-select: text;
+}
+
+/* Header sticky in cima al content-scroll (che è fixed nel viewport).
+   display: flow-root = clearfix dei figli float (.left, .right, .menu)
+   senza il quale l'header collassa in altezza. */
+body.has-canvas #topnav {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 11;
+  background: transparent;
+  display: flow-root;
+}
+
+/* I bottoni Design / Art occupano l'intera riga (full-width) */
+body.has-canvas .menu {
+  width: 100%;
+  clear: both;
+}
+
+/* Clearfix invisibile dopo l'header (toprect rimosso dal markup) */
+body.has-canvas #topnav::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Container relativo per il canvas hover-luma */
+body.has-canvas .designerpage,
+body.has-canvas .artistpage {
+  position: relative;
+}
+
+/* Canvas overlay per luma key on hover (gestito da hover-luma.js) */
+.hover-luma-canvas {
+  position: absolute;
+  pointer-events: none;
+  display: block;
+  opacity: 0;
+}
+
+/* Reset del padding dei contenitori col-* dentro lo scroll fixed,
+   per evitare doppio margine 2.5px (uno dal padding container, uno dal col-) */
+body.has-canvas #content-scroll > [class*="col-"]:first-child {
+  padding-top: 0;
 }
 
 @media only screen and (max-width: 768px) {

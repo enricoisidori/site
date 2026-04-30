@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
+    <meta charset="UTF-8" />
+    <meta name="description" content="Totem — Enrico Isidori" />
+    <meta name="author" content="Enrico Isidori" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Totem — Enrico Isidori</title>
+    <link rel="icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="shortcut icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="apple-touch-icon" href="../asset/svg/cyan.png" />
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
+    <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query", generator: "random", grnnamespace: "6",
+            grnlimit: "50", prop: "imageinfo", iiprop: "url|mime",
+            iiurlwidth: "64", format: "json", origin: "*",
+          })
+      );
+    </script>
+  </head>
+  <body class="has-canvas">
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
+    </div>
+
+    <div id="content-scroll">
+
+          <!--HEADER-->
+          <header id="topnav">
+            <div class="col-12">
+              <a class="btn closebtn" href="../home.html">Close</a><br />
+              Totem
+              <br />
+            </div>
+          </header>
+
+          <div class="info col-4">
+            <p class="description">
+              2023 <br />
+              Plastic<br />
+              8 x 3 x 3 cm <br />
+
+              totem /ˈtoʊtəm/ n. [from an Algonquian indigenous term, ototeman
+              (denoting kinship relations among siblings)]. – (ethnol.) [an animal,
+              plant, object, or phenomenon that, in animistic cultures, is the object
+              of taboo and worship].<br /><br />
+              August 2021 — August 2023<br />
+              This pig is ugly, it’s dirty, picked up off the street by my brother.
+              Once home, it’s placed on my nightstand. My brother and I split the same
+              room, a shared space with personal areas: bed, nightstand, bookshelf,
+              and walls, one side and the other. Finding the pig on my nightstand, I
+              move it to my brother’s. My brother, finding the pig on his nightstand,
+              moves it back to mine. Over time, the pig is hidden in less obvious
+              spots: behind books or objects, among shelves, inside lamps,
+              pillowcases, shoes, cereal boxes. My brother moves to another
+              neighborhood, and the pig begins traveling from house to house, inside
+              backpacks and jacket pockets, smuggled in with the help of a friend or
+              secretly slipped into luggage before leaving — for Milan, where I move,
+              or Paris, where my brother moves. The object becomes an involuntary
+              representation of our relationship. It’s a tacit game, a way to meet.
+              It’s a dirty presence in the other’s space, an invasion, in a dialectic
+              of intimate agreement. The plastic pig is a totem of a fraternal bond.
+            </p>
+          </div>
+          <div class="col-4"></div>
+          <div class="col-8 imgpro-container">
+            <img class="imgpro" src="../asset/totem/totem.jpg" /><br />
+            <img class="imgpro" src="../asset/totem/casa.jpg" /><br />
+            <div class="fluxtext">
+              The floor plan of our house with the pig's movements marked on it.
+            </div>
+            <img class="imgpro" src="../asset/totem/roma.jpg" /><br />
+            <div class="fluxtext">
+              The distance traveled by the pig from our house to my brother's new
+              house.
+            </div>
+
+            <img class="imgpro" src="../asset/totem/europa.jpg" /><br />
+            <div class="fluxtext"></div>
+            The distance traveled by the pig from our house to my and my brother's new
+            house.
+          </div>
+
+    
+    
+  
+      <div class="spacer5"></div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script src="../aleph.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (sessionStorage.getItem("allowAutoplay")) {
+          document.querySelectorAll("video").forEach((v) => v.play().catch(() => {}));
+          sessionStorage.removeItem("allowAutoplay");
+        }
+      });
+    </script>
+  </body>
+</html>

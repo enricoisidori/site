@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
+    <meta charset="UTF-8" />
+    <meta name="description" content="pixelpushing — Enrico Isidori" />
+    <meta name="author" content="Enrico Isidori" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>pixelpushing — Enrico Isidori</title>
+    <link rel="icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="shortcut icon" type="image/png" href="../asset/svg/cyan.png" />
+    <link rel="apple-touch-icon" href="../asset/svg/cyan.png" />
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
+    <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query", generator: "random", grnnamespace: "6",
+            grnlimit: "50", prop: "imageinfo", iiprop: "url|mime",
+            iiurlwidth: "64", format: "json", origin: "*",
+          })
+      );
+    </script>
+  </head>
+  <body class="has-canvas">
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
+    </div>
+
+    <div id="content-scroll">
+
+          <!--HEADER-->
+          <header id="topnav">
+            <div class="col-12">
+              <a class="btn closebtn" href="../home.html">Close</a><br />
+              <!-- Pixel Pushing Playground -->
+              Iterations/Inversions <br>
+  
+            </div>
+          </header>
+
+          <div class="info col-4">
+
+            <p class="description">
+              2023<br>
+              <!-- A space for expression and manipulation of leftover pixels between projects.<br><br> -->
+              Iteration of a continuous inversion transformation of archival material, at the maximum frequency that the machine allows. <br> <br>
+      
+              <p class="outdent">Field<br /> Pixel Pushing Exploration<br>
+
+
+              <p class="outdent">
+                Links<br />
+                <a href="../iterations/inversions.html" target="_blank">iterations/inversions.html</a><br>
+
+              </p>
+
+              <p class="outdent">
+                Features<br />
+                 <a href="https://gpu.gallery/" target="_blank"> Gpu Gallery</a>, 2023 <br> <br> 
+              </p>
+  
+      
+ 
+
+  
+          </div>
+          <div class="col-4"></div>
+    
+
+
+          <div class="col-8 imgpro-container">
+
+            <img class="imgpro" src="../asset/pixelpushing/preview1.png" /><br />
+
+            <img class="imgpro" src="../asset/pixelpushing/preview2.png" /><br />
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="../asset/pixelpushing/Iterationsinversions.mp4" type="video/mp4" />
+            </video>
+
+            <video autoplay muted loop playsinline preload="metadata" class="div100">
+              <source src="../asset/pixelpushing/istallationview.mp4" type="video/mp4" />
+            </video>
+     
+            <!-- <p class="fluxtext">
+              <a href="../iterations/inversions.html" target="_blank">Iterations/Inversions</a><br>
+              2023<br>
+              Features in <a href="https://gpu.gallery/" target="_blank"> Gpu Gallery</a> <br> 
+            </p> -->
+            <!-- <video autoplay muted loop playsinline>
+              <source src="../asset/pixelpushing/ondeath.mp4" type="video/mp4" />
+            </video>
+            <p class="fluxtext">
+              On death without exaggeration <br>
+              2024 <br>
+              Found footage of workplace safety videos produced to convey a practical lesson –avoid death– juxtaposed and merged with a poem by Wisława Szymborska that ridicules death.
+              Found footage of GASCO Abu Dhabi Gas Industries Ltd. <br> 
+  
+            </p> -->
+            <!-- <div class="row div100">
+            <video class="div50l" autoplay muted loop playsinline preload="metadata">
+              <source src="../asset/pixelpushing/notpixel.mp4" type="video/mp4" />
+        
+            </video>
+          </div>
+          <p class="fluxtext">
+            <a href="/pixel/notpixel.html" target="_blank">Pixel/Notpixel</a>  <br>
+            2024 <br>
+          </p> -->
+    
+    
+  
+      <div class="spacer5"></div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script src="../aleph.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (sessionStorage.getItem("allowAutoplay")) {
+          document.querySelectorAll("video").forEach((v) => v.play().catch(() => {}));
+          sessionStorage.removeItem("allowAutoplay");
+        }
+      });
+    </script>
+  </body>
+</html>

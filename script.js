@@ -65,32 +65,23 @@ document.addEventListener("DOMContentLoaded", function () {
   const storedFilter = localStorage.getItem("selectedFilter");
 
   if (storedFilter) {
-    // Find the button with the stored filter
     const activeButton = document.querySelector(
       `.btn[data-filter='${storedFilter}']`
     );
 
     if (activeButton) {
-      // Remove active class from all buttons
       filterButtons.forEach((btn) => {
         btn.classList.remove("active");
-        btn.classList.add("inactive");
       });
-
-      // Add active class to the stored filter button
       activeButton.classList.add("active");
-      activeButton.classList.remove("inactive");
-
-      // Apply the filter
       filterItems(storedFilter);
+    } else {
+      showAllItems();
     }
   } else {
-    // Default to designer page if no stored filter
-    const designerButton = document.querySelector(
-      ".btn[data-filter='designerpage']"
-    );
-    designerButton.classList.add("active");
-    filterItems("designerpage");
+    // Default: nessun filtro attivo, mostra tutto
+    filterButtons.forEach((btn) => btn.classList.remove("active"));
+    showAllItems();
   }
 
   filterButtons.forEach((button) => {
@@ -157,9 +148,11 @@ function updateText() {
     texts[currentLang].description;
 }
 
-document.getElementById("lang-toggle").addEventListener("click", function () {
-  currentLang = currentLang === "en" ? "it" : "en";
-  document.getElementById("lang-toggle").innerHTML =
-    currentLang === "en" ? "ITA" : "ENG";
-  updateText();
-});
+const langToggle = document.getElementById("lang-toggle");
+if (langToggle) {
+  langToggle.addEventListener("click", function () {
+    currentLang = currentLang === "en" ? "it" : "en";
+    langToggle.innerHTML = currentLang === "en" ? "ITA" : "ENG";
+    updateText();
+  });
+}

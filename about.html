@@ -1,134 +1,215 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
     <meta charset="UTF-8" />
-    <meta name="description" content="Artist" />
+    <meta
+      name="description"
+      content="Enrico Isidori — designer, artist and researcher with an antidisciplinary approach."
+    />
     <meta
       name="keywords"
-      content="enrico isidori, artist, designer, digital artist, video artist, artista, conceptual artist, graphic designer, visual designer, isidori, enrico isidori artist, enrico isidori artista, enrico isidori designer, essayist"
+      content="enrico isidori, isidori, artist, researcher, antidisciplinary, communication design, conceptual artist, visual designer, speculative design, non-human perspectives, descriptive models of design, Politecnico di Milano"
     />
     <meta name="author" content="Enrico Isidori" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Enrico Isidori</title>
-    <link rel="shortcut icon" type="image/x-icon" href="asset/svg/white.ico?" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Enrico Isidori — About</title>
+    <link rel="icon" type="image/png" href="asset/svg/cyan.png" />
+    <link rel="shortcut icon" type="image/png" href="asset/svg/cyan.png" />
+    <link rel="apple-touch-icon" href="asset/svg/cyan.png" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow"
+    />
+    <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
     <link rel="stylesheet" href="./style.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query",
+            generator: "random",
+            grnnamespace: "6",
+            grnlimit: "50",
+            prop: "imageinfo",
+            iiprop: "url|mime",
+            iiurlwidth: "64",
+            format: "json",
+            origin: "*",
+          }),
+      );
+    </script>
   </head>
-  <body>
-    <!--HEADER-->
-    <header id="topnav">
-      <div class="left homebtn"><a href="artist.html">Enrico Isidori</a></div>
-      <div class="right homebtn">
-        <a href="about.html">About</a>
-        <!-- <span class="btn langbtn" id="lang-toggle">ITA</span> -->
+  <body class="has-canvas">
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
+    </div>
+
+    <div id="content-scroll">
+      <header id="topnav">
+        <div class="left homebtn"><a href="home.html">Enrico Isidori</a></div>
+        <div class="right homebtn"><a href="about.html">About</a></div>
+        <br />
+      </header>
+
+      <div class="col-12" style="padding-top: 0px !important">
+        <a href="https://www.instagram.com/enrico.isidori/" target="_blank"
+          >Instagram</a
+        ><br />
+        <a href="mailto:enrico.isidori@gmail.com">Mail</a><br />
+        <br />
+
+        <p class="outdent">
+          Designer, artist and researcher. Milan-based.
+          <br /><br />
+        </p>
+
+        <p class="outdent">
+          Work<br />
+          2025—2026 <br />
+          <a
+            href="https://www.instagram.com/operatingsystem_studio/"
+            target="_blank"
+            >Operating System Studio</a
+          >
+          &
+          <a
+            href="https://www.instagram.com/umanesimo.artificiale/"
+            target="_blank"
+            >Umanesimo Artificiale</a
+          >, Designer <br />
+          2023 <br />
+          <a href="https://gigadesignstudio.com/" target="_blank"
+            >Giga Design Studio</a
+          >, Visual Design Intern
+        </p>
+
+        <p class="outdent">
+          Teaching<br />
+          2026—current <br />
+          <a
+            href="https://www.ied.edu/courses/turin/master-of-arts/communication-and-creative-technologies"
+            target="_blank"
+            >Communication and Creative Technologies</a
+          >, IED Torino, Professor<br />
+          2023—current<br />
+          <a
+            href="https://www.researchgate.net/profile/Enrico_Isidori"
+            target="_blank"
+            >Antidisciplinary Communication Design Lab</a
+          >, Politecnico di Milano, Teaching and Research Assistant<br />
+        </p>
+
+        <p class="outdent">
+          Publications <br />
+          2026 <br />
+          Antidisciplinary Communication Design: A case of studio-based practice
+          for producing embodied, explicit, and discursive knowledge, SID
+          <br />
+          2026 <br />
+          Antidisciplinary design as epistemic resistance: Critical and
+          political agency in communication design education, Progetto Grafico
+          <br />
+          2025 <br />
+          Conspiracy Fiction as a Tool for Critical Thinking: Designing
+          Narratives to Reflect on the Contemporary Information System, Cumulus
+          <br />
+          2024 <br />
+          Anthropogenic Narratives: Imagination and Anti-Disciplinarity for the
+          Communication of Non-Human Perspectives, MDA
+        </p>
+
+        <p class="outdent">
+          Exhibitions<br />
+          Jul 2025<br />
+          <a href="https://www.videocitta.com//" target="_blank">Videocittà</a>,
+          Rome<br />
+          Jun 2025<br />
+          <a href="https://sonar.es/en" target="_blank">Sónar</a>, Barcelona<br />
+          Apr 2025 <br />
+          <a href="https://www.salonemilano.it/en" target="_blank"
+            >Salone Satellite</a
+          >, Rho <br />
+          Feb 2025<br />
+          <a href="https://www.meetcenter.it/en" target="_blank">Meet</a>,
+          Milan<br />
+          Apr 2024 <br />
+          <a href="https://www.fabbricadelvapore.org/" target="_blank"
+            >Fabbrica del Vapore</a
+          >, Milan <br />
+          Mar 2023 <br />
+          <a href="https://triennale.org" target="_blank">Triennale</a>, Milan
+          <br />
+          Sep 2022 <br />
+          <a href="https://www.cavallerizza.to.it/" target="_blank"
+            >Cavallerizza Reale</a
+          >, Turin<br />
+        </p>
+
+        <p class="outdent">
+          Lectures &amp; Conferences<br />
+          15 Feb 2026 <br />
+          Out-of-Place Design Condition, Post-Computing Lab, Elisava, Barcelona
+          <br />
+          6 Jun 2025<br />
+          Ethical Leadership: A New Frontier for Design, Nantes<br />
+          15 Mar 2025 <br />
+          Symposium on Antidisciplinary, Transmedia Research Institute,
+          Politecnico di Milano, Milan <br />
+          9 May 2024<br />
+          Environmental Design 4th International Conference, Ginosa
+        </p>
+
+        <p class="outdent">
+          Features<br />
+          May 2025 <br />
+          <a href="https://www.bellariafilmfestival.org/" target="_blank"
+            >Bellaria Film Festival</a
+          >
+          <br />
+          Nov 2024 <br />
+          <a href="http://www.cdsaawards.com/en/" target="_blank"
+            >CDSA Awards</a
+          >
+          <br />
+          May 2024 <br />
+          <a
+            href="https://www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer"
+            target="_blank"
+            >Pittogramma</a
+          >
+          <br />
+          Sep 2022 <br />
+          <a
+            href="https://www.graphicdays.it/neologia/category/in-mostra/"
+            target="_blank"
+            >Graphic Days</a
+          >
+        </p>
+
+        <p class="outdent">
+          Education <br />
+          BA &amp; MA Communication Design, Politecnico di Milano<br />
+        </p>
+
+        <div
+          style="display: block; float: left; width: 100%; height: 50vh"
+        ></div>
+        <div
+          style="display: block; float: left; height: 10px; width: 100%"
+        ></div>
       </div>
-      <br />
-    </header>
-    <div class="toprectabout"></div>
 
-    <p class="col-12">
-      <!-- Contact<br /> -->
-      <a href="https://www.instagram.com/enrico.isidori/" target="_blank"
-        >@enrico.isidori</a
-      ><br />
-      <a href="mailto:enrico.isidori@gmail.com">enrico.isidori@gmail.com</a
-      ><br />
-    </p>
-
-    <p class="abouttext col-6">
-      <span> Based between Milan and Rome.</span><br /><br />
-
-      <a href="artist.html" class="btnabout" data-filter="designerpage"
-        >Visual designer</a
-      >
-      focusing on the conceptual and process-driven aspects of design, working
-      across graphic, editorial, identity, motion, web, interaction, and
-      exhibition design. <br /><br />
-      <a href="artist.html" class="btnabout" data-filter="artistpage"
-        >Conceptual artist</a
-      >
-      whose practice explores minimal interventions and alterations,
-      investigating the potential of objects both in themselves and as
-      unintentionally made artworks.
-
-      <br /><br />
-      <!-- Essayist focused on anti-disciplinary and speculative design approaches,
-      engaging with design process models. His work explores visual narratives,
-      and the communicative potential of non-human perspectives within
-      contemporary design practice. <br /><br /> -->
-    </p>
-
-    <p class="outdent">
-      Experience<br />
-      2023 — current <br />
-      <a
-        href="https://www.researchgate.net/lab/Anti-Disciplinary-Communication-Design-Studio-Francesco-E-Guida"
-        target="_blank"
-        >Anti-Disciplinary Communication Design Studio</a
-      >, Politecnico di Milano, Teaching Assistant<br />
-      2023 <br />
-      <a href="https://gigadesignstudio.com/" target="_blank"
-        >Giga Design Studio</a
-      >, Visual Design Intern
-    </p>
-
-    <p class="outdent">
-      Academic Publications <br />
-
-      <a
-        href="https://www.researchgate.net/publication/381320778_Anthropogenic_Narratives_Imagination_and_Anti-Disciplinarity_for_the_Communication_of_Non-Human_Perspectives"
-        target="_blank"
-      >
-        International Conference on Environmental Design</a
-      >, Ginosa, Jun 2024 <br />
-    </p>
-
-    <p class="outdent">
-      Exhibithion<br />
-      Interdependence, Fabbrica del Vapore, Milan, Apr 2024 <br />
-      Anthropogenic Narratives,
-      <a href="https://triennale.org" target="_blank">Triennale Milano</a>,
-      Milan, Mar 2023 <br />
-      Graphic Days, Cavallerizza Reale, Turin, Sep 2022<br />
-      International Conference on Electronic Literature, Como, May 2022 <br />
-    </p>
-
-    <p class="outdent">
-      Education <br />
-      MA Communication Design, Politecnico di Milano, ongoing <br />
-      BA Communication Design, Politecnico di Milano, 2023 <br />
-    </p>
-    <p class="outdent">
-      Features<br />
-
-      <a
-        href="https://www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer"
-        target="_blank"
-      >
-        Pittogramma</a
-      >, 2024
-      <br />
-
-      <a
-        href=" https://www.graphicdays.it/neologia/category/in-mostra/"
-        target="_blank"
-      >
-        Nuovi linguaggi del visual design in Italia</a
-      >, 2022
-
-      <br />
-      CDSA Adwards 3rd International Media Art Creativity Competition, 2024
-      <br />
-      <br />
-    </p>
-
-    <!-- <p class="abouttext col-6">
-      Feel free to contact me for commission and collaboration or just to write
-      me somthing Email Instagram
-    </p> -->
-    <div class="spacer5"></div>
+      <div class="spacer5"></div>
+    </div>
 
     <script src="script.js"></script>
+    <script src="aleph.js"></script>
   </body>
 </html>

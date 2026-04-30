@@ -1,193 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
     <meta charset="UTF-8" />
-    <meta name="description" content="Artist" />
+    <meta name="description" content="Enrico Isidori — designer, artist and researcher with an antidisciplinary approach." />
     <meta
       name="keywords"
       content="enrico isidori, artist, designer, digital artist, video artist, artista, conceptual artist, graphic designer, visual designer, isidori, enrico isidori artist, enrico isidori artista, enrico isidori designer, essayist"
     />
     <meta name="author" content="Enrico Isidori" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
     <meta
       name="viewport"
-      content="height=device-height, 
-                      width=device-width, initial-scale=1.0, 
-                      minimum-scale=1.0, maximum-scale=1.0, 
-                      user-scalable=no, target-densitydpi=device-dpi"
+      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-
     <title>Enrico Isidori</title>
-    <link
-      rel="shortcut icon"
-      type="image/x-icon"
-      href="/asset/svg/white.ico?"
-    />
+    <link rel="icon" type="image/png" href="asset/svg/cyan.png" />
+    <link rel="shortcut icon" type="image/png" href="asset/svg/cyan.png" />
+    <link rel="apple-touch-icon" href="asset/svg/cyan.png" />
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
+    <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
     <link rel="stylesheet" href="./style.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query", generator: "random", grnnamespace: "6",
+            grnlimit: "50", prop: "imageinfo", iiprop: "url|mime",
+            iiurlwidth: "64", format: "json", origin: "*",
+          })
+      );
+    </script>
   </head>
-  <body>
-    <!--HEADER-->
-    <header id="topnav">
-      <div class="left homebtn"><a href="artist.html">Enrico Isidori</a></div>
-      <div class="right homebtn"><a href="about.html">About</a></div>
-      <div class="menu">
-        <span id="designer" class="btn" data-filter="designerpage"
-          >Visual Designer</span
-        >
-        <br />
-        <span id="artist" class="btn" data-filter="artistpage"
-          >Conceptual Artist</span
-        >
-
-        <!-- <span id="digital" class="btn" data-filter="digitalpage">Essayist</span> -->
-        <br />
-      </div>
-    </header>
-    <div id="toprect"></div>
-
-    <a href="capsule.html">
-      <div class="designerpage col-6">
-        <img class="thumb" src="asset/capsule/med.jpg" /><br />
-        <p class="thumb">Capsule Plaza</p>
-      </div></a
-    >
-    <a href="drawaline.html">
-      <div class="designerpage col-6">
-        <img class="thumb" src="asset/draw/cover.jpg" /><br />
-        <p class="thumb">Draw a line from one side of the page to the other</p>
-      </div></a
-    >
-
-    <a href="6am.html">
-      <div class="designerpage col-6">
-        <img class="thumb" src="asset/6am/1.jpg" /><br />
-        <p class="thumb">6AM</p>
-      </div></a
-    >
-
-    <a href="spectathesis.html">
-      <div class="designerpage col-6">
-        <img class="thumb" src="asset/specta/thesis/thesis11.jpg" /><br />
-        <p class="thumb">SPECTA® (Thesis)</p>
-      </div></a
-    >
-
-    <a href="specta.html">
-      <div class="designerpage col-6">
-        <img class="thumb" src="asset/specta/specta1.jpg" /><br />
-        <p class="thumb">SPECTA®</p>
-      </div></a
-    >
-
-    <a href="pixelpushing.html">
-      <div class="designerpage col-6">
-        <img class="thumb" src="asset/pixelpushing/preview1.png" /><br />
-        <p class="thumb">Iterations/Inversions</p>
-      </div></a
-    >
-
-    <a href="corpomacchina.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/corpomacchina/2.jpg" />
-        <p class="thumb">Corpo macchina (2023)</p>
-      </div>
-    </a>
-
-    <a href="booksimage.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/booksimage/thumb.jpg" /><br />
-        <p class="thumb">Immagine fisica di un libro (2024)</p>
-      </div>
-    </a>
-
-    <a href="monolite.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/monolite/min.png" /><br />
-        <p class="thumb">Monolite (2023)</p>
-      </div>
-    </a>
-
-    <a href="duedadi.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/dadi/min.jpg" /><br />
-        <p class="thumb">Due dadi (2021)</p>
-      </div>
-    </a>
-
-    <a href="blank.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/blank/min.jpg" /><br />
-        <p class="thumb">Blank (2023)</p>
-      </div>
-    </a>
-
-    <a href="karinswork.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/karinswork/min.jpg" /><br />
-        <p class="thumb">Karin's work (2024)</p>
-      </div>
-    </a>
-
-    <a href="totem.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/totem/totem.jpg" />
-        <p class="thumb">Totem (2023)</p>
-      </div>
-    </a>
-
-    <a href="notprevented.html">
-      <div class="artistpage col-6">
-        <img
-          class="thumb"
-          src="asset/notprevented/IMG_0049_Original.jpg"
-        /><br />
-        <p class="thumb">Not prevented photos (2023)</p>
-      </div>
-    </a>
-
-    <a href="whitecanvas.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/whitecanvas/thumb.jpg" /><br />
-        <p class="thumb">1km x 1km white canvas (2023)</p>
-      </div>
-    </a>
-
-    <a href="iperstizioni.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/iperstizioni/jpg/m10.jpg" /><br />
-        <p class="thumb">Unfolds (2023)</p>
-      </div></a
-    >
-
-    <a href="249.html">
-      <div class="artistpage col-6">
-        <img class="thumb" src="asset/2-49/med.jpg" /><br />
-        <p class="thumb">2<sup>49</sup> (2021)</p>
-      </div>
-    </a>
-
-    <div class="footer">
-      <p class="col-12"><br /></p>
-      <a
-        class="col-6"
-        href="https://www.instagram.com/enrico.isidori/"
-        target="_blank"
-        >@enrico.isidori</a
-      >
-      <a class="col-6" href="mailto:enrico.isidori@gmail.com"
-        >enrico.isidori@gmail.com</a
-      ><br />
+  <body class="has-canvas">
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
     </div>
 
-    <div class="spacer5"></div>
-    <script src="script.js">
+    <div id="content-scroll">
+      <header id="topnav">
+        <div class="left homebtn"><a href="home.html">Enrico Isidori</a></div>
+        <div class="right homebtn"><a href="about/">About</a></div>
+        <div class="menu">
+          <span id="design" class="btn" data-filter="designerpage">Design</span>
+          <br />
+          <span id="art" class="btn" data-filter="artistpage">Art</span>
+          <br />
+        </div>
+      </header>
 
-      document.querySelectorAll('a').forEach(link => {
-          link.addEventListener('click', () => {
-              sessionStorage.setItem('allowAutoplay', 'true');
-          });
+      <a href="capsule/">
+        <div class="designerpage col-6">
+          <img class="thumb" src="capsule/asset/med.jpg" /><br />
+          <p class="thumb">Capsule Plaza</p>
+        </div>
+      </a>
+      <a href="drawaline/">
+        <div class="designerpage col-6">
+          <img class="thumb" src="asset/draw/cover.jpg" /><br />
+          <p class="thumb">Draw a line from one side of the page to the other</p>
+        </div>
+      </a>
+
+      <a href="6am/">
+        <div class="designerpage col-6">
+          <img class="thumb" src="asset/6am/1.jpg" /><br />
+          <p class="thumb">6AM</p>
+        </div>
+      </a>
+
+      <a href="spectathesis/">
+        <div class="designerpage col-6">
+          <img class="thumb" src="asset/specta/thesis/thesis11.jpg" /><br />
+          <p class="thumb">SPECTA® (Thesis)</p>
+        </div>
+      </a>
+
+      <a href="specta/">
+        <div class="designerpage col-6">
+          <img class="thumb" src="asset/specta/specta1.jpg" /><br />
+          <p class="thumb">SPECTA®</p>
+        </div>
+      </a>
+
+      <a href="pixelpushing/">
+        <div class="designerpage col-6">
+          <img class="thumb" src="asset/pixelpushing/preview1.png" /><br />
+          <p class="thumb">Iterations/Inversions</p>
+        </div>
+      </a>
+
+      <a href="corpomacchina/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/corpomacchina/2.jpg" />
+          <p class="thumb">Corpo macchina (2023)</p>
+        </div>
+      </a>
+
+      <a href="booksimage/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/booksimage/thumb.jpg" /><br />
+          <p class="thumb">Immagine fisica di un libro (2024)</p>
+        </div>
+      </a>
+
+      <a href="monolite/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/monolite/min.png" /><br />
+          <p class="thumb">Monolite (2023)</p>
+        </div>
+      </a>
+
+      <a href="duedadi/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/dadi/min.jpg" /><br />
+          <p class="thumb">Due dadi (2021)</p>
+        </div>
+      </a>
+
+      <a href="blank/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/blank/min.jpg" /><br />
+          <p class="thumb">Blank (2023)</p>
+        </div>
+      </a>
+
+      <a href="karinswork/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/karinswork/min.jpg" /><br />
+          <p class="thumb">Karin's work (2024)</p>
+        </div>
+      </a>
+
+      <a href="totem/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/totem/totem.jpg" />
+          <p class="thumb">Totem (2023)</p>
+        </div>
+      </a>
+
+      <a href="notprevented/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/notprevented/IMG_0049_Original.jpg" /><br />
+          <p class="thumb">Not prevented photos (2023)</p>
+        </div>
+      </a>
+
+      <a href="whitecanvas/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/whitecanvas/thumb.jpg" /><br />
+          <p class="thumb">1km x 1km white canvas (2023)</p>
+        </div>
+      </a>
+
+      <a href="iperstizioni/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/iperstizioni/jpg/m10.jpg" /><br />
+          <p class="thumb">Unfolds (2023)</p>
+        </div>
+      </a>
+
+      <a href="249/">
+        <div class="artistpage col-6">
+          <img class="thumb" src="asset/2-49/med.jpg" /><br />
+          <p class="thumb">2<sup>49</sup> (2021)</p>
+        </div>
+      </a>
+
+      <div class="footer">
+        <p class="col-12"><br /></p>
+        <a class="col-6" href="https://www.instagram.com/enrico.isidori/" target="_blank">@enrico.isidori</a>
+        <a class="col-6" href="mailto:enrico.isidori@gmail.com">enrico.isidori@gmail.com</a><br />
+      </div>
+
+      <div class="spacer5"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="aleph.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const saved = sessionStorage.getItem('homeScrollY');
+        if (saved) {
+          const scroll = document.getElementById('content-scroll');
+          if (scroll) scroll.scrollTop = parseInt(saved, 10);
+          sessionStorage.removeItem('homeScrollY');
+        }
+      });
+      document.querySelectorAll('#content-scroll a[href]').forEach((a) => {
+        a.addEventListener('click', () => {
+          sessionStorage.setItem('allowAutoplay', '1');
+          const scroll = document.getElementById('content-scroll');
+          if (scroll) sessionStorage.setItem('homeScrollY', scroll.scrollTop);
+        });
       });
     </script>
   </body>
