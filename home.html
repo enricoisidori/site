@@ -4,7 +4,10 @@
     <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
     <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
     <meta charset="UTF-8" />
-    <meta name="description" content="Enrico Isidori — designer, artist and researcher with an antidisciplinary approach." />
+    <meta
+      name="description"
+      content="Enrico Isidori — designer, artist and researcher with an antidisciplinary approach."
+    />
     <meta
       name="keywords"
       content="enrico isidori, artist, designer, digital artist, video artist, artista, conceptual artist, graphic designer, visual designer, isidori, enrico isidori artist, enrico isidori artista, enrico isidori designer, essayist"
@@ -20,17 +23,26 @@
     <link rel="icon" type="image/png" href="asset/svg/cyan.png" />
     <link rel="shortcut icon" type="image/png" href="asset/svg/cyan.png" />
     <link rel="apple-touch-icon" href="asset/svg/cyan.png" />
-    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow"
+    />
     <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
     <link rel="stylesheet" href="./style.css" />
     <script>
       window.__alephPrefetch = fetch(
         "https://commons.wikimedia.org/w/api.php?" +
           new URLSearchParams({
-            action: "query", generator: "random", grnnamespace: "6",
-            grnlimit: "50", prop: "imageinfo", iiprop: "url|mime",
-            iiurlwidth: "64", format: "json", origin: "*",
-          })
+            action: "query",
+            generator: "random",
+            grnnamespace: "6",
+            grnlimit: "50",
+            prop: "imageinfo",
+            iiprop: "url|mime",
+            iiurlwidth: "64",
+            format: "json",
+            origin: "*",
+          }),
       );
     </script>
   </head>
@@ -51,6 +63,13 @@
         </div>
       </header>
 
+      <a href="n+/">
+        <div class="designerpage artistpage col-6">
+          <img class="thumb" src="n+/asset/n-1.jpg" /><br />
+          <p class="thumb">N+ Cognitive Supremacy</p>
+        </div>
+      </a>
+
       <a href="capsule/">
         <div class="designerpage col-6">
           <img class="thumb" src="capsule/asset/med.jpg" /><br />
@@ -60,7 +79,9 @@
       <a href="drawaline/">
         <div class="designerpage col-6">
           <img class="thumb" src="drawaline/asset/cover.jpg" /><br />
-          <p class="thumb">Draw a line from one side of the page to the other</p>
+          <p class="thumb">
+            Draw a line from one side of the page to the other
+          </p>
         </div>
       </a>
 
@@ -143,7 +164,10 @@
 
       <a href="notprevented/">
         <div class="artistpage col-6">
-          <img class="thumb" src="notprevented/asset/IMG_0049_Original.jpg" /><br />
+          <img
+            class="thumb"
+            src="notprevented/asset/IMG_0049_Original.jpg"
+          /><br />
           <p class="thumb">Not prevented photos (2023)</p>
         </div>
       </a>
@@ -171,8 +195,15 @@
 
       <div class="footer">
         <p class="col-12"><br /></p>
-        <a class="col-6" href="https://www.instagram.com/enrico.isidori/" target="_blank">@enrico.isidori</a>
-        <a class="col-6" href="mailto:enrico.isidori@gmail.com">enrico.isidori@gmail.com</a><br />
+        <a
+          class="col-6"
+          href="https://www.instagram.com/enrico.isidori/"
+          target="_blank"
+          >@enrico.isidori</a
+        >
+        <a class="col-6" href="mailto:enrico.isidori@gmail.com"
+          >enrico.isidori@gmail.com</a
+        ><br />
       </div>
 
       <div class="spacer5"></div>
@@ -181,19 +212,19 @@
     <script src="script.js"></script>
     <script src="aleph.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const saved = sessionStorage.getItem('homeScrollY');
+      document.addEventListener("DOMContentLoaded", () => {
+        const saved = sessionStorage.getItem("homeScrollY");
         if (saved) {
-          const scroll = document.getElementById('content-scroll');
+          const scroll = document.getElementById("content-scroll");
           if (scroll) scroll.scrollTop = parseInt(saved, 10);
-          sessionStorage.removeItem('homeScrollY');
+          sessionStorage.removeItem("homeScrollY");
         }
       });
-      document.querySelectorAll('#content-scroll a[href]').forEach((a) => {
-        a.addEventListener('click', () => {
-          sessionStorage.setItem('allowAutoplay', '1');
-          const scroll = document.getElementById('content-scroll');
-          if (scroll) sessionStorage.setItem('homeScrollY', scroll.scrollTop);
+      document.querySelectorAll("#content-scroll a[href]").forEach((a) => {
+        a.addEventListener("click", () => {
+          sessionStorage.setItem("allowAutoplay", "1");
+          const scroll = document.getElementById("content-scroll");
+          if (scroll) sessionStorage.setItem("homeScrollY", scroll.scrollTop);
         });
       });
     </script>
