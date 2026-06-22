@@ -1,0 +1,914 @@
+/* Resto del CSS */
+@import url("https://fonts.cdnfonts.com/css/helvetica-lt-narrow");
+
+:root {
+  --content-top-offset: calc(env(safe-area-inset-top, 0px) + 2.5px);
+}
+/* .info,
+.topnav,
+header,
+.footer,
+.fluxtext,
+*/
+
+/* [class*="page"]:hover {
+  -webkit-filter: invert();
+  filter: invert();
+} */
+
+* {
+  font-family: "Helvetica LT Narrow", sans-serif;
+  font-weight: 400;
+  font-size: 14pt;
+  line-height: 16pt;
+  box-sizing: border-box;
+}
+
+html {
+  width: auto;
+  background-color: white;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+a:-webkit-any-link {
+  text-decoration: underline;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+.info {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: auto;
+  overflow-y: visible;
+  width: 25%;
+}
+
+.outdent {
+  float: left;
+  margin-left: 0;
+  width: 100%;
+  text-indent: 0;
+}
+
+.outdent .outdent {
+  display: block;
+  float: none;
+  margin-left: 0;
+  width: 100%;
+  text-indent: 0;
+}
+
+.indent {
+  display: block;
+  text-indent: 0;
+}
+
+.description + .outdent,
+.outdent + .outdent {
+  margin-top: 16pt;
+}
+
+.description {
+  margin-bottom: 1em;
+}
+
+#toprectsigle {
+  height: 42.66px;
+  /* margin-bottom: 16px; */
+  width: 100%;
+}
+
+/* br {
+  line-height: 10px;
+} */
+
+body {
+  margin: 2.5px;
+  background-color: white;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.btn.active {
+  color: black;
+}
+
+video::-webkit-media-controls {
+  display: none;
+}
+
+*::-webkit-media-controls-panel {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+*::--webkit-media-controls-play-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+*::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.toprectabout {
+  height: 21.5px;
+}
+
+div {
+  margin: 0;
+}
+
+a:link {
+  color: black;
+}
+
+.homebtn a {
+  text-decoration: none;
+  color: black;
+}
+
+.homebtn a:hover {
+  text-decoration: none;
+  color: black;
+}
+
+.thumb {
+  width: 100%;
+}
+
+p.thumb {
+  margin: -3px 0 0px 0;
+}
+
+img.thumb {
+  object-fit: cover;
+  aspect-ratio: 3/2;
+}
+
+video .thumb {
+  object-fit: cover;
+  aspect-ratio: 3/2;
+  width: 100%;
+}
+
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+#project-float-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#project-float-layer img,
+#project-float-layer video {
+  position: absolute;
+  display: block;
+  height: auto;
+  max-height: 40vh;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+#project-float-layer .project-float-mobile {
+  max-height: 58vh;
+  min-width: 52vw;
+}
+
+/* Pulsante aqua (stile OS X / glossy) */
+a.btn-aqua,
+button.btn-aqua {
+  display: inline-block;
+  width: fit-content;
+  font-size: 14pt;
+  font-family: "Helvetica LT Narrow", system-ui, sans-serif;
+  height: auto;
+  padding: 0.35em 1em;
+  border-radius: 1000px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  text-decoration: none !important;
+  color: #000;
+  vertical-align: middle;
+  line-height: 1.4;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.btn-aqua-stack {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.btn-aqua-stack .btn-aqua {
+  pointer-events: auto;
+}
+
+a.btn-aqua.primary,
+button.btn-aqua.primary {
+  background: linear-gradient(
+    rgba(0, 65, 184, 0.625),
+    rgba(45, 115, 199, 0.625),
+    rgba(33, 160, 196, 0.625)
+  );
+  box-shadow:
+    0 0.375em 0.5em rgba(0, 0, 0, 0.3),
+    0 0.125em 0.125em rgba(0, 78, 187, 0.5),
+    inset 0 0.25em 0.5em rgba(0, 17, 49, 0.8),
+    inset 0 0.375em 0.5em 0.25em rgba(0, 78, 187, 0.75);
+}
+
+.btn-aqua.project-btn {
+  color: pink !important;
+}
+
+a.btn-aqua.primary:hover,
+button.btn-aqua.primary:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 48, 115, 0.72) 0%,
+    rgba(28, 98, 178, 0.68) 42%,
+    rgba(48, 148, 192, 0.64) 100%
+  );
+  box-shadow:
+    0 0.375em 0.5em rgba(0, 0, 0, 0.3),
+    0 0.125em 0.125em rgba(0, 78, 187, 0.5),
+    inset 0 0.35em 0.6em rgba(0, 17, 49, 0.55),
+    inset 0 0.1em 0.22em rgba(0, 30, 80, 0.22),
+    inset 0 -0.14em 0.22em rgba(255, 255, 255, 0.38);
+}
+
+a.btn-aqua.primary:focus,
+a.btn-aqua.primary:active,
+button.btn-aqua.primary:focus,
+button.btn-aqua.primary:active {
+  box-shadow:
+    0 0.375em 0.5em rgba(0, 0, 0, 0.3),
+    0 0.125em 0.125em rgba(0, 78, 187, 0.5),
+    inset 0 0.25em 0.5em rgba(0, 17, 49, 0.8),
+    inset 0 0.375em 0.5em 0.25em rgba(0, 78, 187, 0.75),
+    0 0 0.5em rgba(52, 106, 227, 0.5);
+}
+
+a.btn-aqua:before,
+button.btn-aqua:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 33%;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.3)
+  );
+  width: calc(100% - 0.875em);
+  border-radius: 2em 2em 0.5em 0.5em;
+  top: 5%;
+  filter: blur(1px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+a.btn-aqua:hover:before,
+button.btn-aqua:hover:before {
+  height: 42%;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 30, 85, 0.26) 0%,
+    rgba(0, 50, 120, 0.1) 55%,
+    transparent 100%
+  );
+  width: calc(100% - 0.6em);
+  border-radius: 2em 2em 1.2em 1.2em;
+  top: 3%;
+  filter: blur(0.5px);
+}
+
+a.btn-aqua:after,
+button.btn-aqua:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 33%;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.5)
+  );
+  width: calc(100% - 1.25em);
+  border-radius: 0.75em;
+  bottom: 10%;
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+a.btn-aqua:hover:after,
+button.btn-aqua:hover:after {
+  height: 22%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 35%,
+    rgba(255, 255, 255, 0.62) 100%
+  );
+  width: calc(100% - 1.1em);
+  border-radius: 0.4em 0.4em 1.4em 1.4em;
+  bottom: 5%;
+  filter: blur(0.5px);
+}
+
+a.btn-aqua span,
+button.btn-aqua span {
+  position: relative;
+  top: -1px;
+  z-index: 3;
+  letter-spacing: 0.0375em;
+  color: #000;
+  -webkit-text-stroke-width: 0;
+  text-shadow: none;
+}
+
+a.btn-aqua.primary span,
+button.btn-aqua.primary span {
+  text-shadow: none;
+}
+
+a.btn-aqua:visited {
+  color: #000;
+}
+
+.imgpro-container > video,
+.imgpro-container > .video-unmute {
+  display: block;
+  margin-bottom: 16pt;
+}
+
+.video-small {
+  width: 50%;
+  max-width: 50%;
+}
+
+/* Video con pulsante Unmute/Mute in alto a sinistra */
+.video-unmute {
+  position: relative;
+  max-width: 100%;
+  cursor: pointer;
+}
+
+.video-unmute video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.video-unmute-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  padding: 5px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  line-height: inherit;
+  color: #fff;
+  mix-blend-mode: difference;
+  text-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.video-unmute:hover .video-unmute-btn {
+  opacity: 1;
+}
+
+.imgpro {
+  width: 100%;
+}
+
+/* Aggiungi questa classe per i pulsanti non attivi */
+.btn.inactive {
+  color: grey;
+}
+
+/* Assicurati che il colore resti grigio anche in hover */
+.btn.inactive:hover {
+  color: black;
+}
+
+.plainlink {
+  text-decoration: none !important;
+}
+
+.thumb:hover {
+  cursor: pointer;
+}
+
+.btn {
+  text-decoration: none !important;
+  color: grey;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+.btnabout {
+  text-decoration: none !important;
+  color: grey;
+}
+
+.btnabout:hover {
+  text-decoration: none;
+  color: black !important;
+}
+
+.btnabout:visited {
+  color: grey;
+}
+#works {
+  color: black;
+}
+
+/* .text-container {
+  font-family: "Tinos", serif;
+  font-weight: 400;
+  font-style: normal;
+} */
+
+#content {
+  margin-top: -16pt;
+}
+
+.btn:hover {
+  color: black;
+  cursor: pointer;
+}
+
+.btn:active {
+  color: black;
+}
+
+btn:focus {
+  color: black;
+}
+
+.artistpage {
+  display: none;
+}
+
+.fluxtext {
+  margin: -2.5px 0 2.5px 0;
+}
+
+.designerpage {
+  display: none;
+}
+
+.digitalpage {
+  display: none;
+}
+
+a:visited {
+  color: black;
+}
+
+.btn:visited {
+  color: grey;
+}
+
+a:hover {
+  color: black;
+  text-decoration: none;
+}
+
+a:active {
+  color: black;
+}
+
+::-moz-selection {
+  color: white;
+  background: black;
+}
+
+::selection {
+  color: white;
+  background: black;
+}
+
+p {
+  display: block;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+}
+
+#topnav {
+  width: 100vw;
+  position: fixed;
+  z-index: 3;
+}
+
+#toprect {
+  width: 100vw;
+  height: 66px; /* 88px */
+}
+
+.toprectpage {
+  width: 100vw;
+  height: 16pt;
+}
+
+.left {
+  float: left;
+  padding: 2.5px;
+  padding-bottom: 0;
+  width: 50%;
+  text-align: left;
+}
+
+.right {
+  float: left;
+  padding: 2.5px;
+  padding-bottom: 0;
+  width: 50%;
+  text-align: left;
+}
+
+.center {
+  float: left;
+  padding: 2.5px;
+  width: 33.33%;
+  text-align: center;
+}
+
+table {
+  border-collapse: separate;
+  text-align: left;
+  text-indent: 0%;
+  border-spacing: 2px;
+  padding: 0 !important;
+  border-spacing: 0px;
+}
+
+th {
+  width: 16.66%;
+  text-align: left;
+  vertical-align: text-top;
+  padding: 2.5px !important;
+}
+
+.menu {
+  width: 50%;
+  float: left;
+
+  padding: 0px 2.5px 0px 2.5px;
+}
+
+.closebtn {
+  text-decoration: none !important;
+  color: grey !important;
+}
+
+.closebtn:hover {
+  text-decoration: none !important;
+  color: black !important;
+}
+
+.langbtn {
+  float: right;
+  margin-right: 5px;
+}
+
+.div100 {
+  width: 100%;
+}
+
+.div50l {
+  width: 50%;
+  float: left;
+  padding-right: 2.5px;
+  padding-bottom: 2.5px;
+  padding-top: 2.5px;
+}
+
+.div50r {
+  width: 50%;
+  float: left;
+  padding-left: 2.5px;
+  padding-bottom: 2.5px;
+  padding-top: 2.5px;
+}
+
+.div33 {
+  width: 33.33%;
+}
+
+.div25 {
+  width: 25%;
+}
+
+sup {
+  font-size: 10pt;
+  line-height: 0pt;
+}
+
+.colum2 {
+  padding-bottom: 2.5px !important;
+}
+
+[class*="div"] {
+  float: left;
+}
+
+.col-1 {
+  width: 8.33%;
+}
+.col-2 {
+  width: 16.66%;
+}
+
+.col-2bis {
+  width: 22.22%;
+}
+
+.col-3 {
+  width: 25%;
+}
+.col-4 {
+  width: 33.33%;
+}
+.col-5 {
+  width: 41.66%;
+}
+.col-6 {
+  width: 50%;
+}
+.col-7 {
+  width: 58.33%;
+}
+.col-8 {
+  width: 66.66%;
+}
+.col-9 {
+  width: 75%;
+}
+.col-10 {
+  width: 83.33%;
+}
+.col-11 {
+  width: 91.66%;
+}
+.col-12 {
+  width: 100%;
+}
+
+[class*="col-"] {
+  float: left;
+  padding-left: 2.5px;
+  padding-right: 2.5px;
+  padding-top: 2.5px;
+  padding-bottom: 0px;
+}
+
+.spacer5 {
+  float: left;
+  width: 100%;
+  height: 10px;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.gallery {
+  width: 100%;
+}
+
+.mobile {
+  display: none;
+}
+
+/* ── Pagine con canvas Wikipedia di sfondo (home, about) ────────── */
+body.has-canvas {
+  margin: 0;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.has-canvas #aleph-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #fff;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body.has-canvas #aleph-canvas {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  display: block;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+body.has-canvas #content-scroll {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  z-index: 10;
+  padding: var(--content-top-offset) 2.5px 2.5px 2.5px;
+}
+
+/* Testo sopra il canvas: alone bianco per leggibilità */
+body.has-canvas #content-scroll {
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff;
+}
+
+body.white-bg #content-scroll,
+body.white-bg #content-scroll * {
+  text-shadow: none !important;
+}
+
+body.has-canvas #content-scroll a,
+body.has-canvas #content-scroll p {
+  user-select: text;
+}
+
+/* Header sticky in cima al content-scroll (che è fixed nel viewport).
+   display: flow-root = clearfix dei figli float (.left, .right, .menu)
+   senza il quale l'header collassa in altezza. */
+body.has-canvas #topnav {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 11;
+  background: transparent;
+  display: flow-root;
+}
+
+/* I bottoni Design / Art occupano l'intera riga (full-width) */
+body.has-canvas .menu {
+  width: 100%;
+  clear: both;
+}
+
+/* Clearfix invisibile dopo l'header (toprect rimosso dal markup) */
+body.has-canvas #topnav::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Container relativo per il canvas hover-luma */
+body.has-canvas .designerpage,
+body.has-canvas .artistpage {
+  position: relative;
+}
+
+/* Canvas overlay per luma key on hover (gestito da hover-luma.js) */
+.hover-luma-canvas {
+  position: absolute;
+  pointer-events: none;
+  display: block;
+  opacity: 0;
+}
+
+/* Reset del padding dei contenitori col-* dentro lo scroll fixed,
+   per evitare doppio margine 2.5px (uno dal padding container, uno dal col-) */
+body.has-canvas #content-scroll > [class*="col-"]:first-child {
+  padding-top: 0;
+}
+
+@media only screen and (max-width: 768px) {
+  [class*="col-"] {
+    width: 100%;
+  }
+
+  .info {
+    width: 100%;
+  }
+
+  .outdent {
+    margin-left: 20px;
+    width: 100%;
+    text-indent: 0;
+  }
+
+  .outdent .outdent {
+    margin-left: 0;
+    width: 100%;
+    text-indent: 0;
+  }
+
+  .indent {
+    text-indent: 0;
+  }
+
+  .div50l {
+    width: 100%;
+  }
+
+  .div50r {
+    width: 100%;
+  }
+
+  /* .btn:hover {
+    color: grey;
+  } */
+
+  #toprect {
+    height: 66px; /* 101px; */
+  }
+
+  #content {
+    margin-top: 0pt;
+  }
+
+  .fluxtext {
+    margin: 0px 0 5px 0;
+  }
+
+  #toprectsigle {
+    height: 42.66px;
+    /* margin-bottom: 18pt; */
+  }
+
+  /* {
+    font-size: 17pt;
+    line-height: 18pt;
+  } */
+
+  .footer {
+    padding-top: 18px;
+  }
+
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: inline;
+  }
+
+  p.thumb {
+    margin: -2.5px 0 1.5px 0;
+  }
+
+  body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: auto;
+    min-height: 100vh;
+  }
+}

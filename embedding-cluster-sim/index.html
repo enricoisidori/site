@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Embedding cluster simulation</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="workspace">
+      <section class="visualizer" aria-label="Simulazione 3D di risposte embedded">
+        <header class="topbar">
+          <div class="title-block">
+            <p class="eyebrow">Dataset placeholder</p>
+            <h1>Risposte in uno spazio vettoriale 3D</h1>
+          </div>
+
+          <div class="top-actions">
+            <div class="metric" aria-label="Numero di risposte">
+              <strong id="answerCount">0</strong>
+              <span>risposte</span>
+            </div>
+            <div class="metric" aria-label="Numero di cluster">
+              <strong id="clusterCount">0</strong>
+              <span>cluster</span>
+            </div>
+            <button id="resetView" class="ghost-button" type="button">Vista iniziale</button>
+          </div>
+        </header>
+
+        <div class="stage" id="stage">
+          <canvas id="embeddingCanvas" aria-label="Grafico 3D delle risposte"></canvas>
+          <div class="label-layer" id="labelLayer" aria-hidden="true"></div>
+
+          <aside class="detail-panel" aria-live="polite">
+            <p class="detail-source" id="detailSource">Risposta campione</p>
+            <h2 id="detailCluster">Metodo / processo</h2>
+            <p class="answer-text" id="detailText"></p>
+            <dl class="detail-grid">
+              <div>
+                <dt>Coordinate</dt>
+                <dd id="detailCoordinates">x 0.00, y 0.00, z 0.00</dd>
+              </div>
+              <div>
+                <dt>Somiglianza</dt>
+                <dd id="detailSimilarity">0%</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <section class="response-band" aria-labelledby="questionTitle">
+        <div class="question-copy">
+          <p class="eyebrow">Domanda placeholder</p>
+          <h2 id="questionTitle">Quale cambiamento renderebbe questa esperienza piu utile per te?</h2>
+        </div>
+
+        <form class="response-form" id="responseForm">
+          <label for="answerInput">La tua risposta</label>
+          <div class="input-row">
+            <textarea
+              id="answerInput"
+              name="answer"
+              maxlength="220"
+              rows="3"
+              placeholder="Scrivi una risposta breve..."
+            ></textarea>
+            <button type="submit">Aggiungi risposta</button>
+          </div>
+          <p class="form-note" id="formNote" aria-live="polite">Pronto per una nuova risposta.</p>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

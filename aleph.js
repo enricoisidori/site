@@ -1,21 +1,47 @@
 (function () {
+  const ALEPH_BACKGROUND_ENABLED = true;
+  const PROJECT_FLOAT_ENABLED = false;
+  window.__projectFloatEnabled = PROJECT_FLOAT_ENABLED;
+
   const stage = document.getElementById("aleph-stage");
   const contentScroll = document.getElementById("content-scroll");
   const canvas = document.getElementById("aleph-canvas");
   if (!stage || !contentScroll || !canvas) return;
 
   const root = document.documentElement;
+  if (!ALEPH_BACKGROUND_ENABLED) {
+    stage.style.display = "none";
+    document.body.classList.add("white-bg");
+    root.style.setProperty("--root-bg-image", "none");
+    return;
+  }
+
   let whiteBg = localStorage.getItem("aleph_white_bg") === "1";
   if (whiteBg) { stage.style.display = "none"; document.body.classList.add("white-bg"); }
 
   document.body.addEventListener("click", (e) => {
     if (e.target.closest("a")) return;
     if (e.target.closest(".btn")) return;
+    if (e.target.closest(".video-unmute")) return;
     if (e.target.closest("[class*='page']")) return;
+
+    if (window.ProjectFloat?.hasVisible?.()) {
+      window.ProjectFloat.dismiss();
+      whiteBg = true;
+      localStorage.setItem("aleph_white_bg", "1");
+      stage.style.display = "none";
+      document.body.classList.add("white-bg");
+      window.ProjectFloat.pause?.();
+      root.style.setProperty("--root-bg-image", "none");
+      return;
+    }
+
     whiteBg = !whiteBg;
     localStorage.setItem("aleph_white_bg", whiteBg ? "1" : "0");
     stage.style.display = whiteBg ? "none" : "";
     document.body.classList.toggle("white-bg", whiteBg);
+    if (whiteBg) window.ProjectFloat?.pause?.();
+    else window.ProjectFloat?.restart?.();
     root.style.setProperty(
       "--root-bg-image",
       whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`
@@ -409,4 +435,17 @@
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) scheduleRender();
   });
+})();
+
+(function () {
+  if (window.__projectFloatEnabled === false) return;
+
+  const scripts = document.getElementsByTagName("script");
+  for (const s of scripts) {
+    if (!s.src || !/aleph\.js(?:\?.*)?$/.test(s.src)) continue;
+    const float = document.createElement("script");
+    float.src = s.src.replace(/aleph\.js(?:\?.*)?$/, "project-float.js");
+    document.head.appendChild(float);
+    break;
+  }
 })();

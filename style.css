@@ -57,6 +57,23 @@ html {
   text-indent: -40px;
 }
 
+.outdent .outdent {
+  display: block;
+  float: none;
+  margin-left: 0;
+  width: 100%;
+  text-indent: -40px;
+}
+
+.indent {
+  display: block;
+  text-indent: 40px;
+}
+
+.description {
+  margin-bottom: 1em;
+}
+
 #toprectsigle {
   height: 42.66px;
   /* margin-bottom: 16px; */
@@ -84,7 +101,6 @@ body {
 .btn.active {
   color: black;
 }
-
 
 video::-webkit-media-controls {
   display: none;
@@ -149,6 +165,250 @@ video .thumb {
 video {
   max-width: 100%;
   height: auto;
+}
+
+#project-float-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#project-float-layer img,
+#project-float-layer video {
+  position: absolute;
+  display: block;
+  height: auto;
+  max-height: 40vh;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+#project-float-layer .project-float-mobile {
+  max-height: 58vh;
+  min-width: 52vw;
+}
+
+/* Pulsante aqua (stile OS X / glossy) */
+a.btn-aqua,
+button.btn-aqua {
+  display: inline-block;
+  width: fit-content;
+  font-size: 14pt;
+  font-family: "Helvetica LT Narrow", system-ui, sans-serif;
+  height: auto;
+  padding: 0.35em 1em;
+  border-radius: 1000px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  text-decoration: none !important;
+  color: #000;
+  vertical-align: middle;
+  line-height: 1.4;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.btn-aqua-stack {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.btn-aqua-stack .btn-aqua {
+  pointer-events: auto;
+}
+
+a.btn-aqua.primary,
+button.btn-aqua.primary {
+  background: linear-gradient(
+    rgba(0, 65, 184, 0.625),
+    rgba(45, 115, 199, 0.625),
+    rgba(33, 160, 196, 0.625)
+  );
+  box-shadow:
+    0 0.375em 0.5em rgba(0, 0, 0, 0.3),
+    0 0.125em 0.125em rgba(0, 78, 187, 0.5),
+    inset 0 0.25em 0.5em rgba(0, 17, 49, 0.8),
+    inset 0 0.375em 0.5em 0.25em rgba(0, 78, 187, 0.75);
+}
+
+.btn-aqua.project-btn {
+  color: pink !important;
+}
+
+a.btn-aqua.primary:hover,
+button.btn-aqua.primary:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 48, 115, 0.72) 0%,
+    rgba(28, 98, 178, 0.68) 42%,
+    rgba(48, 148, 192, 0.64) 100%
+  );
+  box-shadow:
+    0 0.375em 0.5em rgba(0, 0, 0, 0.3),
+    0 0.125em 0.125em rgba(0, 78, 187, 0.5),
+    inset 0 0.35em 0.6em rgba(0, 17, 49, 0.55),
+    inset 0 0.1em 0.22em rgba(0, 30, 80, 0.22),
+    inset 0 -0.14em 0.22em rgba(255, 255, 255, 0.38);
+}
+
+a.btn-aqua.primary:focus,
+a.btn-aqua.primary:active,
+button.btn-aqua.primary:focus,
+button.btn-aqua.primary:active {
+  box-shadow:
+    0 0.375em 0.5em rgba(0, 0, 0, 0.3),
+    0 0.125em 0.125em rgba(0, 78, 187, 0.5),
+    inset 0 0.25em 0.5em rgba(0, 17, 49, 0.8),
+    inset 0 0.375em 0.5em 0.25em rgba(0, 78, 187, 0.75),
+    0 0 0.5em rgba(52, 106, 227, 0.5);
+}
+
+a.btn-aqua:before,
+button.btn-aqua:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 33%;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.3)
+  );
+  width: calc(100% - 0.875em);
+  border-radius: 2em 2em 0.5em 0.5em;
+  top: 5%;
+  filter: blur(1px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+a.btn-aqua:hover:before,
+button.btn-aqua:hover:before {
+  height: 42%;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 30, 85, 0.26) 0%,
+    rgba(0, 50, 120, 0.1) 55%,
+    transparent 100%
+  );
+  width: calc(100% - 0.6em);
+  border-radius: 2em 2em 1.2em 1.2em;
+  top: 3%;
+  filter: blur(0.5px);
+}
+
+a.btn-aqua:after,
+button.btn-aqua:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 33%;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.5)
+  );
+  width: calc(100% - 1.25em);
+  border-radius: 0.75em;
+  bottom: 10%;
+  filter: blur(3px);
+  pointer-events: none;
+}
+
+a.btn-aqua:hover:after,
+button.btn-aqua:hover:after {
+  height: 22%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 35%,
+    rgba(255, 255, 255, 0.62) 100%
+  );
+  width: calc(100% - 1.1em);
+  border-radius: 0.4em 0.4em 1.4em 1.4em;
+  bottom: 5%;
+  filter: blur(0.5px);
+}
+
+a.btn-aqua span,
+button.btn-aqua span {
+  position: relative;
+  top: -1px;
+  z-index: 3;
+  letter-spacing: 0.0375em;
+  color: #000;
+  -webkit-text-stroke-width: 0;
+  text-shadow: none;
+}
+
+a.btn-aqua.primary span,
+button.btn-aqua.primary span {
+  text-shadow: none;
+}
+
+a.btn-aqua:visited {
+  color: #000;
+}
+
+.imgpro-container > video,
+.imgpro-container > .video-unmute {
+  display: block;
+  margin-bottom: 16pt;
+}
+
+.video-small {
+  width: 50%;
+  max-width: 50%;
+}
+
+/* Video con pulsante Unmute/Mute in alto a sinistra */
+.video-unmute {
+  position: relative;
+  max-width: 100%;
+  cursor: pointer;
+}
+
+.video-unmute video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.video-unmute-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  padding: 5px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  line-height: inherit;
+  color: #fff;
+  mix-blend-mode: difference;
+  text-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.video-unmute:hover .video-unmute-btn {
+  opacity: 1;
 }
 
 .imgpro {
@@ -577,6 +837,16 @@ body.has-canvas #content-scroll > [class*="col-"]:first-child {
     margin-left: 20px;
     width: calc(100% - 20px);
     text-indent: -20px;
+  }
+
+  .outdent .outdent {
+    margin-left: 0;
+    width: 100%;
+    text-indent: -20px;
+  }
+
+  .indent {
+    text-indent: 20px;
   }
 
   .div50l {

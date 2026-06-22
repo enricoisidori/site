@@ -36,7 +36,7 @@ para-disciplinary design, unbounded design, design approaches"
     />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
-    <script>
+    <!-- <script>
       window.__alephPrefetch = fetch(
         "https://commons.wikimedia.org/w/api.php?" +
           new URLSearchParams({
@@ -45,7 +45,7 @@ para-disciplinary design, unbounded design, design approaches"
             iiurlwidth: "64", format: "json", origin: "*",
           })
       );
-    </script>
+    </script> -->
     <style>
       :root {
         --content-top-offset: calc(env(safe-area-inset-top, 0px) + 2.5px);
@@ -123,29 +123,52 @@ para-disciplinary design, unbounded design, design approaches"
       <canvas id="aleph-canvas"></canvas>
     </div>
 
+    <div class="btn-aqua-stack">
+      <!-- <a class="btn-aqua primary" href="mailto:enrico.isidori@gmail.com"
+        ><span>Get in touch</span></a
+      > -->
+      <!-- <a
+        class="btn-aqua primary"
+        href="https://www.instagram.com/enrico.isidori/"
+        target="_blank"
+        rel="noopener noreferrer"
+        ><span>Instagram</span></a
+      > -->
+    </div>
+
     <div id="content-scroll">
     <div class="col-12">
       <span>Enrico Isidori</span><br />
       <a href="https://www.instagram.com/enrico.isidori/" target="_blank"
-        >Instagram</a
+        >@enrico.isidori</a
       ><br />
-      <a href="mailto:enrico.isidori@gmail.com">Mail</a><br />
+      <a href="mailto:enrico.isidori@gmail.com">enrico.isidori@gmail.com</a><br />
 
       <br />
       <p class="outdent">
-  
-        Designer, artist, researcher interested in vernacular forms and practices of visual unlearning. Milan-based.
-           <br />
-        Design practice spans visual, exhibition, interaction, data-information, brand, graphic, editorial, motion, web, art direction, strategy, creative coding, diagram making, rabbit-holing and doomscrolling.
-
-              <br /> Artistic practice investigates the potential of objects activated through minimal interventions.<br />
-Research practice delves into non-disciplinary approaches and non-linear design processes.  <br />  </p>    <p class="outdent">
-<a href="mailto:enrico.isidori@gmail.com">Get in touch</a> for commissions, collaborations, or an exchange of ideas.
-
-
-          <br />
-      <br />
+        Designer, artist, researcher with a concept-driven approach grounded in visual inquiry.
       </p>
+      <p class="outdent">
+        <span class="outdent">
+          Design practice spans visual, exhibition, interaction,
+          data-information, brand, graphic, editorial, motion, web, creative-art direction,
+          strategy, creative coding, diagram making, rabbit-holing and
+          doomscrolling.
+        </span>
+        <span class="outdent">
+          Artistic practice investigates the potential of objects activated
+          through minimal interventions.
+        </span>
+        <span class="outdent">
+          Research practice delves into non-disciplinary approaches and
+          non-linear design processes.
+        </span>
+      </p>
+      <p class="outdent">&nbsp;</p>
+      <p class="outdent">
+        <a href="mailto:enrico.isidori@gmail.com">Get in touch</a> for commissions, collaborations, or an exchange of ideas.
+      </p>
+      <p class="outdent">&nbsp;</p>
     
  
       <!-- <p class="outdent">
@@ -174,7 +197,7 @@ Research practice delves into non-disciplinary approaches and non-linear design 
 
  
      2026—current <br />
-            Freelancer <br />
+            Freelancer (Milan-based) <br />
             2025—2026 <br />
         <a
           href="https://www.instagram.com/operatingsystem_studio/"
@@ -189,7 +212,7 @@ Research practice delves into non-disciplinary approaches and non-linear design 
  2023 <br />
         <a href="https://gigadesignstudio.com/" target="_blank"
           >Giga Design Studio</a
-        >, Visual Design Intern
+        >, Visual Designer
       </p>
     <p class="outdent">
       Teaching<br />
@@ -267,7 +290,7 @@ Antidisciplinary Communication Design: A case of studio-based practice for produ
             <p class="outdent">
         Lectures & Conferences<br />
         24 Jun 2026<br />
-        Design Doing, SID, Bolzano  <br />
+        Design Doing, Società Italiana di Design, Bolzano  <br />
         15 Feb 2026 <br />
         Post-Computing Lab, Elisava, Barcelona  <br />
             6 Jun 2025<br />
@@ -312,16 +335,24 @@ Environmental Design 4th International Conference, Ginosa
 
        <p class="outdent">
         Education <br />
-        BA & MA Communication Design, Politecnico di Milano<br />
+        BA & MA Communication Design, Politecnico di Milano<br /><br />
       </p>
+
+            <!-- <p class="outdent">
+             (the background images are pulled at random from the entire Wikipedia library, click everywhere to toggle it)
+      </p> -->
+
+
  
       <div style="display: block; float: left; width: 100%; height: 50vh"></div>
     <div style="display: block; float: left; height: 10px; width: 100%"></div>
     </div>
     </div>
     <!-- <script src="script.js"></script> -->
+    <script src="aleph.js"></script>
+    <!-- <script src="project-float.js"></script> -->
 
-    <script>
+    <!-- <script>
       (function () {
         // ── Toggle sfondo bianco / speciale ─────────────────────────
         const stage = document.getElementById("aleph-stage");
@@ -330,8 +361,24 @@ Environmental Design 4th International Conference, Ginosa
         let whiteBg = false;
         document.body.addEventListener("click", (e) => {
           if (e.target.closest("a")) return;
+          if (e.target.closest(".btn")) return;
+          if (e.target.closest(".video-unmute")) return;
+
+          if (window.ProjectFloat?.hasVisible?.()) {
+            window.ProjectFloat.dismiss();
+            whiteBg = true;
+            stage.style.display = "none";
+            document.body.classList.add("white-bg");
+            window.ProjectFloat.pause?.();
+            root.style.setProperty("--root-bg-image", "none");
+            return;
+          }
+
           whiteBg = !whiteBg;
           stage.style.display = whiteBg ? "none" : "";
+          document.body.classList.toggle("white-bg", whiteBg);
+          if (whiteBg) window.ProjectFloat?.pause?.();
+          else window.ProjectFloat?.restart?.();
           root.style.setProperty(
             "--root-bg-image",
             whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`
@@ -701,6 +748,6 @@ requestAnimationFrame(lumaIntro);
         });
 
       })();
-    </script>
+    </script> -->
   </body>
 </html>
