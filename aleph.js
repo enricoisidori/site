@@ -75,6 +75,7 @@
   const TRANSITION_PX = 250;
   const FEATHER = 0.12;
   const LUMA_INVERT = false;
+  const COMMONS_FETCH_TIMEOUT = 8000;
 
   const maxBuffer = 12;
   let commonsRefillEnabled = false;
@@ -124,8 +125,16 @@
   async function fetchCommonsUrls(n) {
     if (Commons.prefetching) return;
     Commons.prefetching = true;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(
+      () => controller.abort(),
+      COMMONS_FETCH_TIMEOUT,
+    );
     try {
-      const res = await fetch(commonsApiUrl(n, Commons.thumbWidth));
+      const res = await fetch(commonsApiUrl(n, Commons.thumbWidth), {
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`Commons request failed: ${res.status}`);
       const data = await res.json();
       const pages = data?.query?.pages || {};
       const urls = [];
@@ -141,8 +150,9 @@
       }
       Commons.urlsQueue.push(...urls);
     } catch (e) {
-      console.warn("Commons fetch failed", e);
+      if (e.name !== "AbortError") console.warn("Commons fetch failed", e);
     } finally {
+      window.clearTimeout(timeout);
       Commons.prefetching = false;
     }
   }
@@ -174,6 +184,9 @@
         if (id) Commons.heldIds.delete(id);
         Commons.loadingCount--;
         pumpPreload();
+        if (Commons.urlsQueue.length === 0 && Commons.loadingCount === 0) {
+          fetchCommonsUrls(Commons.minBuffer).then(() => pumpPreload());
+        }
       };
       im.src = url;
     }
@@ -394,6 +407,14 @@
 
   async function initFirstImage() {
     while (Commons.preloaded.length === 0) {
+      if (
+        Commons.urlsQueue.length === 0 &&
+        Commons.loadingCount === 0 &&
+        !Commons.prefetching
+      ) {
+        await fetchCommonsUrls(Commons.minBuffer);
+        pumpPreload();
+      }
       await new Promise((r) => setTimeout(r, 100));
     }
     const frame = Commons.preloaded.shift();
@@ -458,10 +479,15 @@
       : Promise.resolve();
     const fromCache = await cacheBoot;
 
-    await commonsBoot;
-    pumpPreload();
-
-    if (!fromCache) {
+    if (fromCache) {
+      signalAlephReady();
+      commonsBoot.then(() => {
+        pumpPreload();
+        initFirstImage();
+      });
+    } else {
+      await commonsBoot;
+      pumpPreload();
       await initFirstImage();
 
       ctx.fillStyle = "#fff";
@@ -498,10 +524,6 @@
       }
 
       requestAnimationFrame(lumaIntro);
-    } else {
-      // Cache hit: usa la prima nuova immagine anche per aggiornare la favicon.
-      await initFirstImage();
-      signalAlephReady();
     }
 
     commonsRefillEnabled = true;

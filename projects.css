@@ -176,7 +176,31 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 }
 
 .project-media-image {
+  position: relative;
+  overflow: hidden;
+  background: #eee;
   cursor: pointer;
+}
+
+.project-media-image::before {
+  position: absolute;
+  inset: -12px;
+  content: "";
+  background-image: var(--project-placeholder, none);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(10px);
+  transform: scale(1.08);
+}
+
+.project-media-image.media-loaded::before {
+  display: none;
+}
+
+.project-media-image picture {
+  position: relative;
+  z-index: 1;
 }
 
 .project-media img,

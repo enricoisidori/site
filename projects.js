@@ -56,7 +56,9 @@
     const image = document.createElement("img");
     const picture = document.createElement("picture");
     const mobileSrc = getMobileAsset(media.src);
-    const isPriority = mediaIndex === 0 && projectIndex < 3;
+    const isEager = mediaIndex === 0 && projectIndex < 3;
+    const isPriority = mediaIndex === 0 && projectIndex === 0;
+    const placeholder = window.PROJECT_PLACEHOLDERS?.[media.src];
 
     button.type = "button";
     button.className = "project-media project-media-image";
@@ -69,23 +71,33 @@
 
     image.alt = "";
     image.decoding = "async";
-    image.loading = isPriority ? "eager" : "lazy";
+    image.loading = isEager ? "eager" : "lazy";
     if (isPriority) image.dataset.priority = "true";
     if (media.width && media.height) {
       image.width = media.width;
       image.height = media.height;
     }
     if (isPriority) image.fetchPriority = "high";
+    else if (isEager) image.fetchPriority = "auto";
+
+    if (placeholder) {
+      button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
+    }
+    image.addEventListener(
+      "load",
+      () => button.classList.add("media-loaded"),
+      { once: true },
+    );
 
     if (mobileSrc) {
       const mobileSource = document.createElement("source");
       mobileSource.media = "(max-width: 768px)";
       mobileSource.type = "image/webp";
-      if (isPriority) mobileSource.srcset = mobileSrc;
+      if (isEager) mobileSource.srcset = mobileSrc;
       else mobileSource.dataset.srcset = mobileSrc;
       picture.appendChild(mobileSource);
     }
-    if (isPriority) image.src = media.src;
+    if (isEager) image.src = media.src;
     else image.dataset.src = media.src;
     picture.appendChild(image);
     button.appendChild(picture);
