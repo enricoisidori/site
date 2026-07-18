@@ -54,7 +54,10 @@
     stage.style.display = whiteBg ? "none" : "";
     document.body.classList.toggle("white-bg", whiteBg);
     if (whiteBg) window.ProjectFloat?.pause?.();
-    else window.ProjectFloat?.restart?.();
+    else {
+      window.ProjectFloat?.restart?.();
+      startAleph();
+    }
     root.style.setProperty(
       "--root-bg-image",
       whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`
@@ -88,20 +91,21 @@
   const FEATHER = 0.12;
   const LUMA_INVERT = false;
 
-  const RES_STEPS = [96, 128, 192, 256, 320];
-  let resIdx = 2;
+  const RES_STEPS = [64, 96, 128, 160];
+  let resIdx = 1;
 
-  const maxBuffer = 24;
+  const maxBuffer = 4;
+  let commonsRefillEnabled = false;
 
   const Commons = {
     thumbWidth: RES_STEPS[resIdx],
     urlsQueue: [],
     prefetching: false,
-    minBuffer: 12,
+    minBuffer: 2,
     preloaded: [],
     loadingCount: 0,
-    maxConcurrent: 4,
-    maxPool: 36,
+    maxConcurrent: 1,
+    maxPool: 3,
     heldIds: new Set(),
     seenIds: new Set(),
     seenOrder: [],
@@ -139,13 +143,7 @@
     if (Commons.prefetching) return;
     Commons.prefetching = true;
     try {
-      let res;
-      if (window.__alephPrefetch) {
-        res = await window.__alephPrefetch;
-        window.__alephPrefetch = null;
-      } else {
-        res = await fetch(commonsApiUrl(n, Commons.thumbWidth));
-      }
+      const res = await fetch(commonsApiUrl(n, Commons.thumbWidth));
       const data = await res.json();
       const pages = data?.query?.pages || {};
       const urls = [];
@@ -310,7 +308,10 @@
   function prepareNextImage() {
     if (imgNext) return;
     if (Commons.preloaded.length === 0) {
-      if (Commons.urlsQueue.length < Commons.minBuffer)
+      if (
+        commonsRefillEnabled &&
+        Commons.urlsQueue.length < Commons.minBuffer
+      )
         ensureCommonsBuffer(maxBuffer);
       pumpPreload();
       return;
@@ -323,7 +324,10 @@
       Commons.heldIds.delete(frame.id);
       addSeen(frame.id);
     }
-    if (Commons.urlsQueue.length < Math.floor(maxBuffer / 2))
+    if (
+      commonsRefillEnabled &&
+      Commons.urlsQueue.length < Math.floor(maxBuffer / 2)
+    )
       ensureCommonsBuffer(maxBuffer);
     pumpPreload();
   }
@@ -411,14 +415,19 @@
     scheduleRender();
   }
 
-  (async () => {
+  let alephStarted = false;
+
+  async function startAleph() {
+    if (alephStarted) return;
+    alephStarted = true;
     restoreSeenIds();
 
-    Commons.thumbWidth = 64;
+    Commons.thumbWidth = 48;
 
-    const fromCache = await bootFromCache();
+    const isProjectsPage = document.body.classList.contains("projects-page");
+    const fromCache = isProjectsPage ? false : await bootFromCache();
 
-    await fetchCommonsUrls(12);
+    await fetchCommonsUrls(2);
     pumpPreload();
 
     if (!fromCache) {
@@ -459,14 +468,43 @@
       await initFirstImage();
     }
 
-    Commons.thumbWidth = RES_STEPS[resIdx];
-    ensureCommonsBuffer(maxBuffer).then(() => pumpPreload());
+    const qualityDelay = isProjectsPage ? 12000 : 6000;
+    window.setTimeout(() => {
+      commonsRefillEnabled = true;
+      Commons.thumbWidth = RES_STEPS[resIdx];
+      ensureCommonsBuffer(maxBuffer).then(() => pumpPreload());
+    }, qualityDelay);
 
     // Persisti seen IDs periodicamente e all'unload
     setInterval(persistSeenIds, 4000);
     window.addEventListener("pagehide", persistSeenIds);
     window.addEventListener("beforeunload", persistSeenIds);
-  })();
+  }
+
+  function scheduleAlephStart() {
+    const connection = navigator.connection;
+    if (
+      connection?.saveData ||
+      ["slow-2g", "2g"].includes(connection?.effectiveType)
+    ) {
+      return;
+    }
+
+    const delay = document.body.classList.contains("projects-page") ? 6000 : 3000;
+    const queueStart = () => {
+      window.setTimeout(() => {
+        const idle =
+          window.requestIdleCallback ||
+          ((callback) => window.setTimeout(callback, 1500));
+        idle(startAleph, { timeout: 10000 });
+      }, delay);
+    };
+
+    if (document.readyState === "complete") queueStart();
+    else window.addEventListener("load", queueStart, { once: true });
+  }
+
+  if (!whiteBg) scheduleAlephStart();
 
   lastScrollY = getScrollY();
   contentScroll.addEventListener("scroll", onScroll, { passive: true });

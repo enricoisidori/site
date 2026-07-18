@@ -1,8 +1,6 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
-    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
     <meta charset="UTF-8" />
     <meta name="description" content="Enrico Isidori — designer, artist and researcher with an antidisciplinary approach." />
     <meta
@@ -27,16 +25,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../asset/svg/cyan.png" data-wikipedia-favicon />
     <link rel="stylesheet" href="../style.css" />
     <link rel="stylesheet" href="../about.css" />
-    <script>
-      window.__alephPrefetch = fetch(
-        "https://commons.wikimedia.org/w/api.php?" +
-          new URLSearchParams({
-            action: "query", generator: "random", grnnamespace: "6",
-            grnlimit: "12", prop: "imageinfo", iiprop: "url|mime",
-            iiurlwidth: "64", format: "json", origin: "*",
-          })
-      );
-    </script>
   </head>
   <body class="has-canvas about-page">
     <div id="aleph-stage">

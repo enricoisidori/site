@@ -150,27 +150,27 @@ window.PROJECTS = [
       },
       {
         "type": "video",
-        "src": "digitalforest/asset/03.mp4",
+        "src": "digitalforest/asset/03-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "digitalforest/asset/04.mp4",
+        "src": "digitalforest/asset/04-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "digitalforest/asset/05.mp4",
+        "src": "digitalforest/asset/05-optimized.mp4",
         "unmute": true
       },
       {
         "type": "video",
-        "src": "digitalforest/asset/06.mp4",
+        "src": "digitalforest/asset/06-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "digitalforest/asset/07.mp4",
+        "src": "digitalforest/asset/07-optimized.mp4",
         "unmute": false
       },
       {
@@ -181,7 +181,7 @@ window.PROJECTS = [
       },
       {
         "type": "video",
-        "src": "digitalforest/asset/09.mp4",
+        "src": "digitalforest/asset/09-optimized.mp4",
         "unmute": false
       }
     ]
@@ -204,28 +204,28 @@ window.PROJECTS = [
     "media": [
       {
         "type": "video",
-        "src": "capsule/asset/desktop.mp4",
+        "src": "capsule/asset/desktop-optimized.mp4",
         "unmute": false,
         "poster": "capsule/asset/optimized/med.webp"
       },
       {
         "type": "video",
-        "src": "capsule/asset/4.mp4",
+        "src": "capsule/asset/4-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "capsule/asset/3.mp4",
+        "src": "capsule/asset/3-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "capsule/asset/2.mp4",
+        "src": "capsule/asset/2-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "capsule/asset/1.mp4",
+        "src": "capsule/asset/1-optimized.mp4",
         "unmute": false
       }
     ]
@@ -256,17 +256,17 @@ window.PROJECTS = [
       },
       {
         "type": "video",
-        "src": "drawaline/asset/1.mp4",
+        "src": "drawaline/asset/1-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "drawaline/asset/2.mp4",
+        "src": "drawaline/asset/2-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "drawaline/asset/3.mp4",
+        "src": "drawaline/asset/3-optimized.mp4",
         "unmute": false
       },
       {
@@ -403,12 +403,12 @@ window.PROJECTS = [
       },
       {
         "type": "video",
-        "src": "6am/asset/6am1.mp4",
+        "src": "6am/asset/6am1-optimized.mp4",
         "unmute": false
       },
       {
         "type": "video",
-        "src": "6am/asset/6am2.mp4",
+        "src": "6am/asset/6am2-optimized.mp4",
         "unmute": false
       }
     ]
@@ -438,7 +438,7 @@ window.PROJECTS = [
       },
       {
         "type": "video",
-        "src": "spectathesis/asset/spectathesis.mp4",
+        "src": "spectathesis/asset/spectathesis-optimized.mp4",
         "unmute": false
       },
       {
@@ -683,7 +683,7 @@ window.PROJECTS = [
       },
       {
         "type": "video",
-        "src": "pixelpushing/asset/istallationview.mp4",
+        "src": "pixelpushing/asset/istallationview-optimized.mp4",
         "unmute": false
       }
     ]
@@ -709,7 +709,7 @@ window.PROJECTS = [
       },
       {
         "type": "video",
-        "src": "corpomacchina/asset/f.mp4",
+        "src": "corpomacchina/asset/f-optimized.mp4",
         "unmute": false
       },
       {

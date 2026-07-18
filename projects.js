@@ -45,6 +45,9 @@
 
   function getResponsiveVideoAsset(src) {
     if (!window.matchMedia("(max-width: 768px)").matches) return src;
+    if (src.endsWith("-optimized.mp4")) {
+      return src.replace(/-optimized\.mp4$/, "-mobile.mp4");
+    }
     return src.endsWith(".mp4") ? src.replace(/\.mp4$/, "-mobile.mp4") : src;
   }
 
@@ -101,6 +104,7 @@
     video.loop = true;
     video.playsInline = true;
     video.preload = "none";
+    video.setAttribute("loading", "lazy");
     if (media.poster) {
       const mobilePoster = getMobileAsset(media.poster);
       video.poster =
