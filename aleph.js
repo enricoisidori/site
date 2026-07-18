@@ -443,8 +443,8 @@
 
       requestAnimationFrame(lumaIntro);
     } else {
-      // Cache hit: l'immagine è già disegnata. Prepara la prossima senza intro fade.
-      prepareNextImage();
+      // Cache hit: usa la prima nuova immagine anche per aggiornare la favicon.
+      await initFirstImage();
     }
 
     Commons.thumbWidth = RES_STEPS[resIdx];

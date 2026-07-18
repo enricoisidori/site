@@ -28,7 +28,7 @@ header,
   font-weight: 500;
   font-size: 14pt;
   line-height: 16pt;
-  font-stretch: 110%;
+  font-stretch: 130%;
   box-sizing: border-box;
 }
 
@@ -540,17 +540,25 @@ p {
   margin-inline-end: 0px;
 }
 
+body.has-canvas #content-scroll #topnav,
 #topnav {
   width: 100vw;
   position: fixed;
   z-index: 3;
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-weight: 500;
-  text-shadow: none !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff !important;
 }
 
+body.has-canvas #content-scroll #topnav *,
 #topnav * {
-  text-shadow: none !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff !important;
 }
 
 #toprect {

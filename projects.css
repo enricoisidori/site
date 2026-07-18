@@ -14,7 +14,7 @@ body.projects-page {
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-size: 14px;
   font-weight: 500;
-  font-stretch: 110%;
+  font-stretch: 130%;
   line-height: 16px;
 }
 
@@ -46,6 +46,7 @@ html:has(body.projects-page.white-bg) {
 }
 
 /* Navigation */
+body.has-canvas #content-scroll .projects-navigation,
 body.projects-page .projects-navigation {
   position: fixed;
   top: var(--project-gap);
@@ -59,11 +60,18 @@ body.projects-page .projects-navigation {
   white-space: nowrap;
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-weight: 500;
-  text-shadow: none !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff !important;
 }
 
+body.has-canvas #content-scroll .projects-navigation *,
 body.projects-page .projects-navigation * {
-  text-shadow: none !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff !important;
 }
 
 body.projects-page #content-scroll .projects-navigation > a,
@@ -84,16 +92,21 @@ body.projects-page .projects-navigation > a {
   width: max-content;
   color: #000 !important;
   text-decoration: none;
-  text-shadow: none !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff !important;
 }
 
 body.projects-page .projects-navigation > a:first-child {
   left: 0;
+  transform-origin: left center;
 }
 
 body.projects-page .projects-navigation > a:last-child {
   right: 0;
   text-align: right;
+  transform-origin: right center;
 }
 
 body.projects-page .projects-navigation-filters {
@@ -112,7 +125,10 @@ body.projects-page .projects-navigation-filters {
 body.projects-page #content-scroll .projects-navigation .btn,
 body.projects-page #content-scroll .projects-navigation .btn.inactive {
   color: #000 !important;
-  text-shadow: none !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff !important;
 }
 
 body.projects-page #content-scroll .projects-navigation .btn:hover,
@@ -143,10 +159,10 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 /* Media tracks */
 .project-track {
   display: flex;
-  width: calc(100% + (var(--project-gap) * 2));
+  width: 100%;
   height: var(--project-track-height);
-  margin-left: calc(var(--project-gap) * -1);
-  padding-inline: var(--project-gap);
+  margin-left: 0;
+  padding-inline: 0;
   overflow-x: auto;
   overflow-y: hidden;
   gap: 0;
