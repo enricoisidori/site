@@ -1,0 +1,69 @@
+body.about-page {
+  font-family: "neue-haas-grotesk-text", "Neue Haas Grotesk Text", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+body.about-page #content-scroll,
+body.about-page #content-scroll * {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+body.about-page .about-navigation {
+  position: fixed;
+  top: 2.5px;
+  right: 2.5px;
+  left: 2.5px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  z-index: 11;
+  line-height: 16px;
+}
+
+body.about-page .about-navigation > a,
+body.about-page .about-navigation > span {
+  display: block;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  color: #000;
+  line-height: 16px;
+}
+
+body.about-page .about-navigation > a {
+  text-decoration: none;
+}
+
+body.about-page .about-navigation > a:last-child {
+  text-align: right;
+}
+
+body.about-page #content-scroll > .col-12 {
+  padding-top: 0 !important;
+  text-align: center;
+}
+
+body.about-page .outdent {
+  float: none;
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+  text-indent: 0;
+}
+
+body.about-page #content-scroll p {
+  margin: 0;
+}
+
+body.about-page #content-scroll .about-section {
+  margin-top: 16px;
+}

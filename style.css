@@ -1,5 +1,12 @@
 /* Resto del CSS */
-@import url("https://fonts.cdnfonts.com/css/helvetica-lt-narrow");
+@import url("https://use.typekit.net/qqd2gph.css");
+
+@font-face {
+  font-family: "Times NR Seven MT Std";
+  src: url("asset/font/Times%20NR%20Seven%20MT%20Std%20Bold.otf") format("opentype");
+  font-style: normal;
+  font-weight: 700;
+}
 
 :root {
   --content-top-offset: calc(env(safe-area-inset-top, 0px) + 2.5px);
@@ -17,8 +24,8 @@ header,
 } */
 
 * {
-  font-family: "Helvetica LT Narrow", sans-serif;
-  font-weight: 400;
+  font-family: "neue-haas-grotesk-text", "Neue Haas Grotesk Text", sans-serif;
+  font-weight: 700;
   font-size: 14pt;
   line-height: 16pt;
   box-sizing: border-box;
@@ -197,7 +204,7 @@ button.btn-aqua {
   display: inline-block;
   width: fit-content;
   font-size: 14pt;
-  font-family: "Helvetica LT Narrow", system-ui, sans-serif;
+  font-family: "neue-haas-grotesk-text", "Neue Haas Grotesk Text", sans-serif;
   height: auto;
   padding: 0.35em 1em;
   border-radius: 1000px;

@@ -14,6 +14,54 @@ function textFromHtml(value) {
     .join("\n");
 }
 
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function infoFromHtml(projectPath, value) {
+  const links = [];
+  const withPlaceholders = value.replace(
+    /<a\b([^>]*)>([\s\S]*?)<\/a>/gi,
+    (_match, attributes, label) => {
+      const href = (attributes.match(/\bhref="([^"]+)"/i) || [])[1];
+      if (!href) return textFromHtml(label);
+      const target = (attributes.match(/\btarget="([^"]+)"/i) || [])[1];
+      const resolvedHref = /^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(href)
+        ? href
+        : path.posix.normalize(`${projectPath}/${href}`);
+      const index = links.push({
+        href: resolvedHref,
+        label: textFromHtml(label),
+        target: target === "_blank" ? "_blank" : "",
+      }) - 1;
+      return `@@LINK${index}@@`;
+    },
+  );
+  const html = withPlaceholders
+    .replace(/\r?\n/g, " ")
+    .replace(/<br\s*\/?>/gi, "@@BR@@")
+    .replace(/<[^>]+>/g, " ")
+    .split(/(@@BR@@)/)
+    .map((part) =>
+      part === "@@BR@@" ? part : part.replace(/\s+/g, " ").trim(),
+    )
+    .filter(Boolean)
+    .join("")
+    .replace(/(?:@@BR@@){2,}/g, "@@BR@@")
+    .replace(/^@@BR@@|@@BR@@$/g, "")
+    .replace(/@@BR@@/g, "<br>");
+
+  return html.replace(/@@LINK(\d+)@@/g, (_match, index) => {
+    const link = links[Number(index)];
+    const target = link.target ? ' target="_blank" rel="noopener noreferrer"' : "";
+    return `<a href="${escapeHtml(link.href)}"${target}>${escapeHtml(link.label)}</a>`;
+  }).replace(/\bcollaborators\b/gi, "Team");
+}
+
 function slugFromTitle(title) {
   return title
     .replace(/\s*\(\d{4}\)\s*$/, "")
@@ -76,16 +124,18 @@ while ((match = homeProjectPattern.exec(home))) {
   const source = fs
     .readFileSync(projectFile, "utf8")
     .replace(/<!--[\s\S]*?-->/g, "");
-  const title = textFromHtml(match[3]);
+  const rawTitle = textFromHtml(match[3]);
+  const titleDate = (rawTitle.match(/\((\d{4})\)\s*$/) || [])[1] || "";
+  const title = rawTitle.replace(/\s*\(\d{4}\)\s*$/, "");
   const descriptionText = textFromHtml(
     (source.match(/<p class="description">([\s\S]*?)<\/p>/i) || [])[1] || "",
   );
   const descriptionLines = descriptionText.split("\n");
   const date = /^\d{4}(?:[—-].*)?$/.test(descriptionLines[0] || "")
     ? descriptionLines.shift()
-    : "";
+    : titleDate;
   const info = [...source.matchAll(/<p class="outdent">([\s\S]*?)<\/p>/gi)]
-    .map((entry) => textFromHtml(entry[1]))
+    .map((entry) => infoFromHtml(projectPath, entry[1]))
     .filter(Boolean);
 
   const media = mediaFromHtml(projectPath, source);
@@ -105,6 +155,50 @@ while ((match = homeProjectPattern.exec(home))) {
       .filter((className) => /page$/.test(className)),
     date,
     info,
+    description: descriptionLines.join("\n"),
+    media,
+  });
+}
+
+const offDisciplinePath = "offdisicpline";
+if (!projects.some((project) => project.sourcePage === `${offDisciplinePath}/`)) {
+  const source = fs
+    .readFileSync(path.join(root, offDisciplinePath, "index.html"), "utf8")
+    .replace(/<!--[\s\S]*?-->/g, "");
+  const descriptionLines = textFromHtml(
+    (source.match(/<p class="description">([\s\S]*?)<\/p>/i) || [])[1] || "",
+  ).split("\n");
+  const date = /^\d{4}(?:[—-].*)?$/.test(descriptionLines[0] || "")
+    ? descriptionLines.shift()
+    : "2024";
+  const media = fs
+    .readdirSync(path.join(root, offDisciplinePath, "asset"))
+    .filter((file) => /^off\d+\.png$/i.test(file))
+    .sort((a, b) => Number(a.match(/\d+/)[0]) - Number(b.match(/\d+/)[0]))
+    .map((file) => {
+      const optimized = file.replace(/\.png$/i, ".jpg");
+      const optimizedPath = path.join(
+        root,
+        offDisciplinePath,
+        "asset",
+        "optimized",
+        optimized,
+      );
+      return {
+        type: "image",
+        src: fs.existsSync(optimizedPath)
+          ? `${offDisciplinePath}/asset/optimized/${optimized}`
+          : `${offDisciplinePath}/asset/${file}`,
+      };
+    });
+
+  projects.unshift({
+    slug: "off-discipline",
+    sourcePage: `${offDisciplinePath}/`,
+    title: "Off Discipline",
+    categories: ["designerpage"],
+    date,
+    info: [],
     description: descriptionLines.join("\n"),
     media,
   });

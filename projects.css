@@ -8,20 +8,98 @@ body.projects-page {
   width: 100%;
   min-height: 100vh;
   margin: 0;
+  background: #111;
+  color: #000;
+  font-family: "neue-haas-grotesk-text", "Neue Haas Grotesk Text", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
 }
 
-.projects-page #topnav {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 11;
+html:has(body.projects-page),
+body.projects-page #content-scroll {
+  background: #111;
+}
+
+body.projects-page #aleph-stage {
+  background: #111;
+}
+
+body.projects-page #content-scroll {
+  color: #000;
   background: transparent;
-  display: flow-root;
 }
 
-.projects-page .menu {
-  width: 100%;
-  clear: both;
+body.projects-page #content-scroll,
+body.projects-page #content-scroll * {
+  color: #000;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  line-height: inherit;
+  text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 8px #fff;
+}
+
+body.projects-page.white-bg,
+body.projects-page.white-bg #content-scroll {
+  background: #fff;
+  color: #000;
+}
+
+html:has(body.projects-page.white-bg) {
+  background: #fff;
+}
+
+body.projects-page .projects-navigation {
+  position: fixed;
+  top: 2.5px;
+  right: 2.5px;
+  left: 2.5px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  z-index: 11;
+  line-height: 16px;
+}
+
+body.projects-page .projects-navigation > a,
+body.projects-page .projects-navigation-filters,
+body.projects-page .projects-navigation-filters .btn {
+  display: block;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  line-height: 16px;
+}
+
+body.projects-page .projects-navigation > a {
+  color: #000;
+  text-decoration: none;
+}
+
+body.projects-page .projects-navigation > a:last-child {
+  text-align: right;
+}
+
+body.projects-page .projects-navigation-filters {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+body.projects-page #content-scroll .projects-navigation .btn,
+body.projects-page #content-scroll .projects-navigation .btn.inactive {
+  color: #000;
+}
+
+body.projects-page #content-scroll .projects-navigation .btn:hover,
+body.projects-page #content-scroll .projects-navigation .btn.active {
+  color: #777;
 }
 
 .project-row {
@@ -32,6 +110,10 @@ body.projects-page {
 
 .project-row:first-child {
   margin-top: 0;
+}
+
+#projects-list {
+  padding-top: calc(16px + var(--project-gap));
 }
 
 .project-row[hidden] {
@@ -47,6 +129,14 @@ body.projects-page {
   overflow-x: auto;
   overflow-y: hidden;
   gap: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.project-track::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .project-media {
@@ -87,8 +177,16 @@ body.projects-page {
   height: var(--project-media-height);
 }
 
+.project-track,
+.project-media,
+.project-media img,
+.project-media video,
+.project-media-video.video-unmute {
+  height: var(--project-media-height) !important;
+}
+
 .project-details {
-  padding-inline: var(--project-gap);
+  padding: 2.5px var(--project-gap) var(--project-gap);
 }
 
 .project-details[hidden] {
@@ -97,7 +195,7 @@ body.projects-page {
 
 .project-details p {
   margin: 0;
-  white-space: pre-line;
+  white-space: normal !important;
 }
 
 .project-title {
@@ -109,28 +207,27 @@ body.projects-page {
   cursor: pointer;
 }
 
+.project-date,
 .project-info,
 .project-description {
-  width: calc(100% - 40px);
-  margin-left: 40px !important;
-  text-indent: -40px;
+  width: 50%;
+  margin-right: auto !important;
+  margin-left: auto !important;
+  text-align: center;
+}
+
+.project-info {
+  margin-top: 16px !important;
 }
 
 @media only screen and (max-width: 768px) {
-  .project-media:first-child {
-    width: calc(100vw - 20px);
-  }
-
-  .project-media:first-child img,
-  .project-media:first-child video {
-    width: 100%;
-    max-width: 100%;
-  }
-
+  .project-date,
   .project-info,
   .project-description {
-    width: calc(100% - 20px);
-    margin-left: 20px !important;
-    text-indent: -20px;
+    width: 100%;
   }
+}
+
+.project-details {
+  text-align: center;
 }

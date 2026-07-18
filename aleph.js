@@ -23,7 +23,6 @@
     if (e.target.closest("a")) return;
     if (e.target.closest(".btn")) return;
     if (e.target.closest(".video-unmute")) return;
-    if (e.target.closest("[class*='page']")) return;
 
     if (window.ProjectFloat?.hasVisible?.()) {
       window.ProjectFloat.dismiss();

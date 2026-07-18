@@ -1,5 +1,54 @@
 window.PROJECTS = [
   {
+    "slug": "off-discipline",
+    "sourcePage": "offdisicpline/",
+    "title": "Off Discipline",
+    "categories": [
+      "designerpage"
+    ],
+    "date": "2024",
+    "info": [],
+    "description": "",
+    "media": [
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off1.jpg"
+      },
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off2.jpg"
+      },
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off3.jpg"
+      },
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off4.jpg"
+      },
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off5.jpg"
+      },
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off6.jpg"
+      },
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off7.jpg"
+      },
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off8.jpg"
+      },
+      {
+        "type": "image",
+        "src": "offdisicpline/asset/optimized/off9.jpg"
+      }
+    ]
+  },
+  {
     "slug": "n-cognitive-supremacy",
     "sourcePage": "n+/",
     "title": "N+ Cognitive Supremacy",
@@ -9,10 +58,10 @@ window.PROJECTS = [
     ],
     "date": "2025",
     "info": [
-      "Field\nArt direction\nSpeculative\nExibhition\nGraphic\nInteraction\nPhotography\nProduct",
-      "Collaborators\nFilippo Rosati\nPietro Forino\nDaniela Gentile\nNicola Airutti\nCristina Dezi\nBernardo Martins",
-      "Made at\nOperating System Studio\nUmanesimo Artificiale",
-      "Exhibithion\nJul 2025\nVideocittà ,\nRome\nJun 2025\nSónar , Barcelona\nApr 2025"
+      "Field<br>Art direction<br>Speculative<br>Exibhition<br>Graphic<br>Interaction<br>Photography<br>Product",
+      "Team<br>Filippo Rosati<br>Pietro Forino<br>Daniela Gentile<br>Nicola Airutti<br>Cristina Dezi<br>Bernardo Martins",
+      "Made at<br>Operating System Studio<br>Umanesimo Artificiale",
+      "Exhibithion<br>Jul 2025<br><a href=\"https://www.videocitta.com//\" target=\"_blank\" rel=\"noopener noreferrer\">Videocittà</a>, Rome<br>Jun 2025<br><a href=\"https://sonar.es/en\" target=\"_blank\" rel=\"noopener noreferrer\">Sónar</a>, Barcelona<br>Apr 2025"
     ],
     "description": "A non-invasive neural interface developed by N+ Industries to collect\nresidual cognitive activity from the user. Using bone- conducted audio\nstimulation, the system captures neural micro- responses and\nintegrates them into a distributed network. Inspired by a NATO white\npaper stating that “the brain is the new battlefield,” this project\nexplores the intersection of neuroscience and conflict through an\nimmersive and experimental artistic lens. At its core is a pioneering\nenterprise that envisions a future of neuromodulation technologies.\nSpecializing in neuroweapons and NBIC advancements (Nanotechnology,\nBiotechnology, Information Technology, and Cognitive Science), this\nentity develops technologies of control. By presenting these\nunsettling possibilities, the project sparks critical discussions on\nthe future of warfare, human augmentation, and the ethics of cognitive\ncontrol.",
     "media": [
@@ -51,19 +100,19 @@ window.PROJECTS = [
     ],
     "date": "2025",
     "info": [
-      "Field\nInformation design\nData vizualization\nSpatial\ndesign",
-      "Collaborators\nMiguel Ernesto Amaya\nFederico Gajo\nGiacomo Garetto\nFrancesco Scarfone\nEmanuel Simionato",
-      "Exhibited at\nMeet Digital Culture Center, Milan"
+      "Field<br>Information design<br>Data vizualization<br>Spatial design",
+      "Team<br>Miguel Ernesto Amaya<br>Federico Gajo<br>Giacomo Garetto<br>Francesco Scarfone<br>Emanuel Simionato",
+      "Exhibited at<br>Meet Digital Culture Center, Milan"
     ],
     "description": "Trail cams are video cameras triggered by the movement of animals in\ntheir natural habitats. Initially designed for research and wildlife\nmonitoring, they have since become popular content on social media\nplatforms.\nThe installation investigates how animals, inadvertently turned into\ndigital entities, inhabit the online ecosystem—an environment\ncategorized by humans for human consumption.\nThe project examines 273 trail cam videos shared on major Italian\nsocial platforms between 2021 and 2024. The hashtags used at the\ntime of publication establish connections between them. The\ninstallation presents the videos in chronological order, alongside\ntheir associated hashtags, forming a growing network that reflects\nthe evolution of a digital forest—merging human perceptions with\nanimal presence over time.",
     "media": [
       {
         "type": "image",
-        "src": "digitalforest/asset/02.png"
+        "src": "digitalforest/asset/optimized/02.jpg"
       },
       {
         "type": "image",
-        "src": "digitalforest/asset/01.png"
+        "src": "digitalforest/asset/optimized/01.jpg"
       },
       {
         "type": "video",
@@ -110,10 +159,10 @@ window.PROJECTS = [
     ],
     "date": "2023",
     "info": [
-      "Field\nWeb\nMotion",
-      "Collaborators\nGabriele Donini\nDiego Massaro\nGiacomo\nScandolara",
-      "Made at\nGiga Design Studio",
-      "Links\ncapsule.global/plaza"
+      "Field<br>Web<br>Motion",
+      "Team<br>Gabriele Donini<br>Diego Massaro<br>Giacomo Scandolara",
+      "Made at<br><a href=\"https://gigadesignstudio.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Giga Design Studio</a>",
+      "Links<br><a href=\"https://capsule.global/plaza\" target=\"_blank\" rel=\"noopener noreferrer\">capsule.global/plaza</a>"
     ],
     "description": "Pop Up Website for Capsule Plaza, an hybrid between a fair and a\ncollective exhibition, it brings together designers and companies\nfrom various creative fields, bridging industry and culture with a\nbold curation that spans interiors and architecture, beauty and\ntechnology, ecology and craft.",
     "media": [
@@ -154,12 +203,12 @@ window.PROJECTS = [
     ],
     "date": "2022",
     "info": [
-      "Field\nResearch\nEditorial\nWeb",
-      "Collaborators\nDavide Agostinelli\nIrene Benecchi\nBianca Buratti\nAlice Dezio\nMarta Gaggi\nGiulia Gnessi",
-      "Made at\nPolitecnico di Milano",
-      "Exhibited at\nCavallerizza Reale 2022\nDock Dora 2022\nTorino Print Club\nELO 2022",
-      "Links\nenricoisidori.com/draw.html",
-      "Features\nNuovi linguaggi del visual design in Italia , 2022"
+      "Field<br>Research<br>Editorial<br>Web",
+      "Team<br>Davide Agostinelli<br>Irene Benecchi<br>Bianca Buratti<br>Alice Dezio<br>Marta Gaggi<br>Giulia Gnessi",
+      "Made at<br>Politecnico di Milano",
+      "Exhibited at<br>Cavallerizza Reale 2022<br>Dock Dora 2022<br>Torino Print Club<br>ELO 2022",
+      "Links<br><a href=\"https://enricoisidori.com/draw.html\" target=\"_blank\" rel=\"noopener noreferrer\">enricoisidori.com/draw.html</a>",
+      "Features<br>Nuovi linguaggi del visual design in Italia , 2022"
     ],
     "description": "This book is a collection of strangers’ lines on a blank sheet of paper.\n“Draw a line from one side of the page to the other”, this is the\ninstruction 100 bypassers were given along with the reminder to freely\nexpress themselves on the surface. Where one line ends, another\nbegins—they are individual expressions and a single participatory work.\nTo complete the book, the owner of each copy is asked to draw their own\nline on the cover, thus becoming part of the project. The book has a\nsoundtrack generated by associating the lines with the frequency of the\nsound. By scrolling through the pages and listening to the corresponding\nsound, the reader takes a journey into people’s emotions.",
     "media": [
@@ -241,10 +290,10 @@ window.PROJECTS = [
     ],
     "date": "2023",
     "info": [
-      "Field\nEditorial",
-      "Collaborators\nGabriele Donini\nFederico Gajo\nDiego Massaro\nGiacomo Scandolara",
-      "Made at\nGiga Design Studio",
-      "Links\n6am.glass"
+      "Field<br>Editorial",
+      "Team<br>Gabriele Donini<br>Federico Gajo<br>Diego Massaro<br>Giacomo Scandolara",
+      "Made at<br><a href=\"https://gigadesignstudio.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Giga Design Studio</a>",
+      "Links<br><a href=\"https://6am.glass/\" target=\"_blank\" rel=\"noopener noreferrer\">6am.glass</a>"
     ],
     "description": "Catalog for 6:AM Glassworks: an emerging high-end design brand based in\nMilan, founded in 2018, the brand blends the traditional artisanal\napproach with contemporary design techniques, resulting in artistic\nglass creations.",
     "media": [
@@ -297,11 +346,11 @@ window.PROJECTS = [
     ],
     "date": "2023",
     "info": [
-      "Field\nResearch\nEditorial",
-      "Collaborators\nFrancesco Bonetti\nFederico Gajo\nEmiliano\nGaribaldi\nCecilia Pizzagalli\nCamilla Tosi",
-      "Related projects\nSPECTA® (Project)",
-      "Made at\nPolitecnico di Milano\nLaboratorio di Sintesi Finale C1",
-      "Links\nSPECTA.pdf (Complete Thesis)"
+      "Field<br>Research<br>Editorial",
+      "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
+      "Related projects<br><a href=\"specta/\">SPECTA® (Project)</a>",
+      "Made at<br>Politecnico di Milano<br>Laboratorio di Sintesi Finale C1",
+      "Links<br><a href=\"specta.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">SPECTA.pdf (Complete Thesis)</a>"
     ],
     "description": "\"Specta è frutto di un processo creativo durato sei mesi che ha coinvolto diversi ambiti: branding, gra-\nfica, coding, ux design, interaction design, video making, prototipazione, copywriting, foto-\ngrafia, web design, packaging design etc. È stata una progettazione complessa: nei seguenti\nparagrafi verrà districato il tempo e lo spazio progettuale che è stato attraversato.\nSarà esaminato il progetto dal punto di vista temporale, della sequenza delle azioni, del processo ana-\nlizzando i modelli e la loro classificazione; e dal punto di vista spaziale, del perimetro delle\ndiscipline, dell’ambito analizzando le mappature il loro rapporto interdisciplinare. Il design è\ntanto uno stato, un oggetto fermo, un artefatto nello spazio, quanto un verbo, un’azione, un\nprocesso che si sviluppa nel tempo (Doblin, 1987).\nLa volontà di questo elaborato è restituire quella che è stata l’esperienza di progetto in quanto vero e\nproprio laboratorio – una sperimentazione progettuale.\nLo scopo di questo capitolo è mettere alla prova la teoria attraverso un progetto, Specta, e proporre un\nmodello frutto di questa esperienza\" (p.10)",
     "media": [
@@ -405,13 +454,13 @@ window.PROJECTS = [
     ],
     "date": "2023",
     "info": [
-      "Field\nSpeculative\nGraphic\nIdentity\nInteraction\nPackaging\nCopywriting\nPhotography\nVideo Making\nCoding\nProduct",
-      "Collaborators\nFrancesco Bonetti\nFederico Gajo\nEmiliano\nGaribaldi\nCecilia Pizzagalli\nCamilla Tosi",
-      "Made at\nPolitecnico di Milano\nLaboratorio di Sintesi Finale C1",
-      "Related projects\nSPECTA® (Thesis)",
-      "Links\nSPECTA.pdf (Complete Thesis)",
-      "Exhibithion\nInterdependence, Fabbrica del Vapore, Milan, Apr 2024\nAnthropogenic Narratives,\nTriennale Milano ,\nMilan, Mar 2023",
-      "Features\nPittogramma , 2024\nCDSA Adwards International Media Art Creativity Competition, 2024"
+      "Field<br>Speculative<br>Graphic<br>Identity<br>Interaction<br>Packaging<br>Copywriting<br>Photography<br>Video Making<br>Coding<br>Product",
+      "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
+      "Made at<br>Politecnico di Milano<br>Laboratorio di Sintesi Finale C1",
+      "Related projects<br><a href=\"specta/\">SPECTA® (Thesis)</a>",
+      "Links<br><a href=\"specta.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">SPECTA.pdf (Complete Thesis)</a>",
+      "Exhibithion<br>Interdependence, Fabbrica del Vapore, Milan, Apr 2024<br>Anthropogenic Narratives, <a href=\"https://triennale.org\" target=\"_blank\" rel=\"noopener noreferrer\">Triennale Milano</a>, Milan, Mar 2023",
+      "Features<br>Pittogramma , 2024<br>CDSA Adwards International Media Art Creativity Competition, 2024"
     ],
     "description": "Specta è un progetto nato durante il Laboratorio di Sintesi Finale C1\ndel Politecnico di Milano, nell’an- no accademico 2022–2023. É stato\nesposto, insieme agli altri progetti del Laboratorio1, in Triennale\nMilano nella mostra Anthropogenic Narratives: Communicating and\nExperiencing Non-human perspectives. Il lavoro si colloca tra le aree\nprogettuali della speculazione, della comunicazione e dell’interazione.\nLa speculazione, ovvero l’individuazione di scenari di possibili futuri,\nla comunicazione, in particolare la costruzione di un brand e di un\nsistema di identità e l’interazione ossia la creazione di interfacce\nfisiche e digitali. Queste aree del design sono state affrontate\nattraverso l’esplorazione dei temi di progetto e la realizzazione\nconcreta del dispositivo. Il brief di progetto del Laboratorio prevede\nlo sviluppo di un dispositivo interattivo – una macchina comunicativa.\nQuesta deve fare emergere le problematiche legate al cambiamento\nclimatico attuale, dal punto di vista di un elemento naturale, nel caso\ndi Specta, le rocce. L’obiettivo è veicolare il messaggio dell’elemento\nattraverso l’interazione con il dispositivo e il linguaggio visivo del\nbrand che lo ha prodotto nello scenario. Specta adotta il linguaggio\ndelle rocce per trattare temi come anti-ecocentrismo, eco-ansia e\nautocensura. L’obiettivo principale di questo progetto è quello di\nstimola- re lo spettatore a riflettere sull’attuale crisi climatica e le\nsue conseguenza sociali. Attraverso lo scenario si cerca di ampliare la\nprospettiva temporale dell’osservatore sul tema. In un presente\ninverosimile in cui, per sospensione dell’incredulità, le rocce hanno la\ncapacità di comunicare messaggi sul cambiamento climatico, esse\ncercherebbero di convincerci che bisogna essere come loro – indifferenti\n– invitandoci a non guardare e a non provare ansia di fronte a quello\nche è solo un cambiamento.",
     "media": [
@@ -470,18 +519,18 @@ window.PROJECTS = [
     ],
     "date": "2023",
     "info": [
-      "Field\nPixel Pushing Exploration\nLinks\niterations/inversions.html",
-      "Features\nGpu Gallery , 2023"
+      "Field<br>Pixel Pushing Exploration<br>Links<br><a href=\"iterations/inversions.html\" target=\"_blank\" rel=\"noopener noreferrer\">iterations/inversions.html</a>",
+      "Features<br><a href=\"https://gpu.gallery/\" target=\"_blank\" rel=\"noopener noreferrer\">Gpu Gallery</a>, 2023"
     ],
     "description": "Iteration of a continuous inversion transformation of archival material, at the maximum frequency that the machine allows.\nField\nPixel Pushing Exploration\nLinks\niterations/inversions.html",
     "media": [
       {
         "type": "image",
-        "src": "pixelpushing/asset/preview1.png"
+        "src": "pixelpushing/asset/optimized/preview1.jpg"
       },
       {
         "type": "image",
-        "src": "pixelpushing/asset/preview2.png"
+        "src": "pixelpushing/asset/optimized/preview2.jpg"
       },
       {
         "type": "video",
@@ -498,13 +547,13 @@ window.PROJECTS = [
   {
     "slug": "corpo-macchina",
     "sourcePage": "corpomacchina/",
-    "title": "Corpo macchina (2023)",
+    "title": "Corpo macchina",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2023",
     "info": [
-      "Links\nf.html (Generator)"
+      "Links<br><a href=\"f.html\" target=\"_blank\" rel=\"noopener noreferrer\">f.html (Generator)</a>"
     ],
     "description": "",
     "media": [
@@ -582,11 +631,11 @@ window.PROJECTS = [
   {
     "slug": "immagine-fisica-di-un-libro",
     "sourcePage": "booksimage/",
-    "title": "Immagine fisica di un libro (2024)",
+    "title": "Immagine fisica di un libro",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2024",
     "info": [],
     "description": "",
     "media": [
@@ -611,11 +660,11 @@ window.PROJECTS = [
   {
     "slug": "monolite",
     "sourcePage": "monolite/",
-    "title": "Monolite (2023)",
+    "title": "Monolite",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2023",
     "info": [],
     "description": "Pen drive with completely full memory. There is only one file .bit containing a sequence of precisely 256 billion digits \"1\". It is a monolith of data, containing no information other than that it is full.",
     "media": [
@@ -632,11 +681,11 @@ window.PROJECTS = [
   {
     "slug": "due-dadi",
     "sourcePage": "duedadi/",
-    "title": "Due dadi (2021)",
+    "title": "Due dadi",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2021",
     "info": [],
     "description": "Dadi in plastica bianca stampati a laser, si presentano come oggetti\nalterati, altri: sono una alternativa tra le tante possibili. Ogni cosa\npotrebbe essere qualunque altra, ma si presenta come assoluta: \"Un\nmiracolo che non stupisce quanto dovrebbe: la mano ha in verità meno di\nsei dita, però più di quattro\". (Szymborska).",
     "media": [
@@ -665,7 +714,7 @@ window.PROJECTS = [
   {
     "slug": "blank",
     "sourcePage": "blank/",
-    "title": "Blank (2023)",
+    "title": "Blank",
     "categories": [
       "artistpage"
     ],
@@ -690,11 +739,11 @@ window.PROJECTS = [
   {
     "slug": "karin-s-work",
     "sourcePage": "karinswork/",
-    "title": "Karin's work (2024)",
+    "title": "Karin's work",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2024",
     "info": [],
     "description": "",
     "media": [
@@ -707,7 +756,7 @@ window.PROJECTS = [
   {
     "slug": "totem",
     "sourcePage": "totem/",
-    "title": "Totem (2023)",
+    "title": "Totem",
     "categories": [
       "artistpage"
     ],
@@ -736,11 +785,11 @@ window.PROJECTS = [
   {
     "slug": "not-prevented-photos",
     "sourcePage": "notprevented/",
-    "title": "Not prevented photos (2023)",
+    "title": "Not prevented photos",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2023",
     "info": [],
     "description": "",
     "media": [
@@ -757,11 +806,11 @@ window.PROJECTS = [
   {
     "slug": "1km-x-1km-white-canvas",
     "sourcePage": "whitecanvas/",
-    "title": "1km x 1km white canvas (2023)",
+    "title": "1km x 1km white canvas",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2023",
     "info": [],
     "description": "É una tela digitale 1km x 1km completamente bianca esportata JPG. L’opera è stampata parzialmente su fogli A4 timbrati e numerati; i visitatori hanno diritto a prendere un pezzo dell’opera.",
     "media": [
@@ -778,11 +827,11 @@ window.PROJECTS = [
   {
     "slug": "unfolds",
     "sourcePage": "iperstizioni/",
-    "title": "Unfolds (2023)",
+    "title": "Unfolds",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2023",
     "info": [],
     "description": "",
     "media": [
@@ -807,11 +856,11 @@ window.PROJECTS = [
   {
     "slug": "2-49",
     "sourcePage": "249/",
-    "title": "2 49 (2021)",
+    "title": "2 49",
     "categories": [
       "artistpage"
     ],
-    "date": "",
+    "date": "2021",
     "info": [],
     "description": "",
     "media": [

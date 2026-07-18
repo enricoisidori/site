@@ -3,6 +3,28 @@ document.addEventListener("DOMContentLoaded", function () {
   const items = document.querySelectorAll(
     ".artistpage, .designerpage, .digitalpage"
   );
+  const isProjectsPage = document.body.classList.contains("projects-page");
+  const filterNames = {
+    designerpage: "design",
+    artistpage: "art",
+  };
+
+  function filterFromUrl() {
+    if (!isProjectsPage) return null;
+    const filterName = new URLSearchParams(window.location.search).get("filter");
+    return Object.entries(filterNames).find(([, name]) => name === filterName)?.[0] || null;
+  }
+
+  function updateFilterUrl(filter) {
+    if (!isProjectsPage) return;
+    const url = new URL(window.location.href);
+    const filterName = filterNames[filter];
+
+    if (filterName) url.searchParams.set("filter", filterName);
+    else url.searchParams.delete("filter");
+
+    history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }
 
   document.addEventListener(
     "click",
@@ -62,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Retrieve stored filter from localStorage
-  const storedFilter = localStorage.getItem("selectedFilter");
+  const storedFilter = filterFromUrl() || localStorage.getItem("selectedFilter");
 
   if (storedFilter) {
     const activeButton = document.querySelector(
@@ -93,6 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showAllItems();
         // Remove stored filter
         localStorage.removeItem("selectedFilter");
+        updateFilterUrl(null);
       } else {
         // Remove active class from all buttons and activate the clicked one
         filterButtons.forEach((btn) => {
@@ -108,6 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Store the selected filter in localStorage
         localStorage.setItem("selectedFilter", filter);
+        updateFilterUrl(filter);
       }
     });
   });

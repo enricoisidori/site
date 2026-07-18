@@ -8,7 +8,11 @@
   }
 
   function setHash(slug) {
-    history.replaceState(null, "", `#${encodeURIComponent(slug)}`);
+    history.replaceState(
+      null,
+      "",
+      `${location.pathname}${location.search}#${encodeURIComponent(slug)}`,
+    );
   }
 
   function updateOpenProject(slug, shouldWriteHash) {
@@ -39,7 +43,10 @@
     button.className = "project-media project-media-image";
     button.setAttribute("aria-label", `Show information for ${project.title}`);
     button.setAttribute("aria-pressed", "false");
-    button.addEventListener("click", () => updateOpenProject(project.slug, true));
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      updateOpenProject(project.slug, true);
+    });
 
     image.src = media.src;
     image.alt = "";
@@ -66,7 +73,8 @@
     if (media.poster) video.poster = media.poster;
     source.dataset.src = media.src;
     video.appendChild(source);
-    wrapper.addEventListener("click", () => {
+    wrapper.addEventListener("click", (event) => {
+      event.stopPropagation();
       updateOpenProject(project.slug, true);
     });
     wrapper.appendChild(video);
@@ -99,19 +107,19 @@
       details.appendChild(date);
     }
 
-    project.info.forEach((line) => {
-      const info = document.createElement("p");
-      info.className = "project-info";
-      info.textContent = line;
-      details.appendChild(info);
-    });
-
     if (project.description) {
       const description = document.createElement("p");
       description.className = "project-description";
       description.textContent = project.description;
       details.appendChild(description);
     }
+
+    project.info.forEach((line) => {
+      const info = document.createElement("p");
+      info.className = "project-info";
+      info.innerHTML = line;
+      details.appendChild(info);
+    });
 
     return details;
   }
