@@ -18,9 +18,12 @@ body.projects-page {
   line-height: 16px;
 }
 
-html:has(body.projects-page),
-body.projects-page #aleph-stage {
+html:has(body.projects-page) {
   background: #fff;
+}
+
+body.projects-page #aleph-stage {
+  background-color: #fff;
 }
 
 body.projects-page #content-scroll {

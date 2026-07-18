@@ -33,6 +33,7 @@ para-disciplinary design, unbounded design, design approaches"
     <link rel="icon" sizes="32x32" type="image/png" href="asset/svg/cyan.png" data-wikipedia-favicon />
     <link rel="icon" sizes="192x192" type="image/png" href="asset/svg/cyan.png" data-wikipedia-favicon />
     <link rel="apple-touch-icon" sizes="180x180" href="asset/svg/cyan.png" data-wikipedia-favicon />
+    <script src="aleph-boot.js"></script>
     <link rel="stylesheet" href="style.css" />
     <style>
       :root {
@@ -47,7 +48,11 @@ para-disciplinary design, unbounded design, design approaches"
         position: fixed;
         inset: 0;
         z-index: 0;
-        background: #fff;
+        background-color: #fff;
+        background-image: var(--aleph-cached-bg, none);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
         overflow: hidden;
         pointer-events: none;
       }

@@ -67,8 +67,6 @@
       updateOpenProject(project.slug, true);
     });
 
-    if (isPriority) image.src = media.src;
-    else image.dataset.src = media.src;
     image.alt = "";
     image.decoding = "async";
     image.loading = isPriority ? "eager" : "lazy";
@@ -87,6 +85,8 @@
       else mobileSource.dataset.srcset = mobileSrc;
       picture.appendChild(mobileSource);
     }
+    if (isPriority) image.src = media.src;
+    else image.dataset.src = media.src;
     picture.appendChild(image);
     button.appendChild(picture);
     return button;

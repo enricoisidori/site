@@ -52,10 +52,12 @@
   }
 
   function syncRootBackgroundImage(img) {
+    const backgroundImage = img?.src ? `url("${img.src}")` : "none";
     root.style.setProperty(
       "--root-bg-image",
-      img?.src ? `url("${img.src}")` : "none"
+      backgroundImage,
     );
+    root.style.setProperty("--aleph-cached-bg", backgroundImage);
   }
 
   const ctx = canvas.getContext("2d");
@@ -318,6 +320,40 @@
     } catch (_) {}
   }
 
+  function persistCommonsBuffer() {
+    try {
+      const frames = [];
+      const urls = new Set();
+      const addFrame = (id, url) => {
+        if (!url || urls.has(url) || frames.length >= maxBuffer) return;
+        urls.add(url);
+        frames.push({ id: id || "", url });
+      };
+
+      addFrame("", imgNext?.src);
+      Commons.preloaded.forEach((frame) => addFrame(frame.id, frame.img?.src));
+      Commons.urlsQueue.forEach((frame) => addFrame(frame.id, frame.url));
+      sessionStorage.setItem("aleph_buffer", JSON.stringify(frames));
+    } catch (_) {}
+  }
+
+  function restoreCommonsBuffer() {
+    try {
+      const raw = sessionStorage.getItem("aleph_buffer");
+      if (!raw) return;
+      const frames = JSON.parse(raw);
+      if (!Array.isArray(frames)) return;
+
+      const queued = new Set(Commons.urlsQueue.map((frame) => frame.url));
+      frames.slice(0, maxBuffer).forEach((frame) => {
+        if (!frame?.url || queued.has(frame.url)) return;
+        Commons.urlsQueue.push({ id: frame.id || "", url: frame.url });
+        if (frame.id) Commons.heldIds.add(frame.id);
+        queued.add(frame.url);
+      });
+    } catch (_) {}
+  }
+
   function persistSeenIds() {
     try {
       const arr = Array.from(Commons.seenIds).slice(-200);
@@ -398,18 +434,28 @@
   let alephStarted = false;
   let alephStartScheduled = false;
 
+  function signalAlephReady() {
+    if (window.__alephReady) return;
+    window.__alephReady = true;
+    root.dataset.alephReady = "true";
+    window.dispatchEvent(new Event("aleph:ready"));
+  }
+
   async function startAleph() {
     if (alephStarted) return;
     alephStarted = true;
     restoreSeenIds();
+    restoreCommonsBuffer();
 
     Commons.thumbWidth = 64;
 
     const isProjectsPage = document.body.classList.contains("projects-page");
-    const cacheBoot = isProjectsPage
-      ? Promise.resolve(false)
-      : bootFromCache();
-    const commonsBoot = fetchCommonsUrls(isProjectsPage ? 3 : 2);
+    const cacheBoot = bootFromCache();
+    const initialBuffer = isProjectsPage ? 3 : 2;
+    const missingUrls = Math.max(initialBuffer - Commons.urlsQueue.length, 0);
+    const commonsBoot = missingUrls
+      ? fetchCommonsUrls(missingUrls)
+      : Promise.resolve();
     const fromCache = await cacheBoot;
 
     await commonsBoot;
@@ -448,12 +494,14 @@
         ctx.putImageData(out, 0, 0);
 
         if (p < 1) requestAnimationFrame(lumaIntro);
+        else signalAlephReady();
       }
 
       requestAnimationFrame(lumaIntro);
     } else {
       // Cache hit: usa la prima nuova immagine anche per aggiornare la favicon.
       await initFirstImage();
+      signalAlephReady();
     }
 
     commonsRefillEnabled = true;
@@ -462,8 +510,10 @@
 
     // Persisti seen IDs periodicamente e all'unload
     setInterval(persistSeenIds, 4000);
-    window.addEventListener("pagehide", persistSeenIds);
-    window.addEventListener("beforeunload", persistSeenIds);
+    window.addEventListener("pagehide", () => {
+      persistSeenIds();
+      persistCommonsBuffer();
+    });
   }
 
   function scheduleAlephStart() {

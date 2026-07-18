@@ -729,7 +729,11 @@ body.has-canvas #aleph-stage {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: #fff;
+  background-color: #fff;
+  background-image: var(--aleph-cached-bg, none);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   overflow: hidden;
   pointer-events: none;
 }
