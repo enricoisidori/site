@@ -67,24 +67,24 @@
       updateOpenProject(project.slug, true);
     });
 
-    image.src = mobileSrc || media.src;
-    if (mobileSrc && mobileSrc !== media.src) {
-      image.dataset.desktopSrc = media.src;
-    }
+    if (isPriority) image.src = media.src;
+    else image.dataset.src = media.src;
     image.alt = "";
     image.decoding = "async";
     image.loading = isPriority ? "eager" : "lazy";
+    if (isPriority) image.dataset.priority = "true";
     if (media.width && media.height) {
       image.width = media.width;
       image.height = media.height;
     }
-    if (projectIndex === 0 && mediaIndex === 0) image.fetchPriority = "high";
+    if (isPriority) image.fetchPriority = "high";
 
     if (mobileSrc) {
       const mobileSource = document.createElement("source");
       mobileSource.media = "(max-width: 768px)";
       mobileSource.type = "image/webp";
-      mobileSource.srcset = mobileSrc;
+      if (isPriority) mobileSource.srcset = mobileSrc;
+      else mobileSource.dataset.srcset = mobileSrc;
       picture.appendChild(mobileSource);
     }
     picture.appendChild(image);
@@ -107,7 +107,7 @@
     video.setAttribute("loading", "lazy");
     if (media.poster) {
       const mobilePoster = getMobileAsset(media.poster);
-      video.poster =
+      video.dataset.poster =
         mobilePoster && window.matchMedia("(max-width: 768px)").matches
           ? mobilePoster
           : media.poster;
@@ -168,9 +168,49 @@
   function loadVideo(video) {
     const source = video.querySelector("source[data-src]");
     if (!source || source.src) return;
+    if (video.dataset.poster) {
+      video.poster = video.dataset.poster;
+      delete video.dataset.poster;
+    }
     source.src = source.dataset.src;
     video.preload = "metadata";
     video.load();
+  }
+
+  function loadImage(image) {
+    if (!image.dataset.src) return;
+    const picture = image.closest("picture");
+    picture?.querySelectorAll("source[data-srcset]").forEach((source) => {
+      source.srcset = source.dataset.srcset;
+      delete source.dataset.srcset;
+    });
+    image.loading = "eager";
+    image.src = image.dataset.src;
+    delete image.dataset.src;
+  }
+
+  function observeImages() {
+    const images = document.querySelectorAll("img[data-src]");
+    if (!("IntersectionObserver" in window)) {
+      images.forEach(loadImage);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          loadImage(entry.target);
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        root: document.getElementById("content-scroll"),
+        rootMargin: "150% 100%",
+      },
+    );
+
+    images.forEach((image) => observer.observe(image));
   }
 
   function observeVideos() {
@@ -190,7 +230,7 @@
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: "0px" },
+      { rootMargin: "50% 25%" },
     );
 
     videos.forEach((video) => observer.observe(video));
@@ -202,63 +242,37 @@
         window.requestIdleCallback ||
         ((callback) => window.setTimeout(callback, 1500));
       const delay = window.matchMedia("(max-width: 768px)").matches
-        ? 3000
-        : 2000;
+        ? 10000
+        : 8000;
 
       window.setTimeout(() => {
         idle(observeVideos, { timeout: 4000 });
       }, delay);
     };
 
-    if (document.readyState === "complete") start();
-    else window.addEventListener("load", start, { once: true });
-  }
-
-  function canUpgradeImages() {
-    if (window.matchMedia("(max-width: 768px)").matches) return false;
-
-    const connection = navigator.connection;
-    if (!connection) return true;
-    if (connection.saveData) return false;
-    return !["slow-2g", "2g"].includes(connection.effectiveType);
-  }
-
-  function observeHighResolutionImages() {
-    if (!canUpgradeImages()) return;
-
-    const images = document.querySelectorAll("img[data-desktop-src]");
-    if (!("IntersectionObserver" in window)) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-
-          const image = entry.target;
-          image.src = image.dataset.desktopSrc;
-          delete image.dataset.desktopSrc;
-          observer.unobserve(image);
-        });
-      },
-      { rootMargin: "100px" },
-    );
-
-    images.forEach((image) => observer.observe(image));
-  }
-
-  function observeHighResolutionImagesWhenIdle() {
-    const start = () => {
-      const idle =
-        window.requestIdleCallback ||
-        ((callback) => window.setTimeout(callback, 1500));
-
-      window.setTimeout(() => {
-        idle(observeHighResolutionImages, { timeout: 4000 });
-      }, 1500);
+    const startAfterPriorityImages = () => {
+      if (window.__portfolioPriorityReady) start();
+      else window.addEventListener("portfolio:priority-ready", start, { once: true });
     };
 
-    if (document.readyState === "complete") start();
-    else window.addEventListener("load", start, { once: true });
+    if (document.readyState === "complete") startAfterPriorityImages();
+    else window.addEventListener("load", startAfterPriorityImages, { once: true });
+  }
+
+  function signalPriorityImagesReady() {
+    const priorityImages = document.querySelectorAll("img[data-priority]");
+    const pending = Array.from(priorityImages, (image) => {
+      if (image.complete) return Promise.resolve();
+      return new Promise((resolve) => {
+        image.addEventListener("load", resolve, { once: true });
+        image.addEventListener("error", resolve, { once: true });
+      });
+    });
+
+    Promise.all(pending).then(() => {
+      window.__portfolioPriorityReady = true;
+      window.dispatchEvent(new Event("portfolio:priority-ready"));
+    });
   }
 
   function renderProjects() {
@@ -285,7 +299,8 @@
   }
 
   renderProjects();
-  observeHighResolutionImagesWhenIdle();
+  observeImages();
+  signalPriorityImagesReady();
   observeVideosWhenIdle();
 
   function setupEdgeScrolling() {

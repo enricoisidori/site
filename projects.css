@@ -2,6 +2,7 @@
   --project-gap: 2.5px;
   --project-media-height: 500px;
   --project-track-height: 500px;
+  --project-text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 12px #fff;
 }
 
 /* Page */
@@ -9,7 +10,7 @@ body.projects-page {
   width: 100%;
   min-height: 100vh;
   margin: 0;
-  background: #111;
+  background: #fff;
   color: #000;
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-size: 14px;
@@ -19,7 +20,7 @@ body.projects-page {
 
 html:has(body.projects-page),
 body.projects-page #aleph-stage {
-  background: #111;
+  background: #fff;
 }
 
 body.projects-page #content-scroll {
@@ -32,10 +33,7 @@ body.projects-page #content-scroll * {
   color: #000;
   font: inherit;
   font-weight: 500;
-  text-shadow:
-    0 0 2px #fff,
-    0 0 4px #fff,
-    0 0 12px #fff !important;
+  text-shadow: var(--project-text-shadow) !important;
 }
 
 body.projects-page.white-bg,
@@ -57,20 +55,6 @@ body.projects-page .projects-navigation {
   padding: 0;
   line-height: 16px;
   white-space: nowrap;
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
-  font-weight: 500;
-  text-shadow:
-    0 0 2px #fff,
-    0 0 4px #fff,
-    0 0 12px #fff !important;
-}
-
-body.has-canvas #content-scroll .projects-navigation *,
-body.projects-page .projects-navigation * {
-  text-shadow:
-    0 0 2px #fff,
-    0 0 4px #fff,
-    0 0 12px #fff !important;
 }
 
 body.projects-page #content-scroll .projects-navigation > a,
@@ -91,10 +75,6 @@ body.projects-page .projects-navigation > a {
   width: max-content;
   color: #000 !important;
   text-decoration: none;
-  text-shadow:
-    0 0 2px #fff,
-    0 0 4px #fff,
-    0 0 12px #fff !important;
 }
 
 body.projects-page .projects-navigation > a:first-child {
@@ -124,10 +104,6 @@ body.projects-page .projects-navigation-filters {
 body.projects-page #content-scroll .projects-navigation .btn,
 body.projects-page #content-scroll .projects-navigation .btn.inactive {
   color: #000 !important;
-  text-shadow:
-    0 0 2px #fff,
-    0 0 4px #fff,
-    0 0 12px #fff !important;
 }
 
 body.projects-page #content-scroll .projects-navigation .btn:hover,
@@ -180,7 +156,7 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 .project-media {
   display: block;
   flex: 0 0 auto;
-  height: var(--project-media-height);
+  height: 100%;
   margin: 0;
   padding: 0;
   border: 0;
@@ -205,16 +181,8 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   display: block;
   width: auto;
   max-width: none;
-  height: var(--project-media-height);
+  height: 100%;
   object-fit: contain;
-}
-
-.project-track,
-.project-media,
-.project-media img,
-.project-media video,
-.project-media-video.video-unmute {
-  height: var(--project-media-height) !important;
 }
 
 .projects-page .video-unmute-btn {

@@ -678,7 +678,7 @@ window.PROJECTS = [
       },
       {
         "type": "video",
-        "src": "pixelpushing/asset/Iterationsinversions.mp4",
+        "src": "pixelpushing/asset/Iterationsinversions-optimized.mp4",
         "unmute": false
       },
       {

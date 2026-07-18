@@ -172,30 +172,6 @@ video {
   height: auto;
 }
 
-#project-float-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-#project-float-layer img,
-#project-float-layer video {
-  position: absolute;
-  display: block;
-  height: auto;
-  max-height: 40vh;
-  object-fit: contain;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-#project-float-layer .project-float-mobile {
-  max-height: 58vh;
-  min-width: 52vw;
-}
-
 /* Pulsante aqua (stile OS X / glossy) */
 a.btn-aqua,
 button.btn-aqua {

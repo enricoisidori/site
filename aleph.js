@@ -12,8 +12,6 @@
   }
 
   const ALEPH_BACKGROUND_ENABLED = true;
-  const PROJECT_FLOAT_ENABLED = false;
-  window.__projectFloatEnabled = PROJECT_FLOAT_ENABLED;
 
   const stage = document.getElementById("aleph-stage");
   const contentScroll = document.getElementById("content-scroll");
@@ -38,26 +36,11 @@
     if (e.target.closest(".btn")) return;
     if (e.target.closest(".video-unmute")) return;
 
-    if (window.ProjectFloat?.hasVisible?.()) {
-      window.ProjectFloat.dismiss();
-      whiteBg = true;
-      localStorage.setItem("aleph_white_bg", "1");
-      stage.style.display = "none";
-      document.body.classList.add("white-bg");
-      window.ProjectFloat.pause?.();
-      root.style.setProperty("--root-bg-image", "none");
-      return;
-    }
-
     whiteBg = !whiteBg;
     localStorage.setItem("aleph_white_bg", whiteBg ? "1" : "0");
     stage.style.display = whiteBg ? "none" : "";
     document.body.classList.toggle("white-bg", whiteBg);
-    if (whiteBg) window.ProjectFloat?.pause?.();
-    else {
-      window.ProjectFloat?.restart?.();
-      startAleph();
-    }
+    if (!whiteBg) scheduleAlephStart();
     root.style.setProperty(
       "--root-bg-image",
       whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`
@@ -91,21 +74,18 @@
   const FEATHER = 0.12;
   const LUMA_INVERT = false;
 
-  const RES_STEPS = [64, 96, 128, 160];
-  let resIdx = 1;
-
-  const maxBuffer = 4;
+  const maxBuffer = 12;
   let commonsRefillEnabled = false;
 
   const Commons = {
-    thumbWidth: RES_STEPS[resIdx],
+    thumbWidth: 128,
     urlsQueue: [],
     prefetching: false,
-    minBuffer: 2,
+    minBuffer: 6,
     preloaded: [],
     loadingCount: 0,
-    maxConcurrent: 1,
-    maxPool: 3,
+    maxConcurrent: 3,
+    maxPool: 16,
     heldIds: new Set(),
     seenIds: new Set(),
     seenOrder: [],
@@ -416,22 +396,30 @@
   }
 
   let alephStarted = false;
+  let alephStartScheduled = false;
 
   async function startAleph() {
     if (alephStarted) return;
     alephStarted = true;
     restoreSeenIds();
 
-    Commons.thumbWidth = 48;
+    Commons.thumbWidth = 64;
 
     const isProjectsPage = document.body.classList.contains("projects-page");
-    const fromCache = isProjectsPage ? false : await bootFromCache();
+    const cacheBoot = isProjectsPage
+      ? Promise.resolve(false)
+      : bootFromCache();
+    const commonsBoot = fetchCommonsUrls(isProjectsPage ? 3 : 2);
+    const fromCache = await cacheBoot;
 
-    await fetchCommonsUrls(2);
+    await commonsBoot;
     pumpPreload();
 
     if (!fromCache) {
       await initFirstImage();
+
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, CW, CH);
 
       let start = performance.now();
       const duration = 1000;
@@ -468,12 +456,9 @@
       await initFirstImage();
     }
 
-    const qualityDelay = isProjectsPage ? 12000 : 6000;
-    window.setTimeout(() => {
-      commonsRefillEnabled = true;
-      Commons.thumbWidth = RES_STEPS[resIdx];
-      ensureCommonsBuffer(maxBuffer).then(() => pumpPreload());
-    }, qualityDelay);
+    commonsRefillEnabled = true;
+    Commons.thumbWidth = 128;
+    ensureCommonsBuffer(maxBuffer).then(() => pumpPreload());
 
     // Persisti seen IDs periodicamente e all'unload
     setInterval(persistSeenIds, 4000);
@@ -482,29 +467,25 @@
   }
 
   function scheduleAlephStart() {
-    const connection = navigator.connection;
-    if (
-      connection?.saveData ||
-      ["slow-2g", "2g"].includes(connection?.effectiveType)
-    ) {
+    if (alephStarted || alephStartScheduled) return;
+
+    const isProjectsPage = document.body.classList.contains("projects-page");
+    const start = () => {
+      alephStartScheduled = false;
+      startAleph();
+    };
+
+    if (isProjectsPage && !window.__portfolioPriorityReady) {
+      alephStartScheduled = true;
+      window.addEventListener("portfolio:priority-ready", start, { once: true });
       return;
     }
 
-    const delay = document.body.classList.contains("projects-page") ? 6000 : 3000;
-    const queueStart = () => {
-      window.setTimeout(() => {
-        const idle =
-          window.requestIdleCallback ||
-          ((callback) => window.setTimeout(callback, 1500));
-        idle(startAleph, { timeout: 10000 });
-      }, delay);
-    };
-
-    if (document.readyState === "complete") queueStart();
-    else window.addEventListener("load", queueStart, { once: true });
+    alephStartScheduled = true;
+    start();
   }
 
-  if (!whiteBg) scheduleAlephStart();
+  scheduleAlephStart();
 
   lastScrollY = getScrollY();
   contentScroll.addEventListener("scroll", onScroll, { passive: true });
@@ -512,17 +493,4 @@
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) scheduleRender();
   });
-})();
-
-(function () {
-  if (window.__projectFloatEnabled === false) return;
-
-  const scripts = document.getElementsByTagName("script");
-  for (const s of scripts) {
-    if (!s.src || !/aleph\.js(?:\?.*)?$/.test(s.src)) continue;
-    const float = document.createElement("script");
-    float.src = s.src.replace(/aleph\.js(?:\?.*)?$/, "project-float.js");
-    document.head.appendChild(float);
-    break;
-  }
 })();

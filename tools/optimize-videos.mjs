@@ -84,7 +84,15 @@ function remuxWithoutAudio(source, destination) {
   );
 }
 
-function encode(source, destination, maxSize, crf, keepAudio, targetFps) {
+function encode(
+  source,
+  destination,
+  maxSize,
+  crf,
+  keepAudio,
+  targetFps,
+  targetBitrate,
+) {
   if (existsSync(destination) && !process.argv.includes("--force")) return;
 
   const args = [
@@ -99,13 +107,24 @@ function encode(source, destination, maxSize, crf, keepAudio, targetFps) {
     "libx264",
     "-preset",
     "medium",
-    "-crf",
-    String(crf),
     "-pix_fmt",
     "yuv420p",
     "-movflags",
     "+faststart",
   ];
+
+  if (targetBitrate) {
+    args.push(
+      "-b:v",
+      targetBitrate,
+      "-maxrate",
+      targetBitrate === "5M" ? "6M" : "5M",
+      "-bufsize",
+      targetBitrate === "5M" ? "12M" : "10M",
+    );
+  } else {
+    args.push("-crf", String(crf));
+  }
 
   if (keepAudio && hasAudio(source)) {
     args.push("-c:a", "aac", "-b:a", "128k");
@@ -141,6 +160,7 @@ for (const media of videos) {
     targetFps ? 27 : 24,
     media.unmute,
     targetFps,
+    targetFps ? "5M" : null,
   );
   encode(
     source,
@@ -149,5 +169,6 @@ for (const media of videos) {
     targetFps ? 30 : 28,
     media.unmute,
     targetFps,
+    targetFps ? "4M" : null,
   );
 }

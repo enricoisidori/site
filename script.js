@@ -83,24 +83,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  document.querySelectorAll('a[href$="projects.html"]').forEach((link) => {
-    link.addEventListener("click", (event) => {
-      localStorage.removeItem("selectedFilter");
-      if (!isProjectsPage) return;
+  document
+    .querySelectorAll('a[href$="work.html"], a[href$="projects.html"]')
+    .forEach((link) => {
+      link.addEventListener("click", (event) => {
+        localStorage.removeItem("selectedFilter");
+        if (!isProjectsPage) return;
 
-      event.preventDefault();
-      window.closeProjectDetails?.();
-      filterButtons.forEach((button) => {
-        button.classList.remove("active", "inactive");
+        event.preventDefault();
+        window.closeProjectDetails?.();
+        filterButtons.forEach((button) => {
+          button.classList.remove("active", "inactive");
+        });
+        showAllItems();
+
+        const url = new URL(window.location.href);
+        url.searchParams.delete("filter");
+        url.hash = "";
+        history.replaceState(null, "", `${url.pathname}${url.search}`);
       });
-      showAllItems();
-
-      const url = new URL(window.location.href);
-      url.searchParams.delete("filter");
-      url.hash = "";
-      history.replaceState(null, "", `${url.pathname}${url.search}`);
     });
-  });
 
   // Retrieve stored filter from localStorage
   const storedFilter = filterFromUrl() || localStorage.getItem("selectedFilter");

@@ -2,45 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Projects by Enrico Isidori." />
-    <title>Projects — Enrico Isidori</title>
-    <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="icon" type="image/png" href="asset/svg/cyan.png" data-wikipedia-favicon />
-    <link rel="icon" sizes="16x16" type="image/png" href="asset/svg/cyan.png" data-wikipedia-favicon />
-    <link rel="icon" sizes="32x32" type="image/png" href="asset/svg/cyan.png" data-wikipedia-favicon />
-    <link rel="icon" sizes="192x192" type="image/png" href="asset/svg/cyan.png" data-wikipedia-favicon />
-    <link rel="apple-touch-icon" sizes="180x180" href="asset/svg/cyan.png" data-wikipedia-favicon />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="projects.css" />
+    <meta name="robots" content="noindex" />
+    <title>Work — Enrico Isidori</title>
+    <script>
+      location.replace(`work.html${location.search}${location.hash}`);
+    </script>
+    <noscript><meta http-equiv="refresh" content="0; url=work.html" /></noscript>
   </head>
-  <body class="has-canvas projects-page">
-    <div id="aleph-stage">
-      <canvas id="aleph-canvas"></canvas>
-    </div>
-
-    <div id="content-scroll">
-      <nav class="projects-navigation" aria-label="Primary navigation">
-        <a href="projects.html">Enrico Isidori</a>
-        <div class="projects-navigation-filters">
-          <span id="design" class="btn" data-filter="designerpage">Design</span>
-          <span id="art" class="btn" data-filter="artistpage">Art</span>
-        </div>
-        <a href="about/">About</a>
-      </nav>
-
-      <main id="projects-list" aria-label="Projects"></main>
-
-      <footer class="projects-contacts">
-        <a href="https://www.instagram.com/enrico.isidori/" target="_blank">Instagram</a><br />
-        <a href="mailto:enrico.isidori@gmail.com">Mail</a>
-      </footer>
-    </div>
-
-    <script src="projects-data.js"></script>
-    <script src="projects.js"></script>
-    <script src="script.js"></script>
-    <script src="video-unmute.js"></script>
-    <script src="aleph.js"></script>
-  </body>
+  <body></body>
 </html>
