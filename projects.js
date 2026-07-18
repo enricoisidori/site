@@ -39,9 +39,20 @@
     updateOpenProject(activeSlug, true);
   };
 
+  function getMobileAsset(src) {
+    return src.endsWith(".webp") ? src.replace(/\.webp$/, "-mobile.webp") : null;
+  }
+
+  function getResponsiveVideoAsset(src) {
+    if (!window.matchMedia("(max-width: 768px)").matches) return src;
+    return src.endsWith(".mp4") ? src.replace(/\.mp4$/, "-mobile.mp4") : src;
+  }
+
   function createImage(project, media, projectIndex, mediaIndex) {
     const button = document.createElement("button");
     const image = document.createElement("img");
+    const picture = document.createElement("picture");
+    const mobileSrc = getMobileAsset(media.src);
     const isPriority = mediaIndex === 0 && projectIndex < 3;
 
     button.type = "button";
@@ -57,9 +68,21 @@
     image.alt = "";
     image.decoding = "async";
     image.loading = isPriority ? "eager" : "lazy";
+    if (media.width && media.height) {
+      image.width = media.width;
+      image.height = media.height;
+    }
     if (projectIndex === 0 && mediaIndex === 0) image.fetchPriority = "high";
 
-    button.appendChild(image);
+    if (mobileSrc) {
+      const mobileSource = document.createElement("source");
+      mobileSource.media = "(max-width: 768px)";
+      mobileSource.type = "image/webp";
+      mobileSource.srcset = mobileSrc;
+      picture.appendChild(mobileSource);
+    }
+    picture.appendChild(image);
+    button.appendChild(picture);
     return button;
   }
 
@@ -75,8 +98,14 @@
     video.loop = true;
     video.playsInline = true;
     video.preload = "none";
-    if (media.poster) video.poster = media.poster;
-    source.dataset.src = media.src;
+    if (media.poster) {
+      const mobilePoster = getMobileAsset(media.poster);
+      video.poster =
+        mobilePoster && window.matchMedia("(max-width: 768px)").matches
+          ? mobilePoster
+          : media.poster;
+    }
+    source.dataset.src = getResponsiveVideoAsset(media.src);
     video.appendChild(source);
     wrapper.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -140,7 +169,9 @@
   function observeVideos() {
     const videos = document.querySelectorAll(".project-media video");
     if (!("IntersectionObserver" in window)) {
-      videos.forEach(loadVideo);
+      videos.forEach((video, index) => {
+        window.setTimeout(() => loadVideo(video), index * 250);
+      });
       return;
     }
 
@@ -152,10 +183,28 @@
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: "300px" },
+      { rootMargin: "0px" },
     );
 
     videos.forEach((video) => observer.observe(video));
+  }
+
+  function observeVideosWhenIdle() {
+    const start = () => {
+      const idle =
+        window.requestIdleCallback ||
+        ((callback) => window.setTimeout(callback, 1500));
+      const delay = window.matchMedia("(max-width: 768px)").matches
+        ? 3000
+        : 2000;
+
+      window.setTimeout(() => {
+        idle(observeVideos, { timeout: 4000 });
+      }, delay);
+    };
+
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
   }
 
   function renderProjects() {
@@ -182,7 +231,7 @@
   }
 
   renderProjects();
-  observeVideos();
+  observeVideosWhenIdle();
 
   function setupEdgeScrolling() {
     const edgeSize = 48;

@@ -1,0 +1,16 @@
+{
+  "name": "Enrico Isidori",
+  "short_name": "Enrico Isidori",
+  "start_url": "./projects.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "asset/svg/cyan.png",
+      "sizes": "552x552",
+      "type": "image/png"
+    }
+  ]
+}

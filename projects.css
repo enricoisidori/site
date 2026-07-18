@@ -14,7 +14,6 @@ body.projects-page {
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-size: 14px;
   font-weight: 500;
-  font-stretch: 130%;
   line-height: 16px;
 }
 
@@ -133,7 +132,7 @@ body.projects-page #content-scroll .projects-navigation .btn.inactive {
 
 body.projects-page #content-scroll .projects-navigation .btn:hover,
 body.projects-page #content-scroll .projects-navigation .btn.active {
-  color: #777 !important;
+  color: #555 !important;
 }
 
 /* Project rows */
@@ -145,6 +144,8 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   display: block;
   width: 100%;
   margin-top: var(--project-gap);
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--project-track-height);
 }
 
 .project-row:first-child {
@@ -188,6 +189,11 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   background: transparent;
   color: inherit;
   font: inherit;
+}
+
+.project-media picture {
+  display: block;
+  height: 100%;
 }
 
 .project-media-image {

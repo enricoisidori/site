@@ -1,6 +1,4 @@
 /* Resto del CSS */
-@import url("https://use.typekit.net/qqd2gph.css");
-
 @font-face {
   font-family: "Times NR Seven MT Std";
   src: url("asset/font/Times%20NR%20Seven%20MT%20Std%20Bold.otf") format("opentype");
@@ -26,9 +24,8 @@ header,
 * {
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-weight: 500;
-  font-size: 14pt;
-  line-height: 16pt;
-  font-stretch: 130%;
+  font-size: 14px;
+  line-height: 16px;
   box-sizing: border-box;
 }
 

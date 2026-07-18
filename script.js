@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener(
     "click",
     function () {
-      if (window.location.pathname !== "/specta.html") {
+      if (!isProjectsPage && window.location.pathname !== "/specta.html") {
         let videos = document.querySelectorAll("video");
         videos.forEach((video) => {
           video.play().catch((error) => {

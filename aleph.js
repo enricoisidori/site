@@ -1,4 +1,16 @@
 (function () {
+  const mobileViewport = window.matchMedia("(max-width: 768px)");
+  if (mobileViewport.matches && screen.orientation?.lock) {
+    const lockPortrait = () => {
+      screen.orientation.lock("portrait").catch(() => {});
+    };
+    lockPortrait();
+    document.addEventListener("touchstart", lockPortrait, {
+      once: true,
+      passive: true,
+    });
+  }
+
   const ALEPH_BACKGROUND_ENABLED = true;
   const PROJECT_FLOAT_ENABLED = false;
   window.__projectFloatEnabled = PROJECT_FLOAT_ENABLED;
@@ -79,17 +91,17 @@
   const RES_STEPS = [96, 128, 192, 256, 320];
   let resIdx = 2;
 
-  const maxBuffer = 180;
+  const maxBuffer = 24;
 
   const Commons = {
     thumbWidth: RES_STEPS[resIdx],
     urlsQueue: [],
     prefetching: false,
-    minBuffer: 60,
+    minBuffer: 12,
     preloaded: [],
     loadingCount: 0,
-    maxConcurrent: 12,
-    maxPool: 480,
+    maxConcurrent: 4,
+    maxPool: 36,
     heldIds: new Set(),
     seenIds: new Set(),
     seenOrder: [],
@@ -406,7 +418,7 @@
 
     const fromCache = await bootFromCache();
 
-    await fetchCommonsUrls(50);
+    await fetchCommonsUrls(12);
     pumpPreload();
 
     if (!fromCache) {
