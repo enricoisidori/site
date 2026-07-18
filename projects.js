@@ -64,7 +64,10 @@
       updateOpenProject(project.slug, true);
     });
 
-    image.src = media.src;
+    image.src = mobileSrc || media.src;
+    if (mobileSrc && mobileSrc !== media.src) {
+      image.dataset.desktopSrc = media.src;
+    }
     image.alt = "";
     image.decoding = "async";
     image.loading = isPriority ? "eager" : "lazy";
@@ -207,6 +210,53 @@
     else window.addEventListener("load", start, { once: true });
   }
 
+  function canUpgradeImages() {
+    if (window.matchMedia("(max-width: 768px)").matches) return false;
+
+    const connection = navigator.connection;
+    if (!connection) return true;
+    if (connection.saveData) return false;
+    return !["slow-2g", "2g"].includes(connection.effectiveType);
+  }
+
+  function observeHighResolutionImages() {
+    if (!canUpgradeImages()) return;
+
+    const images = document.querySelectorAll("img[data-desktop-src]");
+    if (!("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          const image = entry.target;
+          image.src = image.dataset.desktopSrc;
+          delete image.dataset.desktopSrc;
+          observer.unobserve(image);
+        });
+      },
+      { rootMargin: "100px" },
+    );
+
+    images.forEach((image) => observer.observe(image));
+  }
+
+  function observeHighResolutionImagesWhenIdle() {
+    const start = () => {
+      const idle =
+        window.requestIdleCallback ||
+        ((callback) => window.setTimeout(callback, 1500));
+
+      window.setTimeout(() => {
+        idle(observeHighResolutionImages, { timeout: 4000 });
+      }, 1500);
+    };
+
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+  }
+
   function renderProjects() {
     projects.forEach((project, projectIndex) => {
       const row = document.createElement("section");
@@ -231,6 +281,7 @@
   }
 
   renderProjects();
+  observeHighResolutionImagesWhenIdle();
   observeVideosWhenIdle();
 
   function setupEdgeScrolling() {
