@@ -9,13 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.setAttribute("aria-pressed", String(!video.muted));
     };
 
-    const toggle = () => {
+    const toggle = (event) => {
+      event.stopPropagation();
       video.muted = !video.muted;
       if (!video.muted) video.play().catch(() => {});
       sync();
     };
 
     sync();
-    wrap.addEventListener("click", toggle);
+    btn.addEventListener("click", toggle);
   });
 });

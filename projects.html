@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Projects by Enrico Isidori." />
+    <title>Projects — Enrico Isidori</title>
+    <link rel="icon" type="image/png" href="asset/svg/cyan.png" />
+    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
+    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="projects.css" />
+    <script>
+      window.__alephPrefetch = fetch(
+        "https://commons.wikimedia.org/w/api.php?" +
+          new URLSearchParams({
+            action: "query",
+            generator: "random",
+            grnnamespace: "6",
+            grnlimit: "50",
+            prop: "imageinfo",
+            iiprop: "url|mime",
+            iiurlwidth: "64",
+            format: "json",
+            origin: "*",
+          }),
+      );
+    </script>
+  </head>
+  <body class="has-canvas projects-page">
+    <div id="aleph-stage">
+      <canvas id="aleph-canvas"></canvas>
+    </div>
+
+    <div id="content-scroll">
+      <header id="topnav">
+        <div class="left homebtn"><a href="home.html">Enrico Isidori</a></div>
+        <div class="right homebtn"><a href="about/">About</a></div>
+        <div class="menu">
+          <span id="design" class="btn" data-filter="designerpage">Design</span>
+          <br />
+          <span id="art" class="btn" data-filter="artistpage">Art</span>
+        </div>
+      </header>
+
+      <main id="projects-list" aria-label="Projects"></main>
+    </div>
+
+    <script src="projects-data.js"></script>
+    <script src="projects.js"></script>
+    <script src="script.js"></script>
+    <script src="video-unmute.js"></script>
+    <script src="aleph.js"></script>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+:root {
+  --project-gap: 2.5px;
+  --project-media-height: 500px;
+  --project-track-height: 500px;
+}
+
+body.projects-page {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.projects-page #topnav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 11;
+  background: transparent;
+  display: flow-root;
+}
+
+.projects-page .menu {
+  width: 100%;
+  clear: both;
+}
+
+.project-row {
+  display: block;
+  width: 100%;
+  margin-top: var(--project-gap);
+}
+
+.project-row:first-child {
+  margin-top: 0;
+}
+
+.project-row[hidden] {
+  display: none;
+}
+
+.project-track {
+  display: flex;
+  width: calc(100% + (var(--project-gap) * 2));
+  height: var(--project-track-height);
+  margin-left: calc(var(--project-gap) * -1);
+  padding-inline: var(--project-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 0;
+}
+
+.project-media {
+  display: block;
+  flex: 0 0 auto;
+  height: var(--project-media-height);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.project-media-image {
+  cursor: pointer;
+}
+
+.project-media img,
+.project-media video {
+  display: block;
+  width: auto;
+  max-width: none;
+  height: var(--project-media-height);
+  object-fit: contain;
+}
+
+.project-media-video.video-unmute {
+  height: var(--project-media-height);
+  max-width: none;
+}
+
+.project-media-video.video-unmute video {
+  width: auto;
+  max-width: none;
+  height: var(--project-media-height);
+}
+
+.project-details {
+  padding-inline: var(--project-gap);
+}
+
+.project-details[hidden] {
+  display: none;
+}
+
+.project-details p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.project-title {
+  font: inherit;
+}
+
+.projects-page .video-unmute-btn {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.project-info,
+.project-description {
+  width: calc(100% - 40px);
+  margin-left: 40px !important;
+  text-indent: -40px;
+}
+
+@media only screen and (max-width: 768px) {
+  .project-media:first-child {
+    width: calc(100vw - 20px);
+  }
+
+  .project-media:first-child img,
+  .project-media:first-child video {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .project-info,
+  .project-description {
+    width: calc(100% - 20px);
+    margin-left: 20px !important;
+    text-indent: -20px;
+  }
+}
