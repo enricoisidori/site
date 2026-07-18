@@ -1,8 +1,9 @@
 /* Page typography */
 body.about-page {
-  font-family: "neue-haas-grotesk-display", Helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
+  font-stretch: 110%;
   line-height: 16px;
 }
 
@@ -18,40 +19,46 @@ body.about-page .about-navigation {
   right: 2.5px;
   left: 2.5px;
   z-index: 11;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
   height: 16px;
   margin: 0;
   padding: 0;
   line-height: 16px;
+  white-space: nowrap;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: 500;
+  text-shadow: none !important;
 }
 
-body.about-page .about-navigation > a,
-body.about-page .about-navigation > span {
+body.about-page .about-navigation * {
+  text-shadow: none !important;
+}
+
+body.about-page #content-scroll .about-navigation > a,
+body.about-page #content-scroll .about-navigation > span {
   display: block;
   height: 16px;
   margin: 0;
   padding: 0;
-  color: #000;
+  color: #000 !important;
   line-height: 16px;
+  text-shadow: none !important;
+  white-space: nowrap;
+  min-width: max-content;
 }
 
 body.about-page .about-navigation > a {
+  position: absolute;
+  top: 0;
   width: max-content;
   text-decoration: none;
 }
 
 body.about-page .about-navigation > a:first-child {
-  justify-self: start;
-  margin-left: -8px;
-  padding-inline: 8px;
+  left: 0;
 }
 
 body.about-page .about-navigation > a:last-child {
-  justify-self: end;
-  margin-right: -8px;
-  padding-inline: 8px;
+  right: 0;
   text-align: right;
 }
 

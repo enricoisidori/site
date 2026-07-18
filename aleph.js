@@ -192,6 +192,31 @@
   let pixA = null;
   let pixB = null;
 
+  let wikipediaFaviconSet = false;
+
+  function setWikipediaFavicon(img) {
+    if (wikipediaFaviconSet || !img) return;
+    const size = 192;
+    const iconCanvas = document.createElement("canvas");
+    iconCanvas.width = size;
+    iconCanvas.height = size;
+    const iconCtx = iconCanvas.getContext("2d");
+    const sourceWidth = img.naturalWidth || img.width;
+    const sourceHeight = img.naturalHeight || img.height;
+    if (!sourceWidth || !sourceHeight) return;
+
+    const scale = Math.max(size / sourceWidth, size / sourceHeight);
+    const width = sourceWidth * scale;
+    const height = sourceHeight * scale;
+    iconCtx.drawImage(img, (size - width) / 2, (size - height) / 2, width, height);
+
+    const dataUrl = iconCanvas.toDataURL("image/png");
+    document.querySelectorAll("link[data-wikipedia-favicon]").forEach((link) => {
+      link.href = dataUrl;
+    });
+    wikipediaFaviconSet = true;
+  }
+
   let transitionProgress = 0;
   let scrollAccum = 0;
   let lastScrollY = 0;
@@ -341,6 +366,7 @@
     }
     const frame = Commons.preloaded.shift();
     if (frame && frame.img) {
+      setWikipediaFavicon(frame.img);
       if (!imgCurrent) {
         imgCurrent = frame.img;
         pixA = getPixData(imgCurrent);

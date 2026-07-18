@@ -11,9 +11,10 @@ body.projects-page {
   margin: 0;
   background: #111;
   color: #000;
-  font-family: "neue-haas-grotesk-display", Helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
+  font-stretch: 110%;
   line-height: 16px;
 }
 
@@ -31,7 +32,7 @@ body.projects-page #content-scroll,
 body.projects-page #content-scroll * {
   color: #000;
   font: inherit;
-  font-weight: 700;
+  font-weight: 500;
   text-shadow:
     0 0 2px #fff,
     0 0 4px #fff,
@@ -51,41 +52,47 @@ body.projects-page .projects-navigation {
   right: var(--project-gap);
   left: var(--project-gap);
   z-index: 11;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
   height: 16px;
   margin: 0;
   padding: 0;
   line-height: 16px;
+  white-space: nowrap;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: 500;
+  text-shadow: none !important;
 }
 
-body.projects-page .projects-navigation > a,
-body.projects-page .projects-navigation-filters,
-body.projects-page .projects-navigation-filters .btn {
+body.projects-page .projects-navigation * {
+  text-shadow: none !important;
+}
+
+body.projects-page #content-scroll .projects-navigation > a,
+body.projects-page #content-scroll .projects-navigation-filters .btn,
+body.projects-page #content-scroll .projects-navigation-filters .btn.active {
   display: block;
   height: 16px;
   margin: 0;
   padding: 0;
   line-height: 16px;
+  white-space: nowrap;
+  min-width: max-content;
 }
 
 body.projects-page .projects-navigation > a {
+  position: absolute;
+  top: 0;
   width: max-content;
-  color: #000;
+  color: #000 !important;
   text-decoration: none;
+  text-shadow: none !important;
 }
 
 body.projects-page .projects-navigation > a:first-child {
-  justify-self: start;
-  margin-left: -8px;
-  padding-inline: 8px;
+  left: 0;
 }
 
 body.projects-page .projects-navigation > a:last-child {
-  justify-self: end;
-  margin-right: -8px;
-  padding-inline: 8px;
+  right: 0;
   text-align: right;
 }
 
@@ -93,18 +100,24 @@ body.projects-page .projects-navigation-filters {
   display: flex;
   flex-flow: row nowrap;
   gap: 8px;
+  position: absolute;
+  top: 0;
+  left: 50%;
   align-items: center;
   white-space: nowrap;
+  min-width: max-content;
+  transform: translateX(-50%);
 }
 
 body.projects-page #content-scroll .projects-navigation .btn,
 body.projects-page #content-scroll .projects-navigation .btn.inactive {
-  color: #000;
+  color: #000 !important;
+  text-shadow: none !important;
 }
 
 body.projects-page #content-scroll .projects-navigation .btn:hover,
 body.projects-page #content-scroll .projects-navigation .btn.active {
-  color: #777;
+  color: #777 !important;
 }
 
 /* Project rows */

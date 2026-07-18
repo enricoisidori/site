@@ -24,10 +24,11 @@ header,
 } */
 
 * {
-  font-family: "neue-haas-grotesk-display", Helvetica, sans-serif;
-  font-weight: 700;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: 500;
   font-size: 14pt;
   line-height: 16pt;
+  font-stretch: 110%;
   box-sizing: border-box;
 }
 
@@ -204,7 +205,7 @@ button.btn-aqua {
   display: inline-block;
   width: fit-content;
   font-size: 14pt;
-  font-family: "neue-haas-grotesk-display", Helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
   height: auto;
   padding: 0.35em 1em;
   border-radius: 1000px;
@@ -543,6 +544,13 @@ p {
   width: 100vw;
   position: fixed;
   z-index: 3;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: 500;
+  text-shadow: none !important;
+}
+
+#topnav * {
+  text-shadow: none !important;
 }
 
 #toprect {
