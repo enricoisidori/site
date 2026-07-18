@@ -8,6 +8,8 @@
   const canvas = document.getElementById("aleph-canvas");
   if (!stage || !contentScroll || !canvas) return;
 
+  contentScroll.prepend(stage);
+
   const root = document.documentElement;
   if (!ALEPH_BACKGROUND_ENABLED) {
     stage.style.display = "none";

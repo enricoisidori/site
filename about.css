@@ -1,5 +1,6 @@
+/* Page typography */
 body.about-page {
-  font-family: "neue-haas-grotesk-text", "Neue Haas Grotesk Text", sans-serif;
+  font-family: "neue-haas-grotesk-display", Helvetica, sans-serif;
   font-size: 14px;
   font-weight: 700;
   line-height: 16px;
@@ -7,24 +8,22 @@ body.about-page {
 
 body.about-page #content-scroll,
 body.about-page #content-scroll * {
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
+  font: inherit;
 }
 
+/* Navigation */
 body.about-page .about-navigation {
   position: fixed;
   top: 2.5px;
   right: 2.5px;
   left: 2.5px;
+  z-index: 11;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   height: 16px;
   margin: 0;
   padding: 0;
-  z-index: 11;
   line-height: 16px;
 }
 
@@ -39,16 +38,38 @@ body.about-page .about-navigation > span {
 }
 
 body.about-page .about-navigation > a {
+  width: max-content;
   text-decoration: none;
 }
 
+body.about-page .about-navigation > a:first-child {
+  justify-self: start;
+  margin-left: -8px;
+  padding-inline: 8px;
+}
+
 body.about-page .about-navigation > a:last-child {
+  justify-self: end;
+  margin-right: -8px;
+  padding-inline: 8px;
   text-align: right;
 }
 
+/* Content */
 body.about-page #content-scroll > .col-12 {
   padding-top: 0 !important;
   text-align: center;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff;
+}
+
+body.about-page #content-scroll > .col-12 > a[href^="https://www.instagram.com/enrico.isidori/"],
+body.about-page #content-scroll > .col-12 > a[href^="mailto:"] {
+  position: relative;
+  z-index: 100;
+  pointer-events: auto;
 }
 
 body.about-page .outdent {
@@ -66,4 +87,9 @@ body.about-page #content-scroll p {
 
 body.about-page #content-scroll .about-section {
   margin-top: 16px;
+}
+
+body.about-page .about-background-note {
+  margin: 0;
+  text-align: center;
 }

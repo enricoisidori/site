@@ -34,6 +34,11 @@
     else removeHash();
   }
 
+  window.closeProjectDetails = () => {
+    if (!activeSlug) return;
+    updateOpenProject(activeSlug, true);
+  };
+
   function createImage(project, media, projectIndex, mediaIndex) {
     const button = document.createElement("button");
     const image = document.createElement("img");

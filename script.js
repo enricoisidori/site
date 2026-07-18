@@ -108,6 +108,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", function () {
+      window.closeProjectDetails?.();
+
       if (button.classList.contains("active")) {
         // If active, deactivate it and show all items
         button.classList.remove("active");
