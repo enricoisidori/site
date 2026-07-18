@@ -1,4 +1,15 @@
 (function () {
+  const ALEPH_BACKGROUND_ENABLED =
+    document.body.dataset.alephBackground !== "off";
+  if (!ALEPH_BACKGROUND_ENABLED) {
+    document.documentElement.dataset.alephDisabled = "true";
+    document.documentElement.style.setProperty("--aleph-cached-bg", "none");
+    document.body.classList.add("white-bg");
+    const disabledStage = document.getElementById("aleph-stage");
+    if (disabledStage) disabledStage.style.display = "none";
+    return;
+  }
+
   const mobileViewport = window.matchMedia("(max-width: 768px)");
   if (mobileViewport.matches && screen.orientation?.lock) {
     const lockPortrait = () => {
@@ -11,8 +22,6 @@
     });
   }
 
-  const ALEPH_BACKGROUND_ENABLED = true;
-
   const stage = document.getElementById("aleph-stage");
   const contentScroll = document.getElementById("content-scroll");
   const canvas = document.getElementById("aleph-canvas");
@@ -21,13 +30,6 @@
   contentScroll.prepend(stage);
 
   const root = document.documentElement;
-  if (!ALEPH_BACKGROUND_ENABLED) {
-    stage.style.display = "none";
-    document.body.classList.add("white-bg");
-    root.style.setProperty("--root-bg-image", "none");
-    return;
-  }
-
   let whiteBg = localStorage.getItem("aleph_white_bg") === "1";
   if (whiteBg) { stage.style.display = "none"; document.body.classList.add("white-bg"); }
 
@@ -196,31 +198,6 @@
   let imgNext = null;
   let pixA = null;
   let pixB = null;
-
-  let wikipediaFaviconSet = false;
-
-  function setWikipediaFavicon(img) {
-    if (wikipediaFaviconSet || !img) return;
-    const size = 192;
-    const iconCanvas = document.createElement("canvas");
-    iconCanvas.width = size;
-    iconCanvas.height = size;
-    const iconCtx = iconCanvas.getContext("2d");
-    const sourceWidth = img.naturalWidth || img.width;
-    const sourceHeight = img.naturalHeight || img.height;
-    if (!sourceWidth || !sourceHeight) return;
-
-    const scale = Math.max(size / sourceWidth, size / sourceHeight);
-    const width = sourceWidth * scale;
-    const height = sourceHeight * scale;
-    iconCtx.drawImage(img, (size - width) / 2, (size - height) / 2, width, height);
-
-    const dataUrl = iconCanvas.toDataURL("image/png");
-    document.querySelectorAll("link[data-wikipedia-favicon]").forEach((link) => {
-      link.href = dataUrl;
-    });
-    wikipediaFaviconSet = true;
-  }
 
   let transitionProgress = 0;
   let scrollAccum = 0;
@@ -419,7 +396,6 @@
     }
     const frame = Commons.preloaded.shift();
     if (frame && frame.img) {
-      setWikipediaFavicon(frame.img);
       if (!imgCurrent) {
         imgCurrent = frame.img;
         pixA = getPixData(imgCurrent);

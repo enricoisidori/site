@@ -2,6 +2,8 @@
   const projects = Array.isArray(window.PROJECTS) ? window.PROJECTS : [];
   const list = document.getElementById("projects-list");
   let activeSlug = null;
+  let priorityProjectRow = null;
+  let priorityGeneration = 0;
 
   function removeHash() {
     history.replaceState(null, "", `${location.pathname}${location.search}`);
@@ -79,6 +81,7 @@
     }
     if (isPriority) image.fetchPriority = "high";
     else if (isEager) image.fetchPriority = "auto";
+    else image.fetchPriority = "low";
 
     if (placeholder) {
       button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
@@ -104,7 +107,7 @@
     return button;
   }
 
-  function createVideo(project, media) {
+  function createVideo(project, media, projectIndex, mediaIndex) {
     const wrapper = document.createElement("div");
     const video = document.createElement("video");
     const source = document.createElement("source");
@@ -117,6 +120,11 @@
     video.playsInline = true;
     video.preload = "none";
     video.setAttribute("loading", "lazy");
+    if (mediaIndex < 2) {
+      video.dataset.earlyVideo = "true";
+      video.dataset.projectIndex = String(projectIndex);
+      video.dataset.mediaPosition = String(mediaIndex + 1);
+    }
     if (media.poster) {
       const mobilePoster = getMobileAsset(media.poster);
       video.dataset.poster =
@@ -201,6 +209,79 @@
     delete image.dataset.src;
   }
 
+  function prioritizeProject(row) {
+    if (!row || row === priorityProjectRow) return;
+
+    priorityProjectRow?.querySelectorAll("img").forEach((image) => {
+      image.fetchPriority = "low";
+    });
+    priorityProjectRow?.removeAttribute("data-load-priority");
+    priorityProjectRow = row;
+    priorityProjectRow.dataset.loadPriority = "high";
+    priorityGeneration += 1;
+    const generation = priorityGeneration;
+
+    row.querySelectorAll("img").forEach((image) => {
+      image.fetchPriority = "high";
+      loadImage(image);
+    });
+
+    row.querySelectorAll("video").forEach((video, index) => {
+      window.setTimeout(() => {
+        if (
+          priorityProjectRow !== row ||
+          priorityGeneration !== generation
+        ) {
+          return;
+        }
+        loadVideo(video);
+      }, index * 180);
+    });
+  }
+
+  function setupProjectLoadingPriority() {
+    const scrollRoot = document.getElementById("content-scroll");
+    const rows = Array.from(document.querySelectorAll(".project-row"));
+    let frame = null;
+
+    const update = () => {
+      frame = null;
+      const rootRect = scrollRoot.getBoundingClientRect();
+      const focusY = rootRect.top + rootRect.height * 0.45;
+      const visibleRows = rows.filter((row) => !row.hidden);
+      const rowAtFocus = visibleRows.find((row) => {
+        const rect = row.getBoundingClientRect();
+        return rect.top <= focusY && rect.bottom >= focusY;
+      }) || visibleRows.reduce((closest, row) => {
+        const rect = row.getBoundingClientRect();
+        const distance = Math.min(
+          Math.abs(focusY - rect.top),
+          Math.abs(focusY - rect.bottom),
+        );
+        return !closest || distance < closest.distance
+          ? { row, distance }
+          : closest;
+      }, null)?.row;
+
+      if (rowAtFocus) prioritizeProject(rowAtFocus);
+    };
+
+    const scheduleUpdate = () => {
+      if (frame !== null) return;
+      frame = window.requestAnimationFrame(update);
+    };
+
+    scrollRoot.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate, { passive: true });
+    document.querySelectorAll(".project-track").forEach((track) => {
+      const prioritizeTrack = () => prioritizeProject(track.closest(".project-row"));
+      track.addEventListener("scroll", prioritizeTrack, { passive: true });
+      track.addEventListener("pointerdown", prioritizeTrack, { passive: true });
+    });
+
+    scheduleUpdate();
+  }
+
   function observeImages() {
     const images = document.querySelectorAll("img[data-src]");
     if (!("IntersectionObserver" in window)) {
@@ -225,8 +306,7 @@
     images.forEach((image) => observer.observe(image));
   }
 
-  function observeVideos() {
-    const videos = document.querySelectorAll(".project-media video");
+  function observeVideoSet(videos, rootMargin) {
     if (!("IntersectionObserver" in window)) {
       videos.forEach((video, index) => {
         window.setTimeout(() => loadVideo(video), index * 250);
@@ -242,24 +322,36 @@
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: "50% 25%" },
+      {
+        root: document.getElementById("content-scroll"),
+        rootMargin,
+      },
     );
 
     videos.forEach((video) => observer.observe(video));
   }
 
-  function observeVideosWhenIdle() {
+  function observeEarlyVideos() {
+    observeVideoSet(
+      document.querySelectorAll("video[data-early-video]"),
+      "100% 100%",
+    );
+  }
+
+  function observeDeferredVideos() {
+    observeVideoSet(
+      document.querySelectorAll(".project-media video:not([data-early-video])"),
+      "50% 25%",
+    );
+  }
+
+  function observeDeferredVideosWhenIdle() {
     const start = () => {
       const idle =
         window.requestIdleCallback ||
-        ((callback) => window.setTimeout(callback, 1500));
-      const delay = window.matchMedia("(max-width: 768px)").matches
-        ? 10000
-        : 8000;
+        ((callback) => window.setTimeout(callback, 500));
 
-      window.setTimeout(() => {
-        idle(observeVideos, { timeout: 4000 });
-      }, delay);
+      idle(observeDeferredVideos, { timeout: 1500 });
     };
 
     const startAfterPriorityImages = () => {
@@ -267,8 +359,7 @@
       else window.addEventListener("portfolio:priority-ready", start, { once: true });
     };
 
-    if (document.readyState === "complete") startAfterPriorityImages();
-    else window.addEventListener("load", startAfterPriorityImages, { once: true });
+    startAfterPriorityImages();
   }
 
   function signalPriorityImagesReady() {
@@ -300,7 +391,7 @@
       project.media.forEach((media, mediaIndex) => {
         const mediaElement =
           media.type === "video"
-            ? createVideo(project, media)
+            ? createVideo(project, media, projectIndex, mediaIndex)
             : createImage(project, media, projectIndex, mediaIndex);
         track.appendChild(mediaElement);
       });
@@ -311,9 +402,11 @@
   }
 
   renderProjects();
+  setupProjectLoadingPriority();
   observeImages();
+  observeEarlyVideos();
   signalPriorityImagesReady();
-  observeVideosWhenIdle();
+  observeDeferredVideosWhenIdle();
 
   function setupEdgeScrolling() {
     const edgeSize = 48;
