@@ -30,25 +30,32 @@
   contentScroll.prepend(stage);
 
   const root = document.documentElement;
-  let whiteBg = localStorage.getItem("aleph_white_bg") === "1";
+  // A new browsing session starts on Wikipedia; Work and About share its state.
+  let whiteBg = sessionStorage.getItem("aleph_white_bg") === "1";
+  function setBackground(isWhite) {
+    whiteBg = isWhite;
+    sessionStorage.setItem("aleph_white_bg", whiteBg ? "1" : "0");
+    stage.style.display = whiteBg ? "none" : "";
+    document.body.classList.toggle("white-bg", whiteBg);
+    if (!whiteBg) scheduleAlephStart();
+    root.style.setProperty(
+      "--root-bg-image",
+      whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`,
+    );
+  }
+
+  function toggleBackground() {
+    setBackground(!whiteBg);
+  }
 
   if (whiteBg) { stage.style.display = "none"; document.body.classList.add("white-bg"); }
-
   document.body.addEventListener("click", (e) => {
     if (e.target.closest("a")) return;
     if (e.target.closest("button")) return;
     if (e.target.closest(".btn")) return;
     if (e.target.closest(".video-unmute")) return;
 
-    whiteBg = !whiteBg;
-    localStorage.setItem("aleph_white_bg", whiteBg ? "1" : "0");
-    stage.style.display = whiteBg ? "none" : "";
-    document.body.classList.toggle("white-bg", whiteBg);
-    if (!whiteBg) scheduleAlephStart();
-    root.style.setProperty(
-      "--root-bg-image",
-      whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`
-    );
+    toggleBackground();
   });
 
   function getScrollY() {

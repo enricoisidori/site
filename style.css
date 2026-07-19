@@ -7,7 +7,7 @@
 }
 
 :root {
-  --content-top-offset: calc(env(safe-area-inset-top, 0px) + 2.5px);
+  --content-top-offset: calc(env(safe-area-inset-top, 0px) + 5px);
 }
 /* .info,
 .topnav,
@@ -90,7 +90,7 @@ html {
 } */
 
 body {
-  margin: 2.5px;
+  margin: 5px;
   background-color: white;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -758,7 +758,37 @@ body.has-canvas #content-scroll {
   overscroll-behavior-y: contain;
   touch-action: pan-y;
   z-index: 0;
-  padding: var(--content-top-offset) 2.5px 2.5px 2.5px;
+  padding: var(--content-top-offset) 5px;
+}
+
+/* Text navigation and background control */
+body.has-canvas .site-name {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  height: 16px;
+  color: #000;
+  text-decoration: none;
+}
+
+body.has-canvas .site-name::before,
+body.has-canvas .page-link::before {
+  position: absolute;
+  inset: -10px -8px;
+  content: "";
+}
+
+body.has-canvas .page-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  height: 16px;
+  color: #000;
+  text-decoration: none;
 }
 
 body.has-canvas #content-scroll #aleph-stage {

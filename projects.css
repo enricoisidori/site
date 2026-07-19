@@ -1,5 +1,6 @@
 :root {
-  --project-gap: 2.5px;
+  --project-gap: 5px;
+  --project-side-gap: 3px;
   --project-cover-width: 750px;
   --project-media-height: 500px;
   --project-track-height: 500px;
@@ -11,7 +12,7 @@ body.projects-page {
   width: 100%;
   min-height: 100vh;
   margin: 0;
-  background: #fff;
+  background: transparent;
   color: #000;
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-size: 14px;
@@ -20,7 +21,7 @@ body.projects-page {
 }
 
 html:has(body.projects-page) {
-  background: #fff;
+  background: transparent;
 }
 
 body.projects-page #aleph-stage {
@@ -41,13 +42,13 @@ body.projects-page #content-scroll * {
 }
 
 body.projects-page ::selection {
-  color: #fff;
-  background: rgba(0, 0, 0, 0.7);
+  color: #f00;
+  background: transparent;
 }
 
 body.projects-page ::-moz-selection {
-  color: #fff;
-  background: rgba(0, 0, 0, 0.7);
+  color: #f00;
+  background: transparent;
 }
 
 body.projects-page.white-bg,
@@ -71,35 +72,16 @@ body.projects-page .projects-navigation {
   white-space: nowrap;
 }
 
-body.projects-page #content-scroll .projects-navigation > a,
 body.projects-page #content-scroll .projects-navigation-filters .btn,
 body.projects-page #content-scroll .projects-navigation-filters .btn.active {
   display: block;
   height: 16px;
   margin: 0;
-  padding: 0;
+  padding-top: 0;
+  padding-bottom: 0;
   line-height: 16px;
   white-space: nowrap;
   min-width: max-content;
-}
-
-body.projects-page .projects-navigation > a {
-  position: absolute;
-  top: 0;
-  width: max-content;
-  color: #000 !important;
-  text-decoration: none;
-}
-
-body.projects-page .projects-navigation > a:first-child {
-  left: 0;
-  transform-origin: left center;
-}
-
-body.projects-page .projects-navigation > a:last-child {
-  right: 0;
-  text-align: right;
-  transform-origin: right center;
 }
 
 body.projects-page .projects-navigation-filters {
@@ -119,6 +101,12 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 /* Project rows */
 #projects-list {
   padding-top: calc(16px + var(--project-gap));
+}
+
+@media only screen and (min-width: 769px) {
+  #projects-list {
+    padding-top: 0;
+  }
 }
 
 .project-row {
@@ -332,19 +320,19 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   }
 
   .project-row.project-gallery-open .project-track {
-    width: calc(100% + 5px);
-    margin-left: -2.5px;
+    width: calc(100% + 6px);
+    margin-left: -3px;
   }
 
   .project-row.project-gallery-open .project-track::before,
   .project-row.project-gallery-open .project-track::after {
-    flex: 0 0 2.5px;
+    flex: 0 0 3px;
     height: 1px;
     content: "";
   }
 
   .project-track > .project-cover {
-    width: calc(100% - 5px);
+    width: calc(100% - 6px);
   }
 
   .project-date,

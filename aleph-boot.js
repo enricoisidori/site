@@ -1,8 +1,8 @@
 (function () {
   try {
-    const whiteBackground = localStorage.getItem("aleph_white_bg") === "1";
+    if (sessionStorage.getItem("aleph_white_bg") === "1") return;
     const cachedUrl = localStorage.getItem("aleph_last_url");
-    if (whiteBackground || !cachedUrl) return;
+    if (!cachedUrl) return;
 
     const url = new URL(cachedUrl, window.location.href);
     if (!/^https?:$/.test(url.protocol)) return;

@@ -1,11 +1,11 @@
 (() => {
   const projects = Array.isArray(window.PROJECTS) ? window.PROJECTS : [];
   const list = document.getElementById("projects-list");
-  const scrollRoot = document.getElementById("content-scroll");
   const rowsBySlug = new Map();
+  const openedRows = new Set();
   const mobileQuery = window.matchMedia("(max-width: 768px)");
   const DRIFT_SPEED = 18;
-  let activeRow = null;
+  let focusedRow = null;
   let drift = null;
 
   if (!list) return;
@@ -118,6 +118,21 @@
       ?.setAttribute("aria-expanded", String(isActive));
   }
 
+  function focusProject(row) {
+    if (focusedRow && focusedRow !== row) {
+      focusedRow.querySelector(".project-details").hidden = true;
+    }
+    row.querySelector(".project-details").hidden = false;
+    focusedRow = row;
+  }
+
+  function blurProject(row, shouldWriteHash = true) {
+    if (!row) return;
+    row.querySelector(".project-details").hidden = true;
+    if (focusedRow === row) focusedRow = null;
+    if (shouldWriteHash) removeHash();
+  }
+
   function closeProject(row, shouldWriteHash = true) {
     if (!row) return;
     const track = row.querySelector(".project-track");
@@ -129,43 +144,35 @@
     if (cover && cover.parentElement === track) row.insertBefore(cover, track);
     row.querySelectorAll("video").forEach((video) => video.pause());
     setRowActive(row, false);
-    if (activeRow === row) activeRow = null;
+    if (focusedRow === row) focusedRow = null;
+    openedRows.delete(row);
     if (shouldWriteHash) removeHash();
   }
 
   function openProject(slug, shouldWriteHash = true) {
     const row = rowsBySlug.get(slug);
     if (!row) return;
-    if (activeRow === row) {
+    if (openedRows.has(row)) {
+      focusProject(row);
       if (shouldWriteHash) setHash(slug);
       return;
     }
 
-    const previousRow = activeRow;
-    const keepNextInPlace = Boolean(
-      previousRow &&
-        previousRow.compareDocumentPosition(row) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-    const nextTop = keepNextInPlace ? row.getBoundingClientRect().top : null;
-    if (previousRow) closeProject(previousRow, false);
-
     const track = row.querySelector(".project-track");
     const cover = row.querySelector(".project-cover");
-    if (cover?.dataset.mediaType !== "video") track.prepend(cover);
-    row.classList.add("project-gallery-open");
-    track.hidden = false;
-    track.scrollLeft = 0;
-    activeRow = row;
+    const isSingleImage = row.dataset.singleImage === "true";
+    openedRows.add(row);
     setRowActive(row, true);
-    loadProjectMedia(row);
-
-    if (keepNextInPlace && scrollRoot) {
-      const delta = row.getBoundingClientRect().top - nextTop;
-      scrollRoot.scrollTop += delta;
+    focusProject(row);
+    if (!isSingleImage) {
+      if (cover?.dataset.mediaType !== "video") track.prepend(cover);
+      row.classList.add("project-gallery-open");
+      track.hidden = false;
+      track.scrollLeft = 0;
+      loadProjectMedia(row);
+      window.requestAnimationFrame(() => startProjectDrift(row));
     }
     if (shouldWriteHash) setHash(slug);
-    window.requestAnimationFrame(() => startProjectDrift(row));
   }
 
   function handleMediaClick(event, project) {
@@ -176,7 +183,12 @@
       event.preventDefault();
       return;
     }
-    closeProject(row, true);
+    if (!row) return;
+    if (focusedRow === row) blurProject(row, true);
+    else {
+      focusProject(row);
+      setHash(project.slug);
+    }
   }
 
   function createCover(project, projectIndex) {
@@ -197,8 +209,12 @@
     button.addEventListener("click", (event) => {
       event.stopPropagation();
       const row = rowsBySlug.get(project.slug);
-      if (activeRow === row) closeProject(row, true);
-      else openProject(project.slug, true);
+      if (!openedRows.has(row)) openProject(project.slug, true);
+      else if (focusedRow === row) blurProject(row, true);
+      else {
+        focusProject(row);
+        setHash(project.slug);
+      }
     });
 
     image.alt = "";
@@ -381,6 +397,9 @@
       const cover = createCover(project, projectIndex);
       row.className = `${project.categories.join(" ")} project-row`;
       row.dataset.projectSlug = project.slug;
+      row.dataset.singleImage = String(
+        project.media.length === 1 && project.media[0]?.type === "image",
+      );
       track.className = "project-track";
       track.hidden = true;
       track.setAttribute("aria-label", `${project.title} media`);
@@ -457,14 +476,20 @@
 
   renderProjects();
   setupEdgeScrolling();
+  window.__portfolioPriorityReady = true;
+  window.dispatchEvent(new Event("portfolio:priority-ready"));
 
   window.closeProjectDetails = () => {
-    if (activeRow) closeProject(activeRow, true);
+    openedRows.forEach((row) => closeProject(row, false));
+    removeHash();
   };
   mobileQuery.addEventListener("change", () => {
-    if (!activeRow) return;
-    if (mobileQuery.matches) startProjectDrift(activeRow);
-    else stopProjectDrift(activeRow);
+    if (!mobileQuery.matches) {
+      stopProjectDrift();
+      return;
+    }
+    const lastOpenedRow = Array.from(openedRows).at(-1);
+    if (lastOpenedRow) startProjectDrift(lastOpenedRow);
   });
 
   const initialSlug = decodeURIComponent(location.hash.slice(1));
@@ -476,6 +501,6 @@
   window.addEventListener("hashchange", () => {
     const slug = decodeURIComponent(location.hash.slice(1));
     if (rowsBySlug.has(slug)) openProject(slug, false);
-    else if (activeRow) closeProject(activeRow, false);
+    else removeHash();
   });
 })();
