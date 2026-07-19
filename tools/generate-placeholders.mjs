@@ -14,9 +14,12 @@ vm.runInNewContext(dataSource, context, { filename: "projects-data.js" });
 const assets = Array.from(
   new Set(
     (context.window.PROJECTS || []).flatMap((project) =>
-      project.media
-        .filter((media) => media.type === "image" && media.src?.endsWith(".webp"))
-        .map((media) => media.src),
+      [
+        ...project.media
+          .filter((media) => media.type === "image" && media.src?.endsWith(".webp"))
+          .map((media) => media.src),
+        project.media[0]?.poster,
+      ].filter((asset) => asset?.endsWith(".webp")),
     ),
   ),
 );

@@ -23,7 +23,7 @@
     document.querySelectorAll(".project-row").forEach((row) => {
       const isActive = row.dataset.projectSlug === nextSlug;
       const details = row.querySelector(".project-details");
-      row.querySelectorAll(".project-media-image").forEach((button) => {
+      row.querySelectorAll(".project-cover, .project-media-image").forEach((button) => {
         button.setAttribute("aria-pressed", String(isActive));
       });
       details.hidden = !isActive;
@@ -34,6 +34,36 @@
     if (!shouldWriteHash) return;
     if (nextSlug) setHash(nextSlug);
     else removeHash();
+  }
+
+  function openProjectGallery(slug, shouldWriteHash) {
+    const row = document.querySelector(
+      `[data-project-slug="${CSS.escape(slug)}"]`,
+    );
+    if (!row) return;
+
+    if (!row.classList.contains("project-gallery-open")) {
+      const track = row.querySelector(".project-track");
+      const cover = row.querySelector(".project-cover");
+      const coverWidth = cover?.getBoundingClientRect().width || 0;
+
+      if (cover) track.prepend(cover);
+      row.classList.add("project-gallery-open");
+      track.hidden = false;
+      cover?.setAttribute("aria-expanded", "true");
+      cover?.setAttribute(
+        "aria-label",
+        `Show information for ${projects.find((project) => project.slug === slug)?.title || slug}`,
+      );
+      prioritizeProject(row, true);
+
+      window.requestAnimationFrame(() => {
+        track.scrollLeft = coverWidth / 2;
+      });
+    }
+
+    if (activeSlug !== slug) updateOpenProject(slug, shouldWriteHash);
+    else if (shouldWriteHash) setHash(slug);
   }
 
   window.closeProjectDetails = () => {
@@ -53,35 +83,38 @@
     return src.endsWith(".mp4") ? src.replace(/\.mp4$/, "-mobile.mp4") : src;
   }
 
-  function createImage(project, media, projectIndex, mediaIndex) {
+  function createCover(project, projectIndex) {
     const button = document.createElement("button");
     const image = document.createElement("img");
     const picture = document.createElement("picture");
-    const mobileSrc = getMobileAsset(media.src);
-    const isEager = mediaIndex === 0 && projectIndex < 3;
-    const isPriority = mediaIndex === 0 && projectIndex === 0;
-    const placeholder = window.PROJECT_PLACEHOLDERS?.[media.src];
+    const firstMedia = project.media[0];
+    const src = firstMedia.type === "video" ? firstMedia.poster : firstMedia.src;
+    const mobileSrc = getMobileAsset(src);
+    const isEager = projectIndex < 2;
+    const isPriority = projectIndex === 0;
+    const placeholder = window.PROJECT_PLACEHOLDERS?.[src];
 
     button.type = "button";
-    button.className = "project-media project-media-image";
-    button.setAttribute("aria-label", `Show information for ${project.title}`);
+    button.className = "project-cover";
+    button.setAttribute("aria-label", `Open ${project.title}`);
+    button.setAttribute("aria-expanded", "false");
     button.setAttribute("aria-pressed", "false");
     button.addEventListener("click", (event) => {
       event.stopPropagation();
-      updateOpenProject(project.slug, true);
+      if (button.closest(".project-row")?.classList.contains("project-gallery-open")) {
+        updateOpenProject(project.slug, true);
+        return;
+      }
+      openProjectGallery(project.slug, true);
     });
 
     image.alt = "";
     image.decoding = "async";
     image.loading = isEager ? "eager" : "lazy";
+    image.width = 1500;
+    image.height = 1000;
+    image.fetchPriority = isPriority ? "high" : isEager ? "auto" : "low";
     if (isPriority) image.dataset.priority = "true";
-    if (media.width && media.height) {
-      image.width = media.width;
-      image.height = media.height;
-    }
-    if (isPriority) image.fetchPriority = "high";
-    else if (isEager) image.fetchPriority = "auto";
-    else image.fetchPriority = "low";
 
     if (placeholder) {
       button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
@@ -100,8 +133,55 @@
       else mobileSource.dataset.srcset = mobileSrc;
       picture.appendChild(mobileSource);
     }
-    if (isEager) image.src = media.src;
-    else image.dataset.src = media.src;
+    if (isEager) image.src = src;
+    else image.dataset.src = src;
+    picture.appendChild(image);
+    button.appendChild(picture);
+    return button;
+  }
+
+  function createImage(project, media) {
+    const button = document.createElement("button");
+    const image = document.createElement("img");
+    const picture = document.createElement("picture");
+    const mobileSrc = getMobileAsset(media.src);
+    const placeholder = window.PROJECT_PLACEHOLDERS?.[media.src];
+
+    button.type = "button";
+    button.className = "project-media project-media-image";
+    button.setAttribute("aria-label", `Show information for ${project.title}`);
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", (event) => {
+      event.stopPropagation();
+      updateOpenProject(project.slug, true);
+    });
+
+    image.alt = "";
+    image.decoding = "async";
+    image.loading = "lazy";
+    if (media.width && media.height) {
+      image.width = media.width;
+      image.height = media.height;
+    }
+    image.fetchPriority = "low";
+
+    if (placeholder) {
+      button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
+    }
+    image.addEventListener(
+      "load",
+      () => button.classList.add("media-loaded"),
+      { once: true },
+    );
+
+    if (mobileSrc) {
+      const mobileSource = document.createElement("source");
+      mobileSource.media = "(max-width: 768px)";
+      mobileSource.type = "image/webp";
+      mobileSource.dataset.srcset = mobileSrc;
+      picture.appendChild(mobileSource);
+    }
+    image.dataset.src = media.src;
     picture.appendChild(image);
     button.appendChild(picture);
     return button;
@@ -209,22 +289,30 @@
     delete image.dataset.src;
   }
 
-  function prioritizeProject(row) {
-    if (!row || row === priorityProjectRow) return;
+  function prioritizeProject(row, force = false) {
+    if (!row || (row === priorityProjectRow && !force)) return;
 
-    priorityProjectRow?.querySelectorAll("img").forEach((image) => {
-      image.fetchPriority = "low";
-    });
-    priorityProjectRow?.removeAttribute("data-load-priority");
-    priorityProjectRow = row;
-    priorityProjectRow.dataset.loadPriority = "high";
+    if (row !== priorityProjectRow) {
+      priorityProjectRow?.querySelectorAll("img").forEach((image) => {
+        image.fetchPriority = "low";
+      });
+      priorityProjectRow?.removeAttribute("data-load-priority");
+      priorityProjectRow = row;
+      priorityProjectRow.dataset.loadPriority = "high";
+    }
     priorityGeneration += 1;
     const generation = priorityGeneration;
+    const galleryOpen = row.classList.contains("project-gallery-open");
+    const images = galleryOpen
+      ? row.querySelectorAll(".project-track img")
+      : row.querySelectorAll(".project-cover img");
 
-    row.querySelectorAll("img").forEach((image) => {
+    images.forEach((image) => {
       image.fetchPriority = "high";
       loadImage(image);
     });
+
+    if (!galleryOpen) return;
 
     row.querySelectorAll("video").forEach((video, index) => {
       window.setTimeout(() => {
@@ -382,21 +470,24 @@
     projects.forEach((project, projectIndex) => {
       const row = document.createElement("section");
       const track = document.createElement("div");
+      const cover = createCover(project, projectIndex);
 
       row.className = `${project.categories.join(" ")} project-row`;
       row.dataset.projectSlug = project.slug;
       track.className = "project-track";
+      track.hidden = true;
       track.setAttribute("aria-label", `${project.title} media`);
 
       project.media.forEach((media, mediaIndex) => {
+        if (mediaIndex === 0 && media.type === "image") return;
         const mediaElement =
           media.type === "video"
             ? createVideo(project, media, projectIndex, mediaIndex)
-            : createImage(project, media, projectIndex, mediaIndex);
+            : createImage(project, media);
         track.appendChild(mediaElement);
       });
 
-      row.append(track, createDetails(project));
+      row.append(cover, track, createDetails(project));
       list.appendChild(row);
     });
   }
@@ -475,7 +566,7 @@
   const initialSlug = decodeURIComponent(location.hash.slice(1));
   if (initialSlug && projects.some((project) => project.slug === initialSlug)) {
     localStorage.removeItem("selectedFilter");
-    updateOpenProject(initialSlug, false);
+    openProjectGallery(initialSlug, false);
     document
       .querySelector(`[data-project-slug="${CSS.escape(initialSlug)}"]`)
       .scrollIntoView({ block: "start", behavior: "auto" });
@@ -484,7 +575,7 @@
   window.addEventListener("hashchange", () => {
     const slug = decodeURIComponent(location.hash.slice(1));
     if (projects.some((project) => project.slug === slug)) {
-      updateOpenProject(slug, false);
+      openProjectGallery(slug, false);
     } else if (activeSlug) {
       updateOpenProject(activeSlug, false);
     }
