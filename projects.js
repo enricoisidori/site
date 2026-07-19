@@ -9,6 +9,7 @@
   function stopProjectDrift(row, permanently = true) {
     const drift = projectDrifts.get(row);
     if (drift?.frame !== null) window.cancelAnimationFrame(drift.frame);
+    if (drift?.timer !== null) window.clearTimeout(drift.timer);
     projectDrifts.delete(row);
     if (permanently) row.dataset.driftStopped = "true";
   }
@@ -26,9 +27,21 @@
     track.scrollLeft = 0;
     const drift = {
       frame: null,
+      timer: null,
       previousTime: null,
-      noOverflowSince: null,
       position: 0,
+    };
+
+    const waitForMoreWidth = () => {
+      if (projectDrifts.get(row) !== drift) return;
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      if (maxScroll > drift.position + 0.5) {
+        drift.timer = null;
+        drift.previousTime = null;
+        drift.frame = window.requestAnimationFrame(move);
+        return;
+      }
+      drift.timer = window.setTimeout(waitForMoreWidth, 250);
     };
 
     const move = (time) => {
@@ -36,20 +49,15 @@
       if (drift.previousTime !== null) {
         const elapsed = Math.min(time - drift.previousTime, 50);
         const maxScroll = track.scrollWidth - track.clientWidth;
-        if (maxScroll <= 0) {
-          drift.noOverflowSince ??= time;
-          if (time - drift.noOverflowSince > 5000) {
-            stopProjectDrift(row, false);
-            return;
-          }
-        } else if (drift.position >= maxScroll) {
-          stopProjectDrift(row);
+        if (maxScroll <= drift.position + 0.5) {
+          drift.frame = null;
+          drift.previousTime = null;
+          drift.timer = window.setTimeout(waitForMoreWidth, 250);
           return;
         } else {
-          drift.noOverflowSince = null;
           drift.position = Math.min(
             maxScroll,
-            drift.position + elapsed * 0.024,
+            drift.position + elapsed * 0.032,
           );
           track.scrollLeft = drift.position;
         }
@@ -74,17 +82,10 @@
     );
   }
 
-  function alignProjectToTop(row) {
+  function keepProjectAtViewportPosition(row, previousTop) {
     const scrollRoot = document.getElementById("content-scroll");
     if (!row || !scrollRoot) return;
-
-    const rootStyles = window.getComputedStyle(scrollRoot);
-    const listStyles = window.getComputedStyle(list);
-    const topOffset =
-      (Number.parseFloat(rootStyles.paddingTop) || 0) +
-      (Number.parseFloat(listStyles.paddingTop) || 0);
-    const targetTop = scrollRoot.getBoundingClientRect().top + topOffset;
-    const delta = row.getBoundingClientRect().top - targetTop;
+    const delta = row.getBoundingClientRect().top - previousTop;
     scrollRoot.scrollTop += delta;
   }
 
@@ -96,10 +97,13 @@
       (row) => row.dataset.projectSlug === previousSlug,
     );
     const nextRow = rows.find((row) => row.dataset.projectSlug === nextSlug);
-    const shouldPinNext =
+    const shouldKeepNextInPlace =
       previousRow &&
       nextRow &&
       rows.indexOf(previousRow) < rows.indexOf(nextRow);
+    const nextTopBeforeUpdate = shouldKeepNextInPlace
+      ? nextRow.getBoundingClientRect().top
+      : null;
 
     document.querySelectorAll(".project-row").forEach((row) => {
       const isActive = row.dataset.projectSlug === nextSlug;
@@ -115,8 +119,10 @@
 
     activeSlug = nextSlug;
 
-    if (shouldPinNext) {
-      window.requestAnimationFrame(() => alignProjectToTop(nextRow));
+    if (shouldKeepNextInPlace) {
+      window.requestAnimationFrame(() => {
+        keepProjectAtViewportPosition(nextRow, nextTopBeforeUpdate);
+      });
     }
 
     if (!shouldWriteHash) return;
