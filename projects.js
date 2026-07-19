@@ -24,20 +24,6 @@
     );
   }
 
-  function getMobileAsset(src) {
-    return src?.endsWith(".webp")
-      ? src.replace(/\.webp$/, "-mobile.webp")
-      : null;
-  }
-
-  function getResponsiveVideoAsset(src) {
-    if (!mobileQuery.matches) return src;
-    if (src.endsWith("-optimized.mp4")) {
-      return src.replace(/-optimized\.mp4$/, "-mobile.mp4");
-    }
-    return src.endsWith(".mp4") ? src.replace(/\.mp4$/, "-mobile.mp4") : src;
-  }
-
   function stopProjectDrift(row) {
     if (!drift || (row && drift.row !== row)) return;
     window.cancelAnimationFrame(drift.frame);
@@ -76,65 +62,9 @@
     state.frame = window.requestAnimationFrame(move);
   }
 
-  function loadImage(image, priority = "high") {
-    image.fetchPriority = priority;
-    if (!image.dataset.src) return;
-    const picture = image.closest("picture");
-    picture?.querySelectorAll("source[data-srcset]").forEach((source) => {
-      source.srcset = source.dataset.srcset;
-      delete source.dataset.srcset;
-    });
-    image.src = image.dataset.src;
-    delete image.dataset.src;
-  }
-
-  function loadVideo(video, shouldPlay = true) {
-    video.autoplay = shouldPlay;
-    const source = video.querySelector("source[data-src]");
-    if (!source) {
-      if (shouldPlay) video.play().catch(() => {});
-      return;
-    }
-    if (video.dataset.poster) {
-      video.poster = video.dataset.poster;
-      delete video.dataset.poster;
-    }
-    source.src = getResponsiveVideoAsset(source.dataset.src);
-    delete source.dataset.src;
-    video.preload = "auto";
-    video.load();
-    if (shouldPlay) video.play().catch(() => {});
-  }
-
-  function loadProjectMedia(row) {
-    row.querySelectorAll("img").forEach((image) => loadImage(image, "high"));
-    row.querySelectorAll("video").forEach((video) => loadVideo(video, true));
-  }
-
-  function preloadCoverVideos() {
-    document
-      .querySelectorAll(".project-media-cover-video video")
-      .forEach((video) => loadVideo(video, false));
-  }
-
-  function preloadAllProjectMedia() {
-    if (navigator.connection?.saveData) return;
-    const covers = Array.from(document.querySelectorAll(".project-cover img"));
-    const coverReady = covers.map((image) => {
-      if (image.complete) return Promise.resolve();
-      return new Promise((resolve) => {
-        image.addEventListener("load", resolve, { once: true });
-        image.addEventListener("error", resolve, { once: true });
-      });
-    });
-
-    Promise.all(coverReady).then(() => {
-      document.querySelectorAll(".project-media").forEach((media) => {
-        const image = media.querySelector("img");
-        const video = media.querySelector("video");
-        if (image) loadImage(image, "low");
-        if (video) loadVideo(video, false);
-      });
+  function playProjectVideos(row) {
+    row.querySelectorAll("video").forEach((video) => {
+      video.play().catch(() => {});
     });
   }
 
@@ -214,7 +144,7 @@
       row.classList.add("project-gallery-open");
       track.hidden = false;
       track.scrollLeft = 0;
-      loadProjectMedia(row);
+      playProjectVideos(row);
       window.requestAnimationFrame(() => startProjectDrift(row));
     }
     if (shouldWriteHash) setHash(slug);
@@ -236,14 +166,11 @@
     }
   }
 
-  function createCover(project, projectIndex) {
+  function createCover(project) {
     const button = document.createElement("button");
     const image = document.createElement("img");
-    const picture = document.createElement("picture");
     const firstMedia = project.media[0];
     const src = firstMedia.type === "video" ? firstMedia.poster : firstMedia.src;
-    const mobileSrc = getMobileAsset(src);
-    const placeholder = window.PROJECT_PLACEHOLDERS?.[src];
 
     button.type = "button";
     button.className = "project-cover";
@@ -263,39 +190,16 @@
     });
 
     image.alt = "";
-    image.decoding = "async";
-    image.loading = "eager";
     image.width = 1500;
     image.height = 1000;
-    image.fetchPriority = projectIndex === 0 ? "high" : "auto";
-    if (placeholder) {
-      button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
-    }
-    image.addEventListener(
-      "load",
-      () => button.classList.add("media-loaded"),
-      { once: true },
-    );
-
-    if (mobileSrc) {
-      const mobileSource = document.createElement("source");
-      mobileSource.media = "(max-width: 768px)";
-      mobileSource.type = "image/webp";
-      mobileSource.srcset = mobileSrc;
-      picture.appendChild(mobileSource);
-    }
     image.src = src;
-    picture.appendChild(image);
-    button.appendChild(picture);
+    button.appendChild(image);
     return button;
   }
 
   function createImage(project, media) {
     const button = document.createElement("button");
     const image = document.createElement("img");
-    const picture = document.createElement("picture");
-    const mobileSrc = getMobileAsset(media.src);
-    const placeholder = window.PROJECT_PLACEHOLDERS?.[media.src];
 
     button.type = "button";
     button.className = "project-media project-media-image";
@@ -304,57 +208,26 @@
     button.addEventListener("click", (event) => handleMediaClick(event, project));
 
     image.alt = "";
-    image.decoding = "async";
-    image.loading = "eager";
-    image.fetchPriority = "auto";
     image.width = media.width;
     image.height = media.height;
-    if (placeholder) {
-      button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
-    }
-    image.addEventListener(
-      "load",
-      () => button.classList.add("media-loaded"),
-      { once: true },
-    );
-
-    if (mobileSrc) {
-      const mobileSource = document.createElement("source");
-      mobileSource.media = "(max-width: 768px)";
-      mobileSource.type = "image/webp";
-      mobileSource.dataset.srcset = mobileSrc;
-      picture.appendChild(mobileSource);
-    }
-    image.dataset.src = media.src;
-    picture.appendChild(image);
-    button.appendChild(picture);
+    image.src = media.src;
+    button.appendChild(image);
     return button;
   }
 
   function createVideo(project, media, mediaIndex) {
     const wrapper = document.createElement("div");
     const video = document.createElement("video");
-    const source = document.createElement("source");
 
     wrapper.className = "project-media project-media-video";
     if (mediaIndex === 0) wrapper.classList.add("project-media-cover-video");
     if (media.unmute) wrapper.classList.add("video-unmute");
     wrapper.addEventListener("click", (event) => handleMediaClick(event, project));
-    video.autoplay = false;
     video.muted = true;
     video.loop = true;
     video.playsInline = true;
-    video.preload = "none";
-    if (media.poster) {
-      const mobilePoster = getMobileAsset(media.poster);
-      const poster = mobileQuery.matches && mobilePoster
-        ? mobilePoster
-        : media.poster;
-      if (mediaIndex === 0) video.poster = poster;
-      else video.dataset.poster = poster;
-    }
-    source.dataset.src = media.src;
-    video.appendChild(source);
+    if (media.poster) video.poster = media.poster;
+    video.src = media.src;
     wrapper.appendChild(video);
 
     if (media.unmute) {
@@ -439,10 +312,10 @@
   }
 
   function renderProjects() {
-    projects.forEach((project, projectIndex) => {
+    projects.forEach((project) => {
       const row = document.createElement("section");
       const track = document.createElement("div");
-      const cover = createCover(project, projectIndex);
+      const cover = createCover(project);
       row.className = `${project.categories.join(" ")} project-row`;
       row.dataset.projectSlug = project.slug;
       row.dataset.singleImage = String(
@@ -524,10 +397,6 @@
 
   renderProjects();
   setupEdgeScrolling();
-  preloadCoverVideos();
-  preloadAllProjectMedia();
-  window.__portfolioPriorityReady = true;
-  window.dispatchEvent(new Event("portfolio:priority-ready"));
 
   window.closeProjectDetails = () => {
     openedRows.forEach((row) => closeProject(row, false));
