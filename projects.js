@@ -1,73 +1,14 @@
 (() => {
   const projects = Array.isArray(window.PROJECTS) ? window.PROJECTS : [];
   const list = document.getElementById("projects-list");
-  let activeSlug = null;
-  let priorityProjectRow = null;
-  let priorityGeneration = 0;
-  const projectDrifts = new Map();
+  const scrollRoot = document.getElementById("content-scroll");
+  const rowsBySlug = new Map();
+  const mobileQuery = window.matchMedia("(max-width: 768px)");
+  const DRIFT_SPEED = 18;
+  let activeRow = null;
+  let drift = null;
 
-  function stopProjectDrift(row, permanently = true) {
-    const drift = projectDrifts.get(row);
-    if (drift?.frame !== null) window.cancelAnimationFrame(drift.frame);
-    if (drift?.timer !== null) window.clearTimeout(drift.timer);
-    projectDrifts.delete(row);
-    if (permanently) row.dataset.driftStopped = "true";
-  }
-
-  function startProjectDrift(row, track) {
-    if (
-      !window.matchMedia("(max-width: 768px)").matches ||
-      row.dataset.driftStopped === "true" ||
-      projectDrifts.has(row)
-    ) {
-      return;
-    }
-
-    stopProjectDrift(row, false);
-    track.scrollLeft = 0;
-    const drift = {
-      frame: null,
-      timer: null,
-      previousTime: null,
-      position: 0,
-    };
-
-    const waitForMoreWidth = () => {
-      if (projectDrifts.get(row) !== drift) return;
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      if (maxScroll > drift.position + 0.5) {
-        drift.timer = null;
-        drift.previousTime = null;
-        drift.frame = window.requestAnimationFrame(move);
-        return;
-      }
-      drift.timer = window.setTimeout(waitForMoreWidth, 250);
-    };
-
-    const move = (time) => {
-      if (projectDrifts.get(row) !== drift) return;
-      if (drift.previousTime !== null) {
-        const elapsed = Math.min(time - drift.previousTime, 50);
-        const maxScroll = track.scrollWidth - track.clientWidth;
-        if (maxScroll <= 0.5) {
-          drift.frame = null;
-          drift.previousTime = null;
-          drift.timer = window.setTimeout(waitForMoreWidth, 250);
-          return;
-        } else {
-          if (drift.position >= maxScroll) drift.position = 0;
-          drift.position += elapsed * 0.018;
-          if (drift.position >= maxScroll) drift.position = 0;
-          track.scrollLeft = drift.position;
-        }
-      }
-      drift.previousTime = time;
-      drift.frame = window.requestAnimationFrame(move);
-    };
-
-    projectDrifts.set(row, drift);
-    drift.frame = window.requestAnimationFrame(move);
-  }
+  if (!list) return;
 
   function removeHash() {
     history.replaceState(null, "", `${location.pathname}${location.search}`);
@@ -81,110 +22,161 @@
     );
   }
 
-  function keepProjectAtViewportPosition(row, previousTop) {
-    const scrollRoot = document.getElementById("content-scroll");
-    if (!row || !scrollRoot) return;
-    const delta = row.getBoundingClientRect().top - previousTop;
-    scrollRoot.scrollTop += delta;
-  }
-
-  function updateOpenProject(slug, shouldWriteHash) {
-    const previousSlug = activeSlug;
-    const nextSlug = activeSlug === slug ? null : slug;
-    const rows = Array.from(document.querySelectorAll(".project-row"));
-    const previousRow = rows.find(
-      (row) => row.dataset.projectSlug === previousSlug,
-    );
-    const nextRow = rows.find((row) => row.dataset.projectSlug === nextSlug);
-    const shouldKeepNextInPlace =
-      previousRow &&
-      nextRow &&
-      rows.indexOf(previousRow) < rows.indexOf(nextRow);
-    const nextTopBeforeUpdate = shouldKeepNextInPlace
-      ? nextRow.getBoundingClientRect().top
-      : null;
-
-    if (previousRow && previousSlug !== nextSlug) {
-      stopProjectDrift(previousRow);
-    }
-
-    document.querySelectorAll(".project-row").forEach((row) => {
-      const isActive = row.dataset.projectSlug === nextSlug;
-      const details = row.querySelector(".project-details");
-      row.querySelectorAll(".project-cover, .project-media-image").forEach((button) => {
-        button.setAttribute("aria-pressed", String(isActive));
-        if (button.classList.contains("project-cover")) {
-          button.setAttribute("aria-expanded", String(isActive));
-        }
-      });
-      details.hidden = !isActive;
-    });
-
-    activeSlug = nextSlug;
-
-    if (shouldKeepNextInPlace) {
-      window.requestAnimationFrame(() => {
-        keepProjectAtViewportPosition(nextRow, nextTopBeforeUpdate);
-      });
-    }
-
-    if (!shouldWriteHash) return;
-    if (nextSlug) setHash(nextSlug);
-    else removeHash();
-  }
-
-  function openProjectGallery(slug, shouldWriteHash, shouldOpenDetails = true) {
-    const row = document.querySelector(
-      `[data-project-slug="${CSS.escape(slug)}"]`,
-    );
-    if (!row) return;
-
-    const galleryWasOpen = row.classList.contains("project-gallery-open");
-    if (!galleryWasOpen) {
-      const track = row.querySelector(".project-track");
-      const cover = row.querySelector(".project-cover");
-      const coverRepresentsVideo = cover?.dataset.mediaType === "video";
-
-      if (cover && !coverRepresentsVideo) track.prepend(cover);
-      row.classList.add("project-gallery-open");
-      track.hidden = false;
-      cover?.setAttribute(
-        "aria-label",
-        `Show information for ${projects.find((project) => project.slug === slug)?.title || slug}`,
-      );
-      prioritizeProject(row, true);
-
-      window.requestAnimationFrame(() => {
-        track.scrollLeft = 0;
-        startProjectDrift(row, track);
-      });
-    } else if (row.dataset.driftStopped === "true") {
-      delete row.dataset.driftStopped;
-      window.requestAnimationFrame(() => {
-        startProjectDrift(row, row.querySelector(".project-track"));
-      });
-    }
-
-    if (!shouldOpenDetails) return;
-    if (activeSlug !== slug) updateOpenProject(slug, shouldWriteHash);
-    else if (shouldWriteHash) setHash(slug);
-  }
-
-  window.closeProjectDetails = () => {
-    if (!activeSlug) return;
-    updateOpenProject(activeSlug, true);
-  };
-
   function getMobileAsset(src) {
-    return src.endsWith(".webp") ? src.replace(/\.webp$/, "-mobile.webp") : null;
+    return src?.endsWith(".webp")
+      ? src.replace(/\.webp$/, "-mobile.webp")
+      : null;
   }
 
   function getResponsiveVideoAsset(src) {
-    if (!window.matchMedia("(max-width: 768px)").matches) return src;
+    if (!mobileQuery.matches) return src;
     if (src.endsWith("-optimized.mp4")) {
       return src.replace(/-optimized\.mp4$/, "-mobile.mp4");
     }
     return src.endsWith(".mp4") ? src.replace(/\.mp4$/, "-mobile.mp4") : src;
+  }
+
+  function stopProjectDrift(row) {
+    if (!drift || (row && drift.row !== row)) return;
+    window.cancelAnimationFrame(drift.frame);
+    drift = null;
+  }
+
+  function startProjectDrift(row) {
+    const track = row.querySelector(".project-track");
+    stopProjectDrift();
+    if (!mobileQuery.matches || !track || track.hidden) return;
+
+    const state = {
+      row,
+      track,
+      frame: 0,
+      lastTime: null,
+      position: track.scrollLeft,
+    };
+
+    const move = (time) => {
+      if (drift !== state) return;
+      if (state.lastTime !== null) {
+        const elapsed = Math.min(time - state.lastTime, 50) / 1000;
+        const maxScroll = state.track.scrollWidth - state.track.clientWidth;
+        if (maxScroll > 1) {
+          state.position += DRIFT_SPEED * elapsed;
+          if (state.position >= maxScroll) state.position = 0;
+          state.track.scrollLeft = state.position;
+        }
+      }
+      state.lastTime = time;
+      state.frame = window.requestAnimationFrame(move);
+    };
+
+    drift = state;
+    state.frame = window.requestAnimationFrame(move);
+  }
+
+  function loadImage(image) {
+    if (!image.dataset.src) return;
+    const picture = image.closest("picture");
+    picture?.querySelectorAll("source[data-srcset]").forEach((source) => {
+      source.srcset = source.dataset.srcset;
+      delete source.dataset.srcset;
+    });
+    image.fetchPriority = "high";
+    image.src = image.dataset.src;
+    delete image.dataset.src;
+  }
+
+  function loadVideo(video) {
+    const source = video.querySelector("source[data-src]");
+    if (!source) {
+      video.play().catch(() => {});
+      return;
+    }
+    if (video.dataset.poster) {
+      video.poster = video.dataset.poster;
+      delete video.dataset.poster;
+    }
+    source.src = getResponsiveVideoAsset(source.dataset.src);
+    delete source.dataset.src;
+    video.preload = "metadata";
+    video.load();
+    video.play().catch(() => {});
+  }
+
+  function loadProjectMedia(row) {
+    row.querySelectorAll("img[data-src]").forEach(loadImage);
+    row.querySelectorAll("video").forEach(loadVideo);
+  }
+
+  function setRowActive(row, isActive) {
+    row.querySelector(".project-details").hidden = !isActive;
+    row
+      .querySelectorAll(".project-cover, .project-media-image")
+      .forEach((button) => button.setAttribute("aria-pressed", String(isActive)));
+    row
+      .querySelector(".project-cover")
+      ?.setAttribute("aria-expanded", String(isActive));
+  }
+
+  function closeProject(row, shouldWriteHash = true) {
+    if (!row) return;
+    const track = row.querySelector(".project-track");
+    const cover = row.querySelector(".project-cover");
+    stopProjectDrift(row);
+    track.scrollLeft = 0;
+    track.hidden = true;
+    row.classList.remove("project-gallery-open");
+    if (cover && cover.parentElement === track) row.insertBefore(cover, track);
+    row.querySelectorAll("video").forEach((video) => video.pause());
+    setRowActive(row, false);
+    if (activeRow === row) activeRow = null;
+    if (shouldWriteHash) removeHash();
+  }
+
+  function openProject(slug, shouldWriteHash = true) {
+    const row = rowsBySlug.get(slug);
+    if (!row) return;
+    if (activeRow === row) {
+      if (shouldWriteHash) setHash(slug);
+      return;
+    }
+
+    const previousRow = activeRow;
+    const keepNextInPlace = Boolean(
+      previousRow &&
+        previousRow.compareDocumentPosition(row) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    const nextTop = keepNextInPlace ? row.getBoundingClientRect().top : null;
+    if (previousRow) closeProject(previousRow, false);
+
+    const track = row.querySelector(".project-track");
+    const cover = row.querySelector(".project-cover");
+    if (cover?.dataset.mediaType !== "video") track.prepend(cover);
+    row.classList.add("project-gallery-open");
+    track.hidden = false;
+    track.scrollLeft = 0;
+    activeRow = row;
+    setRowActive(row, true);
+    loadProjectMedia(row);
+
+    if (keepNextInPlace && scrollRoot) {
+      const delta = row.getBoundingClientRect().top - nextTop;
+      scrollRoot.scrollTop += delta;
+    }
+    if (shouldWriteHash) setHash(slug);
+    window.requestAnimationFrame(() => startProjectDrift(row));
+  }
+
+  function handleMediaClick(event, project) {
+    event.stopPropagation();
+    const row = rowsBySlug.get(project.slug);
+    const suppressUntil = Number(row?.dataset.suppressClickUntil || 0);
+    if (performance.now() < suppressUntil) {
+      event.preventDefault();
+      return;
+    }
+    closeProject(row, true);
   }
 
   function createCover(project, projectIndex) {
@@ -194,34 +186,27 @@
     const firstMedia = project.media[0];
     const src = firstMedia.type === "video" ? firstMedia.poster : firstMedia.src;
     const mobileSrc = getMobileAsset(src);
-    const isEager = projectIndex < 2;
-    const isPriority = projectIndex === 0;
     const placeholder = window.PROJECT_PLACEHOLDERS?.[src];
 
     button.type = "button";
     button.className = "project-cover";
     button.dataset.mediaType = firstMedia.type;
-    button.setAttribute("aria-label", `Show information for ${project.title}`);
+    button.setAttribute("aria-label", `Open ${project.title}`);
     button.setAttribute("aria-expanded", "false");
     button.setAttribute("aria-pressed", "false");
     button.addEventListener("click", (event) => {
       event.stopPropagation();
-      if (activeSlug === project.slug) {
-        updateOpenProject(project.slug, true);
-        return;
-      }
-      openProjectGallery(project.slug, false, false);
-      updateOpenProject(project.slug, true);
+      const row = rowsBySlug.get(project.slug);
+      if (activeRow === row) closeProject(row, true);
+      else openProject(project.slug, true);
     });
 
     image.alt = "";
     image.decoding = "async";
-    image.loading = isEager ? "eager" : "lazy";
+    image.loading = "eager";
     image.width = 1500;
     image.height = 1000;
-    image.fetchPriority = isPriority ? "high" : isEager ? "auto" : "low";
-    if (isPriority) image.dataset.priority = "true";
-
+    image.fetchPriority = projectIndex === 0 ? "high" : "auto";
     if (placeholder) {
       button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
     }
@@ -235,12 +220,10 @@
       const mobileSource = document.createElement("source");
       mobileSource.media = "(max-width: 768px)";
       mobileSource.type = "image/webp";
-      if (isEager) mobileSource.srcset = mobileSrc;
-      else mobileSource.dataset.srcset = mobileSrc;
+      mobileSource.srcset = mobileSrc;
       picture.appendChild(mobileSource);
     }
-    if (isEager) image.src = src;
-    else image.dataset.src = src;
+    image.src = src;
     picture.appendChild(image);
     button.appendChild(picture);
     return button;
@@ -255,22 +238,16 @@
 
     button.type = "button";
     button.className = "project-media project-media-image";
-    button.setAttribute("aria-label", `Show information for ${project.title}`);
+    button.setAttribute("aria-label", `Close ${project.title}`);
     button.setAttribute("aria-pressed", "false");
-    button.addEventListener("click", (event) => {
-      event.stopPropagation();
-      updateOpenProject(project.slug, true);
-    });
+    button.addEventListener("click", (event) => handleMediaClick(event, project));
 
     image.alt = "";
     image.decoding = "async";
-    image.loading = "lazy";
-    if (media.width && media.height) {
-      image.width = media.width;
-      image.height = media.height;
-    }
-    image.fetchPriority = "low";
-
+    image.loading = "eager";
+    image.fetchPriority = "auto";
+    image.width = media.width;
+    image.height = media.height;
     if (placeholder) {
       button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
     }
@@ -293,37 +270,27 @@
     return button;
   }
 
-  function createVideo(project, media, projectIndex, mediaIndex) {
+  function createVideo(project, media) {
     const wrapper = document.createElement("div");
     const video = document.createElement("video");
     const source = document.createElement("source");
 
     wrapper.className = "project-media project-media-video";
     if (media.unmute) wrapper.classList.add("video-unmute");
+    wrapper.addEventListener("click", (event) => handleMediaClick(event, project));
     video.autoplay = true;
     video.muted = true;
     video.loop = true;
     video.playsInline = true;
     video.preload = "none";
-    video.setAttribute("loading", "lazy");
-    if (mediaIndex < 2) {
-      video.dataset.earlyVideo = "true";
-      video.dataset.projectIndex = String(projectIndex);
-      video.dataset.mediaPosition = String(mediaIndex + 1);
-    }
     if (media.poster) {
       const mobilePoster = getMobileAsset(media.poster);
-      video.dataset.poster =
-        mobilePoster && window.matchMedia("(max-width: 768px)").matches
-          ? mobilePoster
-          : media.poster;
+      video.dataset.poster = mobileQuery.matches && mobilePoster
+        ? mobilePoster
+        : media.poster;
     }
-    source.dataset.src = getResponsiveVideoAsset(media.src);
+    source.dataset.src = media.src;
     video.appendChild(source);
-    wrapper.addEventListener("click", (event) => {
-      event.stopPropagation();
-      updateOpenProject(project.slug, true);
-    });
     wrapper.appendChild(video);
 
     if (media.unmute) {
@@ -340,7 +307,6 @@
   function createDetails(project) {
     const details = document.createElement("div");
     const title = document.createElement("p");
-
     details.className = "project-details";
     details.hidden = true;
     title.className = "project-title";
@@ -353,235 +319,59 @@
       date.textContent = project.date;
       details.appendChild(date);
     }
-
     if (project.description) {
       const description = document.createElement("p");
       description.className = "project-description";
       description.textContent = project.description;
       details.appendChild(description);
     }
-
     project.info.forEach((line) => {
       const info = document.createElement("p");
       info.className = "project-info";
       info.innerHTML = line;
       details.appendChild(info);
     });
-
     return details;
   }
 
-  function loadVideo(video) {
-    const source = video.querySelector("source[data-src]");
-    if (!source || source.src) return;
-    if (video.dataset.poster) {
-      video.poster = video.dataset.poster;
-      delete video.dataset.poster;
-    }
-    source.src = source.dataset.src;
-    video.preload = "metadata";
-    video.load();
-  }
-
-  function loadImage(image) {
-    if (!image.dataset.src) return;
-    const picture = image.closest("picture");
-    picture?.querySelectorAll("source[data-srcset]").forEach((source) => {
-      source.srcset = source.dataset.srcset;
-      delete source.dataset.srcset;
-    });
-    image.loading = "eager";
-    image.src = image.dataset.src;
-    delete image.dataset.src;
-  }
-
-  function prioritizeProject(row, force = false) {
-    if (!row || (row === priorityProjectRow && !force)) return;
-
-    if (row !== priorityProjectRow) {
-      priorityProjectRow?.querySelectorAll("img").forEach((image) => {
-        image.fetchPriority = "low";
-      });
-      priorityProjectRow?.removeAttribute("data-load-priority");
-      priorityProjectRow = row;
-      priorityProjectRow.dataset.loadPriority = "high";
-    }
-    priorityGeneration += 1;
-    const generation = priorityGeneration;
-    const galleryOpen = row.classList.contains("project-gallery-open");
-    const images = galleryOpen
-      ? row.querySelectorAll(".project-track img")
-      : row.querySelectorAll(".project-cover img");
-
-    images.forEach((image) => {
-      image.fetchPriority = "high";
-      loadImage(image);
-    });
-
-    if (!galleryOpen) return;
-
-    row.querySelectorAll("video").forEach((video, index) => {
-      window.setTimeout(() => {
-        if (
-          priorityProjectRow !== row ||
-          priorityGeneration !== generation
-        ) {
-          return;
+  function setupTrackInteraction(row, track) {
+    let touchStart = null;
+    track.addEventListener(
+      "wheel",
+      (event) => {
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) stopProjectDrift(row);
+      },
+      { passive: true },
+    );
+    track.addEventListener(
+      "touchstart",
+      (event) => {
+        const touch = event.touches[0];
+        touchStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
+      },
+      { passive: true },
+    );
+    track.addEventListener(
+      "touchmove",
+      (event) => {
+        if (!touchStart) return;
+        const touch = event.touches[0];
+        if (!touch) return;
+        const distanceX = Math.abs(touch.clientX - touchStart.x);
+        const distanceY = Math.abs(touch.clientY - touchStart.y);
+        if (distanceX > 8 && distanceX > distanceY) {
+          stopProjectDrift(row);
+          row.dataset.suppressClickUntil = String(performance.now() + 500);
+          touchStart = null;
         }
-        loadVideo(video);
-      }, index * 180);
-    });
-  }
-
-  function setupProjectLoadingPriority() {
-    const scrollRoot = document.getElementById("content-scroll");
-    const rows = Array.from(document.querySelectorAll(".project-row"));
-    let frame = null;
-
-    const update = () => {
-      frame = null;
-      const rootRect = scrollRoot.getBoundingClientRect();
-      const focusY = rootRect.top + rootRect.height * 0.45;
-      const visibleRows = rows.filter((row) => !row.hidden);
-      const rowAtFocus = visibleRows.find((row) => {
-        const rect = row.getBoundingClientRect();
-        return rect.top <= focusY && rect.bottom >= focusY;
-      }) || visibleRows.reduce((closest, row) => {
-        const rect = row.getBoundingClientRect();
-        const distance = Math.min(
-          Math.abs(focusY - rect.top),
-          Math.abs(focusY - rect.bottom),
-        );
-        return !closest || distance < closest.distance
-          ? { row, distance }
-          : closest;
-      }, null)?.row;
-
-      if (rowAtFocus) prioritizeProject(rowAtFocus);
-    };
-
-    const scheduleUpdate = () => {
-      if (frame !== null) return;
-      frame = window.requestAnimationFrame(update);
-    };
-
-    scrollRoot.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate, { passive: true });
-    document.querySelectorAll(".project-track").forEach((track) => {
-      const prioritizeTrack = () => prioritizeProject(track.closest(".project-row"));
-      track.addEventListener("scroll", prioritizeTrack, { passive: true });
-      track.addEventListener("pointerdown", prioritizeTrack, { passive: true });
-    });
-
-    scheduleUpdate();
-  }
-
-  function setupResponsiveProjectDrift() {
-    const rows = Array.from(document.querySelectorAll(".project-row"));
-    window.addEventListener("resize", () => {
-      window.requestAnimationFrame(() => {
-        rows.forEach((row) => {
-          if (!row.classList.contains("project-gallery-open")) return;
-          startProjectDrift(row, row.querySelector(".project-track"));
-        });
-      });
-    }, { passive: true });
-  }
-
-  function observeImages() {
-    const images = document.querySelectorAll("img[data-src]");
-    if (!("IntersectionObserver" in window)) {
-      images.forEach(loadImage);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          loadImage(entry.target);
-          observer.unobserve(entry.target);
-        });
       },
-      {
-        root: document.getElementById("content-scroll"),
-        rootMargin: "150% 100%",
-      },
+      { passive: true },
     );
-
-    images.forEach((image) => observer.observe(image));
-  }
-
-  function observeVideoSet(videos, rootMargin) {
-    if (!("IntersectionObserver" in window)) {
-      videos.forEach((video, index) => {
-        window.setTimeout(() => loadVideo(video), index * 250);
-      });
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          loadVideo(entry.target);
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        root: document.getElementById("content-scroll"),
-        rootMargin,
-      },
-    );
-
-    videos.forEach((video) => observer.observe(video));
-  }
-
-  function observeEarlyVideos() {
-    observeVideoSet(
-      document.querySelectorAll("video[data-early-video]"),
-      "100% 100%",
-    );
-  }
-
-  function observeDeferredVideos() {
-    observeVideoSet(
-      document.querySelectorAll(".project-media video:not([data-early-video])"),
-      "50% 25%",
-    );
-  }
-
-  function observeDeferredVideosWhenIdle() {
-    const start = () => {
-      const idle =
-        window.requestIdleCallback ||
-        ((callback) => window.setTimeout(callback, 500));
-
-      idle(observeDeferredVideos, { timeout: 1500 });
+    const clearTouch = () => {
+      touchStart = null;
     };
-
-    const startAfterPriorityImages = () => {
-      if (window.__portfolioPriorityReady) start();
-      else window.addEventListener("portfolio:priority-ready", start, { once: true });
-    };
-
-    startAfterPriorityImages();
-  }
-
-  function signalPriorityImagesReady() {
-    const priorityImages = document.querySelectorAll("img[data-priority]");
-    const pending = Array.from(priorityImages, (image) => {
-      if (image.complete) return Promise.resolve();
-      return new Promise((resolve) => {
-        image.addEventListener("load", resolve, { once: true });
-        image.addEventListener("error", resolve, { once: true });
-      });
-    });
-
-    Promise.all(pending).then(() => {
-      window.__portfolioPriorityReady = true;
-      window.dispatchEvent(new Event("portfolio:priority-ready"));
-    });
+    track.addEventListener("touchend", clearTouch, { passive: true });
+    track.addEventListener("touchcancel", clearTouch, { passive: true });
   }
 
   function renderProjects() {
@@ -589,59 +379,26 @@
       const row = document.createElement("section");
       const track = document.createElement("div");
       const cover = createCover(project, projectIndex);
-
       row.className = `${project.categories.join(" ")} project-row`;
       row.dataset.projectSlug = project.slug;
       track.className = "project-track";
       track.hidden = true;
       track.setAttribute("aria-label", `${project.title} media`);
-      const stopDrift = () => stopProjectDrift(row);
-      let touchStart = null;
-      track.addEventListener("wheel", (event) => {
-        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) stopDrift();
-      }, { passive: true });
-      track.addEventListener("touchstart", (event) => {
-        const touch = event.touches[0];
-        touchStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
-      }, { passive: true });
-      track.addEventListener("touchmove", (event) => {
-        if (!touchStart) return;
-        const touch = event.touches[0];
-        if (!touch) return;
-        const distanceX = Math.abs(touch.clientX - touchStart.x);
-        const distanceY = Math.abs(touch.clientY - touchStart.y);
-        if (distanceX > 8 && distanceX > distanceY) {
-          stopDrift();
-          touchStart = null;
-        }
-      }, { passive: true });
-      const clearTouchStart = () => {
-        touchStart = null;
-      };
-      track.addEventListener("touchend", clearTouchStart, { passive: true });
-      track.addEventListener("touchcancel", clearTouchStart, { passive: true });
+      setupTrackInteraction(row, track);
 
       project.media.forEach((media, mediaIndex) => {
         if (mediaIndex === 0 && media.type === "image") return;
-        const mediaElement =
+        track.appendChild(
           media.type === "video"
-            ? createVideo(project, media, projectIndex, mediaIndex)
-            : createImage(project, media);
-        track.appendChild(mediaElement);
+            ? createVideo(project, media)
+            : createImage(project, media),
+        );
       });
-
       row.append(cover, track, createDetails(project));
       list.appendChild(row);
+      rowsBySlug.set(project.slug, row);
     });
   }
-
-  renderProjects();
-  setupProjectLoadingPriority();
-  setupResponsiveProjectDrift();
-  observeImages();
-  observeEarlyVideos();
-  signalPriorityImagesReady();
-  observeDeferredVideosWhenIdle();
 
   function setupEdgeScrolling() {
     const edgeSize = 48;
@@ -654,16 +411,14 @@
       edgeTrack = null;
       edgeDirection = 0;
       edgeSpeed = 0;
-      if (edgeFrame !== null) cancelAnimationFrame(edgeFrame);
+      if (edgeFrame !== null) window.cancelAnimationFrame(edgeFrame);
       edgeFrame = null;
     }
-
     function scroll() {
       if (!edgeTrack || !edgeDirection) {
         edgeFrame = null;
         return;
       }
-
       const maxScroll = edgeTrack.scrollWidth - edgeTrack.clientWidth;
       if (
         maxScroll <= 0 ||
@@ -673,55 +428,54 @@
         stop();
         return;
       }
-
       edgeTrack.scrollLeft += edgeDirection * edgeSpeed;
-      edgeFrame = requestAnimationFrame(scroll);
+      edgeFrame = window.requestAnimationFrame(scroll);
     }
 
     document.addEventListener("pointermove", (event) => {
       if (event.pointerType && event.pointerType !== "mouse") return;
-
       const track = document
         .elementsFromPoint(event.clientX, event.clientY)
         .map((element) => element.closest?.(".project-track"))
         .find(Boolean);
-      const distanceFromLeft = event.clientX;
-      const distanceFromRight = window.innerWidth - event.clientX;
-      const atLeft = distanceFromLeft <= edgeSize;
-      const atRight = distanceFromRight <= edgeSize;
-
+      const leftDistance = event.clientX;
+      const rightDistance = window.innerWidth - event.clientX;
+      const atLeft = leftDistance <= edgeSize;
+      const atRight = rightDistance <= edgeSize;
       if (!track || (!atLeft && !atRight)) {
         stop();
         return;
       }
-
       edgeTrack = track;
       edgeDirection = atLeft ? -1 : 1;
-      const distance = atLeft ? distanceFromLeft : distanceFromRight;
+      const distance = atLeft ? leftDistance : rightDistance;
       edgeSpeed = Math.max(1, ((edgeSize - distance) / edgeSize) * 10);
-      if (edgeFrame === null) edgeFrame = requestAnimationFrame(scroll);
+      if (edgeFrame === null) edgeFrame = window.requestAnimationFrame(scroll);
     });
-
     window.addEventListener("blur", stop);
   }
 
+  renderProjects();
   setupEdgeScrolling();
 
-  const initialSlug = decodeURIComponent(location.hash.slice(1));
-  if (initialSlug && projects.some((project) => project.slug === initialSlug)) {
-    localStorage.removeItem("selectedFilter");
-    openProjectGallery(initialSlug, false);
-    document
-      .querySelector(`[data-project-slug="${CSS.escape(initialSlug)}"]`)
-      .scrollIntoView({ block: "start", behavior: "auto" });
-  }
+  window.closeProjectDetails = () => {
+    if (activeRow) closeProject(activeRow, true);
+  };
+  mobileQuery.addEventListener("change", () => {
+    if (!activeRow) return;
+    if (mobileQuery.matches) startProjectDrift(activeRow);
+    else stopProjectDrift(activeRow);
+  });
 
+  const initialSlug = decodeURIComponent(location.hash.slice(1));
+  if (rowsBySlug.has(initialSlug)) {
+    localStorage.removeItem("selectedFilter");
+    openProject(initialSlug, false);
+    rowsBySlug.get(initialSlug).scrollIntoView({ block: "start", behavior: "auto" });
+  }
   window.addEventListener("hashchange", () => {
     const slug = decodeURIComponent(location.hash.slice(1));
-    if (projects.some((project) => project.slug === slug)) {
-      openProjectGallery(slug, false);
-    } else if (activeSlug) {
-      updateOpenProject(activeSlug, false);
-    }
+    if (rowsBySlug.has(slug)) openProject(slug, false);
+    else if (activeRow) closeProject(activeRow, false);
   });
 })();
