@@ -49,16 +49,15 @@
       if (drift.previousTime !== null) {
         const elapsed = Math.min(time - drift.previousTime, 50);
         const maxScroll = track.scrollWidth - track.clientWidth;
-        if (maxScroll <= drift.position + 0.5) {
+        if (maxScroll <= 0.5) {
           drift.frame = null;
           drift.previousTime = null;
           drift.timer = window.setTimeout(waitForMoreWidth, 250);
           return;
         } else {
-          drift.position = Math.min(
-            maxScroll,
-            drift.position + elapsed * 0.032,
-          );
+          if (drift.position >= maxScroll) drift.position = 0;
+          drift.position += elapsed * 0.018;
+          if (drift.position >= maxScroll) drift.position = 0;
           track.scrollLeft = drift.position;
         }
       }
@@ -105,6 +104,10 @@
       ? nextRow.getBoundingClientRect().top
       : null;
 
+    if (previousRow && previousSlug !== nextSlug) {
+      stopProjectDrift(previousRow);
+    }
+
     document.querySelectorAll(".project-row").forEach((row) => {
       const isActive = row.dataset.projectSlug === nextSlug;
       const details = row.querySelector(".project-details");
@@ -136,7 +139,8 @@
     );
     if (!row) return;
 
-    if (!row.classList.contains("project-gallery-open")) {
+    const galleryWasOpen = row.classList.contains("project-gallery-open");
+    if (!galleryWasOpen) {
       const track = row.querySelector(".project-track");
       const cover = row.querySelector(".project-cover");
       const coverRepresentsVideo = cover?.dataset.mediaType === "video";
@@ -153,6 +157,11 @@
       window.requestAnimationFrame(() => {
         track.scrollLeft = 0;
         startProjectDrift(row, track);
+      });
+    } else if (row.dataset.driftStopped === "true") {
+      delete row.dataset.driftStopped;
+      window.requestAnimationFrame(() => {
+        startProjectDrift(row, row.querySelector(".project-track"));
       });
     }
 
@@ -197,6 +206,10 @@
     button.setAttribute("aria-pressed", "false");
     button.addEventListener("click", (event) => {
       event.stopPropagation();
+      if (activeSlug === project.slug) {
+        updateOpenProject(project.slug, true);
+        return;
+      }
       openProjectGallery(project.slug, false, false);
       updateOpenProject(project.slug, true);
     });
@@ -584,7 +597,6 @@
       track.setAttribute("aria-label", `${project.title} media`);
       const stopDrift = () => stopProjectDrift(row);
       let touchStart = null;
-      track.addEventListener("click", stopDrift, { capture: true });
       track.addEventListener("wheel", (event) => {
         if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) stopDrift();
       }, { passive: true });

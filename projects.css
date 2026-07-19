@@ -40,6 +40,16 @@ body.projects-page #content-scroll * {
   text-shadow: var(--project-text-shadow) !important;
 }
 
+body.projects-page ::selection {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+body.projects-page ::-moz-selection {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.7);
+}
+
 body.projects-page.white-bg,
 body.projects-page.white-bg #content-scroll,
 html:has(body.projects-page.white-bg) {
@@ -256,6 +266,15 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   max-width: none;
   height: 100%;
   object-fit: contain;
+}
+
+.project-cover img,
+.project-cover picture,
+.project-media img,
+.project-media picture {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 .projects-page .video-unmute-btn {
