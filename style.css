@@ -209,7 +209,7 @@ button.btn-aqua {
 }
 
 .btn-aqua-stack .btn-aqua {
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 a.btn-aqua.primary,

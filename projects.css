@@ -93,16 +93,7 @@ body.projects-page .projects-navigation > a:last-child {
 }
 
 body.projects-page .projects-navigation-filters {
-  display: flex;
-  flex-flow: row nowrap;
-  gap: 8px;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  align-items: center;
-  white-space: nowrap;
-  min-width: max-content;
-  transform: translateX(-50%);
+  display: none;
 }
 
 body.projects-page #content-scroll .projects-navigation .btn,

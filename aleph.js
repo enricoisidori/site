@@ -31,6 +31,7 @@
 
   const root = document.documentElement;
   let whiteBg = localStorage.getItem("aleph_white_bg") === "1";
+
   if (whiteBg) { stage.style.display = "none"; document.body.classList.add("white-bg"); }
 
   document.body.addEventListener("click", (e) => {
