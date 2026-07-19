@@ -1,6 +1,8 @@
 (() => {
   const projects = Array.isArray(window.PROJECTS) ? window.PROJECTS : [];
   const list = document.getElementById("projects-list");
+  const scrollRoot = document.getElementById("content-scroll");
+  const navigation = document.querySelector(".projects-navigation");
   const rowsBySlug = new Map();
   const openedRows = new Set();
   const mobileQuery = window.matchMedia("(max-width: 768px)");
@@ -74,22 +76,23 @@
     state.frame = window.requestAnimationFrame(move);
   }
 
-  function loadImage(image) {
+  function loadImage(image, priority = "high") {
+    image.fetchPriority = priority;
     if (!image.dataset.src) return;
     const picture = image.closest("picture");
     picture?.querySelectorAll("source[data-srcset]").forEach((source) => {
       source.srcset = source.dataset.srcset;
       delete source.dataset.srcset;
     });
-    image.fetchPriority = "high";
     image.src = image.dataset.src;
     delete image.dataset.src;
   }
 
-  function loadVideo(video) {
+  function loadVideo(video, shouldPlay = true) {
+    video.autoplay = shouldPlay;
     const source = video.querySelector("source[data-src]");
     if (!source) {
-      video.play().catch(() => {});
+      if (shouldPlay) video.play().catch(() => {});
       return;
     }
     if (video.dataset.poster) {
@@ -98,14 +101,55 @@
     }
     source.src = getResponsiveVideoAsset(source.dataset.src);
     delete source.dataset.src;
-    video.preload = "metadata";
+    video.preload = "auto";
     video.load();
-    video.play().catch(() => {});
+    if (shouldPlay) video.play().catch(() => {});
   }
 
   function loadProjectMedia(row) {
-    row.querySelectorAll("img[data-src]").forEach(loadImage);
-    row.querySelectorAll("video").forEach(loadVideo);
+    row.querySelectorAll("img").forEach((image) => loadImage(image, "high"));
+    row.querySelectorAll("video").forEach((video) => loadVideo(video, true));
+  }
+
+  function preloadCoverVideos() {
+    document
+      .querySelectorAll(".project-media-cover-video video")
+      .forEach((video) => loadVideo(video, false));
+  }
+
+  function preloadAllProjectMedia() {
+    if (navigator.connection?.saveData) return;
+    const covers = Array.from(document.querySelectorAll(".project-cover img"));
+    const coverReady = covers.map((image) => {
+      if (image.complete) return Promise.resolve();
+      return new Promise((resolve) => {
+        image.addEventListener("load", resolve, { once: true });
+        image.addEventListener("error", resolve, { once: true });
+      });
+    });
+
+    Promise.all(coverReady).then(() => {
+      document.querySelectorAll(".project-media").forEach((media) => {
+        const image = media.querySelector("img");
+        const video = media.querySelector("video");
+        if (image) loadImage(image, "low");
+        if (video) loadVideo(video, false);
+      });
+    });
+  }
+
+  function alignProjectBelowNavigation(row) {
+    if (!scrollRoot || !navigation) return;
+    window.requestAnimationFrame(() => {
+      const gap =
+        Number.parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "--project-gap",
+          ),
+        ) || 0;
+      const targetTop = navigation.getBoundingClientRect().bottom + gap;
+      scrollRoot.scrollTop += row.getBoundingClientRect().top - targetTop;
+    });
   }
 
   function setRowActive(row, isActive) {
@@ -124,6 +168,7 @@
     }
     row.querySelector(".project-details").hidden = false;
     focusedRow = row;
+    alignProjectBelowNavigation(row);
   }
 
   function blurProject(row, shouldWriteHash = true) {
@@ -286,24 +331,27 @@
     return button;
   }
 
-  function createVideo(project, media) {
+  function createVideo(project, media, mediaIndex) {
     const wrapper = document.createElement("div");
     const video = document.createElement("video");
     const source = document.createElement("source");
 
     wrapper.className = "project-media project-media-video";
+    if (mediaIndex === 0) wrapper.classList.add("project-media-cover-video");
     if (media.unmute) wrapper.classList.add("video-unmute");
     wrapper.addEventListener("click", (event) => handleMediaClick(event, project));
-    video.autoplay = true;
+    video.autoplay = false;
     video.muted = true;
     video.loop = true;
     video.playsInline = true;
     video.preload = "none";
     if (media.poster) {
       const mobilePoster = getMobileAsset(media.poster);
-      video.dataset.poster = mobileQuery.matches && mobilePoster
+      const poster = mobileQuery.matches && mobilePoster
         ? mobilePoster
         : media.poster;
+      if (mediaIndex === 0) video.poster = poster;
+      else video.dataset.poster = poster;
     }
     source.dataset.src = media.src;
     video.appendChild(source);
@@ -409,7 +457,7 @@
         if (mediaIndex === 0 && media.type === "image") return;
         track.appendChild(
           media.type === "video"
-            ? createVideo(project, media)
+            ? createVideo(project, media, mediaIndex)
             : createImage(project, media),
         );
       });
@@ -476,6 +524,8 @@
 
   renderProjects();
   setupEdgeScrolling();
+  preloadCoverVideos();
+  preloadAllProjectMedia();
   window.__portfolioPriorityReady = true;
   window.dispatchEvent(new Event("portfolio:priority-ready"));
 
@@ -496,7 +546,6 @@
   if (rowsBySlug.has(initialSlug)) {
     localStorage.removeItem("selectedFilter");
     openProject(initialSlug, false);
-    rowsBySlug.get(initialSlug).scrollIntoView({ block: "start", behavior: "auto" });
   }
   window.addEventListener("hashchange", () => {
     const slug = decodeURIComponent(location.hash.slice(1));
