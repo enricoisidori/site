@@ -455,8 +455,9 @@
 
     Commons.thumbWidth = 64;
 
+    const isProjectsPage = document.body.classList.contains("projects-page");
     const cacheBoot = bootFromCache();
-    const initialBuffer = 2;
+    const initialBuffer = isProjectsPage ? 3 : 2;
     const missingUrls = Math.max(initialBuffer - Commons.urlsQueue.length, 0);
     const commonsBoot = missingUrls
       ? fetchCommonsUrls(missingUrls)
@@ -524,8 +525,21 @@
 
   function scheduleAlephStart() {
     if (alephStarted || alephStartScheduled) return;
+
+    const isProjectsPage = document.body.classList.contains("projects-page");
+    const start = () => {
+      alephStartScheduled = false;
+      startAleph();
+    };
+
+    if (isProjectsPage && !window.__portfolioPriorityReady) {
+      alephStartScheduled = true;
+      window.addEventListener("portfolio:priority-ready", start, { once: true });
+      return;
+    }
+
     alephStartScheduled = true;
-    startAleph();
+    start();
   }
 
   scheduleAlephStart();
