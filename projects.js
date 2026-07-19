@@ -4,6 +4,63 @@
   let activeSlug = null;
   let priorityProjectRow = null;
   let priorityGeneration = 0;
+  const projectDrifts = new Map();
+
+  function stopProjectDrift(row, permanently = true) {
+    const drift = projectDrifts.get(row);
+    if (drift?.frame !== null) window.cancelAnimationFrame(drift.frame);
+    projectDrifts.delete(row);
+    if (permanently) row.dataset.driftStopped = "true";
+  }
+
+  function startProjectDrift(row, track) {
+    if (
+      !window.matchMedia("(max-width: 768px)").matches ||
+      row.dataset.driftStopped === "true" ||
+      projectDrifts.has(row)
+    ) {
+      return;
+    }
+
+    stopProjectDrift(row, false);
+    track.scrollLeft = 0;
+    const drift = {
+      frame: null,
+      previousTime: null,
+      noOverflowSince: null,
+      position: 0,
+    };
+
+    const move = (time) => {
+      if (projectDrifts.get(row) !== drift) return;
+      if (drift.previousTime !== null) {
+        const elapsed = Math.min(time - drift.previousTime, 50);
+        const maxScroll = track.scrollWidth - track.clientWidth;
+        if (maxScroll <= 0) {
+          drift.noOverflowSince ??= time;
+          if (time - drift.noOverflowSince > 5000) {
+            stopProjectDrift(row, false);
+            return;
+          }
+        } else if (drift.position >= maxScroll) {
+          stopProjectDrift(row);
+          return;
+        } else {
+          drift.noOverflowSince = null;
+          drift.position = Math.min(
+            maxScroll,
+            drift.position + elapsed * 0.024,
+          );
+          track.scrollLeft = drift.position;
+        }
+      }
+      drift.previousTime = time;
+      drift.frame = window.requestAnimationFrame(move);
+    };
+
+    projectDrifts.set(row, drift);
+    drift.frame = window.requestAnimationFrame(move);
+  }
 
   function removeHash() {
     history.replaceState(null, "", `${location.pathname}${location.search}`);
@@ -17,26 +74,57 @@
     );
   }
 
+  function alignProjectToTop(row) {
+    const scrollRoot = document.getElementById("content-scroll");
+    if (!row || !scrollRoot) return;
+
+    const rootStyles = window.getComputedStyle(scrollRoot);
+    const listStyles = window.getComputedStyle(list);
+    const topOffset =
+      (Number.parseFloat(rootStyles.paddingTop) || 0) +
+      (Number.parseFloat(listStyles.paddingTop) || 0);
+    const targetTop = scrollRoot.getBoundingClientRect().top + topOffset;
+    const delta = row.getBoundingClientRect().top - targetTop;
+    scrollRoot.scrollTop += delta;
+  }
+
   function updateOpenProject(slug, shouldWriteHash) {
+    const previousSlug = activeSlug;
     const nextSlug = activeSlug === slug ? null : slug;
+    const rows = Array.from(document.querySelectorAll(".project-row"));
+    const previousRow = rows.find(
+      (row) => row.dataset.projectSlug === previousSlug,
+    );
+    const nextRow = rows.find((row) => row.dataset.projectSlug === nextSlug);
+    const shouldPinNext =
+      previousRow &&
+      nextRow &&
+      rows.indexOf(previousRow) < rows.indexOf(nextRow);
 
     document.querySelectorAll(".project-row").forEach((row) => {
       const isActive = row.dataset.projectSlug === nextSlug;
       const details = row.querySelector(".project-details");
       row.querySelectorAll(".project-cover, .project-media-image").forEach((button) => {
         button.setAttribute("aria-pressed", String(isActive));
+        if (button.classList.contains("project-cover")) {
+          button.setAttribute("aria-expanded", String(isActive));
+        }
       });
       details.hidden = !isActive;
     });
 
     activeSlug = nextSlug;
 
+    if (shouldPinNext) {
+      window.requestAnimationFrame(() => alignProjectToTop(nextRow));
+    }
+
     if (!shouldWriteHash) return;
     if (nextSlug) setHash(nextSlug);
     else removeHash();
   }
 
-  function openProjectGallery(slug, shouldWriteHash) {
+  function openProjectGallery(slug, shouldWriteHash, shouldOpenDetails = true) {
     const row = document.querySelector(
       `[data-project-slug="${CSS.escape(slug)}"]`,
     );
@@ -45,12 +133,11 @@
     if (!row.classList.contains("project-gallery-open")) {
       const track = row.querySelector(".project-track");
       const cover = row.querySelector(".project-cover");
-      const coverWidth = cover?.getBoundingClientRect().width || 0;
+      const coverRepresentsVideo = cover?.dataset.mediaType === "video";
 
-      if (cover) track.prepend(cover);
+      if (cover && !coverRepresentsVideo) track.prepend(cover);
       row.classList.add("project-gallery-open");
       track.hidden = false;
-      cover?.setAttribute("aria-expanded", "true");
       cover?.setAttribute(
         "aria-label",
         `Show information for ${projects.find((project) => project.slug === slug)?.title || slug}`,
@@ -58,10 +145,12 @@
       prioritizeProject(row, true);
 
       window.requestAnimationFrame(() => {
-        track.scrollLeft = coverWidth / 2;
+        track.scrollLeft = 0;
+        startProjectDrift(row, track);
       });
     }
 
+    if (!shouldOpenDetails) return;
     if (activeSlug !== slug) updateOpenProject(slug, shouldWriteHash);
     else if (shouldWriteHash) setHash(slug);
   }
@@ -96,16 +185,14 @@
 
     button.type = "button";
     button.className = "project-cover";
-    button.setAttribute("aria-label", `Open ${project.title}`);
+    button.dataset.mediaType = firstMedia.type;
+    button.setAttribute("aria-label", `Show information for ${project.title}`);
     button.setAttribute("aria-expanded", "false");
     button.setAttribute("aria-pressed", "false");
     button.addEventListener("click", (event) => {
       event.stopPropagation();
-      if (button.closest(".project-row")?.classList.contains("project-gallery-open")) {
-        updateOpenProject(project.slug, true);
-        return;
-      }
-      openProjectGallery(project.slug, true);
+      openProjectGallery(project.slug, false, false);
+      updateOpenProject(project.slug, true);
     });
 
     image.alt = "";
@@ -370,6 +457,18 @@
     scheduleUpdate();
   }
 
+  function setupResponsiveProjectDrift() {
+    const rows = Array.from(document.querySelectorAll(".project-row"));
+    window.addEventListener("resize", () => {
+      window.requestAnimationFrame(() => {
+        rows.forEach((row) => {
+          if (!row.classList.contains("project-gallery-open")) return;
+          startProjectDrift(row, row.querySelector(".project-track"));
+        });
+      });
+    }, { passive: true });
+  }
+
   function observeImages() {
     const images = document.querySelectorAll("img[data-src]");
     if (!("IntersectionObserver" in window)) {
@@ -477,6 +576,32 @@
       track.className = "project-track";
       track.hidden = true;
       track.setAttribute("aria-label", `${project.title} media`);
+      const stopDrift = () => stopProjectDrift(row);
+      let touchStart = null;
+      track.addEventListener("click", stopDrift, { capture: true });
+      track.addEventListener("wheel", (event) => {
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) stopDrift();
+      }, { passive: true });
+      track.addEventListener("touchstart", (event) => {
+        const touch = event.touches[0];
+        touchStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
+      }, { passive: true });
+      track.addEventListener("touchmove", (event) => {
+        if (!touchStart) return;
+        const touch = event.touches[0];
+        if (!touch) return;
+        const distanceX = Math.abs(touch.clientX - touchStart.x);
+        const distanceY = Math.abs(touch.clientY - touchStart.y);
+        if (distanceX > 8 && distanceX > distanceY) {
+          stopDrift();
+          touchStart = null;
+        }
+      }, { passive: true });
+      const clearTouchStart = () => {
+        touchStart = null;
+      };
+      track.addEventListener("touchend", clearTouchStart, { passive: true });
+      track.addEventListener("touchcancel", clearTouchStart, { passive: true });
 
       project.media.forEach((media, mediaIndex) => {
         if (mediaIndex === 0 && media.type === "image") return;
@@ -494,6 +619,7 @@
 
   renderProjects();
   setupProjectLoadingPriority();
+  setupResponsiveProjectDrift();
   observeImages();
   observeEarlyVideos();
   signalPriorityImagesReady();

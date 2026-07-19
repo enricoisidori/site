@@ -1,8 +1,6 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
-    <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
     <meta charset="UTF-8" />
     <meta
       name="description"
@@ -20,32 +18,17 @@
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Enrico Isidori — About</title>
+    <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" type="image/png" href="asset/svg/cyan.png" />
     <link rel="shortcut icon" type="image/png" href="asset/svg/cyan.png" />
     <link rel="apple-touch-icon" href="asset/svg/cyan.png" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow"
-    />
-    <link rel="stylesheet" href="https://use.typekit.net/qqd2gph.css" />
+    <link rel="icon" sizes="16x16" type="image/png" href="asset/svg/cyan.png" />
+    <link rel="icon" sizes="32x32" type="image/png" href="asset/svg/cyan.png" />
+    <link rel="icon" sizes="192x192" type="image/png" href="asset/svg/cyan.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="asset/svg/cyan.png" />
+    <script src="aleph-boot.js?v=20260719-wiki-work"></script>
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./about.css" />
-    <script>
-      window.__alephPrefetch = fetch(
-        "https://commons.wikimedia.org/w/api.php?" +
-          new URLSearchParams({
-            action: "query",
-            generator: "random",
-            grnnamespace: "6",
-            grnlimit: "50",
-            prop: "imageinfo",
-            iiprop: "url|mime",
-            iiurlwidth: "64",
-            format: "json",
-            origin: "*",
-          }),
-      );
-    </script>
   </head>
   <body class="has-canvas about-page">
     <div id="aleph-stage">
@@ -54,9 +37,9 @@
 
     <div id="content-scroll">
       <nav class="about-navigation" aria-label="Primary navigation">
-        <a href="projects.html">Enrico Isidori</a>
+        <a href="work.html">Enrico Isidori</a>
         <span aria-hidden="true"></span>
-        <a href="projects.html">Work</a>
+        <a href="work.html">Work</a>
       </nav>
 
       <div class="col-12" style="padding-top: 0px !important">
@@ -232,8 +215,8 @@
         ></div>
 
         <p class="about-background-note">
-          the background images are pulled at random from the entire Wikipedia
-          library
+          (the background images are pulled at random from the entire Wikipedia
+          library, click everywhere to toggle it)
         </p>
       </div>
 
@@ -241,6 +224,8 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="aleph.js"></script>
+    <script src="aleph.js?v=20260719-wiki-work"></script>
+    <script src="projects-data.js"></script>
+    <script src="work-prefetch.js"></script>
   </body>
 </html>

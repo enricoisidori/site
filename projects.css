@@ -321,6 +321,22 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
     --project-track-height: 65vw;
   }
 
+  .project-row.project-gallery-open .project-track {
+    width: calc(100% + 5px);
+    margin-left: -2.5px;
+  }
+
+  .project-row.project-gallery-open .project-track::before,
+  .project-row.project-gallery-open .project-track::after {
+    flex: 0 0 2.5px;
+    height: 1px;
+    content: "";
+  }
+
+  .project-track > .project-cover {
+    width: calc(100% - 5px);
+  }
+
   .project-date,
   .project-info,
   .project-description {
