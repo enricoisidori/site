@@ -8,14 +8,11 @@
   const mobileQuery = window.matchMedia("(max-width: 768px)");
   const priorityEnabled = document.body.dataset.projectPriority !== "off";
   const openAllProjects = document.body.dataset.projectsOpen === "all";
-  const isWindows =
-    navigator.userAgentData?.platform === "Windows" || /Windows/i.test(navigator.userAgent);
   const DRIFT_SPEED = 18;
   let focusedRow = null;
   let drift = null;
 
   if (!list) return;
-  document.documentElement.classList.toggle("windows-platform", isWindows);
 
   function removeHash() {
     history.replaceState(null, "", `${location.pathname}${location.search}`);
@@ -268,11 +265,15 @@
       event.preventDefault();
       return;
     }
+    toggleProjectActive(row, project.slug);
+  }
+
+  function toggleProjectActive(row, slug) {
     if (!row) return;
     if (focusedRow === row) blurProject(row, true);
     else {
       focusProject(row);
-      setHash(project.slug);
+      setHash(slug);
     }
   }
 
@@ -297,11 +298,7 @@
         return;
       }
       if (!openedRows.has(row)) openProject(project.slug, true);
-      else if (focusedRow === row) blurProject(row, true);
-      else {
-        focusProject(row);
-        setHash(project.slug);
-      }
+      else toggleProjectActive(row, project.slug);
     });
 
     image.alt = "";
@@ -418,6 +415,20 @@
   function setupTrackInteraction(row, track) {
     let touchStart = null;
     let mouseDrag = null;
+
+    track.addEventListener(
+      "click",
+      (event) => {
+        if (event.target.closest(".video-unmute-btn")) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+        const suppressUntil = Number(row.dataset.suppressClickUntil || 0);
+        if (performance.now() < suppressUntil) return;
+        toggleProjectActive(row, row.dataset.projectSlug);
+      },
+      true,
+    );
     track.addEventListener(
       "wheel",
       (event) => {
@@ -461,18 +472,29 @@
       mouseDrag = {
         pointerId: event.pointerId,
         startX: event.clientX,
+        startY: event.clientY,
         startScrollLeft: track.scrollLeft,
         moved: false,
+        captured: false,
       };
-      track.setPointerCapture(event.pointerId);
-      track.classList.add("is-dragging");
       stopProjectDrift(row);
     });
 
     track.addEventListener("pointermove", (event) => {
       if (!mouseDrag || event.pointerId !== mouseDrag.pointerId) return;
       const distance = event.clientX - mouseDrag.startX;
-      if (Math.abs(distance) > 3) mouseDrag.moved = true;
+      const verticalDistance = event.clientY - mouseDrag.startY;
+      if (
+        Math.abs(distance) > 8 &&
+        Math.abs(distance) > Math.abs(verticalDistance)
+      ) {
+        mouseDrag.moved = true;
+        if (!mouseDrag.captured) {
+          track.setPointerCapture(event.pointerId);
+          track.classList.add("is-dragging");
+          mouseDrag.captured = true;
+        }
+      }
       if (!mouseDrag.moved) return;
       track.scrollLeft = mouseDrag.startScrollLeft - distance;
       event.preventDefault();
@@ -480,7 +502,7 @@
 
     const endMouseDrag = (event) => {
       if (!mouseDrag || event.pointerId !== mouseDrag.pointerId) return;
-      if (track.hasPointerCapture(event.pointerId)) {
+      if (mouseDrag.captured && track.hasPointerCapture(event.pointerId)) {
         track.releasePointerCapture(event.pointerId);
       }
       track.classList.remove("is-dragging");
@@ -523,11 +545,22 @@
   }
 
   function setupEdgeScrolling() {
-    const edgeSize = 48;
+    // CSS reference pixels: 4 cm at the standard 96 dpi reference density.
+    const edgeSize = Math.round((4 / 2.54) * 96);
     let edgeTrack = null;
     let edgeDirection = 0;
     let edgeSpeed = 0;
     let edgeFrame = null;
+
+    function trackAtVerticalPosition(y) {
+      return Array.from(document.querySelectorAll(".project-track")).find(
+        (track) => {
+          if (track.hidden) return false;
+          const rect = track.getBoundingClientRect();
+          return y >= rect.top && y <= rect.bottom;
+        },
+      );
+    }
 
     function stop() {
       edgeTrack = null;
@@ -556,10 +589,7 @@
 
     document.addEventListener("pointermove", (event) => {
       if (event.pointerType && event.pointerType !== "mouse") return;
-      const track = document
-        .elementsFromPoint(event.clientX, event.clientY)
-        .map((element) => element.closest?.(".project-track"))
-        .find(Boolean);
+      const track = trackAtVerticalPosition(event.clientY);
       const leftDistance = event.clientX;
       const rightDistance = window.innerWidth - event.clientX;
       const atLeft = leftDistance <= edgeSize;

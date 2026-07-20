@@ -57,6 +57,12 @@
     if (e.target.closest("button")) return;
     if (e.target.closest(".btn")) return;
     if (e.target.closest(".video-unmute")) return;
+    if (
+      document.body.classList.contains("projects-page") &&
+      e.target.closest("#projects-list, .project-details")
+    ) {
+      return;
+    }
 
     toggleBackground();
   });

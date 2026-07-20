@@ -208,26 +208,6 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   user-select: none;
 }
 
-html.windows-platform .project-track {
-  scrollbar-width: thin;
-  scrollbar-color: #000 transparent;
-  -ms-overflow-style: auto;
-}
-
-html.windows-platform .project-track::-webkit-scrollbar {
-  display: block;
-  width: 0;
-  height: 8px;
-}
-
-html.windows-platform .project-track::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-html.windows-platform .project-track::-webkit-scrollbar-thumb {
-  background: #000;
-}
-
 .project-track > .project-cover {
   flex: 0 0 auto;
   margin: 0;
@@ -258,6 +238,12 @@ html.windows-platform .project-track::-webkit-scrollbar-thumb {
    its closed cover, which remains centered by .project-cover. */
 .project-row.project-gallery-open .project-media-cover-video {
   margin-left: 0;
+}
+
+/* Capsule's 2:3 crop is intentionally centered within its row. */
+.project-row[data-project-slug="capsule-plaza"].project-gallery-open
+  .project-media-cover-video {
+  margin-left: max(0px, calc((100% - var(--project-cover-width)) / 2));
 }
 
 .project-media-cover-video video {
