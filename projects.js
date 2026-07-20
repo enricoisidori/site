@@ -581,6 +581,7 @@
   if (openAllProjects) {
     rowsBySlug.forEach((row, slug) => openProject(slug, false, false));
   }
+  if (location.hash) removeHash();
   setupEdgeScrolling();
   setupLeadPreloading();
   signalCoversReady();
@@ -599,11 +600,6 @@
     if (lastOpenedRow) startProjectDrift(lastOpenedRow);
   });
 
-  const initialSlug = decodeURIComponent(location.hash.slice(1));
-  if (rowsBySlug.has(initialSlug)) {
-    localStorage.removeItem("selectedFilter");
-    openProject(initialSlug, false);
-  }
   window.addEventListener("hashchange", () => {
     const slug = decodeURIComponent(location.hash.slice(1));
     if (rowsBySlug.has(slug)) openProject(slug, false);
