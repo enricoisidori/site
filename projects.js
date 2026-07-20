@@ -8,11 +8,14 @@
   const mobileQuery = window.matchMedia("(max-width: 768px)");
   const priorityEnabled = document.body.dataset.projectPriority !== "off";
   const openAllProjects = document.body.dataset.projectsOpen === "all";
+  const isWindows =
+    navigator.userAgentData?.platform === "Windows" || /Windows/i.test(navigator.userAgent);
   const DRIFT_SPEED = 18;
   let focusedRow = null;
   let drift = null;
 
   if (!list) return;
+  document.documentElement.classList.toggle("windows-platform", isWindows);
 
   function removeHash() {
     history.replaceState(null, "", `${location.pathname}${location.search}`);
@@ -218,6 +221,7 @@
     track.scrollLeft = 0;
     track.hidden = true;
     row.classList.remove("project-gallery-open");
+    row.classList.remove("project-open");
     if (cover && cover.parentElement === track) row.insertBefore(cover, track);
     row.querySelectorAll("video").forEach((video) => video.pause());
     setRowActive(row, false);
@@ -241,6 +245,7 @@
     const cover = row.querySelector(".project-cover");
     const isSingleImage = row.dataset.singleImage === "true";
     openedRows.add(row);
+    row.classList.add("project-open");
     list.classList.add("has-open-project");
     setRowOpen(row, true);
     if (shouldFocus) focusProject(row);
@@ -287,6 +292,10 @@
     button.addEventListener("click", (event) => {
       event.stopPropagation();
       const row = rowsBySlug.get(project.slug);
+      if (performance.now() < Number(row?.dataset.suppressClickUntil || 0)) {
+        event.preventDefault();
+        return;
+      }
       if (!openedRows.has(row)) openProject(project.slug, true);
       else if (focusedRow === row) blurProject(row, true);
       else {
@@ -408,6 +417,7 @@
 
   function setupTrackInteraction(row, track) {
     let touchStart = null;
+    let mouseDrag = null;
     track.addEventListener(
       "wheel",
       (event) => {
@@ -444,6 +454,43 @@
     };
     track.addEventListener("touchend", clearTouch, { passive: true });
     track.addEventListener("touchcancel", clearTouch, { passive: true });
+
+    track.addEventListener("pointerdown", (event) => {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      if (event.target.closest(".video-unmute-btn")) return;
+      mouseDrag = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startScrollLeft: track.scrollLeft,
+        moved: false,
+      };
+      track.setPointerCapture(event.pointerId);
+      track.classList.add("is-dragging");
+      stopProjectDrift(row);
+    });
+
+    track.addEventListener("pointermove", (event) => {
+      if (!mouseDrag || event.pointerId !== mouseDrag.pointerId) return;
+      const distance = event.clientX - mouseDrag.startX;
+      if (Math.abs(distance) > 3) mouseDrag.moved = true;
+      if (!mouseDrag.moved) return;
+      track.scrollLeft = mouseDrag.startScrollLeft - distance;
+      event.preventDefault();
+    });
+
+    const endMouseDrag = (event) => {
+      if (!mouseDrag || event.pointerId !== mouseDrag.pointerId) return;
+      if (track.hasPointerCapture(event.pointerId)) {
+        track.releasePointerCapture(event.pointerId);
+      }
+      track.classList.remove("is-dragging");
+      if (mouseDrag.moved) {
+        row.dataset.suppressClickUntil = String(performance.now() + 250);
+      }
+      mouseDrag = null;
+    };
+    track.addEventListener("pointerup", endMouseDrag);
+    track.addEventListener("pointercancel", endMouseDrag);
   }
 
   function renderProjects() {

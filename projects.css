@@ -1,3 +1,19 @@
+@font-face {
+  font-family: "Portfolio Helvetica";
+  src: url("asset/font/helvn.woff") format("woff");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Portfolio Helvetica";
+  src: url("asset/font/helvn_b.woff") format("woff");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   --project-gap: 5px;
   --project-side-gap: 3px;
@@ -14,10 +30,13 @@ body.projects-page {
   margin: 0;
   background: transparent;
   color: #000;
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-family: "Portfolio Helvetica", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-synthesis: none;
 }
 
 html:has(body.projects-page) {
@@ -35,9 +54,12 @@ body.projects-page #content-scroll {
 
 body.projects-page #content-scroll,
 body.projects-page #content-scroll * {
-  color: #000;
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
   font: inherit;
+  font-family: "Portfolio Helvetica", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-weight: 500;
+  text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 12px #fff !important;
   text-shadow: var(--project-text-shadow) !important;
 }
 
@@ -172,6 +194,11 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   display: none;
 }
 
+.project-row.project-open > .project-cover {
+  margin-right: 0;
+  margin-left: 0;
+}
+
 .project-track {
   display: flex;
   width: 100%;
@@ -181,6 +208,7 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   overflow-x: auto;
   overflow-y: hidden;
   gap: 0;
+  cursor: grab;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -189,6 +217,31 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   display: none;
   width: 0;
   height: 0;
+}
+
+.project-track.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+html.windows-platform .project-track {
+  scrollbar-width: thin;
+  scrollbar-color: #000 transparent;
+  -ms-overflow-style: auto;
+}
+
+html.windows-platform .project-track::-webkit-scrollbar {
+  display: block;
+  width: 0;
+  height: 8px;
+}
+
+html.windows-platform .project-track::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html.windows-platform .project-track::-webkit-scrollbar-thumb {
+  background: #000;
 }
 
 .project-track > .project-cover {
