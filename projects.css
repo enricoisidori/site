@@ -217,6 +217,12 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   background: #eee;
 }
 
+/* Open galleries always begin at the left edge. A single-image project keeps
+   its closed cover, which remains centered by .project-cover. */
+.project-row.project-gallery-open .project-media-cover-video {
+  margin-left: 0;
+}
+
 .project-media-cover-video video {
   width: 100%;
   height: 100%;

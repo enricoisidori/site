@@ -7,6 +7,7 @@
   const openedRows = new Set();
   const mobileQuery = window.matchMedia("(max-width: 768px)");
   const priorityEnabled = document.body.dataset.projectPriority !== "off";
+  const openAllProjects = document.body.dataset.projectsOpen === "all";
   const DRIFT_SPEED = 18;
   let focusedRow = null;
   let drift = null;
@@ -185,23 +186,26 @@
     row
       .querySelectorAll(".project-cover, .project-media-image")
       .forEach((button) => button.setAttribute("aria-pressed", String(isActive)));
+  }
+
+  function setRowOpen(row, isOpen) {
     row
       .querySelector(".project-cover")
-      ?.setAttribute("aria-expanded", String(isActive));
+      ?.setAttribute("aria-expanded", String(isOpen));
   }
 
   function focusProject(row) {
     if (focusedRow && focusedRow !== row) {
-      focusedRow.querySelector(".project-details").hidden = true;
+      setRowActive(focusedRow, false);
     }
-    row.querySelector(".project-details").hidden = false;
+    setRowActive(row, true);
     focusedRow = row;
     alignProjectBelowNavigation(row);
   }
 
   function blurProject(row, shouldWriteHash = true) {
     if (!row) return;
-    row.querySelector(".project-details").hidden = true;
+    setRowActive(row, false);
     if (focusedRow === row) focusedRow = null;
     if (shouldWriteHash) removeHash();
   }
@@ -217,17 +221,18 @@
     if (cover && cover.parentElement === track) row.insertBefore(cover, track);
     row.querySelectorAll("video").forEach((video) => video.pause());
     setRowActive(row, false);
+    setRowOpen(row, false);
     if (focusedRow === row) focusedRow = null;
     openedRows.delete(row);
     list.classList.toggle("has-open-project", openedRows.size > 0);
     if (shouldWriteHash) removeHash();
   }
 
-  function openProject(slug, shouldWriteHash = true) {
+  function openProject(slug, shouldWriteHash = true, shouldFocus = true) {
     const row = rowsBySlug.get(slug);
     if (!row) return;
     if (openedRows.has(row)) {
-      focusProject(row);
+      if (shouldFocus) focusProject(row);
       if (shouldWriteHash) setHash(slug);
       return;
     }
@@ -237,8 +242,8 @@
     const isSingleImage = row.dataset.singleImage === "true";
     openedRows.add(row);
     list.classList.add("has-open-project");
-    setRowActive(row, true);
-    focusProject(row);
+    setRowOpen(row, true);
+    if (shouldFocus) focusProject(row);
     if (!isSingleImage) {
       if (cover?.dataset.mediaType !== "video") track.prepend(cover);
       row.classList.add("project-gallery-open");
@@ -526,11 +531,15 @@
   }
 
   renderProjects();
+  if (openAllProjects) {
+    rowsBySlug.forEach((row, slug) => openProject(slug, false, false));
+  }
   setupEdgeScrolling();
   setupLeadPreloading();
   signalCoversReady();
 
   window.closeProjectDetails = () => {
+    if (openAllProjects) return;
     openedRows.forEach((row) => closeProject(row, false));
     removeHash();
   };
