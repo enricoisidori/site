@@ -28,7 +28,8 @@ body.about-page .about-navigation {
   top: 5px;
   right: 5px;
   left: 5px;
-  z-index: 11;
+  /* Keep the primary navigation above the contact block and page content. */
+  z-index: 20;
   height: 16px;
   margin: 0;
   padding: 0;
@@ -36,10 +37,15 @@ body.about-page .about-navigation {
   white-space: nowrap;
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-weight: 500;
+  pointer-events: none;
   text-shadow:
     0 0 2px #fff,
     0 0 4px #fff,
     0 0 12px #fff !important;
+}
+
+body.about-page .about-navigation a {
+  pointer-events: auto;
 }
 
 body.has-canvas #content-scroll .about-navigation *,
@@ -77,13 +83,16 @@ body.about-page #content-scroll > .col-12 {
 }
 
 body.about-page .about-contacts {
+  position: relative;
+  z-index: 12;
   padding-top: 0;
+  line-height: 16px;
+  pointer-events: auto;
 }
 
-body.about-page #content-scroll > .col-12 > a[href^="https://www.instagram.com/enrico.isidori/"],
-body.about-page #content-scroll > .col-12 > a[href^="mailto:"] {
+body.about-page .about-contacts a {
   position: relative;
-  z-index: 100;
+  z-index: 12;
   pointer-events: auto;
 }
 

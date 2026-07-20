@@ -6,6 +6,7 @@
   const rowsBySlug = new Map();
   const openedRows = new Set();
   const mobileQuery = window.matchMedia("(max-width: 768px)");
+  const priorityEnabled = document.body.dataset.projectPriority !== "off";
   const DRIFT_SPEED = 18;
   let focusedRow = null;
   let drift = null;
@@ -79,6 +80,7 @@
 
   function activateProjectMedia(row) {
     row.querySelectorAll("img[data-src]").forEach((image) => {
+      if (priorityEnabled) image.fetchPriority = "high";
       image.src = image.dataset.src;
       delete image.dataset.src;
     });
@@ -89,11 +91,63 @@
         delete video.dataset.poster;
       }
       if (video.dataset.src) {
+        video.preload = "auto";
         video.src = video.dataset.src;
         delete video.dataset.src;
       }
       video.play().catch(() => {});
     });
+  }
+
+  function preloadProjectLead(row) {
+    if (!priorityEnabled || openedRows.has(row) || row.dataset.leadReady === "true") {
+      return;
+    }
+    row.dataset.leadReady = "true";
+    const leadMedia = Array.from(
+      row.querySelectorAll("img[data-src], video[data-src]"),
+    ).slice(0, 2);
+    leadMedia.forEach((media) => {
+      if (media instanceof HTMLImageElement) {
+        media.fetchPriority = "high";
+      } else {
+        media.preload = "auto";
+      }
+      media.src = media.dataset.src;
+      delete media.dataset.src;
+    });
+  }
+
+  function setupLeadPreloading() {
+    if (!priorityEnabled) return;
+    const start = () => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            preloadProjectLead(entry.target);
+            observer.unobserve(entry.target);
+          });
+        },
+        { root: scrollRoot, rootMargin: "200px 0px", threshold: 0.01 },
+      );
+      rowsBySlug.forEach((row) => {
+        observer.observe(row);
+        row.addEventListener("pointerenter", () => preloadProjectLead(row), {
+          once: true,
+          passive: true,
+        });
+        row.addEventListener("focusin", () => preloadProjectLead(row), {
+          once: true,
+        });
+        row.addEventListener("pointerdown", () => preloadProjectLead(row), {
+          once: true,
+          passive: true,
+        });
+      });
+    };
+    if (window.__portfolioPriorityReady) start();
+    else window.addEventListener("portfolio:priority-ready", start, { once: true });
   }
 
   function signalCoversReady() {
@@ -165,6 +219,7 @@
     setRowActive(row, false);
     if (focusedRow === row) focusedRow = null;
     openedRows.delete(row);
+    list.classList.toggle("has-open-project", openedRows.size > 0);
     if (shouldWriteHash) removeHash();
   }
 
@@ -181,6 +236,7 @@
     const cover = row.querySelector(".project-cover");
     const isSingleImage = row.dataset.singleImage === "true";
     openedRows.add(row);
+    list.classList.add("has-open-project");
     setRowActive(row, true);
     focusProject(row);
     if (!isSingleImage) {
@@ -210,11 +266,12 @@
     }
   }
 
-  function createCover(project) {
+  function createCover(project, projectIndex) {
     const button = document.createElement("button");
     const image = document.createElement("img");
     const firstMedia = project.media[0];
     const src = firstMedia.type === "video" ? firstMedia.poster : firstMedia.src;
+    const placeholder = window.PROJECT_PLACEHOLDERS?.[src];
 
     button.type = "button";
     button.className = "project-cover";
@@ -234,8 +291,18 @@
     });
 
     image.alt = "";
+    image.decoding = "async";
     image.width = 1500;
     image.height = 1000;
+    image.fetchPriority = projectIndex < 2 ? "high" : "auto";
+    if (placeholder) {
+      button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
+    }
+    image.addEventListener(
+      "load",
+      () => button.classList.add("media-loaded"),
+      { once: true },
+    );
     image.src = getImageSource(src);
     button.appendChild(image);
     return button;
@@ -244,6 +311,7 @@
   function createImage(project, media) {
     const button = document.createElement("button");
     const image = document.createElement("img");
+    const placeholder = window.PROJECT_PLACEHOLDERS?.[media.src];
 
     button.type = "button";
     button.className = "project-media project-media-image";
@@ -252,8 +320,17 @@
     button.addEventListener("click", (event) => handleMediaClick(event, project));
 
     image.alt = "";
+    image.decoding = "async";
     image.width = media.width;
     image.height = media.height;
+    if (placeholder) {
+      button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
+    }
+    image.addEventListener(
+      "load",
+      () => button.classList.add("media-loaded"),
+      { once: true },
+    );
     image.dataset.src = getImageSource(media.src);
     button.appendChild(image);
     return button;
@@ -365,10 +442,10 @@
   }
 
   function renderProjects() {
-    projects.forEach((project) => {
+    projects.forEach((project, projectIndex) => {
       const row = document.createElement("section");
       const track = document.createElement("div");
-      const cover = createCover(project);
+      const cover = createCover(project, projectIndex);
       row.className = `${project.categories.join(" ")} project-row`;
       row.dataset.projectSlug = project.slug;
       row.dataset.singleImage = String(
@@ -450,6 +527,7 @@
 
   renderProjects();
   setupEdgeScrolling();
+  setupLeadPreloading();
   signalCoversReady();
 
   window.closeProjectDetails = () => {

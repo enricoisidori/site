@@ -100,6 +100,12 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 
 /* Project rows */
 #projects-list {
+  /* With every project closed, let the first cover meet the top edge. */
+  padding-top: 0;
+}
+
+#projects-list.has-open-project {
+  /* An expanded project begins below the fixed navigation. */
   padding-top: calc(16px + var(--project-gap));
 }
 
@@ -144,6 +150,21 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   position: relative;
   z-index: 1;
   object-fit: cover;
+}
+
+.project-cover::before,
+.project-media-image::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: #eee var(--project-placeholder, none) center / cover no-repeat;
+  image-rendering: pixelated;
+  transform: scale(1.01);
+}
+
+.project-cover.media-loaded::before,
+.project-media-image.media-loaded::before {
+  display: none;
 }
 
 .project-row.project-gallery-open > .project-cover,
@@ -211,6 +232,8 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 
 .project-media img,
 .project-media video {
+  position: relative;
+  z-index: 1;
   display: block;
   width: auto;
   max-width: none;

@@ -1,6 +1,9 @@
 (function () {
+  const isProjectsPage = document.body.classList.contains("projects-page");
+  const workMode = document.body.dataset.alephWorkMode || "full";
   const ALEPH_BACKGROUND_ENABLED =
-    document.body.dataset.alephBackground !== "off";
+    document.body.dataset.alephBackground !== "off" &&
+    !(isProjectsPage && workMode === "off");
   if (!ALEPH_BACKGROUND_ENABLED) {
     document.documentElement.dataset.alephDisabled = "true";
     document.documentElement.style.setProperty("--aleph-cached-bg", "none");
@@ -88,18 +91,19 @@
   const LUMA_INVERT = false;
   const COMMONS_FETCH_TIMEOUT = 8000;
 
-  const maxBuffer = 12;
+  const lightWorkMode = isProjectsPage && workMode === "light";
+  const maxBuffer = lightWorkMode ? 4 : 12;
   let commonsRefillEnabled = false;
 
   const Commons = {
     thumbWidth: 128,
     urlsQueue: [],
     prefetching: false,
-    minBuffer: 6,
+    minBuffer: lightWorkMode ? 2 : 6,
     preloaded: [],
     loadingCount: 0,
-    maxConcurrent: 3,
-    maxPool: 16,
+    maxConcurrent: lightWorkMode ? 1 : 3,
+    maxPool: lightWorkMode ? 5 : 16,
     heldIds: new Set(),
     seenIds: new Set(),
     seenOrder: [],
@@ -455,9 +459,8 @@
 
     Commons.thumbWidth = 64;
 
-    const isProjectsPage = document.body.classList.contains("projects-page");
     const cacheBoot = bootFromCache();
-    const initialBuffer = isProjectsPage ? 3 : 2;
+    const initialBuffer = lightWorkMode ? 1 : isProjectsPage ? 3 : 2;
     const missingUrls = Math.max(initialBuffer - Commons.urlsQueue.length, 0);
     const commonsBoot = missingUrls
       ? fetchCommonsUrls(missingUrls)
@@ -526,7 +529,6 @@
   function scheduleAlephStart() {
     if (alephStarted || alephStartScheduled) return;
 
-    const isProjectsPage = document.body.classList.contains("projects-page");
     const start = () => {
       alephStartScheduled = false;
       startAleph();
