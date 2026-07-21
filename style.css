@@ -791,6 +791,12 @@ body.has-canvas .page-link {
   text-decoration: none;
 }
 
+body.has-canvas #content-scroll .site-name:hover,
+body.has-canvas #content-scroll .page-link:hover {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+}
+
 body.has-canvas #content-scroll #aleph-stage {
   z-index: -1;
 }

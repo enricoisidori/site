@@ -302,6 +302,7 @@
     });
 
     image.alt = "";
+    image.draggable = false;
     image.decoding = "async";
     image.width = 1500;
     image.height = 1000;
@@ -331,6 +332,7 @@
     button.addEventListener("click", (event) => handleMediaClick(event, project));
 
     image.alt = "";
+    image.draggable = false;
     image.decoding = "async";
     image.width = media.width;
     image.height = media.height;
@@ -350,14 +352,26 @@
   function createVideo(project, media, mediaIndex) {
     const wrapper = document.createElement("div");
     const video = document.createElement("video");
+    const placeholder =
+      window.PROJECT_PLACEHOLDERS?.[media.src] ||
+      window.PROJECT_PLACEHOLDERS?.[media.poster];
 
     wrapper.className = "project-media project-media-video";
     if (mediaIndex === 0) wrapper.classList.add("project-media-cover-video");
     if (media.unmute) wrapper.classList.add("video-unmute");
     wrapper.addEventListener("click", (event) => handleMediaClick(event, project));
+    if (placeholder) {
+      wrapper.style.setProperty("--project-placeholder", `url("${placeholder}")`);
+    }
     video.muted = true;
+    video.draggable = false;
     video.loop = true;
     video.playsInline = true;
+    video.addEventListener(
+      "loadeddata",
+      () => wrapper.classList.add("media-loaded"),
+      { once: true },
+    );
     if (media.poster) {
       const poster = getImageSource(media.poster);
       if (mediaIndex === 0) video.poster = poster;
@@ -415,6 +429,8 @@
   function setupTrackInteraction(row, track) {
     let touchStart = null;
     let mouseDrag = null;
+
+    track.addEventListener("dragstart", (event) => event.preventDefault());
 
     track.addEventListener(
       "click",

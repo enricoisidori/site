@@ -12,17 +12,20 @@ const context = { window: {} };
 vm.runInNewContext(dataSource, context, { filename: "projects-data.js" });
 
 const assets = Array.from(
-  new Set(
-    (context.window.PROJECTS || []).flatMap((project) =>
-      [
-        ...project.media
-          .filter((media) => media.type === "image" && media.src?.endsWith(".webp"))
-          .map((media) => media.src),
-        project.media[0]?.poster,
-      ].filter((asset) => asset?.endsWith(".webp")),
-    ),
+  new Map(
+    (context.window.PROJECTS || [])
+      .flatMap((project) => project.media)
+      .flatMap((media) => {
+        const files = [];
+        if (media.type === "image" && media.src?.endsWith(".webp")) {
+          files.push([media.src, "image"]);
+        }
+        if (media.type === "video" && media.src) files.push([media.src, "video"]);
+        if (media.poster?.endsWith(".webp")) files.push([media.poster, "image"]);
+        return files;
+      }),
   ),
-);
+).map(([relativePath, type]) => ({ relativePath, type }));
 
 const tempDir = await mkdtemp(path.join(os.tmpdir(), "site-placeholders-"));
 const placeholders = {};
@@ -45,13 +48,30 @@ async function dimensions(file) {
 
 async function worker() {
   while (queue.length) {
-    const relativePath = queue.shift();
+    const asset = queue.shift();
+    const { relativePath, type } = asset;
     const source = path.join(root, relativePath);
     const target = path.join(tempDir, `${Buffer.from(relativePath).toString("hex")}.webp`);
+    const frame = path.join(tempDir, `${Buffer.from(relativePath).toString("hex")}.png`);
     const [width, height] = await dimensions(source);
     const scale = 24 / Math.max(width, height);
     const targetWidth = Math.max(2, Math.round(width * scale));
     const targetHeight = Math.max(2, Math.round(height * scale));
+
+    if (type === "video") {
+      await run("ffmpeg", [
+        "-y",
+        "-v",
+        "error",
+        "-ss",
+        "0.1",
+        "-i",
+        source,
+        "-frames:v",
+        "1",
+        frame,
+      ]);
+    }
 
     await run("cwebp", [
       "-quiet",
@@ -62,7 +82,7 @@ async function worker() {
       "-resize",
       String(targetWidth),
       String(targetHeight),
-      source,
+      type === "video" ? frame : source,
       "-o",
       target,
     ]);
