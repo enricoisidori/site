@@ -19,21 +19,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Enrico Isidori — About</title>
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="icon" type="image/svg+xml" href="asset/svg/Aleph0.svg?v=20260720" />
-    <link rel="shortcut icon" type="image/png" href="asset/svg/aleph-icon-32.png?v=20260720" />
-    <link rel="apple-touch-icon" href="asset/svg/aleph-icon-180.png?v=20260720" />
-    <link rel="icon" sizes="16x16" type="image/png" href="asset/svg/aleph-icon-16.png?v=20260720" />
-    <link rel="icon" sizes="32x32" type="image/png" href="asset/svg/aleph-icon-32.png?v=20260720" />
+    <link rel="icon" type="image/svg+xml" href="asset/svg/Aleph0.svg?v=20260723-red" />
+    <link rel="shortcut icon" type="image/png" href="asset/svg/aleph-icon-32.png?v=20260723-red" />
+    <link rel="apple-touch-icon" href="asset/svg/aleph-icon-180.png?v=20260723-red" />
+    <link rel="icon" sizes="16x16" type="image/png" href="asset/svg/aleph-icon-16.png?v=20260723-red" />
+    <link rel="icon" sizes="32x32" type="image/png" href="asset/svg/aleph-icon-32.png?v=20260723-red" />
     <link
       rel="icon"
       sizes="192x192"
       type="image/png"
-      href="asset/svg/aleph-icon-192.png?v=20260720"
+      href="asset/svg/aleph-icon-192.png?v=20260723-red"
     />
-    <link rel="apple-touch-icon" sizes="180x180" href="asset/svg/aleph-icon-180.png?v=20260720" />
-    <script src="aleph-boot.js?v=20260719-wiki-work"></script>
-    <link rel="stylesheet" href="./style.css?v=20260721-nav-hover" />
-    <link rel="stylesheet" href="./about.css?v=20260720-nav-priority" />
+    <link rel="apple-touch-icon" sizes="180x180" href="asset/svg/aleph-icon-180.png?v=20260723-red" />
+    <script src="aleph-boot.js?v=20260723-transition-frame"></script>
+    <link rel="stylesheet" href="./style.css?v=20260723-nav-difference-only" />
+    <link rel="stylesheet" href="./about.css?v=20260723-nav-difference-only" />
   </head>
   <body class="has-canvas about-page">
     <div id="aleph-stage">
@@ -42,11 +42,12 @@
 
     <div id="content-scroll">
       <nav class="about-navigation" aria-label="Primary navigation">
-        <a class="site-name" href="work.html">Enrico Isidori</a>
-        <a class="page-link" href="work.html">Work</a>
+        <a class="site-name" href="work.html" data-nav-role="static">Enrico Isidori</a>
+        <button class="backdrop-toggle" type="button" data-backdrop-toggle data-nav-role="backdrop" aria-pressed="true" aria-label="Disable backdrop"><span data-backdrop-action="ON" data-nav-role="option">ON</span><span class="backdrop-divider" data-nav-role="static">/</span><span data-backdrop-action="OFF" data-nav-role="option">OFF</span></button>
+        <a class="page-link" href="work.html" data-nav-role="route">Work</a>
       </nav>
 
-      <div class="col-12" style="padding-top: 0px !important">
+      <div class="col-12">
         <div class="about-contacts">
           <a href="mailto:enrico.isidori@gmail.com">enrico.isidori@gmail.com</a
           ><br />
@@ -230,6 +231,6 @@
     </div>
 
     <script src="script.js"></script>
-    <script src="aleph.js?v=20260719-global-toggle"></script>
+    <script src="aleph.js?v=20260723-seamless-canvas-frame"></script>
   </body>
 </html>

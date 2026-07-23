@@ -1,10 +1,14 @@
 :root {
   --project-gap: 5px;
-  --project-side-gap: 3px;
+  --project-side-gap: 5px;
   --project-cover-width: 750px;
   --project-media-height: 500px;
   --project-track-height: 500px;
-  --project-text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 12px #fff;
+  --project-text-shadow:
+    0 0 1px #fff,
+    0 0 3px #fff,
+    0 0 6px #fff,
+    0 0 14px rgba(255, 255, 255, 0.98);
 }
 
 /* Page */
@@ -66,16 +70,22 @@ html:has(body.projects-page.white-bg) {
 /* Navigation */
 body.has-canvas #content-scroll .projects-navigation,
 body.projects-page .projects-navigation {
+  display: contents;
+}
+
+body.projects-page .projects-navigation > .site-name,
+body.projects-page .projects-navigation > .page-link {
   position: fixed;
   top: var(--project-gap);
-  right: var(--project-gap);
-  left: var(--project-gap);
   z-index: 11;
-  height: 16px;
-  margin: 0;
-  padding: 0;
-  line-height: 16px;
-  white-space: nowrap;
+}
+
+body.projects-page .projects-navigation > .site-name {
+  left: var(--project-gap);
+}
+
+body.projects-page .projects-navigation > .page-link {
+  right: var(--project-gap);
 }
 
 body.projects-page #content-scroll .projects-navigation-filters .btn,
@@ -102,6 +112,40 @@ body.projects-page #content-scroll .projects-navigation .btn.inactive {
 body.projects-page #content-scroll .projects-navigation .btn:hover,
 body.projects-page #content-scroll .projects-navigation .btn.active {
   color: #555 !important;
+}
+
+body.projects-page .backdrop-toggle {
+  position: fixed;
+  top: var(--project-gap);
+  left: 50%;
+  z-index: 11;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #000;
+  background: transparent;
+  font: inherit;
+  line-height: 16px;
+  opacity: 1;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+body.projects-page #content-scroll .backdrop-toggle:hover .is-next-action,
+body.projects-page #content-scroll .backdrop-toggle:focus-visible .is-next-action {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+}
+
+body.projects-page #content-scroll .backdrop-toggle.is-feedback .is-next-action {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+}
+
+body.projects-page.white-bg #content-scroll [data-nav-role],
+body.projects-page.white-bg #content-scroll [data-nav-role] * {
+  text-shadow: none !important;
 }
 
 /* Project rows */
@@ -198,6 +242,20 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   cursor: grab;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* The track reaches the viewport edges; the pseudo-elements retain a small
+   inset before the first item and after the last one. */
+.project-row.project-gallery-open .project-track {
+  width: calc(100% + 10px);
+  margin-left: -5px;
+}
+
+.project-row.project-gallery-open .project-track::before,
+.project-row.project-gallery-open .project-track::after {
+  flex: 0 0 var(--project-side-gap);
+  height: 1px;
+  content: "";
 }
 
 .project-track::-webkit-scrollbar {
@@ -351,18 +409,6 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
     --project-cover-width: 100%;
     --project-media-height: 65vw;
     --project-track-height: 65vw;
-  }
-
-  .project-row.project-gallery-open .project-track {
-    width: calc(100% + 6px);
-    margin-left: -3px;
-  }
-
-  .project-row.project-gallery-open .project-track::before,
-  .project-row.project-gallery-open .project-track::after {
-    flex: 0 0 3px;
-    height: 1px;
-    content: "";
   }
 
   .project-track > .project-cover {

@@ -24,28 +24,56 @@ body.about-page ::-moz-selection {
 /* Navigation */
 body.has-canvas #content-scroll .about-navigation,
 body.about-page .about-navigation {
-  position: fixed;
-  top: 5px;
-  right: 5px;
-  left: 5px;
-  /* Keep the primary navigation above the contact block and page content. */
-  z-index: 20;
-  height: 16px;
-  margin: 0;
-  padding: 0;
-  line-height: 16px;
-  white-space: nowrap;
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
-  font-weight: 500;
-  pointer-events: none;
-  text-shadow:
-    0 0 2px #fff,
-    0 0 4px #fff,
-    0 0 12px #fff !important;
+  display: contents;
 }
 
 body.about-page .about-navigation a {
   pointer-events: auto;
+}
+
+body.about-page .about-navigation > .site-name,
+body.about-page .about-navigation > .page-link {
+  position: fixed;
+  top: 5px;
+  z-index: 20;
+}
+
+body.about-page .about-navigation > .site-name {
+  left: 5px;
+}
+
+body.about-page .about-navigation > .page-link {
+  right: 5px;
+}
+
+body.about-page .backdrop-toggle {
+  position: fixed;
+  top: 5px;
+  left: 50%;
+  z-index: 20;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #000;
+  background: transparent;
+  font: inherit;
+  line-height: 16px;
+  opacity: 1;
+  transform: translateX(-50%);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+body.about-page #content-scroll .backdrop-toggle:hover .is-next-action,
+body.about-page #content-scroll .backdrop-toggle:focus-visible .is-next-action {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+}
+
+body.about-page #content-scroll .backdrop-toggle.is-feedback .is-next-action {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
 }
 
 body.has-canvas #content-scroll .about-navigation *,
@@ -54,6 +82,11 @@ body.about-page .about-navigation * {
     0 0 2px #fff,
     0 0 4px #fff,
     0 0 12px #fff !important;
+}
+
+body.about-page.white-bg #content-scroll [data-nav-role],
+body.about-page.white-bg #content-scroll [data-nav-role] * {
+  text-shadow: none !important;
 }
 
 body.about-page #content-scroll .about-navigation > span {
@@ -73,13 +106,19 @@ body.about-page #content-scroll .about-navigation > span {
 }
 
 /* Content */
+/* Two text lines of breathing room below the fixed navigation. */
 body.about-page #content-scroll > .col-12 {
-  padding-top: 0 !important;
+  padding-top: 32px !important;
   text-align: center;
   text-shadow:
     0 0 2px #fff,
     0 0 4px #fff,
     0 0 12px #fff;
+}
+
+/* Match Work's opaque white backdrop in the OFF state. */
+body.about-page.white-bg #content-scroll {
+  background: #fff;
 }
 
 body.about-page .about-contacts {

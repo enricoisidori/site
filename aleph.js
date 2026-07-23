@@ -32,9 +32,38 @@
 
   contentScroll.prepend(stage);
 
+  function cacheTransitionFrame() {
+    if (whiteBg) return;
+    try {
+      sessionStorage.setItem(
+        "aleph_transition_bg",
+        canvas.toDataURL("image/jpeg", 0.82),
+      );
+    } catch (_) {}
+  }
+
   const root = document.documentElement;
   // A new browsing session starts on Wikipedia; Work and About share its state.
   let whiteBg = sessionStorage.getItem("aleph_white_bg") === "1";
+  let backdropFeedbackTimer = null;
+  function updateBackdropToggle() {
+    document.querySelectorAll("[data-backdrop-toggle]").forEach((button) => {
+      const action = whiteBg ? "ON" : "OFF";
+      button
+        .querySelectorAll("[data-backdrop-action]")
+        .forEach((option) => {
+          option.classList.toggle(
+            "is-next-action",
+            option.dataset.backdropAction !== action,
+          );
+        });
+      button.setAttribute("aria-pressed", String(!whiteBg));
+      button.setAttribute(
+        "aria-label",
+        `${action === "ON" ? "Enable" : "Disable"} backdrop`,
+      );
+    });
+  }
   function setBackground(isWhite) {
     whiteBg = isWhite;
     sessionStorage.setItem("aleph_white_bg", whiteBg ? "1" : "0");
@@ -45,6 +74,17 @@
       "--root-bg-image",
       whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`,
     );
+    updateBackdropToggle();
+    document.querySelectorAll("[data-backdrop-toggle]").forEach((button) => {
+      button.classList.remove("is-feedback");
+      window.requestAnimationFrame(() => button.classList.add("is-feedback"));
+    });
+    window.clearTimeout(backdropFeedbackTimer);
+    backdropFeedbackTimer = window.setTimeout(() => {
+      document
+        .querySelectorAll("[data-backdrop-toggle]")
+        .forEach((button) => button.classList.remove("is-feedback"));
+    }, 500);
   }
 
   function toggleBackground() {
@@ -52,6 +92,15 @@
   }
 
   if (whiteBg) { stage.style.display = "none"; document.body.classList.add("white-bg"); }
+  window.addEventListener("pagehide", cacheTransitionFrame, { passive: true });
+  document.querySelectorAll("[data-backdrop-toggle]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleBackground();
+    });
+  });
+  updateBackdropToggle();
   document.body.addEventListener("click", (e) => {
     if (e.target.closest("a")) return;
     if (e.target.closest("button")) return;
@@ -373,8 +422,10 @@
   }
 
   function bootFromCache() {
-    const lastUrl = localStorage.getItem("aleph_last_url");
-    if (!lastUrl) return Promise.resolve(false);
+    const cachedImage =
+      sessionStorage.getItem("aleph_transition_bg") ||
+      localStorage.getItem("aleph_last_url");
+    if (!cachedImage) return Promise.resolve(false);
     return new Promise((resolve) => {
       const im = new Image();
       im.crossOrigin = "anonymous";
@@ -390,7 +441,7 @@
         }
       };
       im.onerror = () => resolve(false);
-      im.src = lastUrl;
+      im.src = cachedImage;
     });
   }
 

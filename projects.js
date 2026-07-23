@@ -8,9 +8,10 @@
   const mobileQuery = window.matchMedia("(max-width: 768px)");
   const priorityEnabled = document.body.dataset.projectPriority !== "off";
   const openAllProjects = document.body.dataset.projectsOpen === "all";
-  const DRIFT_SPEED = 18;
+  const SCROLL_HINT_RATIO = 0.5;
+  const SCROLL_HINT_SCROLL_FACTOR = 1;
   let focusedRow = null;
-  let drift = null;
+  let scrollHintFrame = null;
 
   if (!list) return;
 
@@ -39,44 +40,6 @@
       return src.replace(/-optimized\.mp4$/, "-mobile.mp4");
     }
     return src.endsWith(".mp4") ? src.replace(/\.mp4$/, "-mobile.mp4") : src;
-  }
-
-  function stopProjectDrift(row) {
-    if (!drift || (row && drift.row !== row)) return;
-    window.cancelAnimationFrame(drift.frame);
-    drift = null;
-  }
-
-  function startProjectDrift(row) {
-    const track = row.querySelector(".project-track");
-    stopProjectDrift();
-    if (!mobileQuery.matches || !track || track.hidden) return;
-
-    const state = {
-      row,
-      track,
-      frame: 0,
-      lastTime: null,
-      position: track.scrollLeft,
-    };
-
-    const move = (time) => {
-      if (drift !== state) return;
-      if (state.lastTime !== null) {
-        const elapsed = Math.min(time - state.lastTime, 50) / 1000;
-        const maxScroll = state.track.scrollWidth - state.track.clientWidth;
-        if (maxScroll > 1) {
-          state.position += DRIFT_SPEED * elapsed;
-          if (state.position >= maxScroll) state.position = 0;
-          state.track.scrollLeft = state.position;
-        }
-      }
-      state.lastTime = time;
-      state.frame = window.requestAnimationFrame(move);
-    };
-
-    drift = state;
-    state.frame = window.requestAnimationFrame(move);
   }
 
   function activateProjectMedia(row) {
@@ -214,7 +177,6 @@
     if (!row) return;
     const track = row.querySelector(".project-track");
     const cover = row.querySelector(".project-cover");
-    stopProjectDrift(row);
     track.scrollLeft = 0;
     track.hidden = true;
     row.classList.remove("project-gallery-open");
@@ -252,7 +214,6 @@
       track.hidden = false;
       track.scrollLeft = 0;
       activateProjectMedia(row);
-      window.requestAnimationFrame(() => startProjectDrift(row));
     }
     if (shouldWriteHash) setHash(slug);
   }
@@ -446,13 +407,6 @@
       true,
     );
     track.addEventListener(
-      "wheel",
-      (event) => {
-        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) stopProjectDrift(row);
-      },
-      { passive: true },
-    );
-    track.addEventListener(
       "touchstart",
       (event) => {
         const touch = event.touches[0];
@@ -469,7 +423,6 @@
         const distanceX = Math.abs(touch.clientX - touchStart.x);
         const distanceY = Math.abs(touch.clientY - touchStart.y);
         if (distanceX > 8 && distanceX > distanceY) {
-          stopProjectDrift(row);
           row.dataset.suppressClickUntil = String(performance.now() + 500);
           touchStart = null;
         }
@@ -493,7 +446,6 @@
         moved: false,
         captured: false,
       };
-      stopProjectDrift(row);
     });
 
     track.addEventListener("pointermove", (event) => {
@@ -623,12 +575,77 @@
     window.addEventListener("blur", stop);
   }
 
+  function setupVerticalScrollHints() {
+    if (
+      !scrollRoot ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    const tracks = Array.from(document.querySelectorAll(".project-track"));
+    let nextTrackIndex = 0;
+    let activeHint = null;
+    let lastScrollTop = scrollRoot.scrollTop;
+    let hintsDisabled = false;
+
+    function updateScrollHints() {
+      scrollHintFrame = null;
+      let scrollDelta = scrollRoot.scrollTop - lastScrollTop;
+      lastScrollTop = scrollRoot.scrollTop;
+      if (scrollDelta < 0) hintsDisabled = true;
+      if (hintsDisabled || scrollDelta <= 0) return;
+
+      while (scrollDelta > 0 && nextTrackIndex < tracks.length) {
+        if (!activeHint) {
+          const track = tracks[nextTrackIndex];
+          const cover = track.querySelector(
+            ".project-cover, .project-media-cover-video",
+          );
+          const maxScroll = track.scrollWidth - track.clientWidth;
+          const hintDistance = Math.min(
+            (cover?.getBoundingClientRect().width || 0) * SCROLL_HINT_RATIO,
+            maxScroll,
+          );
+          nextTrackIndex += 1;
+          if (track.hidden || hintDistance <= 1) continue;
+          activeHint = {
+            track,
+            target: Math.min(track.scrollLeft + hintDistance, maxScroll),
+          };
+        }
+
+        const remaining = activeHint.target - activeHint.track.scrollLeft;
+        const movement = Math.min(
+          scrollDelta * SCROLL_HINT_SCROLL_FACTOR,
+          remaining,
+        );
+        activeHint.track.scrollLeft += movement;
+        scrollDelta -= movement / SCROLL_HINT_SCROLL_FACTOR;
+        if (activeHint.track.scrollLeft >= activeHint.target - 1) {
+          activeHint = null;
+        }
+      }
+    }
+
+    scrollRoot.addEventListener(
+      "scroll",
+      () => {
+        if (scrollHintFrame === null) {
+          scrollHintFrame = window.requestAnimationFrame(updateScrollHints);
+        }
+      },
+      { passive: true },
+    );
+  }
+
   renderProjects();
   if (openAllProjects) {
     rowsBySlug.forEach((row, slug) => openProject(slug, false, false));
   }
   if (location.hash) removeHash();
   setupEdgeScrolling();
+  setupVerticalScrollHints();
   setupLeadPreloading();
   signalCoversReady();
 
@@ -637,15 +654,6 @@
     openedRows.forEach((row) => closeProject(row, false));
     removeHash();
   };
-  mobileQuery.addEventListener("change", () => {
-    if (!mobileQuery.matches) {
-      stopProjectDrift();
-      return;
-    }
-    const lastOpenedRow = Array.from(openedRows).at(-1);
-    if (lastOpenedRow) startProjectDrift(lastOpenedRow);
-  });
-
   window.addEventListener("hashchange", () => {
     const slug = decodeURIComponent(location.hash.slice(1));
     if (rowsBySlug.has(slug)) openProject(slug, false);
