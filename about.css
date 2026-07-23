@@ -84,11 +84,6 @@ body.about-page .about-navigation * {
     0 0 12px #fff !important;
 }
 
-body.about-page.white-bg #content-scroll [data-nav-role],
-body.about-page.white-bg #content-scroll [data-nav-role] * {
-  text-shadow: none !important;
-}
-
 body.about-page #content-scroll .about-navigation > span {
   display: block;
   height: 16px;

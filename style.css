@@ -825,45 +825,6 @@ body.white-bg .about-background-note {
   display: none;
 }
 
-/* Each OFF navigation control blends independently. */
-body.white-bg #content-scroll [data-nav-role="static"]:not(.backdrop-divider),
-body.white-bg #content-scroll [data-nav-role="route"],
-body.white-bg #content-scroll [data-nav-role="backdrop"] {
-  color: #fff !important;
-  -webkit-text-fill-color: #fff !important;
-  mix-blend-mode: difference !important;
-  text-shadow: none !important;
-}
-
-body.white-bg #content-scroll [data-nav-role="backdrop"] * {
-  color: #fff !important;
-  -webkit-text-fill-color: #fff !important;
-  mix-blend-mode: normal !important;
-}
-
-/* Only the control currently turning red leaves difference. */
-body.white-bg #content-scroll [data-nav-role="route"]:hover,
-body.white-bg #content-scroll [data-nav-role="route"]:focus-visible,
-body.white-bg #content-scroll [data-nav-role="backdrop"]:hover,
-body.white-bg #content-scroll [data-nav-role="backdrop"]:focus-visible,
-body.white-bg #content-scroll [data-nav-role="backdrop"].is-feedback,
-body.white-bg #content-scroll [data-nav-role="backdrop"]:hover *,
-body.white-bg #content-scroll [data-nav-role="backdrop"]:focus-visible *,
-body.white-bg #content-scroll [data-nav-role="backdrop"].is-feedback * {
-  color: #000 !important;
-  -webkit-text-fill-color: #000 !important;
-  mix-blend-mode: normal !important;
-}
-
-body.white-bg #content-scroll [data-nav-role="route"]:hover,
-body.white-bg #content-scroll [data-nav-role="route"]:focus-visible,
-body.white-bg #content-scroll [data-nav-role="backdrop"]:hover .is-next-action,
-body.white-bg #content-scroll [data-nav-role="backdrop"]:focus-visible .is-next-action,
-body.white-bg #content-scroll [data-nav-role="backdrop"].is-feedback .is-next-action {
-  color: #f00 !important;
-  -webkit-text-fill-color: #f00 !important;
-}
-
 @media only screen and (max-width: 768px) {
   body.has-canvas .page-link::before,
   body.has-canvas .backdrop-toggle::before {

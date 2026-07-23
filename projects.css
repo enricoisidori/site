@@ -143,11 +143,6 @@ body.projects-page #content-scroll .backdrop-toggle.is-feedback .is-next-action 
   -webkit-text-fill-color: #f00 !important;
 }
 
-body.projects-page.white-bg #content-scroll [data-nav-role],
-body.projects-page.white-bg #content-scroll [data-nav-role] * {
-  text-shadow: none !important;
-}
-
 /* Project rows */
 #projects-list {
   /* With every project closed, let the first cover meet the top edge. */
