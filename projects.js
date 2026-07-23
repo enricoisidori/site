@@ -133,13 +133,13 @@
   function alignProjectBelowNavigation(row) {
     if (!scrollRoot || !navigation) return;
     window.requestAnimationFrame(() => {
-      const gap =
-        Number.parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue(
-            "--project-gap",
-          ),
-        ) || 0;
-      const targetTop = navigation.getBoundingClientRect().bottom + gap;
+      // Use the first project's rendered resting position as the reference.
+      // This captures the actual navbar spacing, including CSS margins and
+      // responsive layout values, instead of recreating it in JavaScript.
+      const firstRow = list.querySelector(".project-row");
+      const targetTop = firstRow
+        ? firstRow.getBoundingClientRect().top + scrollRoot.scrollTop
+        : 0;
       scrollRoot.scrollTop += row.getBoundingClientRect().top - targetTop;
     });
   }

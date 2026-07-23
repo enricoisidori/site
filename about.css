@@ -130,6 +130,21 @@ body.about-page .about-contacts a {
   pointer-events: auto;
 }
 
+/* Preserve the compact desktop composition while giving the email CTA a
+   comfortable, WCAG-sized touch target on phones. */
+@media only screen and (max-width: 768px) {
+  body.about-page .get-in-touch-link {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    margin: -14px -16px;
+    padding: 0 16px;
+    touch-action: manipulation;
+  }
+}
+
 body.about-page .outdent {
   float: none;
   width: 100%;
