@@ -76,7 +76,7 @@
     />
     <script src="aleph-boot.js?v=20260815-refresh-off"></script>
     <link rel="stylesheet" href="./style.css?v=20260815-off-red-controls" />
-    <link rel="stylesheet" href="./about.css?v=20260815-note-always-visible" />
+    <link rel="stylesheet" href="./about.css?v=20260815-index-hover-red" />
   </head>
   <body class="has-canvas about-page white-bg">
     <div id="aleph-stage">
@@ -259,6 +259,10 @@
           Education <br />
           BA &amp; MA Communication Design, Politecnico di Milano<br />
         </p>
+        <p
+          class="outdent about-section about-project-index"
+          data-project-index
+        ></p>
         <button
           class="aleph-symbol-toggle"
           type="button"
@@ -272,17 +276,17 @@
         </button>
         <p class="about-background-note">
           The ℵ₀ images are always different, as they are randomly drawn from
-          Wikipedia’s entire library. It is a finite approximation of the
-          <a
+          Wikipedia’s entire library. It is inspired by Borges'<a
             href="https://web.mit.edu/allanmc/www/borgesaleph.pdf"
             target="_blank"
             >Aleph</a
-          >
-          described by Borges.
+          >.
         </p>
       </div>
     </div>
 
+    <script src="projects-data.js"></script>
+    <script src="about-index.js?v=20260815-index-title-year"></script>
     <script src="script.js"></script>
     <script src="work-prefetch.js?v=20260815-warm-five-media"></script>
     <script src="aleph.js?v=20260815-index-eager-aleph"></script>

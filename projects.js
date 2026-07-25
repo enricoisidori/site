@@ -710,7 +710,12 @@
   }
 
   renderProjects();
-  if (location.hash) removeHash();
+  if (location.hash) {
+    const initialSlug = decodeURIComponent(location.hash.slice(1));
+    const initialRow = rowsBySlug.get(initialSlug);
+    if (initialRow) focusProject(initialRow);
+    else removeHash();
+  }
   setupEdgeScrolling();
   setupVerticalScrollHints();
   setupLeadPreloading();
