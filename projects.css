@@ -354,7 +354,9 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 .projects-contacts {
   position: relative;
   z-index: 12;
-  padding: var(--project-gap) var(--project-gap) 0;
+  padding: 0 var(--project-gap);
+  margin-top: var(--project-gap);
+  margin-bottom: var(--project-gap);
   text-align: center;
 }
 

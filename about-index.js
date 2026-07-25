@@ -10,7 +10,7 @@
   );
   const fragment = document.createDocumentFragment();
 
-  fragment.append("Index", document.createElement("br"));
+  fragment.append("Projects", document.createElement("br"));
   orderedProjects.forEach((project) => {
     const link = document.createElement("a");
     const year = yearFor(project);

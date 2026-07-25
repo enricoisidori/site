@@ -164,3 +164,11 @@ html[data-aleph-background="off"] body.about-page #content-scroll .about-backgro
 html[data-aleph-background="on"] body.about-page.has-canvas #content-scroll .aleph-symbol-toggle {
   margin-bottom: 20px;
 }
+
+@media only screen and (max-width: 768px) {
+  body.about-page #content-scroll .aleph-symbol-toggle,
+  html[data-aleph-background="on"] body.about-page.has-canvas #content-scroll .aleph-symbol-toggle {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}

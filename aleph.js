@@ -125,6 +125,28 @@
     });
   });
   updateAlephButton();
+  document.querySelectorAll(".site-name").forEach((link) => {
+    link.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        try {
+          sessionStorage.removeItem(CONTROL_STATE_KEY);
+          sessionStorage.removeItem("aleph_transition_bg");
+          sessionStorage.removeItem("aleph_buffer");
+        } catch (_) {}
+        const resetUrl = new URL(
+          isProjectsPage ? window.location.href : link.href,
+          window.location.href,
+        );
+        resetUrl.search = "";
+        resetUrl.hash = "";
+        window.location.replace(resetUrl.href);
+      },
+      true,
+    );
+  });
   document.body.addEventListener("click", (e) => {
     if (
       e.target.closest(
@@ -133,10 +155,42 @@
     )
       return;
     if (!backgroundControlEnabled) return;
-    const selection = window.getSelection();
-    if (selection && !selection.isCollapsed) return;
     setBackground(!whiteBg, "background");
   });
+
+  // Safari can rubber-band a fixed scrolling layer and reveal the page below
+  // it. Block only the outward pull at either edge.
+  let touchStartY = null;
+  contentScroll.addEventListener(
+    "touchstart",
+    (event) => {
+      touchStartY = event.touches[0]?.clientY ?? null;
+    },
+    { passive: true },
+  );
+  contentScroll.addEventListener(
+    "touchmove",
+    (event) => {
+      if (touchStartY === null || event.touches.length !== 1) return;
+      const currentY = event.touches[0]?.clientY;
+      if (currentY === undefined) return;
+      const maxScrollTop = contentScroll.scrollHeight - contentScroll.clientHeight;
+      if (
+        (currentY > touchStartY && contentScroll.scrollTop <= 0) ||
+        (currentY < touchStartY && contentScroll.scrollTop >= maxScrollTop)
+      ) {
+        event.preventDefault();
+      }
+    },
+    { passive: false },
+  );
+  contentScroll.addEventListener(
+    "touchend",
+    () => {
+      touchStartY = null;
+    },
+    { passive: true },
+  );
 
   function getScrollY() {
     return contentScroll?.scrollTop || 0;

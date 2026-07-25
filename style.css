@@ -842,8 +842,13 @@ body.has-canvas #content-scroll * {
 @media only screen and (max-width: 768px) {
   body.has-canvas .page-link::before {
     position: absolute;
-    inset: -14px -18px;
+    inset: -24px -32px;
     content: "";
+  }
+
+  body.has-canvas :is(.projects-navigation, .about-navigation) > .page-link {
+    z-index: 100 !important;
+    touch-action: manipulation;
   }
 }
 
@@ -858,6 +863,7 @@ body.has-canvas #content-scroll * {
   color: #000;
   cursor: pointer;
   font: inherit;
+  font-variant-emoji: text;
   line-height: inherit;
   white-space: nowrap;
 }
