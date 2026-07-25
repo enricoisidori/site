@@ -1,5 +1,7 @@
 (function () {
   const isProjectsPage = document.body.classList.contains("projects-page");
+  const isControlledPage =
+    isProjectsPage || document.body.classList.contains("about-page");
   const workMode = document.body.dataset.alephWorkMode || "full";
   const ALEPH_BACKGROUND_ENABLED =
     document.body.dataset.alephBackground !== "off" &&
@@ -44,18 +46,33 @@
 
   const root = document.documentElement;
   const CONTROL_STATE_KEY = "aleph_control_state";
+  const navigation = performance.getEntriesByType("navigation")[0];
+  const isReload =
+    navigation?.type === "reload" || performance.navigation?.type === 1;
+  if (isControlledPage && isReload) {
+    try {
+      sessionStorage.removeItem(CONTROL_STATE_KEY);
+    } catch (_) {}
+  }
   let savedControlState = null;
-  try {
-    savedControlState = JSON.parse(
-      sessionStorage.getItem(CONTROL_STATE_KEY) || "null",
-    );
-  } catch (_) {}
+  if (isControlledPage) {
+    try {
+      savedControlState = JSON.parse(
+        sessionStorage.getItem(CONTROL_STATE_KEY) || "null",
+      );
+    } catch (_) {}
+  }
 
   // A new session starts OFF and locked. Work and About share this state.
-  let backgroundControlEnabled = savedControlState?.controlEnabled === true;
-  let whiteBg = savedControlState?.backgroundOn !== true;
+  let backgroundControlEnabled = isControlledPage
+    ? savedControlState?.controlEnabled === true
+    : true;
+  let whiteBg = isControlledPage
+    ? savedControlState?.backgroundOn !== true
+    : false;
 
   function persistControlState() {
+    if (!isControlledPage) return;
     try {
       sessionStorage.setItem(
         CONTROL_STATE_KEY,

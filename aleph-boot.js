@@ -3,6 +3,15 @@
     const isControlledPage = /\/(?:work|about)\.html$/.test(
       window.location.pathname,
     );
+    const navigation = performance.getEntriesByType("navigation")[0];
+    const isReload =
+      navigation?.type === "reload" || performance.navigation?.type === 1;
+    if (isControlledPage && isReload) {
+      // Work/About share a state while navigating, but an explicit refresh
+      // always begins again from OFF.
+      sessionStorage.removeItem("aleph_control_state");
+      return;
+    }
     if (isControlledPage) {
       const saved = JSON.parse(
         sessionStorage.getItem("aleph_control_state") || "null",
