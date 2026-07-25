@@ -1,6 +1,16 @@
 (function () {
   try {
-    if (sessionStorage.getItem("aleph_white_bg") === "1") return;
+    const isControlledPage = /\/(?:work|about)\.html$/.test(
+      window.location.pathname,
+    );
+    if (isControlledPage) {
+      const saved = JSON.parse(
+        sessionStorage.getItem("aleph_control_state") || "null",
+      );
+      if (!saved?.backgroundOn) return;
+    } else if (sessionStorage.getItem("aleph_white_bg") === "1") {
+      return;
+    }
     const cachedUrl =
       sessionStorage.getItem("aleph_transition_bg") ||
       localStorage.getItem("aleph_last_url");

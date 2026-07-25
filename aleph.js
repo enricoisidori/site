@@ -43,70 +43,79 @@
   }
 
   const root = document.documentElement;
-  // A new browsing session starts on Wikipedia; Work and About share its state.
-  let whiteBg = sessionStorage.getItem("aleph_white_bg") === "1";
-  let backdropFeedbackTimer = null;
-  function updateBackdropToggle() {
-    document.querySelectorAll("[data-backdrop-toggle]").forEach((button) => {
-      const action = whiteBg ? "ON" : "OFF";
-      button
-        .querySelectorAll("[data-backdrop-action]")
-        .forEach((option) => {
-          option.classList.toggle(
-            "is-next-action",
-            option.dataset.backdropAction !== action,
-          );
-        });
+  const CONTROL_STATE_KEY = "aleph_control_state";
+  let savedControlState = null;
+  try {
+    savedControlState = JSON.parse(
+      sessionStorage.getItem(CONTROL_STATE_KEY) || "null",
+    );
+  } catch (_) {}
+
+  // A new session starts OFF and locked. Work and About share this state.
+  let backgroundControlEnabled = savedControlState?.controlEnabled === true;
+  let whiteBg = savedControlState?.backgroundOn !== true;
+
+  function persistControlState() {
+    try {
+      sessionStorage.setItem(
+        CONTROL_STATE_KEY,
+        JSON.stringify({
+          controlEnabled: backgroundControlEnabled,
+          backgroundOn: !whiteBg,
+        }),
+      );
+    } catch (_) {}
+  }
+
+  function updateAlephButton() {
+    document.querySelectorAll("[data-aleph-toggle]").forEach((button) => {
       button.setAttribute("aria-pressed", String(!whiteBg));
       button.setAttribute(
         "aria-label",
-        `${action === "ON" ? "Enable" : "Disable"} backdrop`,
+        whiteBg ? "Activate Aleph background" : "Deactivate Aleph background",
       );
     });
   }
-  function setBackground(isWhite) {
+
+  function setBackground(isWhite, source) {
     whiteBg = isWhite;
-    sessionStorage.setItem("aleph_white_bg", whiteBg ? "1" : "0");
-    stage.style.display = whiteBg ? "none" : "";
+    if (source === "button") {
+      backgroundControlEnabled = !isWhite;
+    }
+
+    persistControlState();
     document.body.classList.toggle("white-bg", whiteBg);
+    root.dataset.alephBackground = whiteBg ? "off" : "on";
+    root.dataset.alephControl = backgroundControlEnabled ? "enabled" : "locked";
     if (!whiteBg) scheduleAlephStart();
     root.style.setProperty(
       "--root-bg-image",
       whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`,
     );
-    updateBackdropToggle();
-    document.querySelectorAll("[data-backdrop-toggle]").forEach((button) => {
-      button.classList.remove("is-feedback");
-      window.requestAnimationFrame(() => button.classList.add("is-feedback"));
-    });
-    window.clearTimeout(backdropFeedbackTimer);
-    backdropFeedbackTimer = window.setTimeout(() => {
-      document
-        .querySelectorAll("[data-backdrop-toggle]")
-        .forEach((button) => button.classList.remove("is-feedback"));
-    }, 500);
+    updateAlephButton();
   }
 
-  function toggleBackground() {
-    setBackground(!whiteBg);
-  }
-
-  if (whiteBg) { stage.style.display = "none"; document.body.classList.add("white-bg"); }
+  document.body.classList.toggle("white-bg", whiteBg);
+  root.dataset.alephBackground = whiteBg ? "off" : "on";
+  root.dataset.alephControl = backgroundControlEnabled ? "enabled" : "locked";
   window.addEventListener("pagehide", cacheTransitionFrame, { passive: true });
-  document.querySelectorAll("[data-backdrop-toggle]").forEach((button) => {
+  document.querySelectorAll("[data-aleph-toggle]").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      toggleBackground();
+      setBackground(!whiteBg, "button");
     });
   });
-  updateBackdropToggle();
+  updateAlephButton();
   document.body.addEventListener("click", (e) => {
-    if (e.target.closest("a")) return;
-    if (e.target.closest("button")) return;
-    if (e.target.closest(".btn")) return;
-    if (e.target.closest(".video-unmute")) return;
-    toggleBackground();
+    if (
+      e.target.closest(
+        "a, button, .btn, .video-unmute, input, select, textarea, label",
+      )
+    )
+      return;
+    if (!backgroundControlEnabled) return;
+    setBackground(!whiteBg, "background");
   });
 
   function getScrollY() {

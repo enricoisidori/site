@@ -60,9 +60,7 @@ body.projects-page ::-moz-selection {
   background: transparent;
 }
 
-body.projects-page.white-bg,
-body.projects-page.white-bg #content-scroll,
-html:has(body.projects-page.white-bg) {
+html:has(body.projects-page) {
   background: #fff;
 }
 
@@ -111,35 +109,6 @@ body.projects-page #content-scroll .projects-navigation .btn.inactive {
 body.projects-page #content-scroll .projects-navigation .btn:hover,
 body.projects-page #content-scroll .projects-navigation .btn.active {
   color: #555 !important;
-}
-
-body.projects-page .backdrop-toggle {
-  position: fixed;
-  top: var(--project-gap);
-  left: 50%;
-  z-index: 11;
-  height: 16px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #000;
-  background: transparent;
-  font: inherit;
-  line-height: 16px;
-  opacity: 1;
-  transform: translateX(-50%);
-  cursor: pointer;
-}
-
-body.projects-page #content-scroll .backdrop-toggle:hover .is-next-action,
-body.projects-page #content-scroll .backdrop-toggle:focus-visible .is-next-action {
-  color: #f00 !important;
-  -webkit-text-fill-color: #f00 !important;
-}
-
-body.projects-page #content-scroll .backdrop-toggle.is-feedback .is-next-action {
-  color: #f00 !important;
-  -webkit-text-fill-color: #f00 !important;
 }
 
 /* Project rows */
