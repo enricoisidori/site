@@ -754,6 +754,19 @@ body.has-canvas.white-bg #aleph-stage {
   opacity: 0;
 }
 
+body.has-canvas.white-bg #content-scroll {
+  background: transparent !important;
+}
+
+body.has-canvas.white-bg #content-scroll::before {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: #fff;
+  content: "";
+  pointer-events: none;
+}
+
 body.has-canvas #content-scroll {
   position: fixed;
   inset: 0;
@@ -836,45 +849,134 @@ body.has-canvas #content-scroll * {
 
 .aleph-symbol-toggle {
   display: block;
-  width: calc(100% - 95px);
-  height: 200px;
-  margin: 20px 0 0 42.5px;
+  width: max-content;
+  height: auto;
+  margin: 20px auto;
   padding: 0;
   border: 0;
   background: transparent;
+  color: #000;
   cursor: pointer;
+  font: inherit;
+  line-height: inherit;
+  white-space: nowrap;
 }
 
-.aleph-symbol-toggle img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  filter: brightness(0);
-}
-
-.aleph-symbol-toggle:hover img,
-.aleph-symbol-toggle:focus-visible img {
-  filter: none;
-}
-
-html[data-aleph-background="on"] .aleph-symbol-toggle img {
-  filter: brightness(0) drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff)
-    drop-shadow(0 0 12px #fff);
-}
-
-html[data-aleph-background="on"] .aleph-symbol-toggle:hover img,
-html[data-aleph-background="on"] .aleph-symbol-toggle:focus-visible img {
-  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff)
-    drop-shadow(0 0 12px #fff);
+body.has-canvas #content-scroll .aleph-symbol-toggle:hover,
+body.has-canvas #content-scroll .aleph-symbol-toggle:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
 }
 
 @media only screen and (max-width: 768px) {
   .aleph-symbol-toggle {
-    width: calc(100% - 5px);
-    height: 66.6667px;
-    margin: 10px 0 10px 2.5px;
+    display: flex;
+    width: 160px;
+    height: 64px;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto;
   }
+}
+
+html[data-aleph-background="off"] body.has-canvas #content-scroll :is(a, p, span, button, h1, h2, h3, h4, h5, h6, li, small, strong, em, sub) {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  text-rendering: auto;
+}
+
+html[data-aleph-background="off"] body.has-canvas #content-scroll :is(img, video, canvas, picture, svg) {
+  mix-blend-mode: normal !important;
+}
+
+html[data-aleph-background="off"] body.has-canvas #content-scroll .projects-navigation > *,
+html[data-aleph-background="off"] body.has-canvas #content-scroll .about-navigation > * {
+  z-index: 1000 !important;
+}
+
+/* Work navigation is the sole OFF-state difference layer: it inverts against
+   whatever passes behind it, while its typography stays otherwise unstyled. */
+html[data-aleph-background="off"] body.has-canvas #content-scroll .projects-navigation > :is(a, span, button) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  mix-blend-mode: difference !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  text-rendering: auto;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* About deliberately has no visual effect in OFF. */
+html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll,
+html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll * {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+  text-rendering: auto;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+html[data-aleph-background="off"] body.has-canvas #content-scroll .aleph-symbol-toggle:hover,
+html[data-aleph-background="off"] body.has-canvas #content-scroll .aleph-symbol-toggle:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+}
+
+html[data-aleph-background="off"] body.has-canvas #content-scroll .page-link:hover,
+html[data-aleph-background="off"] body.has-canvas #content-scroll .page-link:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+}
+
+html[data-aleph-background="off"] body.has-canvas #content-scroll :is(a, button):hover,
+html[data-aleph-background="off"] body.has-canvas #content-scroll :is(a, button):focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+}
+
+html[data-aleph-background="on"] body.has-canvas #content-scroll .aleph-symbol-toggle {
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff !important;
+}
+
+html[data-aleph-background] body.has-canvas #content-scroll .about-contacts a,
+html[data-aleph-background] body.has-canvas #content-scroll .site-name:hover,
+html[data-aleph-background] body.has-canvas #content-scroll .site-name:focus-visible {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  mix-blend-mode: normal !important;
+}
+
+/* This comes after the shared hover rules so About remains entirely plain in OFF. */
+html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll :is(a, button):hover,
+html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll :is(a, button):focus-visible {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+}
+
+/* The two controls stay visibly interactive even in About's otherwise flat
+   OFF state. */
+html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll .aleph-symbol-toggle:hover,
+html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll .aleph-symbol-toggle:focus-visible,
+html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll .about-navigation .page-link:hover,
+html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll .about-navigation .page-link:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
 }
 
 body.has-canvas #content-scroll a,

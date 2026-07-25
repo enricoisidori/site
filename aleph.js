@@ -80,14 +80,16 @@
   function setBackground(isWhite, source) {
     whiteBg = isWhite;
     if (source === "button") {
-      backgroundControlEnabled = !isWhite;
+      // The first use of the dedicated control unlocks background toggling for
+      // the whole session. Returning to OFF must not lock it again.
+      backgroundControlEnabled = true;
     }
 
     persistControlState();
     document.body.classList.toggle("white-bg", whiteBg);
     root.dataset.alephBackground = whiteBg ? "off" : "on";
     root.dataset.alephControl = backgroundControlEnabled ? "enabled" : "locked";
-    if (!whiteBg) scheduleAlephStart();
+    if (!whiteBg) scheduleAlephStart({ priority: true });
     root.style.setProperty(
       "--root-bg-image",
       whiteBg || !imgCurrent ? "none" : `url("${imgCurrent.src}")`,
@@ -115,6 +117,8 @@
     )
       return;
     if (!backgroundControlEnabled) return;
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed) return;
     setBackground(!whiteBg, "background");
   });
 
@@ -585,15 +589,53 @@
     });
   }
 
-  function scheduleAlephStart() {
-    if (alephStarted || alephStartScheduled) return;
+  let idleStartId = null;
+  let fallbackStartId = null;
+
+  function cancelDeferredAlephStart() {
+    if (idleStartId !== null && window.cancelIdleCallback) {
+      window.cancelIdleCallback(idleStartId);
+    }
+    if (fallbackStartId !== null) window.clearTimeout(fallbackStartId);
+    idleStartId = null;
+    fallbackStartId = null;
+    alephStartScheduled = false;
+  }
+
+  function scheduleAlephStart({ priority = false } = {}) {
+    if (alephStarted) return;
+    if (alephStartScheduled) {
+      if (!priority) return;
+      cancelDeferredAlephStart();
+    }
 
     const start = () => {
       alephStartScheduled = false;
       startAleph();
     };
 
-    if (isProjectsPage && !window.__portfolioPriorityReady) {
+    // In the default OFF state, keep Aleph's image work behind the page's
+    // visible resources. A user activation always takes precedence.
+    if (!priority && whiteBg) {
+      alephStartScheduled = true;
+      const queueIdleStart = () => {
+        const begin = () => {
+          idleStartId = null;
+          fallbackStartId = null;
+          start();
+        };
+        if (window.requestIdleCallback) {
+          idleStartId = window.requestIdleCallback(begin, { timeout: 6000 });
+        } else {
+          fallbackStartId = window.setTimeout(begin, 1200);
+        }
+      };
+      if (document.readyState === "complete") queueIdleStart();
+      else window.addEventListener("load", queueIdleStart, { once: true });
+      return;
+    }
+
+    if (!priority && isProjectsPage && !window.__portfolioPriorityReady) {
       alephStartScheduled = true;
       window.addEventListener("portfolio:priority-ready", start, { once: true });
       return;
@@ -603,7 +645,7 @@
     start();
   }
 
-  scheduleAlephStart();
+  scheduleAlephStart({ priority: !whiteBg });
 
   lastScrollY = getScrollY();
   contentScroll.addEventListener("scroll", onScroll, { passive: true });
