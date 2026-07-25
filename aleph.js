@@ -2,6 +2,7 @@
   const isProjectsPage = document.body.classList.contains("projects-page");
   const isControlledPage =
     isProjectsPage || document.body.classList.contains("about-page");
+  const eagerAleph = !isControlledPage;
   const workMode = document.body.dataset.alephWorkMode || "full";
   const ALEPH_BACKGROUND_ENABLED =
     document.body.dataset.alephBackground !== "off" &&
@@ -31,8 +32,6 @@
   const contentScroll = document.getElementById("content-scroll");
   const canvas = document.getElementById("aleph-canvas");
   if (!stage || !contentScroll || !canvas) return;
-
-  contentScroll.prepend(stage);
 
   function cacheTransitionFrame() {
     if (whiteBg) return;
@@ -215,7 +214,7 @@
     return `${base}?${p.toString()}`;
   }
 
-  async function fetchCommonsUrls(n) {
+  async function fetchCommonsUrls(n, priority = false) {
     if (Commons.prefetching) return;
     Commons.prefetching = true;
     const controller = new AbortController();
@@ -226,6 +225,9 @@
     try {
       const res = await fetch(commonsApiUrl(n, Commons.thumbWidth), {
         signal: controller.signal,
+        // Browsers that support fetch priority use this for Index's first
+        // frame; other browsers safely ignore the hint.
+        priority: priority ? "high" : "low",
       });
       if (!res.ok) throw new Error(`Commons request failed: ${res.status}`);
       const data = await res.json();
@@ -264,6 +266,7 @@
       const { id, url } = Commons.urlsQueue.shift();
       const im = new Image();
       im.crossOrigin = "anonymous";
+      im.fetchPriority = (eagerAleph || !whiteBg) && !imgCurrent ? "high" : "auto";
       Commons.loadingCount++;
       im.onload = () => {
         Commons.preloaded.push({ id, img: im });
@@ -542,8 +545,9 @@
     const cacheBoot = bootFromCache();
     const initialBuffer = lightWorkMode ? 1 : isProjectsPage ? 3 : 2;
     const missingUrls = Math.max(initialBuffer - Commons.urlsQueue.length, 0);
+    const initialFetchPriority = eagerAleph || !whiteBg;
     const commonsBoot = missingUrls
-      ? fetchCommonsUrls(missingUrls)
+      ? fetchCommonsUrls(missingUrls, initialFetchPriority)
       : Promise.resolve();
     const fromCache = await cacheBoot;
 

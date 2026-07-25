@@ -10,6 +10,32 @@
   const openAllProjects = document.body.dataset.projectsOpen === "all";
   const SCROLL_HINT_RATIO = 0.5;
   const SCROLL_HINT_SCROLL_FACTOR = 1;
+  const VIDEO_DIMENSIONS = {
+    "asset/rhytuals/image/02-motion-optimized.mp4": [720, 1280],
+    "asset/rhytuals/image/r-14-optimized.mp4": [1312, 1920],
+    "asset/imageofabook/7-optimized.mp4": [1440, 1920],
+    "digitalforest/asset/03-optimized.mp4": [1700, 1214],
+    "digitalforest/asset/04-optimized.mp4": [956, 1700],
+    "digitalforest/asset/05-optimized.mp4": [1700, 956],
+    "digitalforest/asset/06-optimized.mp4": [1700, 956],
+    "digitalforest/asset/07-optimized.mp4": [1700, 1214],
+    "digitalforest/asset/09-optimized.mp4": [1700, 1214],
+    "capsule/asset/desktop-optimized.mp4": [1700, 956],
+    "capsule/asset/4-optimized.mp4": [1700, 1700],
+    "capsule/asset/3-optimized.mp4": [1700, 1700],
+    "capsule/asset/2-optimized.mp4": [1080, 1080],
+    "capsule/asset/1-optimized.mp4": [1700, 1700],
+    "drawaline/asset/cover.mp4": [1266, 844],
+    "drawaline/asset/1-optimized.mp4": [1700, 1276],
+    "drawaline/asset/2-optimized.mp4": [1700, 1276],
+    "drawaline/asset/3-optimized.mp4": [1700, 1276],
+    "6am/asset/6am1-optimized.mp4": [1202, 1700],
+    "6am/asset/6am2-optimized.mp4": [720, 1280],
+    "spectathesis/asset/spectathesis-optimized.mp4": [1700, 1134],
+    "pixelpushing/asset/Iterationsinversions-optimized.mp4": [1700, 956],
+    "pixelpushing/asset/istallationview-optimized.mp4": [956, 1700],
+    "corpomacchina/asset/f-optimized.mp4": [1700, 1134],
+  };
   let focusedRow = null;
   let scrollHintFrame = null;
 
@@ -42,6 +68,11 @@
       return src.replace(/-optimized\.mp4$/, "-mobile.mp4");
     }
     return src.endsWith(".mp4") ? src.replace(/\.mp4$/, "-mobile.mp4") : src;
+  }
+
+  function getMediaDimensions(media) {
+    if (media.width && media.height) return [media.width, media.height];
+    return VIDEO_DIMENSIONS[media.src] || null;
   }
 
   function activateProjectMedia(row) {
@@ -246,6 +277,7 @@
     const firstMedia = project.media[0];
     const src = firstMedia.type === "video" ? firstMedia.poster : firstMedia.src;
     const placeholder = window.PROJECT_PLACEHOLDERS?.[src];
+    const dimensions = getMediaDimensions(firstMedia);
 
     button.type = "button";
     button.className = "project-cover";
@@ -267,8 +299,10 @@
     image.alt = "";
     image.draggable = false;
     image.decoding = "async";
-    image.width = 1500;
-    image.height = 1000;
+    // Reserve the real footprint before the file decodes. The previous fixed
+    // 3:2 placeholder made centered covers jump horizontally on load.
+    image.width = dimensions?.[0] || 1500;
+    image.height = dimensions?.[1] || 1000;
     image.fetchPriority = projectIndex < 2 ? "high" : "auto";
     if (placeholder) {
       button.style.setProperty("--project-placeholder", `url("${placeholder}")`);
@@ -318,6 +352,7 @@
     const placeholder =
       window.PROJECT_PLACEHOLDERS?.[media.src] ||
       window.PROJECT_PLACEHOLDERS?.[media.poster];
+    const dimensions = getMediaDimensions(media);
 
     wrapper.className = "project-media project-media-video";
     if (mediaIndex === 0) wrapper.classList.add("project-media-cover-video");
@@ -330,6 +365,10 @@
     video.draggable = false;
     video.loop = true;
     video.playsInline = true;
+    if (dimensions) {
+      video.width = dimensions[0];
+      video.height = dimensions[1];
+    }
     video.addEventListener(
       "loadeddata",
       () => wrapper.classList.add("media-loaded"),
@@ -490,11 +529,12 @@
       const row = document.createElement("section");
       const track = document.createElement("div");
       const cover = createCover(project, projectIndex);
+      const details = createDetails(project);
+      const isSingleImage =
+        project.media.length === 1 && project.media[0]?.type === "image";
       row.className = `${project.categories.join(" ")} project-row`;
       row.dataset.projectSlug = project.slug;
-      row.dataset.singleImage = String(
-        project.media.length === 1 && project.media[0]?.type === "image",
-      );
+      row.dataset.singleImage = String(isSingleImage);
       track.className = "project-track";
       track.hidden = true;
       track.setAttribute("aria-label", `${project.title} media`);
@@ -508,7 +548,32 @@
             : createImage(project, media),
         );
       });
-      row.append(cover, track, createDetails(project));
+
+      // Work is configured with every project open. Build that final DOM
+      // before connecting the row, so a centered/closed cover is never
+      // painted and then moved into its left-aligned track.
+      if (openAllProjects) {
+        openedRows.add(row);
+        row.classList.add("project-open");
+        list.classList.add("has-open-project");
+        cover.setAttribute("aria-expanded", "true");
+        if (!isSingleImage) {
+          if (cover.dataset.mediaType !== "video") track.prepend(cover);
+          row.classList.add("project-gallery-open");
+          track.hidden = false;
+        }
+      }
+
+      if (
+        openAllProjects &&
+        !isSingleImage &&
+        cover.dataset.mediaType !== "video"
+      ) {
+        row.append(track, details);
+      } else {
+        row.append(cover, track, details);
+      }
+      if (openAllProjects && !isSingleImage) activateProjectMedia(row);
       list.appendChild(row);
       rowsBySlug.set(project.slug, row);
     });
@@ -645,9 +710,6 @@
   }
 
   renderProjects();
-  if (openAllProjects) {
-    rowsBySlug.forEach((row, slug) => openProject(slug, false, false));
-  }
   if (location.hash) removeHash();
   setupEdgeScrolling();
   setupVerticalScrollHints();

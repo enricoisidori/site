@@ -76,7 +76,7 @@
     />
     <script src="aleph-boot.js?v=20260815-refresh-off"></script>
     <link rel="stylesheet" href="./style.css?v=20260815-off-red-controls" />
-    <link rel="stylesheet" href="./about.css?v=20260730-responsive-margins" />
+    <link rel="stylesheet" href="./about.css?v=20260815-note-always-visible" />
   </head>
   <body class="has-canvas about-page white-bg">
     <div id="aleph-stage">
@@ -266,19 +266,26 @@
           aria-pressed="false"
           aria-label="Activate Aleph background"
         >
-          ⮕ ℵ₀ ⬅
+          ⬇<br />
+          ⮕ ℵ₀ ⬅<br />
+          ⬆
         </button>
         <p class="about-background-note">
-          The background images are pulled at random from the entire Wikipedia
-          library
+          The ℵ₀ images are always different, as they are randomly drawn from
+          Wikipedia’s entire library. It is a finite approximation of the
+          <a
+            href="https://web.mit.edu/allanmc/www/borgesaleph.pdf"
+            target="_blank"
+            >Aleph</a
+          >
+          described by Borges.
         </p>
       </div>
-
-      <div class="spacer5"></div>
     </div>
 
     <script src="script.js"></script>
-    <script src="aleph.js?v=20260815-refresh-off"></script>
+    <script src="work-prefetch.js?v=20260815-warm-five-media"></script>
+    <script src="aleph.js?v=20260815-index-eager-aleph"></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",

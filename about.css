@@ -133,10 +133,23 @@ body.about-page #content-scroll .about-section {
 
 body.about-page #content-scroll .about-background-note {
   margin: 0;
-  opacity: 0;
+  display: block;
   text-align: center;
 }
 
+body.about-page #content-scroll .aleph-symbol-toggle {
+  margin-bottom: 20px;
+}
+
 html[data-aleph-background="on"] body.about-page #content-scroll .about-background-note {
-  opacity: 1;
+  display: block;
+  margin-bottom: 5px;
+}
+
+html[data-aleph-background="off"] body.about-page #content-scroll .about-background-note {
+  margin-bottom: 5px;
+}
+
+html[data-aleph-background="on"] body.about-page.has-canvas #content-scroll .aleph-symbol-toggle {
+  margin-bottom: 20px;
 }
