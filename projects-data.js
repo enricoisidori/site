@@ -1,5 +1,57 @@
 window.PROJECTS = [
   {
+    "slug": "rhytuals",
+    "sourcePage": "asset/rhytuals/",
+    "title": "Rhytuals",
+    "categories": [
+      "designerpage"
+    ],
+    "date": "2025",
+    "info": [
+      "Field<br>Research<br>Editorial",
+      "Team<br>Giulia Bonalumi<br>Federico Gajo<br>Enrico Isidori<br>Francesco Scarfone<br>Ekaterina Shults<br>Camilla Tosi"
+    ],
+    "description": "Rhytuals explores how rhythm structures social behavior and transforms collective actions into rituals.\nIt examines rhythm’s role in shaping identity, community, and resistance, revealing its power as a unifying force across cultures and histories.\nThe chapters of the magazine unfold simultaneously on the same pages. A non-conventional reading method that allows each page to be turned multiple times with completely different rhythms depending on the chapter.",
+    "media": [
+      { "type": "image", "src": "asset/rhytuals/optimized/r-0.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-1.webp", "width": 1361, "height": 1700 },
+      { "type": "video", "src": "asset/rhytuals/image/02-motion-optimized.mp4", "unmute": false },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-2.webp", "width": 652, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-3.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-4.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-5.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-6.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-7.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-8.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-9.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-10.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-11.webp", "width": 1361, "height": 1700 },
+      { "type": "image", "src": "asset/rhytuals/optimized/r-12.webp", "width": 1361, "height": 1700 },
+      { "type": "video", "src": "asset/rhytuals/image/r-14-optimized.mp4", "unmute": false }
+    ]
+  },
+  {
+    "slug": "image-of-a-book",
+    "sourcePage": "asset/imageofabook/",
+    "title": "Image of a book",
+    "categories": [
+      "artistpage"
+    ],
+    "date": "2024",
+    "info": [
+      "Field<br>Art"
+    ],
+    "description": "10x18x1cm\n\nThis book is unreadable, yet visible and recognizable as such. It exists as an autonomous object in its own right.\nIt is composed of images generated with Stable Diffusion, trained locally on page layouts, then printed and bound.\n\nThe work builds on Giulio Confalonieri's 1963 exploration of a book of layered, unreadable texts made from printing waste sheets, which he described as \"the image of reading suspended at the stage preceding knowledge.\"",
+    "media": [
+      { "type": "image", "src": "asset/imageofabook/optimized/1.webp", "width": 1275, "height": 1700 },
+      { "type": "image", "src": "asset/imageofabook/optimized/2.webp", "width": 1276, "height": 1700 },
+      { "type": "image", "src": "asset/imageofabook/optimized/3.webp", "width": 1700, "height": 1134 },
+      { "type": "image", "src": "asset/imageofabook/optimized/4.webp", "width": 1700, "height": 1430 },
+      { "type": "image", "src": "asset/imageofabook/optimized/4b.webp", "width": 1275, "height": 1700 },
+      { "type": "video", "src": "asset/imageofabook/7-optimized.mp4", "unmute": false }
+    ]
+  },
+  {
     "slug": "off-discipline",
     "sourcePage": "offdisicpline/",
     "title": "Off Discipline",

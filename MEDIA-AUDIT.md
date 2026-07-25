@@ -1,23 +1,24 @@
 # Media audit
 
-Generated: 2026-07-20T10:23:34.679Z
+Generated: 2026-07-23T16:02:16.444Z
 
-- Media files: 2692
-- Repository media weight: 2.28 GB
-- Work-referenced variants found: 270
-- Work-referenced variants weight: 148.2 MB
-- Work variants requiring attention: 0
+- Media files: 2734
+- Repository media weight: 2.33 GB
+- Work-referenced variants found: 298
+- Work-referenced variants weight: 190.1 MB
+- Work variants requiring attention: 1
 
 ## Weight by format
 
 | Format | Files | Weight (MB) |
 |---|---:|---:|
-| mp4 | 88 | 1378.9 |
-| jpg | 2267 | 510.7 |
+| mp4 | 90 | 1418.3 |
+| jpg | 2268 | 510.7 |
 | mov | 10 | 121.0 |
 | gif | 40 | 120.5 |
 | png | 49 | 115.8 |
-| webp | 229 | 34.9 |
+| webp | 255 | 37.3 |
+| jpeg | 13 | 6.0 |
 | svg | 9 | 0.4 |
 
 ## Largest files in the repository
@@ -41,6 +42,7 @@ Generated: 2026-07-20T10:23:34.679Z
 | overtrace/2_media/assets/#2-mediatico-contenuto-verticale-19122025.MP4 | 39.584 MB | 442×790 | mp4/h264 | not referenced by Work |
 | digitalforest/asset/05.mp4 | 38.944 MB | 1920×1080 | mp4/h264 | not referenced by Work |
 | overtrace/9_ecological/assets/Map_Oak_1.mp4 | 36.279 MB | 1080×1080 | mp4/h264 | not referenced by Work |
+| asset/rhytuals/13.mp4 | 35.450 MB | 1920×1080 | mp4/h264 | rhytuals:gallery-15:desktop |
 | overtrace/9_ecological/assets/PM10_Oak.mp4 | 31.766 MB | 1080×1080 | mp4/h264 | not referenced by Work |
 | overtrace/2_media/assets/#2-mediatico-trailer.mp4 | 30.433 MB | 3840×2160 | mp4/h264 | not referenced by Work |
 | overtrace/2_media/assets/#2-mediatico-teaser.mp4 | 28.488 MB | 1920×1080 | mp4/h264 | not referenced by Work |
@@ -63,12 +65,12 @@ Generated: 2026-07-20T10:23:34.679Z
 | digitalforest/asset/04.mov | 11.885 MB | 1080×1920 | mov/h264 | not referenced by Work |
 | offdisicpline/asset/off8.png | 11.860 MB | 2279×3038 | png/png | not referenced by Work |
 | overtrace/4_metric/assets/teaser_0212.mp4 | 11.558 MB | 4096×2304 | mp4/h264 | not referenced by Work |
-| offdisicpline/asset/off9.png | 11.485 MB | 2279×3038 | png/png | not referenced by Work |
 
 ## Largest files served by Work
 
 | File | Size | Dimensions | Bitrate | Use |
 |---|---:|---:|---:|---|
+| asset/rhytuals/13.mp4 | 35.450 MB | 1920×1080 | 10797 kbps | rhytuals:gallery-15:desktop |
 | pixelpushing/asset/Iterationsinversions-optimized.mp4 | 19.144 MB | 1700×956 | 2552 kbps | iterations-inversions:gallery-3:desktop |
 | pixelpushing/asset/istallationview-optimized.mp4 | 16.257 MB | 956×1700 | 2168 kbps | iterations-inversions:gallery-4:desktop |
 | pixelpushing/asset/Iterationsinversions-mobile.mp4 | 10.818 MB | 1080×608 | 1442 kbps | iterations-inversions:gallery-3:mobile |
@@ -77,6 +79,7 @@ Generated: 2026-07-20T10:23:34.679Z
 | digitalforest/asset/06-mobile.mp4 | 4.759 MB | 1080×608 | 1560 kbps | digital-forest:gallery-6:mobile |
 | pixelpushing/asset/istallationview-mobile.mp4 | 4.382 MB | 608×1080 | 584 kbps | iterations-inversions:gallery-4:mobile |
 | drawaline/asset/1-optimized.mp4 | 4.282 MB | 1700×1276 | 2315 kbps | draw-a-line-from-one-side-of-the-page-to-the-other:gallery-2:desktop |
+| asset/rhytuals/#3.mp4 | 3.986 MB | 1280×720 | 2773 kbps | rhytuals:gallery-3:desktop |
 | spectathesis/asset/spectathesis-optimized.mp4 | 3.924 MB | 1700×1134 | 2308 kbps | specta-thesis:gallery-2:desktop |
 | digitalforest/asset/04-optimized.mp4 | 3.749 MB | 956×1700 | 2590 kbps | digital-forest:gallery-4:desktop |
 | digitalforest/asset/03-optimized.mp4 | 3.713 MB | 1700×1214 | 2856 kbps | digital-forest:gallery-3:desktop |
@@ -107,12 +110,11 @@ Generated: 2026-07-20T10:23:34.679Z
 | capsule/asset/1-mobile.mp4 | 0.629 MB | 1080×1080 | 1134 kbps | capsule-plaza:gallery-5:mobile |
 | digitalforest/asset/07-mobile.mp4 | 0.609 MB | 1080×772 | 394 kbps | digital-forest:gallery-7:mobile |
 | monolite/asset/optimized/2.webp | 0.491 MB | 1700×1134 | — kbps | monolite:gallery-2:desktop |
-| pixelpushing/asset/optimized/preview1.webp | 0.475 MB | 1700×957 | — kbps | iterations-inversions:cover+first:desktop |
-| capsule/asset/3-mobile.mp4 | 0.419 MB | 1080×1080 | 693 kbps | capsule-plaza:gallery-3:mobile |
 
 ## Work assets requiring attention
 
 | File | Use | Size | Dimensions | Codec | Recommendation |
 |---|---|---:|---:|---|---|
+| asset/rhytuals/13.mp4 | rhytuals:gallery-15:desktop | 35.450 MB | 1920×1080 | h264 | resize-1700+recompress-video |
 
 The complete one-file-per-row inventory is in `media-audit.csv`.

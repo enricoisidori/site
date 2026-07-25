@@ -34,8 +34,10 @@
     return src;
   }
 
-  function getVideoSource(src) {
+  function getVideoSource(media) {
+    const src = media.src;
     if (!mobileQuery.matches) return src;
+    if (media.mobileSrc) return media.mobileSrc;
     if (src.endsWith("-optimized.mp4")) {
       return src.replace(/-optimized\.mp4$/, "-mobile.mp4");
     }
@@ -340,9 +342,9 @@
     }
     if (mediaIndex === 0) {
       video.preload = "auto";
-      video.src = getVideoSource(media.src);
+      video.src = getVideoSource(media);
     } else {
-      video.dataset.src = getVideoSource(media.src);
+      video.dataset.src = getVideoSource(media);
     }
     wrapper.appendChild(video);
 
@@ -514,7 +516,7 @@
 
   function setupEdgeScrolling() {
     // CSS reference pixels: 4 cm at the standard 96 dpi reference density.
-    const edgeSize = Math.round((4 / 2.54) * 96);
+    const desktopEdgeSize = Math.round((4 / 2.54) * 96);
     let edgeTrack = null;
     let edgeDirection = 0;
     let edgeSpeed = 0;
@@ -557,6 +559,9 @@
 
     document.addEventListener("pointermove", (event) => {
       if (event.pointerType && event.pointerType !== "mouse") return;
+      const edgeSize = mobileQuery.matches
+        ? desktopEdgeSize / 2
+        : desktopEdgeSize;
       const track = trackAtVerticalPosition(event.clientY);
       const leftDistance = event.clientX;
       const rightDistance = window.innerWidth - event.clientX;
