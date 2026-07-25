@@ -148,6 +148,12 @@ body.about-page #content-scroll .about-background-note {
   text-align: center;
 }
 
+body.about-page #content-scroll .aleph-inline-symbol {
+  display: inline;
+  white-space: nowrap;
+  font-variant-emoji: text;
+}
+
 body.about-page #content-scroll .aleph-symbol-toggle {
   margin-bottom: 20px;
 }
