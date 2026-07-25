@@ -38,6 +38,31 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
+/* The document itself never scrolls on canvas pages; only #content-scroll
+   does. This prevents iOS from rubber-banding the outer viewport. */
+html:has(body.has-canvas) {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* If Safari still exposes the root compositor layer, keep it visually in sync
+   with the fixed Aleph stage. The :has() specificity also beats the page-level
+   white fallback in about.css and projects.css. */
+html[data-aleph-background="on"]:has(body.has-canvas) {
+  background-color: #fff;
+  background-image: var(--root-bg-image, var(--aleph-cached-bg, none));
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+html[data-aleph-background="off"]:has(body.has-canvas) {
+  background-color: #fff;
+  background-image: none;
+}
+
 a:-webkit-any-link {
   text-decoration: underline;
 }
@@ -773,7 +798,7 @@ body.has-canvas #content-scroll {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+  overscroll-behavior: none;
   touch-action: pan-y;
   z-index: 0;
   padding: var(--content-top-offset) 5px;
@@ -840,13 +865,21 @@ body.has-canvas #content-scroll * {
 }
 
 @media only screen and (max-width: 768px) {
+  body.has-canvas .site-name::before {
+    position: absolute;
+    inset: -18px -20px;
+    content: "";
+  }
+
   body.has-canvas .page-link::before {
     position: absolute;
     inset: -24px -32px;
     content: "";
   }
 
-  body.has-canvas :is(.projects-navigation, .about-navigation) > .page-link {
+  body.has-canvas
+    :is(.projects-navigation, .about-navigation)
+    > :is(.site-name, .page-link) {
     z-index: 100 !important;
     touch-action: manipulation;
   }

@@ -158,12 +158,31 @@
     setBackground(!whiteBg, "background");
   });
 
-  // Safari can rubber-band a fixed scrolling layer and reveal the page below
-  // it. Block only the outward pull at either edge.
+  // iOS Safari can keep rubber-banding after touchend. Keep the fixed scroller
+  // one physical pixel inside its limits so that momentum never grabs an edge.
+  const SCROLL_EDGE_GUARD = 1;
   let touchStartY = null;
+
+  function guardScrollEdges() {
+    const maxScrollTop =
+      contentScroll.scrollHeight - contentScroll.clientHeight;
+    if (maxScrollTop <= SCROLL_EDGE_GUARD * 2) return;
+
+    if (contentScroll.scrollTop <= 0) {
+      contentScroll.scrollTop = SCROLL_EDGE_GUARD;
+    } else if (contentScroll.scrollTop >= maxScrollTop) {
+      contentScroll.scrollTop = maxScrollTop - SCROLL_EDGE_GUARD;
+    }
+  }
+
+  requestAnimationFrame(guardScrollEdges);
+  contentScroll.addEventListener("scroll", guardScrollEdges, {
+    passive: true,
+  });
   contentScroll.addEventListener(
     "touchstart",
     (event) => {
+      guardScrollEdges();
       touchStartY = event.touches[0]?.clientY ?? null;
     },
     { passive: true },
@@ -176,8 +195,10 @@
       if (currentY === undefined) return;
       const maxScrollTop = contentScroll.scrollHeight - contentScroll.clientHeight;
       if (
-        (currentY > touchStartY && contentScroll.scrollTop <= 0) ||
-        (currentY < touchStartY && contentScroll.scrollTop >= maxScrollTop)
+        (currentY > touchStartY &&
+          contentScroll.scrollTop <= SCROLL_EDGE_GUARD) ||
+        (currentY < touchStartY &&
+          contentScroll.scrollTop >= maxScrollTop - SCROLL_EDGE_GUARD)
       ) {
         event.preventDefault();
       }
@@ -188,6 +209,15 @@
     "touchend",
     () => {
       touchStartY = null;
+      guardScrollEdges();
+    },
+    { passive: true },
+  );
+  contentScroll.addEventListener(
+    "touchcancel",
+    () => {
+      touchStartY = null;
+      guardScrollEdges();
     },
     { passive: true },
   );
