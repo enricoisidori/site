@@ -131,11 +131,6 @@
       (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
-        try {
-          sessionStorage.removeItem(CONTROL_STATE_KEY);
-          sessionStorage.removeItem("aleph_transition_bg");
-          sessionStorage.removeItem("aleph_buffer");
-        } catch (_) {}
         const resetUrl = new URL(
           isProjectsPage ? window.location.href : link.href,
           window.location.href,
