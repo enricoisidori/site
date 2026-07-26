@@ -1,8 +1,5 @@
 (function () {
   try {
-    if (new URLSearchParams(window.location.search).has("persistent-about")) {
-      return;
-    }
     const isControlledPage = /\/(?:work|about)\.html$/.test(
       window.location.pathname,
     );

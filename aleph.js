@@ -1,8 +1,4 @@
 (function () {
-  if (new URLSearchParams(window.location.search).has("persistent-about")) {
-    return;
-  }
-
   const isProjectsPage = document.body.classList.contains("projects-page");
   const isControlledPage =
     isProjectsPage || document.body.classList.contains("about-page");

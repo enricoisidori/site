@@ -800,28 +800,6 @@ body.has-canvas #content-scroll {
   padding: var(--content-top-offset) 5px;
 }
 
-/* Work remains mounted while its persistent About view is visible. */
-body.persistent-about-active .projects-navigation,
-body.persistent-about-active > #content-scroll {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-#persistent-about-frame {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: none;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: transparent;
-}
-
-body.persistent-about-active #persistent-about-frame {
-  display: block;
-}
-
 /* Navigation stays above the scroll surface in both visual modes. */
 body.has-canvas
   :is(.projects-navigation, .about-navigation)
