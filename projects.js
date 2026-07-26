@@ -12,29 +12,53 @@
   const SCROLL_HINT_SCROLL_FACTOR = 1;
   const VIDEO_DIMENSIONS = {
     "asset/rhytuals/image/02-motion-optimized.mp4": [720, 1280],
+    "asset/rhytuals/image/02-motion-mobile.mp4": [608, 1080],
     "asset/rhytuals/image/r-14-optimized.mp4": [1312, 1920],
+    "asset/rhytuals/image/r-14-mobile.mp4": [874, 1280],
     "asset/imageofabook/7-optimized.mp4": [1440, 1920],
+    "asset/imageofabook/7-mobile.mp4": [960, 1280],
     "digitalforest/asset/03-optimized.mp4": [1700, 1214],
+    "digitalforest/asset/03-mobile.mp4": [1080, 772],
     "digitalforest/asset/04-optimized.mp4": [956, 1700],
+    "digitalforest/asset/04-mobile.mp4": [608, 1080],
     "digitalforest/asset/05-optimized.mp4": [1700, 956],
+    "digitalforest/asset/05-mobile.mp4": [1080, 608],
     "digitalforest/asset/06-optimized.mp4": [1700, 956],
+    "digitalforest/asset/06-mobile.mp4": [1080, 608],
     "digitalforest/asset/07-optimized.mp4": [1700, 1214],
+    "digitalforest/asset/07-mobile.mp4": [1080, 772],
     "digitalforest/asset/09-optimized.mp4": [1700, 1214],
+    "digitalforest/asset/09-mobile.mp4": [1080, 772],
     "capsule/asset/desktop-optimized.mp4": [1700, 956],
+    "capsule/asset/desktop-mobile.mp4": [1080, 608],
     "capsule/asset/4-optimized.mp4": [1700, 1700],
+    "capsule/asset/4-mobile.mp4": [1080, 1080],
     "capsule/asset/3-optimized.mp4": [1700, 1700],
+    "capsule/asset/3-mobile.mp4": [1080, 1080],
     "capsule/asset/2-optimized.mp4": [1080, 1080],
+    "capsule/asset/2-mobile.mp4": [1080, 1080],
     "capsule/asset/1-optimized.mp4": [1700, 1700],
+    "capsule/asset/1-mobile.mp4": [1080, 1080],
     "drawaline/asset/cover.mp4": [1266, 844],
+    "drawaline/asset/cover-mobile.mp4": [1080, 720],
     "drawaline/asset/1-optimized.mp4": [1700, 1276],
+    "drawaline/asset/1-mobile.mp4": [1080, 810],
     "drawaline/asset/2-optimized.mp4": [1700, 1276],
+    "drawaline/asset/2-mobile.mp4": [1080, 810],
     "drawaline/asset/3-optimized.mp4": [1700, 1276],
+    "drawaline/asset/3-mobile.mp4": [1080, 810],
     "6am/asset/6am1-optimized.mp4": [1202, 1700],
+    "6am/asset/6am1-mobile.mp4": [762, 1080],
     "6am/asset/6am2-optimized.mp4": [720, 1280],
+    "6am/asset/6am2-mobile.mp4": [608, 1080],
     "spectathesis/asset/spectathesis-optimized.mp4": [1700, 1134],
+    "spectathesis/asset/spectathesis-mobile.mp4": [1080, 720],
     "pixelpushing/asset/Iterationsinversions-optimized.mp4": [1700, 956],
+    "pixelpushing/asset/Iterationsinversions-mobile.mp4": [1080, 608],
     "pixelpushing/asset/istallationview-optimized.mp4": [956, 1700],
+    "pixelpushing/asset/istallationview-mobile.mp4": [608, 1080],
     "corpomacchina/asset/f-optimized.mp4": [1700, 1134],
+    "corpomacchina/asset/f-mobile.mp4": [1080, 720],
   };
   let focusedRow = null;
   let scrollHintFrame = null;
@@ -72,7 +96,11 @@
 
   function getMediaDimensions(media) {
     if (media.width && media.height) return [media.width, media.height];
-    return VIDEO_DIMENSIONS[media.src] || null;
+    return (
+      VIDEO_DIMENSIONS[getVideoSource(media)] ||
+      VIDEO_DIMENSIONS[media.src] ||
+      null
+    );
   }
 
   function activateProjectMedia(row) {
@@ -368,6 +396,10 @@
     if (dimensions) {
       video.width = dimensions[0];
       video.height = dimensions[1];
+      wrapper.style.aspectRatio =
+        project.slug === "capsule-plaza" && mediaIndex === 0
+          ? "3 / 2"
+          : `${dimensions[0]} / ${dimensions[1]}`;
     }
     video.addEventListener(
       "loadeddata",
@@ -580,8 +612,8 @@
   }
 
   function setupEdgeScrolling() {
-    // CSS reference pixels: 4 cm at the standard 96 dpi reference density.
-    const desktopEdgeSize = Math.round((4 / 2.54) * 96);
+    // Two thirds of the previous 4 cm desktop activation area.
+    const desktopEdgeSize = Math.round(((4 / 2.54) * 96 * 2) / 3);
     let edgeTrack = null;
     let edgeDirection = 0;
     let edgeSpeed = 0;
@@ -624,9 +656,11 @@
 
     document.addEventListener("pointermove", (event) => {
       if (event.pointerType && event.pointerType !== "mouse") return;
-      const edgeSize = mobileQuery.matches
-        ? desktopEdgeSize / 2
-        : desktopEdgeSize;
+      if (mobileQuery.matches) {
+        stop();
+        return;
+      }
+      const edgeSize = desktopEdgeSize;
       const track = trackAtVerticalPosition(event.clientY);
       const leftDistance = event.clientX;
       const rightDistance = window.innerWidth - event.clientX;

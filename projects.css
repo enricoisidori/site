@@ -1,6 +1,5 @@
 :root {
   --project-gap: 5px;
-  --project-side-gap: 5px;
   --project-media-height: 500px;
   --project-track-height: 500px;
   --project-text-shadow:
@@ -207,18 +206,11 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   -ms-overflow-style: none;
 }
 
-/* The track reaches the viewport edges; the pseudo-elements retain a small
-   inset before the first item and after the last one. */
+/* Compensate for #content-scroll's 5px padding so media reach both viewport
+   edges with no artificial first/last-item inset. */
 .project-row.project-gallery-open .project-track {
   width: calc(100% + 10px);
   margin-left: -5px;
-}
-
-.project-row.project-gallery-open .project-track::before,
-.project-row.project-gallery-open .project-track::after {
-  flex: 0 0 var(--project-side-gap);
-  height: 1px;
-  content: "";
 }
 
 .project-track::-webkit-scrollbar {
@@ -265,11 +257,6 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   margin-left: 0;
 }
 
-.project-media-cover-video video {
-  width: auto;
-  height: 100%;
-}
-
 .project-media-image {
   position: relative;
   overflow: hidden;
@@ -279,6 +266,7 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 
 .project-media-video {
   position: relative;
+  width: auto;
   overflow: hidden;
   background: #eee;
 }
@@ -296,6 +284,11 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 }
 
 .project-media-video video {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
   opacity: 0;
 }
 
@@ -304,8 +297,15 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 }
 
 .project-media-cover-video video {
-  width: auto;
+  width: 100%;
   height: 100%;
+}
+
+.project-row[data-project-slug="capsule-plaza"]
+  .project-media-cover-video
+  video {
+  object-fit: cover;
+  object-position: center;
 }
 
 .project-cover img,

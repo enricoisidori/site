@@ -1023,6 +1023,16 @@ html[data-aleph-background] body.has-canvas .site-name:focus-visible {
   mix-blend-mode: normal !important;
 }
 
+html[data-aleph-background="on"] body.has-canvas
+  :is(.projects-navigation, .about-navigation)
+  > .page-link:hover,
+html[data-aleph-background="on"] body.has-canvas
+  :is(.projects-navigation, .about-navigation)
+  > .page-link:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+}
+
 /* This comes after the shared hover rules so About remains entirely plain in OFF. */
 html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll :is(a, button):hover,
 html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll :is(a, button):focus-visible {
