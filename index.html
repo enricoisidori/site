@@ -35,8 +35,8 @@ para-disciplinary design, unbounded design, design approaches"
     <link rel="apple-touch-icon" sizes="180x180" href="asset/svg/aleph-icon-180.png?v=20260723-red" />
     <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
     <script src="aleph-boot.js?v=20260815-index-toggle"></script>
-    <script defer src="aleph.js?v=20260815-mobile-overscroll-edge"></script>
-    <link rel="stylesheet" href="style.css" />
+    <script defer src="aleph.js?v=20260815-scroll-layer-clean"></script>
+    <link rel="stylesheet" href="style.css?v=20260815-scroll-layer-clean" />
     <style>
       :root {
         --content-top-offset: calc(env(safe-area-inset-top, 0px) + 2.5px);
@@ -79,8 +79,7 @@ para-disciplinary design, unbounded design, design approaches"
         inset: 0;
         overflow-y: auto;
         overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
+        overscroll-behavior: none;
         touch-action: pan-y;
         z-index: 10;
         padding:
