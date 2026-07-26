@@ -51,9 +51,14 @@
   });
 
   window.addEventListener("message", (event) => {
-    if (event.origin !== location.origin || event.data?.type !== "persistent-about:work") {
+    if (event.origin !== location.origin) {
       return;
     }
+    if (event.data?.type === "persistent-about:aleph-on") {
+      window.dispatchEvent(new Event("aleph:activate"));
+      return;
+    }
+    if (event.data?.type !== "persistent-about:work") return;
     const target = new URL(event.data.href || "work.html", location.href);
     if (!isWorkUrl(target)) return;
     showWork(target, { push: true });

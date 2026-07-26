@@ -128,6 +128,9 @@
       setBackground(!whiteBg, "button");
     });
   });
+  window.addEventListener("aleph:activate", () => {
+    setBackground(false, "button");
+  });
   updateAlephButton();
   document.querySelectorAll(".site-name").forEach((link) => {
     link.addEventListener(
