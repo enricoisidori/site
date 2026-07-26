@@ -158,6 +158,22 @@ body.about-page #content-scroll .aleph-symbol-toggle {
   margin-bottom: 20px;
 }
 
+/* About can be displayed above the already-running Work document. In this
+   mode its own document stays transparent so the original Aleph canvas is
+   retained instead of being recreated in a second page. */
+html[data-persistent-about] {
+  background: transparent !important;
+}
+
+html[data-persistent-about] body.about-page,
+html[data-persistent-about] body.about-page #content-scroll {
+  background: transparent !important;
+}
+
+html[data-persistent-about] body.about-page #aleph-stage {
+  display: none;
+}
+
 html[data-aleph-background="on"] body.about-page #content-scroll .about-background-note {
   display: block;
   margin-bottom: 5px;

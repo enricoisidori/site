@@ -226,7 +226,21 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 
 .project-track > .project-cover {
   flex: 0 0 auto;
+  max-width: none;
+  height: 100%;
   margin: 0;
+}
+
+/* Every item is assigned an explicit device-pixel-aligned width by
+   projects.js. Keep the image inside that same box instead of allowing the
+   replaced element to recalculate a second, fractional width. */
+.project-track > .project-cover img,
+.project-track > .project-media-image img {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .project-media {
@@ -287,7 +301,7 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   width: 100%;
   max-width: none;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   opacity: 0;
 }
@@ -317,9 +331,23 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   user-select: none;
 }
 
-.projects-page .video-unmute-btn {
+html[data-aleph-background] body.projects-page.has-canvas #content-scroll
+  .video-unmute-btn {
   pointer-events: auto;
   cursor: pointer;
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  mix-blend-mode: difference !important;
+  text-shadow: none !important;
+}
+
+html[data-aleph-background] body.projects-page.has-canvas #content-scroll
+  .video-unmute-btn:hover,
+html[data-aleph-background] body.projects-page.has-canvas #content-scroll
+  .video-unmute-btn:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
 }
 
 /* Project details */

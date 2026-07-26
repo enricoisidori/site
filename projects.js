@@ -62,6 +62,7 @@
   };
   let focusedRow = null;
   let scrollHintFrame = null;
+  let mediaGeometryFrame = null;
 
   if (!list) return;
 
@@ -337,7 +338,10 @@
     }
     image.addEventListener(
       "load",
-      () => button.classList.add("media-loaded"),
+      () => {
+        button.classList.add("media-loaded");
+        syncMediaBox(button, image);
+      },
       { once: true },
     );
     image.src = getImageSource(src);
@@ -366,12 +370,69 @@
     }
     image.addEventListener(
       "load",
-      () => button.classList.add("media-loaded"),
+      () => {
+        button.classList.add("media-loaded");
+        syncMediaBox(button, image);
+      },
       { once: true },
     );
     image.dataset.src = getImageSource(media.src);
     button.appendChild(image);
     return button;
+  }
+
+  function snapToDevicePixel(value) {
+    const pixelRatio = window.devicePixelRatio || 1;
+    return Math.round(value * pixelRatio) / pixelRatio;
+  }
+
+  function syncMediaBox(wrapper, media) {
+    const track = wrapper.closest(".project-track");
+    if (!track) return;
+
+    const height = track.getBoundingClientRect().height;
+    const isVideo = media instanceof HTMLVideoElement;
+    const intrinsicWidth = isVideo
+      ? media.videoWidth || media.width
+      : media.naturalWidth || media.width;
+    const intrinsicHeight = isVideo
+      ? media.videoHeight || media.height
+      : media.naturalHeight || media.height;
+    if (!height || !intrinsicWidth || !intrinsicHeight) return;
+
+    const aspectRatio =
+      Number(wrapper.dataset.fillRatio) || intrinsicWidth / intrinsicHeight;
+    const width = snapToDevicePixel(height * aspectRatio);
+
+    wrapper.style.width = `${width}px`;
+    wrapper.style.height = `${height}px`;
+    wrapper.style.aspectRatio = String(aspectRatio);
+  }
+
+  function syncTrackGeometry() {
+    document.querySelectorAll(".project-track").forEach((track) => {
+      // Reset first so responsive CSS can supply the new intended height.
+      track.style.height = "";
+      const height = snapToDevicePixel(track.getBoundingClientRect().height);
+      track.style.height = `${height}px`;
+      Array.from(track.children).forEach((item) => {
+        if (
+          !item.matches(".project-cover, .project-media") ||
+          !item.querySelector("img, video")
+        ) {
+          return;
+        }
+        syncMediaBox(item, item.querySelector("img, video"));
+      });
+    });
+  }
+
+  function requestMediaGeometrySync() {
+    if (mediaGeometryFrame !== null) return;
+    mediaGeometryFrame = window.requestAnimationFrame(() => {
+      mediaGeometryFrame = null;
+      syncTrackGeometry();
+    });
   }
 
   function createVideo(project, media, mediaIndex) {
@@ -396,11 +457,24 @@
     if (dimensions) {
       video.width = dimensions[0];
       video.height = dimensions[1];
-      wrapper.style.aspectRatio =
+      wrapper.dataset.fillRatio = String(
         project.slug === "capsule-plaza" && mediaIndex === 0
-          ? "3 / 2"
-          : `${dimensions[0]} / ${dimensions[1]}`;
+          ? 3 / 2
+          : dimensions[0] / dimensions[1],
+      );
     }
+    video.addEventListener(
+      "loadedmetadata",
+      () => {
+        // A mobile derivative can have a subtly different aspect ratio from
+        // its desktop source. Use the decoded file's own dimensions before it
+        // is painted, so the wrapper and frame share one pixel grid.
+        video.width = video.videoWidth;
+        video.height = video.videoHeight;
+        syncMediaBox(wrapper, video);
+      },
+      { once: true },
+    );
     video.addEventListener(
       "loadeddata",
       () => wrapper.classList.add("media-loaded"),
@@ -744,6 +818,8 @@
   }
 
   renderProjects();
+  syncTrackGeometry();
+  window.addEventListener("resize", requestMediaGeometrySync, { passive: true });
   if (location.hash) {
     const initialSlug = decodeURIComponent(location.hash.slice(1));
     const initialRow = rowsBySlug.get(initialSlug);
