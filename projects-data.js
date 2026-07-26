@@ -31,27 +31,6 @@ window.PROJECTS = [
     ]
   },
   {
-    "slug": "image-of-a-book",
-    "sourcePage": "asset/imageofabook/",
-    "title": "Image of a book",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2024",
-    "info": [
-      "Field<br>Art"
-    ],
-    "description": "10x18x1cm\n\nThis book is unreadable, yet visible and recognizable as such. It exists as an autonomous object in its own right.\nIt is composed of images generated with Stable Diffusion, trained locally on page layouts, then printed and bound.\n\nThe work builds on Giulio Confalonieri's 1963 exploration of a book of layered, unreadable texts made from printing waste sheets, which he described as \"the image of reading suspended at the stage preceding knowledge.\"",
-    "media": [
-      { "type": "image", "src": "asset/imageofabook/optimized/1.webp", "width": 1275, "height": 1700 },
-      { "type": "image", "src": "asset/imageofabook/optimized/2.webp", "width": 1276, "height": 1700 },
-      { "type": "image", "src": "asset/imageofabook/optimized/3.webp", "width": 1700, "height": 1134 },
-      { "type": "image", "src": "asset/imageofabook/optimized/4.webp", "width": 1700, "height": 1430 },
-      { "type": "image", "src": "asset/imageofabook/optimized/4b.webp", "width": 1275, "height": 1700 },
-      { "type": "video", "src": "asset/imageofabook/7-optimized.mp4", "unmute": false }
-    ]
-  },
-  {
     "slug": "off-discipline",
     "sourcePage": "offdisicpline/",
     "title": "Off Discipline",
@@ -116,6 +95,27 @@ window.PROJECTS = [
         "width": 1440,
         "height": 1920
       }
+    ]
+  },
+  {
+    "slug": "image-of-a-book",
+    "sourcePage": "asset/imageofabook/",
+    "title": "Image of a book",
+    "categories": [
+      "artistpage"
+    ],
+    "date": "2024",
+    "info": [
+      "Field<br>Art"
+    ],
+    "description": "10x18x1cm\n\nThis book is unreadable, yet visible and recognizable as such. It exists as an autonomous object in its own right.\nIt is composed of images generated with Stable Diffusion, trained locally on page layouts, then printed and bound.\n\nThe work builds on Giulio Confalonieri's 1963 exploration of a book of layered, unreadable texts made from printing waste sheets, which he described as \"the image of reading suspended at the stage preceding knowledge.\"",
+    "media": [
+      { "type": "image", "src": "asset/imageofabook/optimized/1.webp", "width": 1275, "height": 1700 },
+      { "type": "image", "src": "asset/imageofabook/optimized/2.webp", "width": 1276, "height": 1700 },
+      { "type": "image", "src": "asset/imageofabook/optimized/3.webp", "width": 1700, "height": 1134 },
+      { "type": "image", "src": "asset/imageofabook/optimized/4.webp", "width": 1700, "height": 1430 },
+      { "type": "image", "src": "asset/imageofabook/optimized/4b.webp", "width": 1275, "height": 1700 },
+      { "type": "video", "src": "asset/imageofabook/7-optimized.mp4", "unmute": false }
     ]
   },
   {

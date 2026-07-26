@@ -64,7 +64,7 @@
       href="asset/svg/aleph-icon-180.png?v=20260723-red"
     />
     <script src="aleph-boot.js?v=20260815-refresh-off"></script>
-    <link rel="stylesheet" href="style.css?v=20260815-boundary-overscroll-nav" />
+    <link rel="stylesheet" href="style.css?v=20260815-nav-backdrop-layer" />
     <link rel="stylesheet" href="projects.css?v=20260815-footer-margins" />
   </head>
   <!-- Set project-priority to "off" and aleph-work-mode to "full" or "off" for A/B tests. -->
@@ -78,18 +78,18 @@
       <canvas id="aleph-canvas"></canvas>
     </div>
 
-    <div id="content-scroll">
-      <nav class="projects-navigation" aria-label="Primary navigation">
-        <a class="site-name" href="work.html" data-nav-role="static"
-          >Enrico Isidori</a
-        >
-        <div class="projects-navigation-filters" aria-hidden="true">
-          <span id="design" class="btn" data-filter="designerpage">Design</span>
-          <span id="art" class="btn" data-filter="artistpage">Art</span>
-        </div>
-        <a class="page-link" href="about.html" data-nav-role="route">About</a>
-      </nav>
+    <nav class="projects-navigation" aria-label="Primary navigation">
+      <a class="site-name" href="work.html" data-nav-role="static"
+        >Enrico Isidori</a
+      >
+      <div class="projects-navigation-filters" aria-hidden="true">
+        <span id="design" class="btn" data-filter="designerpage">Design</span>
+        <span id="art" class="btn" data-filter="artistpage">Art</span>
+      </div>
+      <a class="page-link" href="about.html" data-nav-role="route">About</a>
+    </nav>
 
+    <div id="content-scroll">
       <main id="projects-list" aria-label="Projects"></main>
 
       <footer class="projects-contacts">
@@ -101,7 +101,7 @@
       </footer>
     </div>
 
-    <script src="projects-data.js"></script>
+    <script src="projects-data.js?v=20260815-swap-two-three"></script>
     <script src="projects-placeholders.js?v=20260721-video-frames"></script>
     <script src="projects.js?v=20260815-project-url-selection"></script>
     <script src="script.js"></script>

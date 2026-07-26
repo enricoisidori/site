@@ -801,7 +801,7 @@ body.has-canvas #content-scroll {
 }
 
 /* Navigation stays above the scroll surface in both visual modes. */
-body.has-canvas #content-scroll
+body.has-canvas
   :is(.projects-navigation, .about-navigation)
   > :is(.site-name, .page-link) {
   z-index: 1000;
@@ -837,13 +837,13 @@ body.has-canvas .page-link {
   text-decoration: none;
 }
 
-body.has-canvas #content-scroll .page-link:hover {
+body.has-canvas .page-link:hover {
   color: #f00 !important;
   -webkit-text-fill-color: #f00 !important;
 }
 
-body.has-canvas #content-scroll .site-name:hover,
-body.has-canvas #content-scroll .site-name:focus-visible {
+body.has-canvas .site-name:hover,
+body.has-canvas .site-name:focus-visible {
   color: #000 !important;
   -webkit-text-fill-color: #000 !important;
 }
@@ -934,14 +934,14 @@ html[data-aleph-background="off"] body.has-canvas #content-scroll :is(img, video
   mix-blend-mode: normal !important;
 }
 
-html[data-aleph-background="off"] body.has-canvas #content-scroll .projects-navigation > *,
-html[data-aleph-background="off"] body.has-canvas #content-scroll .about-navigation > * {
+html[data-aleph-background="off"] body.has-canvas .projects-navigation > *,
+html[data-aleph-background="off"] body.has-canvas .about-navigation > * {
   z-index: 1000 !important;
 }
 
 /* Work navigation is the sole OFF-state difference layer: it inverts against
    whatever passes behind it, while its typography stays otherwise unstyled. */
-html[data-aleph-background="off"] body.has-canvas #content-scroll .projects-navigation > :is(a, span, button) {
+html[data-aleph-background="off"] body.has-canvas .projects-navigation > :is(a, span, button) {
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
   mix-blend-mode: difference !important;
@@ -950,6 +950,18 @@ html[data-aleph-background="off"] body.has-canvas #content-scroll .projects-navi
   text-rendering: auto;
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
+}
+
+html[data-aleph-background="on"] body.has-canvas
+  :is(.projects-navigation, .about-navigation)
+  > :is(a, span, button) {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  mix-blend-mode: normal !important;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 4px #fff,
+    0 0 12px #fff !important;
 }
 
 /* About deliberately has no visual effect in OFF. */
@@ -965,6 +977,16 @@ html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll * {
   -moz-osx-font-smoothing: auto;
 }
 
+html[data-aleph-background="off"] body.about-page.has-canvas
+  .about-navigation
+  > :is(a, span, button) {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+}
+
 html[data-aleph-background="off"] body.has-canvas #content-scroll .aleph-symbol-toggle:hover,
 html[data-aleph-background="off"] body.has-canvas #content-scroll .aleph-symbol-toggle:focus-visible {
   color: #f00 !important;
@@ -972,8 +994,8 @@ html[data-aleph-background="off"] body.has-canvas #content-scroll .aleph-symbol-
   mix-blend-mode: normal !important;
 }
 
-html[data-aleph-background="off"] body.has-canvas #content-scroll .page-link:hover,
-html[data-aleph-background="off"] body.has-canvas #content-scroll .page-link:focus-visible {
+html[data-aleph-background="off"] body.has-canvas .page-link:hover,
+html[data-aleph-background="off"] body.has-canvas .page-link:focus-visible {
   color: #f00 !important;
   -webkit-text-fill-color: #f00 !important;
   mix-blend-mode: normal !important;
@@ -994,8 +1016,8 @@ html[data-aleph-background="on"] body.has-canvas #content-scroll .aleph-symbol-t
 }
 
 html[data-aleph-background] body.has-canvas #content-scroll .about-contacts a,
-html[data-aleph-background] body.has-canvas #content-scroll .site-name:hover,
-html[data-aleph-background] body.has-canvas #content-scroll .site-name:focus-visible {
+html[data-aleph-background] body.has-canvas .site-name:hover,
+html[data-aleph-background] body.has-canvas .site-name:focus-visible {
   color: #000 !important;
   -webkit-text-fill-color: #000 !important;
   mix-blend-mode: normal !important;
@@ -1014,8 +1036,8 @@ html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll :is
    OFF state. */
 html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll .aleph-symbol-toggle:hover,
 html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll .aleph-symbol-toggle:focus-visible,
-html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll .about-navigation .page-link:hover,
-html[data-aleph-background="off"] body.about-page.has-canvas #content-scroll .about-navigation .page-link:focus-visible {
+html[data-aleph-background="off"] body.about-page.has-canvas .about-navigation .page-link:hover,
+html[data-aleph-background="off"] body.about-page.has-canvas .about-navigation .page-link:focus-visible {
   color: #f00 !important;
   -webkit-text-fill-color: #f00 !important;
   mix-blend-mode: normal !important;
