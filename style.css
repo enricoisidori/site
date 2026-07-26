@@ -796,9 +796,15 @@ body.has-canvas #content-scroll {
   overflow-x: hidden;
   overscroll-behavior: none;
   touch-action: pan-y;
-  isolation: isolate;
   z-index: 0;
   padding: var(--content-top-offset) 5px;
+}
+
+/* Navigation stays above the scroll surface in both visual modes. */
+body.has-canvas #content-scroll
+  :is(.projects-navigation, .about-navigation)
+  > :is(.site-name, .page-link) {
+  z-index: 1000;
 }
 
 /* Text navigation and background control */
