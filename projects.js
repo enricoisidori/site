@@ -630,6 +630,36 @@
     track.addEventListener("pointercancel", endMouseDrag);
   }
 
+  function setupProjectInfoCursor() {
+    if (window.matchMedia("(max-width: 768px)").matches) return;
+
+    const cursor = document.createElement("img");
+    cursor.className = "project-info-cursor";
+    cursor.src = "asset/svg/info.svg";
+    cursor.alt = "";
+    cursor.setAttribute("aria-hidden", "true");
+    document.body.appendChild(cursor);
+
+    const hide = () => cursor.classList.remove("is-visible");
+    const show = (event) => {
+      if (event.pointerType && event.pointerType !== "mouse") return;
+      if (event.target.closest(".video-unmute-btn")) {
+        hide();
+        return;
+      }
+      cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+      cursor.classList.add("is-visible");
+    };
+
+    document
+      .querySelectorAll(".project-track, .project-row > .project-cover")
+      .forEach((target) => {
+        target.addEventListener("pointerenter", show);
+        target.addEventListener("pointermove", show, { passive: true });
+        target.addEventListener("pointerleave", hide);
+      });
+  }
+
   function renderProjects() {
     projects.forEach((project, projectIndex) => {
       const row = document.createElement("section");
@@ -818,6 +848,7 @@
   }
 
   renderProjects();
+  setupProjectInfoCursor();
   syncTrackGeometry();
   window.addEventListener("resize", requestMediaGeometrySync, { passive: true });
   if (location.hash) {

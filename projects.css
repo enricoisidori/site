@@ -201,7 +201,7 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   overflow-x: auto;
   overflow-y: hidden;
   gap: 0;
-  cursor: grab;
+  cursor: pointer;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -222,6 +222,41 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
 .project-track.is-dragging {
   cursor: grabbing;
   user-select: none;
+}
+
+.project-info-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1001;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  opacity: 0;
+  filter: invert(1);
+  mix-blend-mode: difference;
+  will-change: transform, opacity;
+  transition: opacity 100ms ease;
+}
+
+.project-info-cursor.is-visible {
+  opacity: 1;
+}
+
+@media only screen and (min-width: 769px) {
+  .project-track,
+  .project-track *,
+  .project-row > .project-cover,
+  .project-row > .project-cover *,
+  .project-track.is-dragging {
+    cursor: none !important;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .project-info-cursor {
+    display: none;
+  }
 }
 
 .project-track > .project-cover {
