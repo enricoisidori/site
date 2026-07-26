@@ -153,6 +153,64 @@
     setBackground(!whiteBg, "background");
   });
 
+  // Stop only gestures that try to move beyond the vertical scroll limits.
+  // This prevents the browser's white pull-to-refresh/elastic layer without
+  // changing scrollTop or interfering with ordinary scrolling and clicks.
+  let previousTouchY = null;
+
+  contentScroll.addEventListener(
+    "touchstart",
+    (event) => {
+      previousTouchY =
+        event.touches.length === 1 ? event.touches[0].clientY : null;
+    },
+    { capture: true, passive: true },
+  );
+
+  contentScroll.addEventListener(
+    "touchmove",
+    (event) => {
+      if (previousTouchY === null || event.touches.length !== 1) return;
+
+      const currentTouchY = event.touches[0].clientY;
+      const movementY = currentTouchY - previousTouchY;
+      previousTouchY = currentTouchY;
+      const maxScrollTop =
+        contentScroll.scrollHeight - contentScroll.clientHeight;
+      const pullingPastTop = contentScroll.scrollTop <= 0 && movementY > 0;
+      const pullingPastBottom =
+        contentScroll.scrollTop >= maxScrollTop && movementY < 0;
+
+      if (pullingPastTop || pullingPastBottom) event.preventDefault();
+    },
+    { capture: true, passive: false },
+  );
+
+  const clearTouchPosition = () => {
+    previousTouchY = null;
+  };
+  contentScroll.addEventListener("touchend", clearTouchPosition, {
+    capture: true,
+    passive: true,
+  });
+  contentScroll.addEventListener("touchcancel", clearTouchPosition, {
+    capture: true,
+    passive: true,
+  });
+
+  contentScroll.addEventListener(
+    "wheel",
+    (event) => {
+      const maxScrollTop =
+        contentScroll.scrollHeight - contentScroll.clientHeight;
+      const movingPastTop = contentScroll.scrollTop <= 0 && event.deltaY < 0;
+      const movingPastBottom =
+        contentScroll.scrollTop >= maxScrollTop && event.deltaY > 0;
+      if (movingPastTop || movingPastBottom) event.preventDefault();
+    },
+    { capture: true, passive: false },
+  );
+
   function getScrollY() {
     return contentScroll?.scrollTop || 0;
   }
