@@ -1,9 +1,12 @@
 (function initOvertraceUI() {
   const NS = (window.OvertraceUI = window.OvertraceUI || {});
   const FS_DB_NAME = "overtrace-ui";
-  const FS_DB_VERSION = 1;
+  const FS_DB_VERSION = 2;
   const FS_STORE_NAME = "project-fs-context";
   const FS_STORE_KEY = "active-project";
+  const SHARED_STORE_NAME = "shared-project-state";
+  const SHARED_STORE_KEY = "active-project";
+  const LEGACY_SHARED_PROJECT_KEY = "overtrace.shared.project.v1";
   const PROJECT_DISPLAY_META = Object.freeze({
     "1_linguistic": {
       id: "1_linguistic",
@@ -192,6 +195,163 @@
     });
   }
 
+  function projectNodePayload(rawNode) {
+    if (!rawNode || typeof rawNode !== "object") return {};
+    if (rawNode.data && typeof rawNode.data === "object") return rawNode.data;
+    return rawNode;
+  }
+
+  function projectFileEntries(project) {
+    const files = [];
+    for (const rawNode of Array.isArray(project?.nodes) ? project.nodes : []) {
+      const data = projectNodePayload(rawNode);
+      const nodeFiles = Array.isArray(data?.files)
+        ? data.files
+        : Array.isArray(rawNode?.files)
+          ? rawNode.files
+          : [];
+      for (const file of nodeFiles) {
+        if (file && typeof file === "object") files.push(file);
+      }
+    }
+    return files;
+  }
+
+  function edgeEndpoints(edge) {
+    if (!edge || typeof edge !== "object") return { source: null, target: null };
+    return {
+      source: edge.s ?? edge.source ?? edge.from ?? null,
+      target: edge.t ?? edge.target ?? edge.to ?? null,
+    };
+  }
+
+  function stripTransientProjectData(project) {
+    if (!project) return project;
+    let clean;
+    try {
+      clean = structuredClone(project);
+    } catch (_) {
+      clean = JSON.parse(JSON.stringify(project));
+    }
+    for (const file of projectFileEntries(clean)) {
+      delete file.resolvedUrl;
+      delete file._resolvedUrl;
+      delete file._resolvedObjectUrl;
+    }
+    return clean;
+  }
+
+  function isUsableAssetUrl(value) {
+    return /^(?:data:|blob:|https?:|file:)/i.test(String(value || "").trim());
+  }
+
+  function resolveWebAssetUrl(pathValue, assetBase = "") {
+    const path = String(pathValue || "").trim();
+    if (!path) return "";
+    if (isUsableAssetUrl(path)) return path;
+    const cleanPath = path.replace(/^\.?\//, "");
+    try {
+      const baseUrl = new URL(String(assetBase || ""), document.baseURI);
+      return new URL(cleanPath, baseUrl).href;
+    } catch (_) {
+      return `${assetBase || ""}${cleanPath}`;
+    }
+  }
+
+  async function readFileFromDirectory(dirHandle, pathValue) {
+    if (!dirHandle || !pathValue) return null;
+    const parts = String(pathValue)
+      .replace(/\\/g, "/")
+      .replace(/^\.?\//, "")
+      .split("/")
+      .filter((part) => part && part !== ".");
+    if (!parts.length || parts.some((part) => part === "..")) return null;
+    let current = dirHandle;
+    for (let i = 0; i < parts.length - 1; i += 1) {
+      current = await current.getDirectoryHandle(parts[i], { create: false });
+    }
+    const fileHandle = await current.getFileHandle(parts[parts.length - 1], {
+      create: false,
+    });
+    return fileHandle.getFile();
+  }
+
+  function resolveProjectAssetUrl(fileEntry, assetBase = "") {
+    if (!fileEntry || typeof fileEntry !== "object") return "";
+    const resolved = String(
+      fileEntry.resolvedUrl || fileEntry._resolvedUrl || "",
+    ).trim();
+    if (resolved) return resolved;
+    const embedded = String(fileEntry.dataUrl || "").trim();
+    if (embedded) return embedded;
+    const direct = String(fileEntry.url || "").trim();
+    if (isUsableAssetUrl(direct)) return direct;
+    const path = String(fileEntry.path || direct || "").trim();
+    return path ? resolveWebAssetUrl(path, assetBase) : "";
+  }
+
+  async function hydrateProjectAssets(project, options = {}) {
+    const files = projectFileEntries(project);
+    const dirHandle = options.dirHandle || null;
+    const assetBase = String(options.assetBase || "");
+    const concurrency = Math.max(1, Math.min(12, Number(options.concurrency) || 6));
+    let cursor = 0;
+
+    async function hydrateFile(file) {
+      const embedded = String(file.dataUrl || "").trim();
+      if (embedded) {
+        file.resolvedUrl = embedded;
+        return;
+      }
+      const direct = String(file.url || "").trim();
+      if (isUsableAssetUrl(direct) && !direct.startsWith("blob:")) {
+        file.resolvedUrl = direct;
+        return;
+      }
+      const path = String(file.path || direct || "").trim();
+      if (!path) {
+        file.resolvedUrl = "";
+        return;
+      }
+      if (dirHandle) {
+        try {
+          const diskFile = await readFileFromDirectory(dirHandle, path);
+          if (diskFile) {
+            const objectUrl = URL.createObjectURL(diskFile);
+            file.resolvedUrl = objectUrl;
+            file._resolvedObjectUrl = objectUrl;
+            return;
+          }
+        } catch (err) {
+          console.warn(`Unable to read project asset "${path}"`, err);
+        }
+      }
+      file.resolvedUrl = resolveWebAssetUrl(path, assetBase);
+    }
+
+    async function worker() {
+      while (cursor < files.length) {
+        const index = cursor++;
+        await hydrateFile(files[index]);
+      }
+    }
+
+    await Promise.all(
+      Array.from({ length: Math.min(concurrency, files.length) }, () => worker()),
+    );
+    return project;
+  }
+
+  function releaseProjectAssetUrls(project) {
+    for (const file of projectFileEntries(project)) {
+      const objectUrl = String(file._resolvedObjectUrl || "");
+      if (objectUrl.startsWith("blob:")) URL.revokeObjectURL(objectUrl);
+      delete file.resolvedUrl;
+      delete file._resolvedUrl;
+      delete file._resolvedObjectUrl;
+    }
+  }
+
   function openFsDb() {
     if (!("indexedDB" in window)) return Promise.resolve(null);
     if (NS.__fsDbPromise) return NS.__fsDbPromise;
@@ -201,6 +361,9 @@
         const db = request.result;
         if (!db.objectStoreNames.contains(FS_STORE_NAME)) {
           db.createObjectStore(FS_STORE_NAME);
+        }
+        if (!db.objectStoreNames.contains(SHARED_STORE_NAME)) {
+          db.createObjectStore(SHARED_STORE_NAME);
         }
       };
       request.onsuccess = () => resolve(request.result);
@@ -276,6 +439,86 @@
       console.warn("Unable to clear FS context", err);
       return false;
     }
+  }
+
+  async function saveSharedProjectState(payload) {
+    if (!payload?.project) return false;
+    const db = await openFsDb();
+    if (db) {
+      try {
+        const tx = db.transaction(SHARED_STORE_NAME, "readwrite");
+        await withRequest(
+          tx.objectStore(SHARED_STORE_NAME).put(payload, SHARED_STORE_KEY),
+        );
+        await new Promise((resolve, reject) => {
+          tx.oncomplete = () => resolve();
+          tx.onerror = () =>
+            reject(tx.error || new Error("Unable to save shared project"));
+          tx.onabort = () =>
+            reject(tx.error || new Error("Shared project transaction aborted"));
+        });
+        try {
+          const legacyJson = JSON.stringify(payload);
+          if (legacyJson.length <= 1_500_000) {
+            localStorage.setItem(LEGACY_SHARED_PROJECT_KEY, legacyJson);
+          } else {
+            localStorage.removeItem(LEGACY_SHARED_PROJECT_KEY);
+          }
+        } catch (_) {
+          // IndexedDB is the primary store; localStorage is compatibility only.
+        }
+        return true;
+      } catch (err) {
+        console.warn("Unable to persist shared project in IndexedDB", err);
+      }
+    }
+    try {
+      localStorage.setItem(LEGACY_SHARED_PROJECT_KEY, JSON.stringify(payload));
+      return true;
+    } catch (err) {
+      console.warn("Unable to persist shared project", err);
+      return false;
+    }
+  }
+
+  async function loadSharedProjectState() {
+    const db = await openFsDb();
+    if (db) {
+      try {
+        const tx = db.transaction(SHARED_STORE_NAME, "readonly");
+        const payload = await withRequest(
+          tx.objectStore(SHARED_STORE_NAME).get(SHARED_STORE_KEY),
+        );
+        if (payload?.project) return payload;
+      } catch (err) {
+        console.warn("Unable to load shared project from IndexedDB", err);
+      }
+    }
+    try {
+      const raw = localStorage.getItem(LEGACY_SHARED_PROJECT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      console.warn("Unable to load legacy shared project", err);
+      return null;
+    }
+  }
+
+  async function clearSharedProjectState() {
+    const db = await openFsDb();
+    if (db) {
+      try {
+        const tx = db.transaction(SHARED_STORE_NAME, "readwrite");
+        await withRequest(
+          tx.objectStore(SHARED_STORE_NAME).delete(SHARED_STORE_KEY),
+        );
+      } catch (err) {
+        console.warn("Unable to clear shared project", err);
+      }
+    }
+    try {
+      localStorage.removeItem(LEGACY_SHARED_PROJECT_KEY);
+    } catch (_) {}
+    return true;
   }
 
   async function openProjectFolder(options = {}) {
@@ -361,11 +604,22 @@
   NS.attachToolbarTooltips = attachToolbarTooltips;
   NS.buildProjectFsContext = buildProjectFsContext;
   NS.clearProjectFsContext = clearProjectFsContext;
+  NS.clearSharedProjectState = clearSharedProjectState;
+  NS.edgeEndpoints = edgeEndpoints;
   NS.formatProjectDisplayName = formatProjectDisplayName;
   NS.getProjectDisplayMeta = getProjectDisplayMeta;
+  NS.hydrateProjectAssets = hydrateProjectAssets;
   NS.isMobileAppMode = isMobileAppMode;
   NS.loadProjectFsContext = loadProjectFsContext;
+  NS.loadSharedProjectState = loadSharedProjectState;
   NS.openProjectFolder = openProjectFolder;
   NS.openProjectJsonFile = openProjectJsonFile;
+  NS.projectFileEntries = projectFileEntries;
+  NS.projectNodePayload = projectNodePayload;
+  NS.readFileFromDirectory = readFileFromDirectory;
+  NS.releaseProjectAssetUrls = releaseProjectAssetUrls;
+  NS.resolveProjectAssetUrl = resolveProjectAssetUrl;
   NS.saveProjectFsContext = saveProjectFsContext;
+  NS.saveSharedProjectState = saveSharedProjectState;
+  NS.stripTransientProjectData = stripTransientProjectData;
 })();

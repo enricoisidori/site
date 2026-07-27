@@ -628,12 +628,6 @@
         -webkit-user-drag: none !important;
         user-drag: none !important;
       }
-      /* In fondo al SECONDO <style>, per eliminare il doppio disegno degli edge:
-         manteniamo SOLO il canvas per la resa visiva; lo SVG resta solo per l'hit. */
-      .edge-visible {
-        display: none !important;
-      }
-
       /* === CSS (aggiungere in fondo al SECONDO <style>) ===================== */
 
       /* Help panel layout */
@@ -2155,20 +2149,27 @@
           return false;
         }
 
-        function persistSharedProjectState(source = "editor") {
+        async function persistSharedProjectState(source = "editor") {
           const folderName = inferCurrentFolderName();
           const assetBase =
             String(projectCtx?.assetBase || "").trim() ||
             (folderName ? `${folderName}/` : "");
+          const losslessBlob = await buildLosslessProjectBlob();
+          const sharedProject = JSON.parse(await losslessBlob.text());
           const payload = {
             version: 1,
             source,
             savedAt: Date.now(),
             folderName: folderName || null,
             assetBase,
-            project: buildProjectObject(6, "paths"),
+            project: sharedProject,
           };
-          localStorage.setItem(SHARED_PROJECT_KEY, JSON.stringify(payload));
+          const saved =
+            (await window.OvertraceUI?.saveSharedProjectState?.(payload)) ??
+            false;
+          if (!saved) {
+            localStorage.setItem(SHARED_PROJECT_KEY, JSON.stringify(payload));
+          }
           return payload;
         }
 
@@ -2178,9 +2179,12 @@
           if (!from || from === "editor") return false;
           if (!["analysis", "space", "process"].includes(from)) return false;
           try {
-            const raw = localStorage.getItem(SHARED_PROJECT_KEY);
-            if (!raw) return false;
-            const payload = JSON.parse(raw);
+            const payload =
+              (await window.OvertraceUI?.loadSharedProjectState?.()) ||
+              (() => {
+                const raw = localStorage.getItem(SHARED_PROJECT_KEY);
+                return raw ? JSON.parse(raw) : null;
+              })();
             if (!payload || !payload.project) return false;
             if (payload.source && payload.source !== from) return false;
             const routedFolder = params.get("project") || null;
@@ -2344,6 +2348,7 @@
         const btnScale = document.getElementById("btnScale");
         const dataViewState = { scale: "relative", chart: null };
         let __openProjectPending = false;
+        let __projectLoadGeneration = 0;
         let __statusTimer = null;
         function setStatus(msg) {
           status.textContent = msg || "";
@@ -2537,29 +2542,35 @@
         edgeCanvas.id = "edgesCanvas";
         edgeCanvas.style.position = "absolute";
         edgeCanvas.style.inset = "0";
-        edgeCanvas.style.zIndex = "1"; // sotto ai nodi (.node ha z-index:1, ma trasformata; questo resta dietro)
+        edgeCanvas.style.zIndex = "0";
         edgeCanvas.style.pointerEvents = "none"; // eventi restano all'SVG per hit-test
         stage.insertBefore(edgeCanvas, edgesSVG.nextSibling);
         const edgeCtx = edgeCanvas.getContext("2d", { alpha: true });
 
-        let __edgesCSSHidden = false;
-        function __hideSvgVisibleOnce() {
-          if (__edgesCSSHidden) return;
-          __edgesCSSHidden = true;
-          // Se non hai messo la regola CSS, nascondi via JS
-          edgesSVG
-            .querySelectorAll(".edge-visible")
-            .forEach((p) => (p.style.display = "none"));
-        }
+        let edgeCanvasCssWidth = 0;
+        let edgeCanvasCssHeight = 0;
+        let edgeCanvasDpr = 0;
 
         function resizeEdgeCanvasToStage() {
           const r = stage.getBoundingClientRect();
           // pixel reali per nitidezza su HiDPI
           const dpr = Math.max(1, window.devicePixelRatio || 1);
-          edgeCanvas.width = Math.max(1, Math.round(r.width * dpr));
-          edgeCanvas.height = Math.max(1, Math.round(r.height * dpr));
-          edgeCanvas.style.width = `${Math.max(1, Math.round(r.width))}px`;
-          edgeCanvas.style.height = `${Math.max(1, Math.round(r.height))}px`;
+          const width = Math.max(1, Math.round(r.width));
+          const height = Math.max(1, Math.round(r.height));
+          if (
+            width === edgeCanvasCssWidth &&
+            height === edgeCanvasCssHeight &&
+            dpr === edgeCanvasDpr
+          ) {
+            return;
+          }
+          edgeCanvasCssWidth = width;
+          edgeCanvasCssHeight = height;
+          edgeCanvasDpr = dpr;
+          edgeCanvas.width = Math.max(1, Math.round(width * dpr));
+          edgeCanvas.height = Math.max(1, Math.round(height * dpr));
+          edgeCanvas.style.width = `${width}px`;
+          edgeCanvas.style.height = `${height}px`;
           edgeCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
@@ -2570,10 +2581,18 @@
         }
 
         function drawAllEdgesOnCanvas() {
-          __hideSvgVisibleOnce();
           resizeEdgeCanvasToStage();
           const ctx = edgeCtx;
-          ctx.clearRect(0, 0, edgeCanvas.width, edgeCanvas.height);
+          ctx.clearRect(0, 0, edgeCanvasCssWidth, edgeCanvasCssHeight);
+
+          const zoom = Math.max(0.01, state.zoom || 1);
+          const worldLeft = -state.pan.x / zoom - 80 / zoom;
+          const worldTop = -state.pan.y / zoom - 80 / zoom;
+          const worldRight =
+            (edgeCanvasCssWidth - state.pan.x) / zoom + 80 / zoom;
+          const worldBottom =
+            (edgeCanvasCssHeight - state.pan.y) / zoom + 80 / zoom;
+          const edgeAlpha = Math.min(0.82, 0.28 + Math.sqrt(zoom) * 0.52);
 
           // 1) edge normali
           ctx.save();
@@ -2583,35 +2602,40 @@
             const s = anchor(e.s, "right");
             const t = anchor(e.t, "left");
             if (!s || !t) continue;
+            if (
+              Math.max(s.x, t.x) < worldLeft ||
+              Math.min(s.x, t.x) > worldRight ||
+              Math.max(s.y, t.y) < worldTop ||
+              Math.min(s.y, t.y) > worldBottom
+            ) {
+              continue;
+            }
 
             const isWeak = !!e.dashed;
             const isSel = state.selEdges.has(i);
 
             // Impostazioni comuni
             ctx.lineCap = "butt"; // cap rettangolare per coerenza
+            ctx.globalAlpha = isSel ? 1 : edgeAlpha;
 
             if (isWeak) {
-              // WEAK: più fini, grigio scuro, gap breve
-              const dash = [8, 3]; // gap più corto
+              const dash = [7 / zoom, 4 / zoom];
               ctx.setLineDash(dash);
 
               if (isSel) {
-                // WEAK selezionati: più spessi e bianchi (restano tratteggiati)
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 1.7 / zoom;
                 ctx.strokeStyle = "#000000";
               } else {
-                ctx.lineWidth = 2; // più fini
+                ctx.lineWidth = 0.7 / zoom;
                 ctx.strokeStyle = "#9a9a9a";
               }
             } else {
-              // NORMAL
               ctx.setLineDash([]);
               if (isSel) {
-                // Selezionati: più spessi e bianchi
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2 / zoom;
                 ctx.strokeStyle = "#000000";
               } else {
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 1.05 / zoom;
                 ctx.strokeStyle = "#6f6f6f";
               }
             }
@@ -2623,7 +2647,8 @@
           if (state.dragLink && state.dragLink.active) {
             const to = { x: state.dragLink.x, y: state.dragLink.y };
             ctx.setLineDash([]);
-            ctx.lineWidth = 2;
+            ctx.globalAlpha = 1;
+            ctx.lineWidth = 1.5 / zoom;
             ctx.strokeStyle = "#000000";
             for (const sid of state.dragLink.sources || []) {
               const a =
@@ -3460,12 +3485,14 @@
         }
 
         function positionNode(node) {
-          const el = $("#" + node.id);
+          const el = document.getElementById(node.id);
+          if (!el) return;
           const p = fromWorld(node.x, node.y);
           el.style.transform = `translate(${p.x}px,${p.y}px) scale(${state.zoom})`;
         }
         function measure(node) {
-          const el = $("#" + node.id);
+          const el = document.getElementById(node.id);
+          if (!el) return;
           node.w = el.offsetWidth;
           node.h = el.offsetHeight;
         }
@@ -3523,7 +3550,7 @@
         }
 
         function populate(node) {
-          const el = $("#" + node.id);
+          const el = document.getElementById(node.id);
           if (!el) return;
           const d = node.data;
           const hasTitle = !!(d.title && d.title.trim());
@@ -3574,7 +3601,7 @@
             .join("");
 
           const imagesEl = el.querySelector(".images");
-          const imgs = (d.files || []).filter((f) => f.isImage);
+          const imgs = (d.files || []).filter((f) => f.isImage && f.url);
           imagesEl.innerHTML = imgs
             .map(
               (f) =>
@@ -3601,7 +3628,7 @@
           });
 
           const attEl = el.querySelector(".attachments");
-          const docs = (d.files || []).filter((f) => !f.isImage);
+          const docs = (d.files || []).filter((f) => !f.isImage && f.url);
           attEl.innerHTML = docs
             .map((f) => {
               const href = esc(f.url),
@@ -3656,7 +3683,7 @@
             .map((file, i) => {
               const name = esc(file.name || "file");
               const size = bytes(file.size || 0);
-              const thumb = file.isImage
+              const thumb = file.isImage && file.url
                 ? `<img class="thumb" src="${esc(file.url)}" alt="">`
                 : "";
               return `<div class="file-row"><div class="file-left">${thumb}<div class="name">• ${name}${
@@ -4298,7 +4325,7 @@
         $("#btnSave").addEventListener("click", saveProjectSmart);
         $("#btnProcessAnalysis")?.addEventListener("click", async () => {
           try {
-            persistSharedProjectState("editor");
+            await persistSharedProjectState("editor");
           } catch (err) {
             console.warn("Unable to persist shared project state", err);
           }
@@ -4314,7 +4341,7 @@
         });
         $("#btnAnalysis")?.addEventListener("click", async () => {
           try {
-            persistSharedProjectState("editor");
+            await persistSharedProjectState("editor");
           } catch (err) {
             console.warn("Unable to persist shared project state", err);
           }
@@ -4329,11 +4356,9 @@
           { id: "btnFit", text: "Fit view" },
           { id: "btnAuto", text: "Auto layout" },
           { id: "btnOpen", text: "Open project" },
-          { id: "btnSave", text: "Save project" },
           { id: "btnProcessAnalysis", text: "Process analysis" },
           { id: "btnAnalysis", text: "Space analysis" },
           { id: "btnResearch", text: "Atlas" },
-          { id: "btnNew", text: "New project" },
           { id: "btnUndo", text: "Undo" },
           { id: "btnRedo", text: "Redo" },
           { id: "btnDel", text: "Delete selection" },
@@ -4354,7 +4379,7 @@
           });
         });
         document.getElementById("btnNew")?.addEventListener("click", () => {
-          saveProjectSmart().then(() => newProject());
+          void createNewProject();
         });
 
         // (old connect handler removed in favor of FSM)
@@ -4484,19 +4509,17 @@
           { passive: false },
         );
 
+        let applyingViewportTransform = false;
         function applyView() {
           ensureSVGSize();
           updateGrid();
-          state.nodes.forEach((n) => positionNode(n));
-          // ricalcola le geometrie degli edge già presenti
-          for (let i = 0; i < state.edges.length; i++) {
-            const ed = state.edges[i];
-            const s = anchor(ed.s, "right");
-            const t = anchor(ed.t, "left");
-            if (!s || !t) continue;
-            updateEdgePathsD(i, pathCubic(s, t));
+          applyingViewportTransform = true;
+          try {
+            state.nodes.forEach((n) => positionNode(n));
+          } finally {
+            applyingViewportTransform = false;
           }
-          // Canvas per la resa visiva
+          // Gli edge restano in coordinate world: il viewBox li porta con pan/zoom.
           if (typeof scheduleEdgeCanvasDraw === "function")
             scheduleEdgeCanvasDraw();
         }
@@ -5211,18 +5234,22 @@
         /* ---------- SAVE / OPEN (veloce per grafi grandi) ---------- */
         async function saveProjectSmart() {
           if (projectCtx.mode === "folder" && projectCtx.dirHandle) {
-            await saveProjectToDir(projectCtx.dirHandle);
-            setStatus(`Project saved — ${fmtTime10()}`);
-            return;
+            try {
+              await saveProjectToDir(projectCtx.dirHandle, {
+                copyExistingAssets: false,
+              });
+              setStatus(`Project saved — ${fmtTime10()}`);
+              return true;
+            } catch (err) {
+              console.error("Unable to save project folder", err);
+              setStatus("Unable to save project");
+              return false;
+            }
           }
-          if (projectCtx.mode === "file" && projectCtx.fileHandle) {
-            await saveProjectToFile(projectCtx.fileHandle);
-            setStatus(`Project saved (overwrite) — ${fmtTime10()}`);
-            return;
-          }
-          // When we don't have a folder handle, "saving normally" means downloading a JSON
-          // that preserves existing asset paths and embeds only the unsaved (no-path) assets.
-          await exportProjectJsonDownload("project.json");
+          // A normal first save always creates a complete project folder. A JSON-only
+          // download remains available only as a compatibility fallback for browsers
+          // without the File System Access API.
+          return saveAs();
         }
 
         async function blobToDataUrl(blob) {
@@ -5323,30 +5350,107 @@
           downloadBlob(fileName, blob);
           setStatus(`Project saved (download) — ${fmtTime10()}`);
         }
+        function normalizeProjectFolderName(name) {
+          return sanitizeName(String(name || "").trim())
+            .replace(/[\u0000-\u001f]/g, "")
+            .replace(/^\.+$/, "")
+            .trim();
+        }
+
+        async function chooseNewProjectDirectory({
+          defaultName = "Untitled project",
+          cancelledStatus = "Save cancelled",
+        } = {}) {
+          // prompt() is synchronous, so the following directory picker still runs
+          // within the original click gesture required by the browser API.
+          const requestedName = window.prompt(
+            "Name the new project folder:",
+            defaultName,
+          );
+          if (requestedName === null) {
+            setStatus(cancelledStatus);
+            return null;
+          }
+          const folderName = normalizeProjectFolderName(requestedName);
+          if (!folderName) {
+            setStatus("A project folder needs a name");
+            return null;
+          }
+
+          let parentDir;
+          try {
+            // The browser must receive permission for a parent directory, but the
+            // actual project directory is always created by Overtrace below. Start
+            // from Documents so a new project can be placed there immediately.
+            parentDir = await window.showDirectoryPicker({
+              id: "overtrace-project-location",
+              mode: "readwrite",
+              startIn: "documents",
+            });
+          } catch (err) {
+            if (err?.name === "AbortError") {
+              setStatus(cancelledStatus);
+              return null;
+            }
+            console.error("Unable to choose project location", err);
+            setStatus("Unable to choose project location");
+            return null;
+          }
+
+          try {
+            await parentDir.getDirectoryHandle(folderName, { create: false });
+            setStatus(`A project folder named “${folderName}” already exists`);
+            return null;
+          } catch (err) {
+            if (err?.name && err.name !== "NotFoundError") {
+              console.error("Unable to inspect project location", err);
+              setStatus("Unable to create project folder");
+              return null;
+            }
+          }
+
+          try {
+            const dir = await parentDir.getDirectoryHandle(folderName, {
+              create: true,
+            });
+            return { dir, folderName };
+          } catch (err) {
+            console.error("Unable to create project folder", err);
+            setStatus("Unable to create project folder");
+            return null;
+          }
+        }
+
+        function setProjectFolderContext(dir, folderName = dir?.name || null) {
+          projectCtx.mode = "folder";
+          projectCtx.dirHandle = dir;
+          projectCtx.fileHandle = null;
+          projectCtx.folderName = folderName;
+          projectCtx.assetBase = folderName ? `${folderName}/` : "";
+        }
+
         async function saveAs() {
           const supportsFS = "showDirectoryPicker" in window;
           if (supportsFS) {
+            const destination = await chooseNewProjectDirectory({
+              defaultName: projectCtx.folderName || "Untitled project",
+            });
+            if (!destination) return false;
             try {
-              const dir = await window.showDirectoryPicker({
-                mode: "readwrite",
+              await saveProjectToDir(destination.dir, {
+                copyExistingAssets: true,
               });
-              await saveProjectToDir(dir);
-              projectCtx.mode = "folder";
-              projectCtx.dirHandle = dir;
-              projectCtx.fileHandle = null;
-              projectCtx.folderName = dir?.name || null;
-              projectCtx.assetBase = dir?.name ? `${dir.name}/` : "";
+              setProjectFolderContext(destination.dir, destination.folderName);
               await syncProjectFsContext();
-              setStatus(`Project saved (new fast folder) — ${fmtTime10()}`);
-              return;
+              setStatus(`Project folder saved — ${fmtTime10()}`);
+              return true;
             } catch (err) {
-              console.warn(
-                "Save As cancelled or failed, falling back to light JSON",
-                err,
-              );
+              console.error("Unable to save project folder", err);
+              setStatus("Unable to save project folder");
+              return false;
             }
           }
-          // Fallback: download a lossless JSON (keeps paths, embeds unsaved assets).
+          // Compatibility fallback: old browsers cannot grant a writable folder.
           await exportProjectJsonDownload("project.json");
           projectCtx.mode = "embedded";
           projectCtx.dirHandle = null;
@@ -5354,6 +5458,7 @@
           projectCtx.folderName = null;
           projectCtx.assetBase = "";
           await syncProjectFsContext();
+          return true;
         }
 
         // filesMode: "none" | "paths" | "embedded" (noi usiamo "paths" o "none")
@@ -5420,16 +5525,85 @@
           };
         }
 
-        async function saveProjectToDir(dir) {
+        async function assetBlobForSave(file) {
+          const directUrl = String(file?.url || file?.dataUrl || "").trim();
+          if (directUrl) {
+            const response = await fetch(directUrl);
+            if (!response.ok && !directUrl.startsWith("blob:")) {
+              throw new Error(`Asset request failed (${response.status})`);
+            }
+            return response.blob();
+          }
+          if (file?.path && projectCtx.dirHandle) {
+            return readFileByPath(projectCtx.dirHandle, file.path);
+          }
+          if (file?.path) {
+            const relPath = String(file.path).replace(/^\.?\//, "");
+            const base = String(projectCtx.assetBase || "")
+              .trim()
+              .replace(/\/+$/, "");
+            const candidates = [
+              base ? `${base}/${relPath}` : "",
+              projectCtx.folderName
+                ? `${projectCtx.folderName}/${relPath}`
+                : "",
+              relPath,
+            ].filter(Boolean);
+            for (const candidate of [...new Set(candidates)]) {
+              try {
+                const response = await fetch(candidate);
+                if (response.ok) return response.blob();
+              } catch (_) {
+                // Try the next project-relative candidate.
+              }
+            }
+          }
+          throw new Error(`Asset source unavailable: ${file?.name || "file"}`);
+        }
+
+        async function saveProjectToDir(
+          dir,
+          { copyExistingAssets = false } = {},
+        ) {
           await ensureSubdir(dir, "assets");
-          // 1) Copia solo i NUOVI file (quelli già con path si saltano)
+          // On overwrite, copy only new files. On Save As/first Save, copy every
+          // asset so the selected folder is a complete, portable project.
           const toCopy = [];
+          const reservedPaths = new Set();
+          if (!copyExistingAssets) {
+            for (const n of state.nodes) {
+              for (const f of n.data.files || []) {
+                if (f.path) reservedPaths.add(String(f.path).toLowerCase());
+              }
+            }
+          }
+
+          const reserveAssetPath = (preferredName, isImage, isPDF) => {
+            const baseName = sanitizeName(
+              (preferredName || "file").replace(/\s+/g, "_"),
+            );
+            const noExt = baseName.replace(/\.[a-z0-9]+$/i, "") || "file";
+            const ext = isImage
+              ? ".jpg"
+              : extFromName(baseName) || (isPDF ? ".pdf" : ".bin");
+            let index = 1;
+            let rel = `assets/${noExt}${ext}`;
+            while (reservedPaths.has(rel.toLowerCase())) {
+              index += 1;
+              rel = `assets/${noExt}_${index}${ext}`;
+            }
+            reservedPaths.add(rel.toLowerCase());
+            return rel;
+          };
+
           for (const n of state.nodes) {
             for (const f of n.data.files || []) {
-              if (f.path) {
-                continue;
-              } // già su disco
-              toCopy.push({ node: n, file: f });
+              if (f.path && !copyExistingAssets) continue;
+              toCopy.push({
+                node: n,
+                file: f,
+                rel: reserveAssetPath(f.name, !!f.isImage, !!f.isPDF),
+              });
             }
           }
 
@@ -5441,41 +5615,46 @@
             setStatus("Saving assets (0/" + total + ")");
           }
 
-          await asyncPool(2, toCopy, async ({ file }) => {
+          const failures = [];
+          await asyncPool(2, toCopy, async ({ file, rel }) => {
             try {
-              let blob = await fetch(file.url).then((r) => r.blob());
-
-              const baseName = sanitizeName(
-                (file.name || "file").replace(/\s+/g, "_"),
-              );
-              const noExt = baseName.replace(/\.[a-z0-9]+$/i, "");
-              let finalName, rel;
+              const blob = await assetBlobForSave(file);
+              let savedBlob = blob;
 
               if (file.isImage) {
                 // Ricompressione a JPG 1500px lato lungo
                 const jpg = await resizeImageBlob(blob, 1500, 512 * 1024);
-                finalName = `${noExt}.jpg`;
-                rel = `assets/${finalName}`;
                 await writeFileByPath(dir, rel, jpg);
+                savedBlob = jpg;
+                file.type = "image/jpeg";
+                file.size = jpg.size;
               } else {
-                const ext =
-                  extFromName(baseName) || (file.isPDF ? ".pdf" : ".bin");
-                finalName = extFromName(baseName)
-                  ? baseName
-                  : `${baseName}${ext}`;
-                rel = `assets/${finalName}`;
                 await writeFileByPath(dir, rel, blob);
+                file.type = blob.type || file.type || "application/octet-stream";
+                file.size = blob.size;
               }
 
               file.path = rel;
               delete file.dataUrl;
+              const oldUrl = file.url;
+              file.url = URL.createObjectURL(savedBlob);
+              if (String(oldUrl || "").startsWith("blob:")) {
+                URL.revokeObjectURL(oldUrl);
+              }
             } catch (e) {
               console.warn("Copy failed:", file?.name, e);
+              failures.push({ file, error: e });
             } finally {
               done++;
               setStatus(`Saving assets (${done}/${total})`);
             }
           });
+
+          if (failures.length) {
+            throw new Error(
+              `${failures.length} asset${failures.length === 1 ? "" : "s"} could not be saved`,
+            );
+          }
 
           // 2) Scrivi JSON con soli path (niente dataUrl)
           const project = buildProjectObject(6, "paths");
@@ -5574,6 +5753,7 @@
         }
 
         async function newProject() {
+          __projectLoadGeneration += 1;
           pushHistory();
           finalizeEditsCurrentNode();
           clearAllSelection();
@@ -5608,7 +5788,41 @@
           setStatus("New project");
         }
 
+        async function createNewProject() {
+          const supportsFS = "showDirectoryPicker" in window;
+          if (!supportsFS) {
+            await newProject();
+            setStatus("New project created — use Save to download JSON");
+            return true;
+          }
+
+          // Ask for the destination before touching the current project: cancelling
+          // either dialog leaves the project currently open completely untouched.
+          const destination = await chooseNewProjectDirectory({
+            defaultName: "Untitled project",
+            cancelledStatus: "New project cancelled",
+          });
+          if (!destination) return false;
+
+          await newProject();
+          setProjectFolderContext(destination.dir, destination.folderName);
+          try {
+            // This creates both assets/ and the initial project.json immediately.
+            await saveProjectToDir(destination.dir, {
+              copyExistingAssets: false,
+            });
+            await syncProjectFsContext();
+            setStatus(`New project “${destination.folderName}” created`);
+            return true;
+          } catch (err) {
+            console.error("Unable to initialise new project folder", err);
+            setStatus("New project created, but its folder could not be initialised");
+            return false;
+          }
+        }
+
         async function loadProject(project, dirHandle) {
+          const loadGeneration = ++__projectLoadGeneration;
           finalizeEditsCurrentNode();
           clearAllSelection();
           document.querySelectorAll(".node").forEach((n) => n.remove());
@@ -5633,8 +5847,9 @@
               /^(?:[a-z]+:)?\/\//i.test(rawPath) ||
               rawPath.startsWith("/") ||
               rawPath.startsWith("data:");
-            push(rawPath);
-            if (!looksAbsolute) {
+            if (looksAbsolute) {
+              push(rawPath);
+            } else {
               const relPath = rawPath.replace(/^\.?\//, "");
               const base = String(projectCtx.assetBase || "")
                 .trim()
@@ -5642,13 +5857,19 @@
               if (base) push(`${base}/${relPath}`);
               const folder = inferCurrentFolderName();
               if (folder) push(`${folder}/${relPath}`);
+              push(relPath);
             }
             return out;
           };
 
+          const directoryAssetTasks = [];
           for (const pn of project.nodes || []) {
+            const rawNodeId = pn?.id;
             const node = {
-              id: pn.id || uid(),
+              id:
+                rawNodeId == null || String(rawNodeId).trim() === ""
+                  ? uid()
+                  : String(rawNodeId),
               x: pn.x || 0,
               y: pn.y || 0,
               w: pn.w || NODE_W,
@@ -5670,31 +5891,23 @@
             node.data.tags = normalizeArray(d.tags || []);
             node.data.desc = d.desc || "";
             node.data.links = (d.links || []).slice();
-            node.data.files = await Promise.all(
-              (d.files || []).map(async (f) => {
-                if (f.dataUrl) {
-                  const blob = await (await fetch(f.dataUrl)).blob();
-                  return { ...f, url: URL.createObjectURL(blob) };
-                } else if (f.path && dirHandle) {
-                  const file = await readFileByPath(dirHandle, f.path);
-                  return { ...f, url: URL.createObjectURL(file) };
-                } else if (f.path) {
-                  for (const candidate of resolveAssetCandidates(f.path)) {
-                    try {
-                      const res = await fetch(candidate, { cache: "no-store" });
-                      if (!res.ok) continue;
-                      const blob = await res.blob();
-                      return { ...f, url: URL.createObjectURL(blob) };
-                    } catch (_) {
-                      // try next candidate
-                    }
-                  }
-                  return { ...f, url: "" };
-                } else {
-                  return { ...f, url: "" };
-                }
-              }),
-            );
+            // Mount the graph immediately. Hosted projects can use their resolved
+            // URLs directly; folder-backed assets are hydrated in parallel after
+            // every node and edge is already visible.
+            node.data.files = (d.files || []).map((f) => {
+              if (f.dataUrl) return { ...f, url: f.dataUrl };
+              if (f.path && dirHandle) return { ...f, url: "" };
+              if (f.path) {
+                return {
+                  ...f,
+                  url: resolveAssetCandidates(f.path)[0] || "",
+                };
+              }
+              return { ...f, url: f.url || "" };
+            });
+            if (dirHandle && node.data.files.some((f) => f.path)) {
+              directoryAssetTasks.push(node);
+            }
 
             state.nodes.push(node);
             vocabInitNodeSnapshot(node);
@@ -5708,11 +5921,29 @@
             // rAF per allineare font/immagini
             scheduleMeasureAfterPopulate(node);
           }
-          state.edges = (project.edges || []).map((e) => ({
-            s: e.s,
-            t: e.t,
-            dashed: !!e.dashed,
-          }));
+          state.edges = (project.edges || [])
+            .map((e) => {
+              const endpoints =
+                window.OvertraceUI?.edgeEndpoints?.(e) || {
+                  source: e?.s,
+                  target: e?.t,
+                };
+              if (endpoints.source == null || endpoints.target == null) {
+                return null;
+              }
+              return {
+                s: String(endpoints.source),
+                t: String(endpoints.target),
+                dashed: !!(e.dashed ?? e.weak),
+              };
+            })
+            .filter(
+              (e) =>
+                e &&
+                e.s !== e.t &&
+                state.nodes.some((node) => node.id === e.s) &&
+                state.nodes.some((node) => node.id === e.t),
+            );
 
           if (project.vocab) {
             vocab.areasMRU.clear();
@@ -5736,10 +5967,58 @@
 
           ensureSVGSize();
           updateGrid();
+          fitView();
           // Prima costruisci i path di hit nello SVG, poi ridisegna il canvas
           if (typeof renderEdges === "function") renderEdges();
           if (typeof scheduleEdgeCanvasDraw === "function")
             scheduleEdgeCanvasDraw();
+          if (document.fonts?.ready) {
+            document.fonts.ready.then(() => {
+              if (loadGeneration !== __projectLoadGeneration) return;
+              for (const node of state.nodes) {
+                measure(node);
+                positionNode(node);
+              }
+              fitView();
+              scheduleEdgeCanvasDraw();
+            });
+          }
+
+          // File System Access handles must be read asynchronously. Keep this work
+          // off the critical rendering path and refresh each node only when its
+          // own assets are ready.
+          if (directoryAssetTasks.length) {
+            void asyncPool(4, directoryAssetTasks, async (node) => {
+              const hydrated = await Promise.all(
+                (node.data.files || []).map(async (file) => {
+                  if (!file.path || file.url) return file;
+                  try {
+                    const diskFile = await readFileByPath(dirHandle, file.path);
+                    return { ...file, url: URL.createObjectURL(diskFile) };
+                  } catch (err) {
+                    console.warn("Unable to load project asset:", file.path, err);
+                    return file;
+                  }
+                }),
+              );
+              if (
+                loadGeneration !== __projectLoadGeneration ||
+                !state.nodes.includes(node)
+              ) {
+                for (const file of hydrated) {
+                  if (String(file.url || "").startsWith("blob:")) {
+                    URL.revokeObjectURL(file.url);
+                  }
+                }
+                return;
+              }
+              node.data.files = hydrated;
+              populate(node);
+              scheduleMeasureAfterPopulate(node);
+            }).catch((err) => {
+              console.warn("Project asset hydration failed", err);
+            });
+          }
         }
 
         function undo() {
@@ -6202,34 +6481,31 @@
         (() => {
           const css = `
 .edge-visible {
-  stroke: #6f6f6f;
-  stroke-width: 2;
-  fill: none;
-  cursor: pointer;
-  pointer-events: stroke;
+  display: none;
 }
 .edge-visible.selected {
   stroke: #000000;
-  stroke-width: 3;
+  stroke-width: 2;
 }
 .edge-visible.weak {
   stroke: #9a9a9a;
   stroke-opacity: 0.9;
   stroke-dasharray: 10 6;
   stroke-linecap: round;
-  stroke-width: 1.5;
+  stroke-width: 1;
 }
 .edge-visible.weak.selected {
   stroke: #000000;
   stroke-opacity: 1;
   stroke-dasharray: 10 6;
   stroke-linecap: round;
-  stroke-width: 2.5;
+  stroke-width: 2;
 }
 /* Hit area invisibile ma larga, sempre cliccabile sullo stroke */
 .edge-hit {
   stroke: transparent;
   stroke-width: 24;
+  vector-effect: non-scaling-stroke;
   fill: none;
   cursor: pointer;
   pointer-events: stroke;
@@ -6346,6 +6622,7 @@
               edgesSVG.appendChild(path);
             }
           }
+          scheduleEdgeCanvasDraw();
         };
 
         /* 4) Ogni volta che un nodo viene riposizionato, aggiorna SOLO gli edge collegati
@@ -6353,6 +6630,7 @@
         const __origPositionNodeRef = positionNode;
         positionNode = function patchedPositionNode(node) {
           __origPositionNodeRef(node);
+          if (applyingViewportTransform) return;
           // aggiorna tutti gli edge collegati al nodo
           for (let i = 0; i < state.edges.length; i++) {
             const ed = state.edges[i];
@@ -6363,6 +6641,7 @@
               __updateEdgePaths(i, pathCubic(s, t));
             }
           }
+          scheduleEdgeCanvasDraw();
         };
       })(); // chiusura dell'IIFE
 

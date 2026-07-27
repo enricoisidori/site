@@ -367,6 +367,11 @@
       }
 
       function resolveProjectAssetSrc(projectId, file) {
+        const sharedResolved = window.OvertraceUI?.resolveProjectAssetUrl?.(
+          file,
+          `./${projectId}/`,
+        );
+        if (sharedResolved) return sharedResolved;
         const raw = String(file?.path || file?.url || file?.name || "").trim();
         if (!raw) return "";
         return `./${projectId}/${raw.replace(/^\.\//, "")}`;

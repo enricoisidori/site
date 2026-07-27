@@ -1359,8 +1359,10 @@
           paused: true,
           projectName: "",
           rawProject: null,
+          assetProject: null,
           folderName: null,
           assetBase: "",
+          assetDirHandle: null,
           pointerDown: {
             x: 0,
             y: 0,
@@ -1872,6 +1874,11 @@
             state.rawProject = null;
             return;
           }
+          if (window.OvertraceUI?.stripTransientProjectData) {
+            state.rawProject =
+              window.OvertraceUI.stripTransientProjectData(project);
+            return;
+          }
           try {
             state.rawProject = structuredClone(project);
           } catch (_) {
@@ -1888,7 +1895,7 @@
           return text || null;
         }
 
-        function persistSharedProjectState(source = "space") {
+        async function persistSharedProjectState(source = "space") {
           if (!state.rawProject) return false;
           const folderName =
             state.folderName || inferFolderNameFromBase(state.assetBase);
@@ -1901,7 +1908,11 @@
             label: state.projectName || "",
             project: state.rawProject,
           };
-          localStorage.setItem(SHARED_PROJECT_KEY, JSON.stringify(payload));
+          const saved =
+            await window.OvertraceUI?.saveSharedProjectState?.(payload);
+          if (!saved) {
+            localStorage.setItem(SHARED_PROJECT_KEY, JSON.stringify(payload));
+          }
           return true;
         }
 
@@ -1910,25 +1921,38 @@
           const from = params.get("from");
           if (!from || from === "space") return false;
           try {
-            const raw = localStorage.getItem(SHARED_PROJECT_KEY);
-            if (!raw) return false;
-            const payload = JSON.parse(raw);
+            const payload =
+              (await window.OvertraceUI?.loadSharedProjectState?.()) ||
+              (() => {
+                const raw = localStorage.getItem(SHARED_PROJECT_KEY);
+                return raw ? JSON.parse(raw) : null;
+              })();
             if (!payload || !payload.project) return false;
             if (payload.source && payload.source !== from) return false;
 
-            buildGraph(
+            const requestedFolder =
+              payload.folderName ||
+              params.get("project") ||
+              inferFolderNameFromBase(payload.assetBase);
+            const fsContext =
+              await window.OvertraceUI?.loadProjectFsContext?.();
+            const dirHandle =
+              fsContext?.kind === "folder" &&
+              fsContext.handle &&
+              (!requestedFolder ||
+                !fsContext.folderName ||
+                fsContext.folderName === requestedFolder)
+                ? fsContext.handle
+                : null;
+
+            await loadProjectSource(
               payload.project,
               payload.label || payload.folderName || "Project",
-            );
-            setRawProject(payload.project);
-            state.folderName = payload.folderName || null;
-            state.assetBase =
               payload.assetBase ||
-              (payload.folderName ? `${payload.folderName}/` : "");
-            if (!state.assetBase) {
-              state.assetBase = await detectAssetBase(payload.project);
-            }
-            updateAllNodeLabelAssets();
+                (payload.folderName ? `${payload.folderName}/` : ""),
+              payload.folderName || null,
+              dirHandle,
+            );
             refreshToolbarOptions();
             applyImagesVisibility();
 
@@ -1950,7 +1974,10 @@
           if (!Array.isArray(node.files) || node.files.length === 0) return;
 
           const firstImage =
-            state.showImages && node.files.find((f) => !!f && f.isImage);
+            state.showImages &&
+            node.files.find(
+              (f) => !!f && f.isImage && !!resolveAssetUrl(f),
+            );
           if (firstImage && state.showImages) {
             const url = resolveAssetUrl(firstImage);
             if (url) {
@@ -2457,7 +2484,7 @@
                 ? Number(raw.y)
                 : fallbackY;
               return {
-                id: String(raw?.id || `node_${i}`),
+                id: String(raw?.id ?? `node_${i}`),
                 x,
                 y,
                 w,
@@ -2474,10 +2501,15 @@
 
           const edges = [];
           for (const edge of Array.isArray(rawEdges) ? rawEdges : []) {
-            const a = byId.get(String(edge?.s));
-            const b = byId.get(String(edge?.t));
+            const endpoints =
+              window.OvertraceUI?.edgeEndpoints?.(edge) || {
+                source: edge?.s,
+                target: edge?.t,
+              };
+            const a = byId.get(String(endpoints.source));
+            const b = byId.get(String(endpoints.target));
             if (a == null || b == null || a === b) continue;
-            edges.push({ a, b, weak: !!edge?.dashed });
+            edges.push({ a, b, weak: !!(edge?.dashed ?? edge?.weak) });
             nodes[a].degree += 1;
             nodes[b].degree += 1;
           }
@@ -4286,7 +4318,7 @@
                 ? n.files
                 : [];
             return {
-              id: String(n.id || `node_${i}`),
+              id: String(n.id ?? `node_${i}`),
               title: data.title || "(untitled)",
               type: data.type || "Unknown",
               action: data.action || "-",
@@ -4391,10 +4423,15 @@
 
           const edges = [];
           for (const e of rawEdges) {
-            const a = idToIndex.get(String(e.s));
-            const b = idToIndex.get(String(e.t));
+            const endpoints =
+              window.OvertraceUI?.edgeEndpoints?.(e) || {
+                source: e?.s,
+                target: e?.t,
+              };
+            const a = idToIndex.get(String(endpoints.source));
+            const b = idToIndex.get(String(endpoints.target));
             if (a == null || b == null || a === b) continue;
-            edges.push({ a, b, weak: !!e.dashed });
+            edges.push({ a, b, weak: !!(e.dashed ?? e.weak) });
             nodes[a].degree += 1;
             nodes[b].degree += 1;
           }
@@ -4670,10 +4707,12 @@
         }
 
         function resolveAssetUrl(fileEntry) {
-          if (!fileEntry || !fileEntry.path) return "";
-          const rel = String(fileEntry.path).replace(/^\.\//, "");
-          if (!state.assetBase) return "";
-          return `${state.assetBase}${rel}`;
+          return (
+            window.OvertraceUI?.resolveProjectAssetUrl?.(
+              fileEntry,
+              state.assetBase,
+            ) || ""
+          );
         }
 
         function renderNodeMedia(node, targetEl = dom.nodeMedia) {
@@ -4927,12 +4966,29 @@
           return "";
         }
 
-        async function loadProjectSource(project, label, preferredBase = "") {
-          buildGraph(project, label);
+        async function loadProjectSource(
+          project,
+          label,
+          preferredBase = "",
+          preferredFolder = null,
+          preferredDirHandle = null,
+        ) {
           state.assetBase = preferredBase || (await detectAssetBase(project));
-          state.folderName = inferFolderNameFromBase(state.assetBase);
+          state.folderName =
+            preferredFolder || inferFolderNameFromBase(state.assetBase);
+          state.assetDirHandle = preferredDirHandle || null;
+          if (state.assetProject && state.assetProject !== project) {
+            window.OvertraceUI?.releaseProjectAssetUrls?.(state.assetProject);
+          }
+          await window.OvertraceUI?.hydrateProjectAssets?.(project, {
+            assetBase: state.assetBase,
+            dirHandle: state.assetDirHandle,
+          });
+          state.assetProject = project;
+
+          buildGraph(project, label);
           updateAllNodeLabelAssets();
-          persistSharedProjectState("space");
+          await persistSharedProjectState("space");
         }
 
         async function loadFromJsonFile(file, label = "") {
@@ -4967,7 +5023,13 @@
             folderName || entry?.fileName?.replace(/\.json$/i, "") || "Project";
           const assetBase =
             entry?.assetBase || (folderName ? `${folderName}/` : "");
-          await loadProjectSource(entry.project, label, assetBase);
+          await loadProjectSource(
+            entry.project,
+            label,
+            assetBase,
+            folderName || null,
+            entry?.dirHandle || null,
+          );
           const fsContext = window.OvertraceUI?.buildProjectFsContext?.(entry);
           if (fsContext) {
             await window.OvertraceUI?.saveProjectFsContext?.(fsContext);
@@ -5222,10 +5284,10 @@
             openJsonDialog();
           });
 
-          dom.btnEditor?.addEventListener("click", () => {
+          dom.btnEditor?.addEventListener("click", async () => {
             let persisted = false;
             try {
-              persisted = !!persistSharedProjectState("space");
+              persisted = !!(await persistSharedProjectState("space"));
             } catch (err) {
               console.warn("Unable to persist shared project state", err);
             }
@@ -5245,10 +5307,10 @@
             window.location.href = "./index.html";
           });
 
-          dom.btnProcess?.addEventListener("click", () => {
+          dom.btnProcess?.addEventListener("click", async () => {
             let persisted = false;
             try {
-              persisted = !!persistSharedProjectState("space");
+              persisted = !!(await persistSharedProjectState("space"));
             } catch (err) {
               console.warn("Unable to persist shared project state", err);
             }
@@ -5700,11 +5762,12 @@
             });
             if (!res.ok) return;
             const project = await res.json();
-            buildGraph(project, folder);
-            state.assetBase = `${folder}/`;
-            state.folderName = folder;
-            updateAllNodeLabelAssets();
-            persistSharedProjectState("space");
+            await loadProjectSource(
+              project,
+              folder,
+              `${folder}/`,
+              folder,
+            );
             setHint(`Default load: ${folder}/project.json`, "ok");
           } catch (_) {
             // keep manual flow
