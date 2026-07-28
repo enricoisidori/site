@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cooperazione / Benessere — 3D</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      background: #fff;
+      color: #151515;
+      font-family: Georgia, "Times New Roman", Times, serif;
+    }
+    canvas { display: block; }
+    .ui {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .title {
+      position: absolute;
+      top: 28px;
+      left: 28px;
+      margin: 0;
+      max-width: 490px;
+      font-size: clamp(18px, 1.75vw, 27px);
+      font-weight: 700;
+      line-height: 1.03;
+      letter-spacing: -.025em;
+    }
+    .title span {
+      display: block;
+      margin-top: 10px;
+      font-size: .49em;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .hint {
+      position: absolute;
+      left: 28px;
+      bottom: 76px;
+      margin: 0;
+      color: #6d6d6d;
+      font-size: 11px;
+      line-height: 1.55;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .counter {
+      position: absolute;
+      left: 50%;
+      bottom: 48px;
+      transform: translateX(-50%);
+      color: #555;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      opacity: 0;
+      transition: opacity .8s ease;
+    }
+    .others-caption {
+      position: absolute;
+      left: 50%;
+      bottom: 82px;
+      margin: 0;
+      transform: translateX(-50%) translateY(8px);
+      color: #151515;
+      font-size: clamp(13px, 1.25vw, 17px);
+      font-weight: 900;
+      letter-spacing: -.02em;
+      opacity: 0;
+      transition: opacity .8s ease, transform .8s ease;
+      white-space: nowrap;
+    }
+    .others-caption.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .counter.visible { opacity: 1; }
+    #reset {
+      position: absolute;
+      right: 28px;
+      top: 86px;
+      pointer-events: auto;
+      border: 1px solid #d4d4d4;
+      border-radius: 0;
+      background: rgba(255,255,255,.9);
+      color: #151515;
+      padding: 9px 15px;
+      font: 700 11px Georgia, "Times New Roman", serif;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    #reset:hover { border-color: #111; }
+    .nav-button {
+      position: absolute; bottom: 24px; width: 50px; height: 50px; display: grid; place-items: center;
+      pointer-events: auto;
+      border: 1px solid #171717; background: #fff; color: #171717; text-decoration: none;
+      font: 400 24px/1 Arial, sans-serif; transition: color .2s ease, background .2s ease;
+    }
+    .nav-button:hover { color: #fff; background: #e52a20; border-color: #e52a20; }
+    .nav-button.previous { left: 28px; }
+    .nav-button.next { right: 28px; }
+    .flow-progress {
+      position: absolute; right: 94px; bottom: 42px;
+      font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    }
+    @media (max-width: 680px) {
+      .title { top: 20px; left: 20px; max-width: 290px; }
+      .hint { left: 20px; bottom: 48px; font-size: 9px; }
+      .counter { bottom: 43px; font-size: 11px; }
+      #reset { right: 20px; top: 76px; }
+      .others-caption { bottom: 74px; font-size: 12px; }
+      .nav-button { bottom: 18px; }
+      .nav-button.previous { left: 20px; }
+      .nav-button.next { right: 20px; }
+      .flow-progress { right: 82px; bottom: 36px; }
+    }
+    .error {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      place-items: center;
+      padding: 30px;
+      background: #fff;
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="ui">
+    <h1 class="title" id="question-title"></h1>
+    <a class="nav-button previous" id="previous-question" href="#" aria-label="Domanda precedente">←</a>
+    <span class="flow-progress" id="question-progress">5 / 6</span>
+    <a class="nav-button next" id="next-question" href="#" aria-label="Domanda successiva">→</a>
+    <p class="hint" id="hint">Muovi il mouse sul piano<br>per scegliere la tua posizione</p>
+    <span class="counter" id="counter"></span>
+    <p class="others-caption" id="others-caption">Tutti gli altri si sono posizionati qui.</p>
+    <button id="reset" type="button">Ricomincia</button>
+  </div>
+  <div class="error" id="error">
+    Impossibile caricare la scena 3D.<br>
+    Apri la pagina con una connessione internet attiva.
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
+
+    const compassConfigs = {
+      3: {
+        title: '3. Come ritieni l’impatto delle nuove tecnologie nel tuo lavoro?',
+        axes: ['Facilita il mio lavoro', 'Non facilita il mio lavoro', 'Alleggerisce il carico di lavoro', 'Aumenta il carico di lavoro']
+      },
+      4: {
+        title: '4. Le tue condizioni di lavoro:',
+        axes: ['Nei prossimi anni miglioreranno', 'Nei prossimi anni peggioreranno', 'Negli ultimi anni sono migliorate', 'Negli ultimi anni sono peggiorate']
+      },
+      5: {
+        title: '5. Quale equilibrio dovrebbe cercare il lavoro contemporaneo?',
+        axes: ['Competizione', 'Cooperazione', 'Produttività', 'Benessere']
+      }
+    };
+    const questionNumber = Number(new URLSearchParams(location.search).get('q')) || 5;
+    const compassConfig = compassConfigs[questionNumber] || compassConfigs[5];
+    const questionHref = number => {
+      if (number === 1) return 'red-cubes-question-1.html';
+      if (number === 6) return 'red-cubes-placeholder.html?q=6';
+      if (number === 2) return 'red-cubes-priorities.html';
+      return `red-cubes-compass.html?q=${number}`;
+    };
+    document.title = `${compassConfig.title} — Compass`;
+    document.querySelector('#question-title').innerHTML = `${compassConfig.title}<span>Posizionati rispetto ai 4 assi</span>`;
+    document.querySelector('#question-progress').textContent = `${questionNumber} / 6`;
+    document.querySelector('#previous-question').href = questionHref(questionNumber - 1);
+    document.querySelector('#next-question').href = questionHref(questionNumber + 1);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+    scene.fog = new THREE.Fog(0xffffff, 52, 95);
+
+    const camera = new THREE.PerspectiveCamera(34, innerWidth / innerHeight, 0.1, 100);
+    const topCameraPosition = new THREE.Vector3(0, 29, 0.01);
+    const axonometricCameraPosition = new THREE.Vector3(15, 13, 17);
+    const topTarget = new THREE.Vector3(0, 0, 0);
+    const axonometricTarget = new THREE.Vector3(1.3, 1.8, 1.4);
+    camera.position.copy(topCameraPosition);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.06;
+    document.body.prepend(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.copy(topTarget);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.055;
+    controls.minDistance = 10;
+    controls.maxDistance = 34;
+    controls.maxPolarAngle = Math.PI * 0.49;
+    controls.minPolarAngle = 0.001;
+    controls.enableRotate = false;
+    controls.enableZoom = false;
+    controls.enablePan = false;
+    controls.update();
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xcacaca, 2.25));
+    const sun = new THREE.DirectionalLight(0xffffff, 4.4);
+    sun.position.set(-7, 18, -4);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -13;
+    sun.shadow.camera.right = 13;
+    sun.shadow.camera.top = 13;
+    sun.shadow.camera.bottom = -13;
+    sun.shadow.camera.near = 1;
+    sun.shadow.camera.far = 38;
+    sun.shadow.bias = -0.0004;
+    scene.add(sun);
+
+    // Un unico piano continuo sotto la bussola.
+    const board = new THREE.Group();
+    const boardGeometry = new THREE.BoxGeometry(14, 0.16, 14);
+    const boardMesh = new THREE.Mesh(
+      boardGeometry,
+      new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.94, metalness: 0 })
+    );
+    boardMesh.position.y = -0.12;
+    boardMesh.receiveShadow = true;
+    board.add(boardMesh);
+    const boardOutline = new THREE.LineSegments(
+      new THREE.EdgesGeometry(boardGeometry),
+      new THREE.LineBasicMaterial({ color: 0x242424, transparent: true, opacity: 0.52 })
+    );
+    boardOutline.position.copy(boardMesh.position);
+    board.add(boardOutline);
+    scene.add(board);
+
+    // Quattro assi reali sul piano: frecce dal centro e parole alle estremità.
+    const axes = new THREE.Group();
+    const axisOrigin = new THREE.Vector3(0, 0.13, 0);
+    function addAxis(direction) {
+      const arrowLength = 7.28;
+      const arrow = new THREE.ArrowHelper(direction, axisOrigin, arrowLength, 0x111111, 0.30, 0.20);
+      arrow.line.material.depthTest = true;
+      arrow.cone.material.depthTest = true;
+      arrow.line.visible = false;
+      const rod = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.011, 0.011, arrowLength - 0.28, 8),
+        new THREE.MeshBasicMaterial({ color: 0x111111, depthTest: true })
+      );
+      rod.position.copy(axisOrigin).addScaledVector(direction, (arrowLength - 0.34) / 2);
+      rod.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
+      axes.add(rod);
+      axes.add(arrow);
+    }
+    addAxis(new THREE.Vector3(1, 0, 0));
+    addAxis(new THREE.Vector3(-1, 0, 0));
+    addAxis(new THREE.Vector3(0, 0, 1));
+    addAxis(new THREE.Vector3(0, 0, -1));
+
+    function makeAxisLabel(text) {
+      const isLong = text.length > 22;
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = isLong ? 260 : 180;
+      const context = canvas.getContext('2d');
+      context.fillStyle = '#111111';
+      let lines = [text];
+      if (isLong) {
+        const words = text.split(' ');
+        let first = '';
+        let second = '';
+        words.forEach(word => {
+          if ((first + ' ' + word).trim().length <= Math.ceil(text.length / 2) || !first) first = `${first} ${word}`.trim();
+          else second = `${second} ${word}`.trim();
+        });
+        lines = [first, second].filter(Boolean);
+      }
+      let fontSize = isLong ? 54 : 62;
+      do {
+        context.font = `700 ${fontSize}px Georgia, Times New Roman, serif`;
+        fontSize -= 2;
+      } while (Math.max(...lines.map(line => context.measureText(line).width)) > 900 && fontSize > 34);
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      const lineHeight = isLong ? 61 : 68;
+      lines.forEach((line, index) => {
+        const y = canvas.height / 2 + (index - (lines.length - 1) / 2) * lineHeight;
+        context.fillText(line, 512, y);
+      });
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.minFilter = THREE.LinearFilter;
+      const label = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false
+      }));
+      label.scale.set(isLong ? 4.9 : 4.05, isLong ? 1.2 : 0.71, 1);
+      label.renderOrder = 9;
+      return label;
+    }
+    [
+      [compassConfig.axes[0], -8.25, 0],
+      [compassConfig.axes[1], 8.25, 0],
+      [compassConfig.axes[2], 0, -8.25],
+      [compassConfig.axes[3], 0, 8.25]
+    ].forEach(([text, x, z]) => {
+      const label = makeAxisLabel(text);
+      label.position.set(x, 0.24, z);
+      axes.add(label);
+    });
+    scene.add(axes);
+
+    const world = new CANNON.World({
+      gravity: new CANNON.Vec3(0, -13.5, 0)
+    });
+    world.allowSleep = true;
+    world.broadphase = new CANNON.SAPBroadphase(world);
+    world.solver.iterations = 16;
+
+    const cubeMaterial = new CANNON.Material('cube');
+    const groundMaterial = new CANNON.Material('ground');
+    world.addContactMaterial(new CANNON.ContactMaterial(cubeMaterial, groundMaterial, {
+      friction: 0.62,
+      restitution: 0.08,
+      contactEquationStiffness: 1e8,
+      contactEquationRelaxation: 3
+    }));
+    world.addContactMaterial(new CANNON.ContactMaterial(cubeMaterial, cubeMaterial, {
+      friction: 0.52,
+      restitution: 0.06
+    }));
+
+    const groundBody = new CANNON.Body({
+      mass: 0,
+      material: groundMaterial,
+      shape: new CANNON.Box(new CANNON.Vec3(7, 0.1, 7)),
+      position: new CANNON.Vec3(0, -0.12, 0)
+    });
+    world.addBody(groundBody);
+
+    // Un bordo fisico basso e invisibile mantiene l'accumulo nel quadrante
+    // senza trasformarlo in una griglia rigida: in cima i cubi possono traboccare.
+    function addBarrier(x, z, halfX, halfZ) {
+      const barrier = new CANNON.Body({
+        mass: 0,
+        material: groundMaterial,
+        shape: new CANNON.Box(new CANNON.Vec3(halfX, 0.72, halfZ)),
+        position: new CANNON.Vec3(x, 0.62, z)
+      });
+      world.addBody(barrier);
+    }
+    addBarrier(0.05, 3.5, 0.04, 3.45);
+    addBarrier(6.95, 3.5, 0.04, 3.45);
+    addBarrier(3.5, 0.05, 3.45, 0.04);
+    addBarrier(3.5, 6.95, 3.45, 0.04);
+
+    const redMaterials = [
+      new THREE.MeshStandardMaterial({ color: 0xf02b20, roughness: 0.42, metalness: 0.02 }),
+      new THREE.MeshStandardMaterial({ color: 0xd9231a, roughness: 0.5, metalness: 0 }),
+      new THREE.MeshStandardMaterial({ color: 0xff3b2d, roughness: 0.38, metalness: 0.03 })
+    ];
+    const cubes = [];
+    const maxCubes = 120;
+    let spawnClock = 0;
+    let spawnIndex = 0;
+    let hasPlaced = false;
+    let revealOthers = false;
+    let myCube = null;
+    let myCubeBody = null;
+    let myCubeFade = 0;
+    let cameraTransition = 0;
+    let otherWait = -1;
+    const hint = document.querySelector('#hint');
+    const counter = document.querySelector('#counter');
+    const othersCaption = document.querySelector('#others-caption');
+    function spawnCube(delayHeight = 0) {
+      if (cubes.length >= maxCubes) return;
+      const size = THREE.MathUtils.randFloat(0.46, 0.67);
+      const geometry = new THREE.BoxGeometry(size, size, size);
+      const mesh = new THREE.Mesh(geometry, redMaterials[spawnIndex % redMaterials.length]);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      // Posizione nel quadrante +x / +z: Cooperazione e Benessere.
+      const angle = spawnIndex * 2.39996;
+      const radius = Math.min(1.8, 0.3 + spawnIndex * 0.018);
+      const x = 3.25 + Math.cos(angle) * radius + THREE.MathUtils.randFloatSpread(0.45);
+      const z = 3.2 + Math.sin(angle) * radius + THREE.MathUtils.randFloatSpread(0.45);
+      const y = 8.2 + delayHeight + Math.random() * 3;
+      mesh.position.set(x, y, z);
+      mesh.rotation.set(Math.random(), Math.random(), Math.random());
+      scene.add(mesh);
+
+      const half = size / 2;
+      const body = new CANNON.Body({
+        mass: size * 1.35,
+        material: cubeMaterial,
+        shape: new CANNON.Box(new CANNON.Vec3(half, half, half)),
+        position: new CANNON.Vec3(x, y, z),
+        angularDamping: 0.18,
+        linearDamping: 0.015,
+        sleepSpeedLimit: 0.12,
+        sleepTimeLimit: 1.2
+      });
+      body.quaternion.setFromEuler(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+      body.angularVelocity.set(
+        THREE.MathUtils.randFloatSpread(1.8),
+        THREE.MathUtils.randFloatSpread(1.8),
+        THREE.MathUtils.randFloatSpread(1.8)
+      );
+      world.addBody(body);
+      cubes.push({ mesh, body });
+      spawnIndex++;
+      counter.textContent = `${cubes.length} risposte`;
+    }
+
+    function clearCubes() {
+      cubes.forEach(({ mesh, body }) => {
+        scene.remove(mesh);
+        mesh.geometry.dispose();
+        world.removeBody(body);
+      });
+      cubes.length = 0;
+      spawnIndex = 0;
+      spawnClock = 0;
+      counter.textContent = '';
+      counter.classList.remove('visible');
+    }
+
+    // Nella vista zenitale l'hover è volutamente un solo quadrato piatto.
+    const previewMaterial = new THREE.MeshBasicMaterial({
+      color: 0xf02b20,
+      transparent: true,
+      opacity: 0.24,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+    const preview = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.62), previewMaterial);
+    preview.rotation.x = -Math.PI / 2;
+    preview.position.y = 0.04;
+    preview.visible = false;
+    scene.add(preview);
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const hoverPoint = new THREE.Vector3();
+    let pointerDown = null;
+
+    function updatePreview(event) {
+      if (hasPlaced) return;
+      pointer.x = (event.clientX / innerWidth) * 2 - 1;
+      pointer.y = -(event.clientY / innerHeight) * 2 + 1;
+      raycaster.setFromCamera(pointer, camera);
+      if (raycaster.ray.intersectPlane(plane, hoverPoint) &&
+          Math.abs(hoverPoint.x) < 6.75 && Math.abs(hoverPoint.z) < 6.75) {
+        preview.position.set(hoverPoint.x, 0.04, hoverPoint.z);
+        preview.visible = true;
+        renderer.domElement.style.cursor = 'crosshair';
+      } else {
+        preview.visible = false;
+        renderer.domElement.style.cursor = 'grab';
+      }
+    }
+
+    function placeMyCube() {
+      if (hasPlaced || !preview.visible) return;
+      hasPlaced = true;
+      preview.visible = false;
+      renderer.domElement.style.cursor = 'grab';
+      const material = new THREE.MeshStandardMaterial({
+        color: 0xe9241a,
+        transparent: true,
+        opacity: 0,
+        roughness: 0.34,
+        metalness: 0.03
+      });
+      myCube = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.72, 0.72), material);
+      myCube.position.set(hoverPoint.x, 11.5, hoverPoint.z);
+      myCube.rotation.set(0.08, 0.24, -0.05);
+      myCube.castShadow = true;
+      myCube.receiveShadow = true;
+      scene.add(myCube);
+      myCubeBody = new CANNON.Body({
+        mass: 1.1,
+        material: cubeMaterial,
+        shape: new CANNON.Box(new CANNON.Vec3(0.36, 0.36, 0.36)),
+        position: new CANNON.Vec3(hoverPoint.x, 11.5, hoverPoint.z),
+        angularDamping: 0.2,
+        sleepSpeedLimit: 0.12,
+        sleepTimeLimit: 0.8
+      });
+      myCubeBody.quaternion.setFromEuler(myCube.rotation.x, myCube.rotation.y, myCube.rotation.z);
+      myCubeBody.angularVelocity.set(0.45, -0.25, 0.34);
+      world.addBody(myCubeBody);
+      hint.innerHTML = 'Il tuo cubo sta cadendo.<br>Poi vedrai dove si è formato il gruppo';
+      myCubeFade = 0.01;
+      cameraTransition = 0.001;
+    }
+
+    function resetExperience() {
+      clearCubes();
+      if (myCube) {
+        scene.remove(myCube);
+        myCube.geometry.dispose();
+        myCube.material.dispose();
+        myCube = null;
+      }
+      if (myCubeBody) {
+        world.removeBody(myCubeBody);
+        myCubeBody = null;
+      }
+      hasPlaced = false;
+      revealOthers = false;
+      myCubeFade = 0;
+      otherWait = -1;
+      cameraTransition = 0;
+      camera.position.copy(topCameraPosition);
+      controls.target.copy(topTarget);
+      controls.enableRotate = false;
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      controls.update();
+      preview.visible = false;
+      othersCaption.classList.remove('visible');
+      hint.innerHTML = 'Muovi il mouse sul piano<br>per scegliere la tua posizione';
+    }
+
+    renderer.domElement.addEventListener('pointermove', updatePreview);
+    renderer.domElement.addEventListener('pointerdown', event => {
+      pointerDown = { x: event.clientX, y: event.clientY };
+    });
+    renderer.domElement.addEventListener('pointerup', event => {
+      if (!pointerDown) return;
+      const moved = Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y);
+      pointerDown = null;
+      if (moved < 6) placeMyCube();
+    });
+    document.querySelector('#reset').addEventListener('click', resetExperience);
+    resetExperience();
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), 0.05);
+      if (cameraTransition > 0 && cameraTransition < 1) {
+        cameraTransition = Math.min(1, cameraTransition + delta * 0.88);
+        const ease = 1 - Math.pow(1 - cameraTransition, 3);
+        camera.position.lerpVectors(topCameraPosition, axonometricCameraPosition, ease);
+        controls.target.lerpVectors(topTarget, axonometricTarget, ease);
+        if (cameraTransition === 1) {
+          controls.enableRotate = true;
+          controls.enableZoom = true;
+          controls.enablePan = true;
+        }
+      }
+      if (myCube && myCubeFade < 1) {
+        myCubeFade = Math.min(1, myCubeFade + delta * 1.3);
+        myCube.material.opacity = myCubeFade;
+      }
+      if (myCube && myCubeBody) {
+        myCube.position.copy(myCubeBody.position);
+        myCube.quaternion.copy(myCubeBody.quaternion);
+        const hasLanded = myCubeBody.position.y < 1.1 && Math.abs(myCubeBody.velocity.y) < 0.8;
+        if (hasLanded && otherWait < 0 && !revealOthers) {
+          otherWait = 0.85;
+          hint.innerHTML = '';
+        }
+        if (otherWait > 0 && !revealOthers) {
+          otherWait -= delta;
+        }
+        if (otherWait <= 0 && otherWait > -1 && !revealOthers) {
+          revealOthers = true;
+          othersCaption.classList.add('visible');
+          counter.classList.add('visible');
+          for (let i = 0; i < 4; i++) spawnCube(i * 0.45);
+        }
+      }
+      if (revealOthers) {
+        spawnClock += delta;
+        if (spawnClock > 0.34 && cubes.length < maxCubes) {
+          spawnClock = 0;
+          spawnCube();
+        }
+      }
+
+      world.step(1 / 60, delta, 4);
+      cubes.forEach(({ mesh, body }) => {
+        mesh.position.copy(body.position);
+        mesh.quaternion.copy(body.quaternion);
+        // Recupera rarissimi cubi che riescono a cadere oltre il piano.
+        if (body.position.y < -8) {
+          body.position.set(3.2, 13, 3.2);
+          body.velocity.setZero();
+          body.angularVelocity.setZero();
+        }
+      });
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    });
+  </script>
+  <script>
+    addEventListener('error', () => {
+      document.querySelector('#error').style.display = 'grid';
+    });
+  </script>
+</body>
+</html>

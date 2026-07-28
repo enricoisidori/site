@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Questionario sul lavoro</title>
+  <style>
+    :root { --red: #e52a20; --ink: #171717; --line: #c9c9c9; }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
+    body {
+      background: #fff;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .nav-button {
+      position: fixed; z-index: 4; bottom: 24px; width: 50px; height: 50px; display: grid; place-items: center;
+      border: 1px solid var(--ink); background: #fff; color: var(--ink); text-decoration: none;
+      font: 400 24px/1 Arial, sans-serif; transition: color .2s ease, background .2s ease;
+    }
+    .nav-button:hover { background: var(--red); border-color: var(--red); color: #fff; }
+    .nav-button.previous { left: 28px; }
+    .nav-button.next { right: 28px; }
+    .flow-progress {
+      position: fixed; z-index: 4; right: 94px; bottom: 42px;
+      font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    }
+    main {
+      width: min(720px, calc(100vw - 48px));
+      margin-left: clamp(24px, 7vw, 104px);
+      padding: clamp(100px, 16vh, 160px) 0 80px;
+    }
+    .eyebrow { margin: 0 0 17px; color: var(--red); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0 0 18px; max-width: 690px; font-size: clamp(32px, 4.2vw, 58px); line-height: .98; letter-spacing: -.045em; }
+    .instruction { margin: 0 0 31px; color: #555; font-size: 14px; }
+    .options { border-top: 1px solid var(--ink); }
+    .option {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 15px 0; border-bottom: 1px solid var(--line); color: #343434;
+      font-size: clamp(16px, 1.55vw, 21px);
+    }
+    .option::after {
+      content: ""; flex: 0 0 15px; width: 15px; height: 15px; border: 1px solid #999; border-radius: 50%;
+    }
+    body[data-question="6"] .option::after { border-radius: 0; }
+    .placeholder-note {
+      margin: 22px 0 0; color: #888; font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+    }
+    @media (max-width: 680px) {
+      .nav-button { bottom: 18px; }
+      .nav-button.previous { left: 20px; }
+      .nav-button.next { right: 20px; }
+      .flow-progress { right: 82px; bottom: 36px; }
+      main { margin-left: 20px; width: calc(100vw - 40px); padding-top: 90px; }
+      .option { padding: 13px 0; }
+    }
+  </style>
+</head>
+<body>
+  <a class="nav-button previous" id="previous" href="#" aria-label="Domanda precedente">←</a>
+  <span class="flow-progress" id="progress"></span>
+  <a class="nav-button next" id="next" href="#" aria-label="Domanda successiva">→</a>
+  <main>
+    <p class="eyebrow">Placeholder della domanda</p>
+    <h1 id="title"></h1>
+    <p class="instruction" id="instruction"></p>
+    <div class="options" id="options"></div>
+    <p class="placeholder-note">L’interazione verrà sviluppata nella fase successiva.</p>
+  </main>
+  <script>
+    const configurations = {
+      1: {
+        title: '1. Quale conquista sindacale del Novecento ritieni oggi più importante?',
+        instruction: 'Scelta singola',
+        options: [
+          'Riduzione dell’orario di lavoro',
+          'Diritto di sciopero',
+          'Contrattazione collettiva',
+          'Statuto dei lavoratori',
+          'Ferie retribuite',
+          'Pensioni e tutele previdenziali',
+          'Tutele sulla salute e sicurezza'
+        ],
+        previous: 'red-cubes-question-1.html',
+        next: 'red-cubes-priorities.html'
+      },
+      6: {
+        title: '6. Quali temi dovrebbe affrontare prioritariamente il sindacato nei prossimi anni?',
+        instruction: 'Scegli tre priorità',
+        options: [
+          'Aumentare i salari',
+          'Lotta alla precarietà',
+          'Migliorare la sicurezza sul lavoro',
+          'Ridurre le disuguaglianze',
+          'Governare la trasformazione tecnologica',
+          'Difendere l’ambiente',
+          'Rafforzare la democrazia'
+        ],
+        previous: 'red-cubes-compass.html?q=5',
+        next: 'red-cubes-placeholder.html?q=6'
+      }
+    };
+    const number = Number(new URLSearchParams(location.search).get('q')) === 6 ? 6 : 1;
+    const config = configurations[number];
+    document.body.dataset.question = number;
+    document.title = config.title;
+    document.querySelector('#title').textContent = config.title;
+    document.querySelector('#instruction').textContent = config.instruction;
+    document.querySelector('#progress').textContent = `${number} / 6`;
+    document.querySelector('#previous').href = config.previous;
+    document.querySelector('#next').href = config.next;
+    if (number === 1) document.querySelector('#previous').style.visibility = 'hidden';
+    if (number === 6) document.querySelector('#next').style.visibility = 'hidden';
+    document.querySelector('#options').innerHTML = config.options.map(option => `<div class="option">${option}</div>`).join('');
+  </script>
+</body>
+</html>

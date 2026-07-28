@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>La conquista sindacale più importante</title>
+  <style>
+    :root { --red: #e52a20; --ink: #171717; --line: #c9c9c9; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: #fff; color: var(--ink); font-family: Georgia, "Times New Roman", serif; }
+    canvas { position: fixed; inset: 0; display: block; opacity: 0; transition: opacity .8s ease; }
+    body.is-revealed canvas { opacity: 1; }
+    .selection {
+      position: fixed; inset: 0; z-index: 3; display: grid; align-items: center;
+      padding: 70px clamp(24px, 7vw, 104px) 78px;
+      background: #fff; transition: opacity .65s ease, transform .75s cubic-bezier(.22,.8,.2,1);
+    }
+    body.is-revealed .selection { opacity: 0; transform: translateY(-18px); pointer-events: none; }
+    .panel { width: min(780px, 100%); }
+    h1 { margin: 0 0 14px; max-width: 760px; font-size: clamp(29px, 4vw, 56px); line-height: .98; letter-spacing: -.045em; }
+    .instruction { margin: 0 0 24px; color: #555; font-size: 14px; }
+    .options { border-top: 1px solid var(--ink); }
+    .option {
+      width: 100%; display: grid; grid-template-columns: 22px 1fr; align-items: center; gap: 15px;
+      padding: 12px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent;
+      color: #343434; font: inherit; font-size: clamp(15px, 1.4vw, 20px); text-align: left; cursor: pointer;
+    }
+    .option-square {
+      width: 17px; height: 17px; border: 1px solid #6d6d6d; background: #fff;
+      transition: background .22s ease, border-color .22s ease, transform .22s ease;
+    }
+    .option:hover .option-square { transform: scale(1.18); border-color: var(--red); }
+    .option.is-selected { color: #111; font-weight: 700; }
+    .option.is-selected .option-square { border-color: var(--red); background: var(--red); transform: scale(1.18); }
+    .scene-title {
+      position: fixed; z-index: 2; top: 25px; left: 28px; width: min(420px, calc(100vw - 100px));
+      margin: 0; opacity: 0; transform: translateY(8px); pointer-events: none;
+      transition: opacity .7s .45s ease, transform .7s .45s ease;
+    }
+    body.is-revealed .scene-title { opacity: 1; transform: none; }
+    .scene-title strong { display: block; font-size: clamp(19px, 2vw, 28px); line-height: 1; letter-spacing: -.03em; }
+    .scene-title span { display: block; margin-top: 8px; color: #555; font-size: 12px; line-height: 1.35; }
+    .nav-button {
+      position: fixed; z-index: 8; bottom: 24px; width: 50px; height: 50px; display: grid; place-items: center;
+      border: 1px solid #171717; border-radius: 0; background: #fff; color: #171717;
+      text-decoration: none; font: 400 24px/1 Arial, sans-serif; cursor: pointer;
+      transition: color .2s ease, background .2s ease, opacity .2s ease;
+    }
+    .nav-button.next { right: 28px; }
+    .nav-button.previous { left: 28px; visibility: hidden; }
+    .nav-button:hover, .nav-button.is-ready { background: var(--red); border-color: var(--red); color: #fff; }
+    .nav-button:disabled { opacity: .24; cursor: default; background: #fff; border-color: #171717; color: #171717; }
+    .progress {
+      position: fixed; z-index: 8; right: 94px; bottom: 42px;
+      font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    }
+    @media (max-width: 680px) {
+      .selection { padding: 60px 20px 76px; }
+      h1 { font-size: 30px; }
+      .option { padding: 10px 0; font-size: 14px; }
+      .scene-title { top: 20px; left: 20px; }
+      .nav-button { bottom: 18px; }
+      .nav-button.next { right: 20px; }
+      .nav-button.previous { left: 20px; }
+      .progress { right: 82px; bottom: 36px; }
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="selection">
+    <div class="panel">
+      <h1>1. Quale conquista sindacale del Novecento ritieni oggi più importante?</h1>
+      <p class="instruction">Scegli una risposta</p>
+      <div class="options" id="options"></div>
+    </div>
+  </main>
+  <p class="scene-title">
+    <strong>Le risposte diventano materia.</strong>
+    <span>La dimensione dei cubi rappresenta la percentuale delle scelte. Puoi muoverti nello spazio.</span>
+  </p>
+  <button class="nav-button previous" type="button" aria-label="Domanda precedente">←</button>
+  <span class="progress">1 / 6</span>
+  <button class="nav-button next" id="next" type="button" aria-label="Conferma e continua" disabled>→</button>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
+
+    const answers = [
+      'Riduzione dell’orario di lavoro',
+      'Diritto di sciopero',
+      'Contrattazione collettiva',
+      'Statuto dei lavoratori',
+      'Ferie retribuite',
+      'Pensioni e tutele previdenziali',
+      'Tutele sulla salute e sicurezza'
+    ];
+    const percentages = [19, 12, 18, 14, 9, 11, 17];
+    const options = document.querySelector('#options');
+    const next = document.querySelector('#next');
+    let selected = -1;
+    let revealed = false;
+
+    answers.forEach((answer, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'option';
+      button.innerHTML = `<span class="option-square" aria-hidden="true"></span><span>${answer}</span>`;
+      button.addEventListener('click', () => {
+        selected = index;
+        [...options.children].forEach((item, itemIndex) => item.classList.toggle('is-selected', itemIndex === index));
+        next.disabled = false;
+        next.classList.add('is-ready');
+      });
+      options.append(button);
+    });
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+    const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, .1, 80);
+    camera.position.set(0, 1.6, 16);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    document.body.prepend(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0, .2, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = .055;
+    controls.minDistance = 9;
+    controls.maxDistance = 24;
+    controls.enabled = false;
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xb8b8b8, 2.2));
+    const sun = new THREE.DirectionalLight(0xffffff, 4);
+    sun.position.set(-8, 12, 9);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    scene.add(sun);
+
+    const world = new CANNON.World({ gravity: new CANNON.Vec3(0, 0, 0) });
+    world.solver.iterations = 14;
+    const physicsMaterial = new CANNON.Material('cubes');
+    world.addContactMaterial(new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, {
+      friction: .05, restitution: .72
+    }));
+    const boundaryMaterial = new CANNON.Material('boundary');
+    world.addContactMaterial(new CANNON.ContactMaterial(physicsMaterial, boundaryMaterial, {
+      friction: .02, restitution: .82
+    }));
+    function boundary(position, halfExtents) {
+      const body = new CANNON.Body({
+        mass: 0, material: boundaryMaterial,
+        position: new CANNON.Vec3(...position),
+        shape: new CANNON.Box(new CANNON.Vec3(...halfExtents))
+      });
+      world.addBody(body);
+    }
+    boundary([0, -4.9, 0], [8, .1, 5.5]);
+    boundary([0, 5.5, 0], [8, .1, 5.5]);
+    boundary([-8.1, .3, 0], [.1, 5, 5.5]);
+    boundary([8.1, .3, 0], [.1, 5, 5.5]);
+    boundary([0, .3, -5.6], [8, 5, .1]);
+    boundary([0, .3, 5.6], [8, 5, .1]);
+
+    const redMaterials = [
+      new THREE.MeshStandardMaterial({ color: 0xee2e23, roughness: .38 }),
+      new THREE.MeshStandardMaterial({ color: 0xd9251b, roughness: .48 }),
+      new THREE.MeshStandardMaterial({ color: 0xff4436, roughness: .34 })
+    ];
+    const cubes = [];
+    const labels = [];
+    function makeLabel(answer, percentage) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 900; canvas.height = 190;
+      const context = canvas.getContext('2d');
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = '#151515';
+      context.font = '700 38px Georgia, Times New Roman, serif';
+      const words = answer.split(' ');
+      let first = ''; let second = '';
+      words.forEach(word => {
+        if ((`${first} ${word}`).trim().length < 25 || !first) first = `${first} ${word}`.trim();
+        else second = `${second} ${word}`.trim();
+      });
+      context.fillText(first, 450, 50);
+      if (second) context.fillText(second, 450, 94);
+      context.fillStyle = '#e52a20';
+      context.font = '700 52px Arial, sans-serif';
+      context.fillText(`${percentage}%`, 450, 151);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+      sprite.scale.set(4.2, .9, 1);
+      sprite.visible = false;
+      scene.add(sprite);
+      return sprite;
+    }
+
+    percentages.forEach((percentage, index) => {
+      const size = .82 + percentage * .047;
+      const geometry = new THREE.BoxGeometry(size, size, size);
+      const mesh = new THREE.Mesh(geometry, redMaterials[index % redMaterials.length]);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.scale.setScalar(.01);
+      mesh.visible = false;
+      scene.add(mesh);
+      const x = -5.9 + index * 1.95;
+      const y = (index % 2 ? 1.7 : -1.4);
+      const z = (index % 3 - 1) * 1.2;
+      const body = new CANNON.Body({
+        mass: size * size,
+        material: physicsMaterial,
+        shape: new CANNON.Box(new CANNON.Vec3(size / 2, size / 2, size / 2)),
+        position: new CANNON.Vec3(x, y, z),
+        linearDamping: .025,
+        angularDamping: .12
+      });
+      body.velocity.set((index % 2 ? -1 : 1) * (.7 + index * .08), (index - 3) * .12, (index % 3 - 1) * .55);
+      body.angularVelocity.set(.25 + index * .06, -.2 + index * .04, .18);
+      world.addBody(body);
+      body.sleep();
+      cubes.push({ mesh, body, size });
+      labels.push(makeLabel(answers[index], percentage));
+    });
+
+    let revealProgress = 0;
+    function reveal() {
+      revealed = true;
+      document.body.classList.add('is-revealed');
+      next.classList.remove('is-ready');
+      next.setAttribute('aria-label', 'Vai alla domanda 2');
+      cubes.forEach(({ mesh, body }, index) => {
+        mesh.visible = true;
+        body.wakeUp();
+        if (index === selected) body.velocity.scale(1.45, body.velocity);
+      });
+      setTimeout(() => { controls.enabled = true; }, 750);
+    }
+    next.addEventListener('click', () => {
+      if (!revealed) reveal();
+      else location.href = 'red-cubes-priorities.html';
+    });
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), .05);
+      if (revealed) {
+        revealProgress = Math.min(1, revealProgress + delta * 1.15);
+        const eased = 1 - Math.pow(1 - revealProgress, 3);
+        world.step(1 / 60, delta, 4);
+        cubes.forEach(({ mesh, body, size }, index) => {
+          mesh.position.copy(body.position);
+          mesh.quaternion.copy(body.quaternion);
+          const selectedBoost = index === selected ? 1.08 : 1;
+          mesh.scale.setScalar(eased * selectedBoost);
+          const label = labels[index];
+          label.visible = revealProgress > .32;
+          label.material.opacity = Math.min(1, (revealProgress - .32) * 2.4);
+          label.position.set(body.position.x, body.position.y + size * .72 + .7, body.position.z);
+        });
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    });
+  </script>
+</body>
+</html>

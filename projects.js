@@ -53,6 +53,8 @@
     "6am/asset/6am2-mobile.mp4": [608, 1080],
     "spectathesis/asset/spectathesis-optimized.mp4": [1700, 1134],
     "spectathesis/asset/spectathesis-mobile.mp4": [1080, 720],
+    "specta/asset/SPECTA-optimized.mp4": [1700, 956],
+    "specta/asset/SPECTA-mobile.mp4": [1080, 608],
     "pixelpushing/asset/Iterationsinversions-optimized.mp4": [1700, 956],
     "pixelpushing/asset/Iterationsinversions-mobile.mp4": [1080, 608],
     "pixelpushing/asset/istallationview-optimized.mp4": [956, 1700],

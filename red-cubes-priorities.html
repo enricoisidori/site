@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Priorità del lavoro — cubi rossi</title>
+  <style>
+    :root { --red: #e52a20; --ink: #171717; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: #fff; color: var(--ink); font-family: Georgia, "Times New Roman", serif; }
+    canvas { position: fixed; inset: 0; display: block; }
+    .interface { position: fixed; inset: 0; z-index: 2; pointer-events: none; transition: opacity .55s ease, transform .7s cubic-bezier(.22,.8,.2,1); }
+    .interface.is-confirmed { opacity: 0; transform: translateY(-18px); }
+    .panel { position: absolute; top: 50%; left: clamp(24px, 7vw, 104px); width: min(570px, calc(100vw - 48px)); transform: translateY(-50%); }
+    h1 { max-width: 530px; margin: 0 0 13px; font-size: clamp(27px, 3.25vw, 47px); line-height: .95; letter-spacing: -.05em; }
+    .intro { margin: 0 0 24px; max-width: 450px; color: #525252; font-size: 14px; line-height: 1.35; }
+    .total { margin: 0 0 11px; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .total strong { color: var(--red); font-size: 14px; }
+    .choices { border-top: 1px solid #1c1c1c; }
+    .choice { padding: 13px 0; border-bottom: 1px solid #bdbdbd; }
+    .choice-head { display: grid; grid-template-columns: minmax(145px, 1fr) auto; gap: 16px; align-items: center; }
+    .choice label { font-size: clamp(16px, 1.45vw, 20px); line-height: 1; font-weight: 700; letter-spacing: -.025em; }
+    output { color: var(--red); font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; }
+    input[type="range"] { appearance: none; width: 100%; height: 16px; margin: 12px 0 0; background: transparent; pointer-events: auto; cursor: ew-resize; }
+    input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: #1d1d1d; }
+    input[type="range"]::-moz-range-track { height: 2px; background: #1d1d1d; }
+    input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; margin-top: -7px; border: 1px solid #9c160f; border-radius: 0; background: var(--red); }
+    input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border: 1px solid #9c160f; border-radius: 0; background: var(--red); }
+    .nav-button {
+      position: fixed; z-index: 7; bottom: 24px; width: 50px; height: 50px; display: grid; place-items: center;
+      border: 1px solid var(--ink); border-radius: 0; background: #fff; color: var(--ink);
+      text-decoration: none; font: 400 24px/1 Arial, sans-serif; cursor: pointer;
+      transition: background .2s ease, color .2s ease, transform .2s ease;
+    }
+    .nav-button.previous { left: 28px; }
+    .nav-button.next { right: 28px; }
+    .nav-button:hover { background: var(--red); border-color: var(--red); color: #fff; transform: translateY(-2px); }
+    .flow-progress { position: fixed; z-index: 7; right: 94px; bottom: 42px; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .scene-caption { position: fixed; z-index: 3; top: 28px; left: 28px; margin: 0; max-width: 330px; opacity: 0; transform: translateY(10px); transition: opacity .6s .52s ease, transform .6s .52s ease; pointer-events: none; }
+    .scene-caption.visible { opacity: 1; transform: translateY(0); }
+    .scene-caption strong { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+    .scene-caption span { display: block; margin-top: 6px; color: #555; font-size: 13px; line-height: 1.25; }
+    .restart { position: fixed; z-index: 4; right: 28px; top: 28px; display: none; border: 1px solid #222; border-radius: 0; background: #fff; color: #171717; padding: 12px 15px; font: 700 10px Georgia, "Times New Roman", serif; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+    .restart.visible { display: block; }
+    @media (max-width: 680px) {
+      .panel { left: 20px; width: calc(100vw - 40px); padding-top: 34px; }
+      h1 { font-size: 29px; max-width: 330px; }
+      .intro { margin-bottom: 21px; font-size: 12px; }
+      .choice { padding: 10px 0 11px; }
+      .choice label { font-size: 15px; }
+      .nav-button { bottom: 18px; }
+      .nav-button.previous { left: 20px; }
+      .nav-button.next { right: 20px; }
+      .flow-progress { right: 82px; bottom: 36px; }
+      .restart { right: 20px; top: 20px; }
+      .scene-caption { top: 20px; left: 20px; }
+    }
+  </style>
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <div class="interface" id="interface">
+    <main class="panel">
+      <h1>2. Quali caratteristiche sono più rilevanti nel lavoro?</h1>
+      <p class="intro">Regola i quattro slider</p>
+      <p class="total">Importanza distribuita: <strong id="total">100</strong>/100</p>
+      <div class="choices" id="choices"></div>
+    </main>
+  </div>
+  <a class="nav-button previous" href="red-cubes-question-1.html" aria-label="Domanda precedente">←</a>
+  <span class="flow-progress">2 / 6</span>
+  <button class="nav-button next" id="confirm" type="button" aria-label="Conferma e continua">→</button>
+  <p class="scene-caption" id="scene-caption"><strong>La tua mappa del lavoro</strong><span>Il cubo in cima è la tua risposta; sotto, le risposte precedenti si sono accumulate.</span></p>
+  <button class="restart" id="restart" type="button">Modifica la risposta</button>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const qualities = [
+      'Equilibrio vita-lavoro',
+      'Stabilità economica',
+      'Possibilità di crescita',
+      'Riconoscimento sociale'
+    ];
+    const values = [25, 25, 25, 25];
+    const choices = document.querySelector('#choices');
+    const totalEl = document.querySelector('#total');
+    const interfaceEl = document.querySelector('#interface');
+    const caption = document.querySelector('#scene-caption');
+    const restart = document.querySelector('#restart');
+    let confirmed = false;
+
+    qualities.forEach((quality, index) => {
+      const row = document.createElement('div');
+      row.className = 'choice';
+      row.innerHTML = `
+        <div class="choice-head"><label for="range-${index}">${quality}</label><output id="output-${index}">25%</output></div>
+        <input id="range-${index}" type="range" min="0" max="100" step="5" value="25" aria-label="${quality}">
+      `;
+      choices.append(row);
+      row.querySelector('input').addEventListener('input', event => redistribute(index, Number(event.target.value)));
+    });
+
+    function redistribute(changed, nextValue) {
+      const remainder = 100 - nextValue;
+      const others = values.map((value, index) => index === changed ? 0 : value);
+      const previousTotal = others.reduce((sum, value) => sum + value, 0);
+      let allocated = 0;
+      const indices = [0, 1, 2, 3].filter(index => index !== changed);
+      indices.forEach((index, order) => {
+        const proposed = previousTotal ? Math.round((others[index] / previousTotal) * remainder / 5) * 5 : Math.floor(remainder / indices.length / 5) * 5;
+        const value = order === indices.length - 1 ? remainder - allocated : Math.min(proposed, remainder - allocated);
+        values[index] = value;
+        allocated += value;
+      });
+      values[changed] = nextValue;
+      updateInterface();
+    }
+
+    function updateInterface() {
+      values.forEach((value, index) => {
+        document.querySelector(`#range-${index}`).value = value;
+        document.querySelector(`#output-${index}`).textContent = `${value}%`;
+      });
+      totalEl.textContent = values.reduce((sum, value) => sum + value, 0);
+      updateTowers();
+    }
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+    scene.fog = new THREE.Fog(0xffffff, 26, 48);
+    const camera = new THREE.PerspectiveCamera(34, innerWidth / innerHeight, .1, 100);
+    // La distribuzione inizia come una lettura zenitale; confermando, la camera
+    // si inclina e rivela che le quattro ripartizioni hanno profondità e altezza.
+    const initialCamera = new THREE.Vector3(0, 29, .01);
+    const finalCamera = new THREE.Vector3(0, 23, 17);
+    const initialTarget = new THREE.Vector3(0, 0, 0);
+    const finalTarget = new THREE.Vector3(0, 4.8, 0);
+    camera.position.copy(initialCamera);
+    camera.lookAt(initialTarget);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.03;
+    document.body.prepend(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.copy(initialTarget);
+    controls.enableDamping = true;
+    controls.dampingFactor = .055;
+    controls.minDistance = 11;
+    controls.maxDistance = 34;
+    controls.enabled = false;
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xb4b4b4, 2.1));
+    const sun = new THREE.DirectionalLight(0xffffff, 3.4);
+    sun.position.set(-8, 18, 10);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -12; sun.shadow.camera.right = 12;
+    sun.shadow.camera.top = 12; sun.shadow.camera.bottom = -12;
+    scene.add(sun);
+
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(25, 25), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 }));
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const redMaterials = [
+      new THREE.MeshStandardMaterial({ color: 0xf13328, roughness: .43 }),
+      new THREE.MeshStandardMaterial({ color: 0xd62219, roughness: .5 }),
+      new THREE.MeshStandardMaterial({ color: 0xff4538, roughness: .38 })
+    ];
+    const cubeGeometry = new THREE.BoxGeometry(.72, .72, .72);
+    const towerPositions = [[-6, 0], [-2, 0], [2, 0], [6, 0]];
+    const previousCounts = [11, 16, 8, 13];
+    const selectionPositions = qualities.map(() => [0, 0]);
+    const selectionCubes = selectionPositions.map(([x, z], index) => {
+      const cube = new THREE.Mesh(cubeGeometry, redMaterials[index % redMaterials.length]);
+      cube.castShadow = false;
+      cube.receiveShadow = false;
+      scene.add(cube);
+      return cube;
+    });
+    const alignmentRaycaster = new THREE.Raycaster();
+    const alignmentPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const alignmentPoint = new THREE.Vector3();
+    function alignSelectionSquares() {
+      if (confirmed) return;
+      camera.position.copy(initialCamera);
+      camera.lookAt(initialTarget);
+      camera.updateMatrixWorld();
+      const panelRect = document.querySelector('.panel').getBoundingClientRect();
+      const desiredX = Math.min(innerWidth - 46, panelRect.right + Math.min(120, innerWidth * .1));
+      qualities.forEach((quality, index) => {
+        const sliderRect = document.querySelector(`#range-${index}`).getBoundingClientRect();
+        const pointer = new THREE.Vector2(
+          desiredX / innerWidth * 2 - 1,
+          -(sliderRect.top + sliderRect.height / 2) / innerHeight * 2 + 1
+        );
+        alignmentRaycaster.setFromCamera(pointer, camera);
+        if (alignmentRaycaster.ray.intersectPlane(alignmentPlane, alignmentPoint)) {
+          selectionPositions[index][0] = alignmentPoint.x;
+          selectionPositions[index][1] = alignmentPoint.z;
+        }
+      });
+    }
+    const towers = towerPositions.map(([x, z], index) => {
+      const group = new THREE.Group();
+      group.position.set(x, 0, z);
+      const cubes = [];
+      let stackHeight = 0;
+      let historyHeight = 0;
+      for (let level = 0; level < 20; level++) {
+        const size = .50 + ((index * 7 + level * 5) % 6) * .038;
+        const cube = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), redMaterials[(index + level) % redMaterials.length]);
+        cube.position.y = stackHeight + size / 2;
+        cube.castShadow = true; cube.receiveShadow = true;
+        group.add(cube); cubes.push({ mesh: cube, size, baseY: cube.position.y });
+        stackHeight += size;
+        if (level + 1 === previousCounts[index]) historyHeight = stackHeight;
+      }
+      scene.add(group);
+      group.visible = false;
+      return { group, cubes, historyHeight };
+    });
+
+    const towerLabels = [];
+    function makeLabel(text) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 900; canvas.height = 150;
+      const context = canvas.getContext('2d');
+      context.fillStyle = '#171717';
+      context.font = '700 42px Georgia, Times New Roman, serif';
+      context.textAlign = 'center'; context.textBaseline = 'middle';
+      context.fillText(text, 450, 75);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+      sprite.scale.set(4.8, .8, 1);
+      return sprite;
+    }
+    towerPositions.forEach(([x, z], index) => {
+      const label = makeLabel(qualities[index]);
+      label.position.set(x, .2, z + .9);
+      label.visible = false;
+      scene.add(label);
+      towerLabels.push(label);
+    });
+
+    function updateTowers() {
+      towers.forEach((tower, towerIndex) => {
+        const active = previousCounts[towerIndex];
+        tower.cubes.forEach((cube, level) => {
+          cube.mesh.visible = level < active;
+          cube.mesh.scale.setScalar(1);
+        });
+      });
+      selectionCubes.forEach((cube, index) => {
+        const size = .56 + values[index] / 78;
+        cube.scale.set(size, confirmed ? size : .025, size);
+        cube.castShadow = confirmed;
+        cube.receiveShadow = confirmed;
+        if (!confirmed) {
+          const [x, z] = selectionPositions[index];
+          cube.position.set(x, .012, z);
+        }
+      });
+    }
+
+    let transition = 0;
+    document.querySelector('#confirm').addEventListener('click', () => {
+      if (confirmed) {
+        location.href = 'red-cubes-compass.html?q=3';
+        return;
+      }
+      confirmed = true;
+      towers.forEach(tower => { tower.group.visible = true; });
+      towerLabels.forEach(label => { label.visible = true; });
+      interfaceEl.classList.add('is-confirmed');
+      caption.classList.add('visible');
+      restart.classList.add('visible');
+      document.querySelector('#confirm').setAttribute('aria-label', 'Vai alla domanda 3');
+    });
+    restart.addEventListener('click', () => {
+      confirmed = false;
+      transition = 0;
+      controls.enabled = false;
+      controls.target.copy(initialTarget);
+      towers.forEach(tower => { tower.group.visible = false; });
+      towerLabels.forEach(label => { label.visible = false; });
+      interfaceEl.classList.remove('is-confirmed');
+      caption.classList.remove('visible');
+      restart.classList.remove('visible');
+      document.querySelector('#confirm').setAttribute('aria-label', 'Conferma e continua');
+      alignSelectionSquares();
+      updateTowers();
+    });
+
+    const clock = new THREE.Clock();
+    const selectionFrom = new THREE.Vector3();
+    const selectionTo = new THREE.Vector3();
+    const animatedTarget = new THREE.Vector3();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), .05);
+      const goal = confirmed ? 1 : 0;
+      transition += (goal - transition) * Math.min(1, delta * 2.1);
+      const eased = transition * transition * (3 - 2 * transition);
+      animatedTarget.lerpVectors(initialTarget, finalTarget, eased);
+      if (!controls.enabled) {
+        camera.position.lerpVectors(initialCamera, finalCamera, eased);
+        camera.lookAt(animatedTarget);
+      }
+      selectionCubes.forEach((cube, index) => {
+        const size = .56 + values[index] / 78;
+        const [startX, startZ] = selectionPositions[index];
+        const [endX, endZ] = towerPositions[index];
+        selectionFrom.set(startX, .012, startZ);
+        selectionTo.set(endX, towers[index].historyHeight + .36 * size, endZ);
+        cube.position.lerpVectors(selectionFrom, selectionTo, eased);
+        const thicknessProgress = Math.max(0, Math.min(1, eased * 1.65 - .18));
+        cube.scale.set(size, THREE.MathUtils.lerp(.025, size, thicknessProgress), size);
+        cube.castShadow = eased > .08;
+        cube.receiveShadow = eased > .08;
+      });
+      towers.forEach((tower, towerIndex) => {
+        const active = previousCounts[towerIndex];
+        tower.cubes.forEach((cube, level) => {
+          if (!cube.mesh.visible) return;
+          const arrival = Math.max(0, Math.min(1, (eased * 1.4 - level * .025)));
+          const bounce = 1 + Math.sin(Math.min(1, arrival) * Math.PI) * .08;
+          cube.mesh.scale.setScalar(bounce);
+          cube.mesh.position.y = cube.baseY + (1 - arrival) * .55;
+        });
+      });
+      if (confirmed && transition > .985 && !controls.enabled) {
+        controls.target.copy(finalTarget);
+        controls.enabled = true;
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    alignSelectionSquares();
+    updateInterface();
+    animate();
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      requestAnimationFrame(() => {
+        alignSelectionSquares();
+        updateTowers();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -142,6 +142,21 @@ body.about-page #content-scroll .about-project-index a {
   text-decoration: none;
 }
 
+html[data-aleph-background] body.about-page.has-canvas #content-scroll a:hover,
+html[data-aleph-background] body.about-page.has-canvas #content-scroll a:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+  text-decoration: underline;
+}
+
+html[data-aleph-background] body.about-page.has-canvas #content-scroll .about-project-index a:hover,
+html[data-aleph-background] body.about-page.has-canvas #content-scroll .about-project-index a:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  text-decoration: none;
+}
+
 body.about-page #content-scroll .about-background-note {
   margin: 0;
   display: block;

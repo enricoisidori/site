@@ -513,12 +513,12 @@ a:visited {
 }
 
 a:hover {
-  color: black;
-  text-decoration: none;
+  color: #f00;
+  text-decoration: underline;
 }
 
 a:active {
-  color: black;
+  color: #f00;
 }
 
 ::-moz-selection {
@@ -840,6 +840,11 @@ body.has-canvas .page-link {
 body.has-canvas .page-link:hover {
   color: #f00 !important;
   -webkit-text-fill-color: #f00 !important;
+}
+
+body.has-canvas .site-name:hover,
+body.has-canvas .page-link:hover {
+  text-decoration: none;
 }
 
 body.has-canvas .site-name:hover,

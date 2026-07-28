@@ -170,6 +170,24 @@ window.PROJECTS = [
         "src": "n+/asset/optimized/n-6.webp",
         "width": 1700,
         "height": 1133
+      },
+      {
+        "type": "image",
+        "src": "n+/asset/optimized/n-6-detail.webp",
+        "width": 1360,
+        "height": 1700
+      },
+      {
+        "type": "image",
+        "src": "n+/asset/optimized/n-7.webp",
+        "width": 1360,
+        "height": 1700
+      },
+      {
+        "type": "image",
+        "src": "n+/asset/optimized/n-8.webp",
+        "width": 1360,
+        "height": 1700
       }
     ]
   },
@@ -677,6 +695,11 @@ window.PROJECTS = [
         "height": 1134
       },
       {
+        "type": "video",
+        "src": "specta/asset/SPECTA-optimized.mp4",
+        "unmute": true
+      },
+      {
         "type": "image",
         "src": "specta/asset/optimized/specta15.webp",
         "width": 1700,
@@ -857,43 +880,6 @@ window.PROJECTS = [
     ]
   },
   {
-    "slug": "immagine-fisica-di-un-libro",
-    "sourcePage": "booksimage/",
-    "title": "Immagine fisica di un libro",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2024",
-    "info": [],
-    "description": "",
-    "media": [
-      {
-        "type": "image",
-        "src": "booksimage/asset/optimized/a1.webp",
-        "width": 1920,
-        "height": 1634
-      },
-      {
-        "type": "image",
-        "src": "booksimage/asset/optimized/a6.webp",
-        "width": 1920,
-        "height": 1634
-      },
-      {
-        "type": "image",
-        "src": "booksimage/asset/optimized/a3.webp",
-        "width": 1920,
-        "height": 1634
-      },
-      {
-        "type": "image",
-        "src": "booksimage/asset/optimized/detail.webp",
-        "width": 1920,
-        "height": 1280
-      }
-    ]
-  },
-  {
     "slug": "monolite",
     "sourcePage": "monolite/",
     "title": "Monolite",
@@ -958,199 +944,6 @@ window.PROJECTS = [
         "src": "duedadi/asset/optimized/dadiscansioni4.webp",
         "width": 1080,
         "height": 1421
-      }
-    ]
-  },
-  {
-    "slug": "blank",
-    "sourcePage": "blank/",
-    "title": "Blank",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2023",
-    "info": [],
-    "description": "30 x 40 cm (x3)\nImmagini generate per errore dall’AI Adobe Photoshop alla richiesta di riempire una selezione del foglio di bianco (prompt: “blank”) ha risposto con tre interpretazioni diverse.\n[da sistemare]",
-    "media": [
-      {
-        "type": "image",
-        "src": "blank/asset/optimized/med.webp",
-        "width": 1920,
-        "height": 1280
-      },
-      {
-        "type": "image",
-        "src": "blank/asset/optimized/med.webp",
-        "width": 1920,
-        "height": 1280
-      },
-      {
-        "type": "image",
-        "src": "blank/asset/optimized/med.webp",
-        "width": 1920,
-        "height": 1280
-      }
-    ]
-  },
-  {
-    "slug": "karin-s-work",
-    "sourcePage": "karinswork/",
-    "title": "Karin's work",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2024",
-    "info": [],
-    "description": "",
-    "media": [
-      {
-        "type": "image",
-        "src": "karinswork/asset/optimized/med.webp",
-        "width": 1920,
-        "height": 1280
-      }
-    ]
-  },
-  {
-    "slug": "totem",
-    "sourcePage": "totem/",
-    "title": "Totem",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2023",
-    "info": [],
-    "description": "Plastic\n8 x 3 x 3 cm\ntotem /ˈtoʊtəm/ n. [from an Algonquian indigenous term, ototeman\n(denoting kinship relations among siblings)]. – (ethnol.) [an animal,\nplant, object, or phenomenon that, in animistic cultures, is the object\nof taboo and worship].\nAugust 2021 — August 2023\nThis pig is ugly, it’s dirty, picked up off the street by my brother.\nOnce home, it’s placed on my nightstand. My brother and I split the same\nroom, a shared space with personal areas: bed, nightstand, bookshelf,\nand walls, one side and the other. Finding the pig on my nightstand, I\nmove it to my brother’s. My brother, finding the pig on his nightstand,\nmoves it back to mine. Over time, the pig is hidden in less obvious\nspots: behind books or objects, among shelves, inside lamps,\npillowcases, shoes, cereal boxes. My brother moves to another\nneighborhood, and the pig begins traveling from house to house, inside\nbackpacks and jacket pockets, smuggled in with the help of a friend or\nsecretly slipped into luggage before leaving — for Milan, where I move,\nor Paris, where my brother moves. The object becomes an involuntary\nrepresentation of our relationship. It’s a tacit game, a way to meet.\nIt’s a dirty presence in the other’s space, an invasion, in a dialectic\nof intimate agreement. The plastic pig is a totem of a fraternal bond.",
-    "media": [
-      {
-        "type": "image",
-        "src": "totem/asset/optimized/totem.webp",
-        "width": 1920,
-        "height": 1280
-      },
-      {
-        "type": "image",
-        "src": "totem/asset/optimized/casa.webp",
-        "width": 1420,
-        "height": 1920
-      },
-      {
-        "type": "image",
-        "src": "totem/asset/optimized/roma.webp",
-        "width": 1420,
-        "height": 1920
-      },
-      {
-        "type": "image",
-        "src": "totem/asset/optimized/europa.webp",
-        "width": 1420,
-        "height": 1920
-      }
-    ]
-  },
-  {
-    "slug": "not-prevented-photos",
-    "sourcePage": "notprevented/",
-    "title": "Not prevented photos",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2023",
-    "info": [],
-    "description": "",
-    "media": [
-      {
-        "type": "image",
-        "src": "notprevented/asset/optimized/IMG_0049_Original.webp",
-        "width": 1920,
-        "height": 1883
-      },
-      {
-        "type": "image",
-        "src": "notprevented/asset/optimized/IMG_0049_Original.webp",
-        "width": 1920,
-        "height": 1883
-      }
-    ]
-  },
-  {
-    "slug": "1km-x-1km-white-canvas",
-    "sourcePage": "whitecanvas/",
-    "title": "1km x 1km white canvas",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2023",
-    "info": [],
-    "description": "É una tela digitale 1km x 1km completamente bianca esportata JPG. L’opera è stampata parzialmente su fogli A4 timbrati e numerati; i visitatori hanno diritto a prendere un pezzo dell’opera.",
-    "media": [
-      {
-        "type": "image",
-        "src": "whitecanvas/asset/optimized/min.webp",
-        "width": 1343,
-        "height": 896
-      },
-      {
-        "type": "image",
-        "src": "whitecanvas/asset/optimized/info.webp",
-        "width": 1851,
-        "height": 704
-      }
-    ]
-  },
-  {
-    "slug": "unfolds",
-    "sourcePage": "iperstizioni/",
-    "title": "Unfolds",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2023",
-    "info": [],
-    "description": "",
-    "media": [
-      {
-        "type": "image",
-        "src": "iperstizioni/asset/optimized/med.webp",
-        "width": 1920,
-        "height": 1280
-      },
-      {
-        "type": "image",
-        "src": "iperstizioni/asset/jpg/optimized/m10.webp",
-        "width": 1357,
-        "height": 1920
-      },
-      {
-        "type": "image",
-        "src": "iperstizioni/asset/jpg/optimized/m8.webp",
-        "width": 1357,
-        "height": 1920
-      },
-      {
-        "type": "image",
-        "src": "iperstizioni/asset/jpg/optimized/m6.webp",
-        "width": 1357,
-        "height": 1920
-      }
-    ]
-  },
-  {
-    "slug": "2-49",
-    "sourcePage": "249/",
-    "title": "2 49",
-    "categories": [
-      "artistpage"
-    ],
-    "date": "2021",
-    "info": [],
-    "description": "",
-    "media": [
-      {
-        "type": "image",
-        "src": "249/asset/optimized/med.webp",
-        "width": 1920,
-        "height": 1280
       }
     ]
   }
