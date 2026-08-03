@@ -233,17 +233,40 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   height: 18px;
   pointer-events: none;
   opacity: 0;
-  filter: invert(1);
-  mix-blend-mode: difference;
+  transition: none !important;
+  animation: none !important;
+  filter:
+    drop-shadow(0 0 1px #fff)
+    drop-shadow(0 0 3px #fff)
+    drop-shadow(0 0 6px #fff)
+    drop-shadow(0 0 14px rgba(255, 255, 255, 0.98));
   will-change: transform, opacity;
-  transition: opacity 100ms ease;
 }
 
 .project-info-cursor.is-visible {
   opacity: 1;
 }
 
-@media only screen and (min-width: 769px) {
+html[data-aleph-background="off"] .project-info-cursor {
+  filter: invert(1);
+  mix-blend-mode: difference;
+}
+
+html[data-aleph-background] body.projects-page #content-scroll .project-details a:hover,
+html[data-aleph-background] body.projects-page #content-scroll .project-details a:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+}
+
+@media (pointer: fine) {
+  body.projects-page #content-scroll a,
+  body.projects-page #content-scroll button,
+  body.projects-page #content-scroll .btn,
+  body.projects-page #content-scroll .video-unmute {
+    cursor: pointer;
+  }
+
   .project-track,
   .project-track *,
   .project-row > .project-cover,
@@ -253,7 +276,7 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   }
 }
 
-@media only screen and (max-width: 768px) {
+@media (pointer: coarse) {
   .project-info-cursor {
     display: none;
   }

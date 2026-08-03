@@ -8,7 +8,7 @@
       navigation?.type === "reload" || performance.navigation?.type === 1;
     if (isControlledPage && isReload) {
       // Work/About share a state while navigating, but an explicit refresh
-      // always begins again from OFF.
+      // always begins again from ON.
       sessionStorage.removeItem("aleph_control_state");
       return;
     }
@@ -16,7 +16,7 @@
       const saved = JSON.parse(
         sessionStorage.getItem("aleph_control_state") || "null",
       );
-      if (!saved?.backgroundOn) return;
+      if (saved?.backgroundOn === false) return;
     } else if (sessionStorage.getItem("aleph_white_bg") === "1") {
       return;
     }

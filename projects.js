@@ -633,7 +633,7 @@
   }
 
   function setupProjectInfoCursor() {
-    if (window.matchMedia("(max-width: 768px)").matches) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
 
     const cursor = document.createElement("img");
     cursor.className = "project-info-cursor";
@@ -649,7 +649,7 @@
         hide();
         return;
       }
-      cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
+      cursor.style.transform = `translate3d(${event.clientX - 9}px, ${event.clientY - 9}px, 0)`;
       cursor.classList.add("is-visible");
     };
 

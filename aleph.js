@@ -62,12 +62,10 @@
     } catch (_) {}
   }
 
-  // A new session starts OFF and locked. Work and About share this state.
-  let backgroundControlEnabled = isControlledPage
-    ? savedControlState?.controlEnabled === true
-    : true;
+  // A new session starts ON. Work and About share the chosen state.
+  let backgroundControlEnabled = true;
   let whiteBg = isControlledPage
-    ? savedControlState?.backgroundOn !== true
+    ? savedControlState?.backgroundOn === false
     : false;
 
   function persistControlState() {
@@ -145,6 +143,7 @@
       true,
     );
   });
+
   document.body.addEventListener("click", (e) => {
     if (
       e.target.closest(
