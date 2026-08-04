@@ -28,7 +28,7 @@
         image-rendering: auto;
         user-select: none;
         -webkit-user-drag: none;
-        pointer-events: none;
+        cursor: pointer;
       }
       /* HUD UI rimossa: comandi restano attivi via tastiera */
     </style>
@@ -63,10 +63,10 @@
       const Commons = {
         // Miniature per massimizzare throughput; qualità secondaria
         thumbWidth: RES_STEPS[resIdx],
-        urlsQueue: [], // [{id, url}]
+        urlsQueue: [], // [{id, url, pageUrl}]
         prefetching: false,
         minBuffer: 60, // cuscinetto URL
-        preloaded: [], // [{id, img}]
+        preloaded: [], // [{id, img, pageUrl}]
         loadingCount: 0,
         maxConcurrent: 12, // decodifica parallela
         maxPool: 480, // cap del pool
@@ -95,9 +95,11 @@
           generator: "random",
           grnnamespace: "6",
           grnlimit: String(n),
-          prop: "imageinfo",
+          prop: "imageinfo|globalusage",
           iiprop: "url|mime",
           iiurlwidth: String(width),
+          guprop: "url",
+          gulimit: "10",
           format: "json",
           origin: "*",
         });
@@ -119,7 +121,12 @@
             const mime = info?.mime || "";
             if (!title || !u || !mime.startsWith("image/")) continue;
             if (Commons.seenIds.has(title) || Commons.heldIds.has(title)) continue;
-            urls.push({ id: title, url: u });
+            const usages = pages[k]?.globalusage || [];
+            // Privilegia la voce italiana, poi qualsiasi altra voce Wikipedia.
+            const wikipediaUsage =
+              usages.find((usage) => /\/\/it\.wikipedia\.org\//.test(usage.url || "")) ||
+              usages.find((usage) => /\/\/[^/]+\.wikipedia\.org\//.test(usage.url || ""));
+            urls.push({ id: title, url: u, pageUrl: wikipediaUsage?.url || "" });
             Commons.heldIds.add(title);
           }
           Commons.urlsQueue.push(...urls);
@@ -167,7 +174,7 @@
             const info = pages[k]?.imageinfo?.[0];
             const u = info?.thumburl || info?.url;
             const mime = info?.mime || "";
-            if (u && mime.startsWith("image/")) return { id: title, url: u };
+            if (u && mime.startsWith("image/")) return { id: title, url: u, pageUrl: "" };
           }
         } catch (_) {}
         return null;
@@ -187,13 +194,13 @@
           Commons.urlsQueue.length > 0
         ) {
           const cand = Commons.urlsQueue.shift();
-          const { id, url } = cand || {};
+          const { id, url, pageUrl } = cand || {};
           const im = new Image();
           im.crossOrigin = "anonymous";
           Commons.loadingCount++;
           im.onload = () => {
             // push oggetto con id + immagine; mantieni cap (discard vecchi)
-            Commons.preloaded.push({ id, img: im });
+            Commons.preloaded.push({ id, img: im, pageUrl });
             if (Commons.preloaded.length > Commons.maxPool) Commons.preloaded.shift();
             Commons.loadingCount--;
             pumpPreload();
@@ -237,6 +244,9 @@
 
       function setPlaying(p) {
         playing = !!p;
+        img.title = playing
+          ? "Clicca per mettere in pausa"
+          : "Clicca per aprire la pagina Wikipedia dell'immagine";
         if (stateEl) stateEl.textContent = playing ? "PLAY" : "PAUSE";
         if (playing) restart();
         else stop();
@@ -248,6 +258,18 @@
       }
 
       let ticking = false;
+      let currentPageUrl = "";
+      let faviconSet = false;
+
+      function setFavicon(url) {
+        if (faviconSet || !url) return;
+        const favicon = document.querySelector('link[rel="icon"]') || document.createElement("link");
+        favicon.rel = "icon";
+        favicon.href = url;
+        if (!favicon.parentNode) document.head.appendChild(favicon);
+        faviconSet = true;
+      }
+
       async function tick() {
         if (ticking) return;
         ticking = true;
@@ -263,6 +285,13 @@
           const frame = Commons.preloaded.length > 0 ? Commons.preloaded.shift() : null;
           if (frame && frame.img && frame.img.src) {
             img.src = frame.img.src;
+            setFavicon(frame.img.src);
+            currentPageUrl = frame.pageUrl || "";
+            img.dataset.commonsPage = frame.id
+              ? `https://commons.wikimedia.org/wiki/${encodeURIComponent(
+                  frame.id.replace(/ /g, "_")
+                )}`
+              : "";
             // appena mostrata: marca come vista e libera il blocco
             if (frame.id) {
               Commons.heldIds.delete(frame.id);
@@ -368,7 +397,20 @@
         }
       });
 
-      // Click per play/pause (utile senza tastiera)
+      // A flusso fermo l'immagine apre la voce Wikipedia in cui viene usata.
+      // Se non è associata a una voce, rimane disponibile la pagina del file su Commons.
+      img.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (playing) {
+          setPlaying(false);
+          return;
+        }
+        const commonsPage = img.dataset.commonsPage;
+        const destination = currentPageUrl || commonsPage;
+        if (destination) window.open(destination, "_blank", "noopener");
+      });
+
+      // Click fuori dall'immagine per play/pause (utile senza tastiera)
       document.addEventListener("click", () => setPlaying(!playing));
 
       // Se la scheda va in background, riduci stress

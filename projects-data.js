@@ -6,7 +6,7 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2025",
     info: [
-      "Field<br>Research<br>Editorial",
+      "Field<br>Research<br>Editorial design",
       "Team<br>Giulia Bonalumi<br>Federico Gajo<br>Enrico Isidori<br>Francesco Scarfone<br>Ekaterina Shults<br>Camilla Tosi",
     ],
     description:
@@ -107,9 +107,13 @@ window.PROJECTS = [
     sourcePage: "offdisicpline/",
     title: "Off Discipline",
     categories: ["designerpage"],
-    date: "2024",
-    info: [],
-    description: "",
+    date: "2026",
+    info: [
+      "Field<br>Research<br>Editorial design",
+      'Link<br><a href="https://enricoisidori.com/overtrace" target="_blank" rel="noopener noreferrer">enricoisidori.com/overtrace</a>',
+    ],
+    description:
+      "Design is an anomalous discipline. This volume explores the “off” character of design against disciplinary logics. Design is out-of-place: misplaced because it does not have a stable object of study, inappropriate because this characteristic can subvert the disciplinary norms of other fields. The research is developed through a purpose-built software tool for the progressive tracing of design processes.",
     media: [
       {
         type: "image",
@@ -173,7 +177,7 @@ window.PROJECTS = [
     title: "Image of a book",
     categories: ["artistpage"],
     date: "2024",
-    info: ["Field<br>Art"],
+    info: [],
     description:
       '10x18x1cm\n\nThis book is unreadable, yet visible and recognizable as such. It exists as an autonomous object in its own right.\nIt is composed of images generated with Stable Diffusion, trained locally on page layouts, then printed and bound.\n\nThe work builds on Giulio Confalonieri\'s 1963 exploration of a book of layered, unreadable texts made from printing waste sheets, which he described as "the image of reading suspended at the stage preceding knowledge."',
     media: [
@@ -221,19 +225,96 @@ window.PROJECTS = [
     categories: ["designerpage", "artistpage"],
     date: "2025",
     info: [
-      "Field<br>Art direction<br>Speculative<br>Exibhition<br>Graphic<br>Interaction<br>Photography<br>Product",
-      "Team<br>Filippo Rosati<br>Pietro Forino<br>Daniela Gentile<br>Nicola Airutti<br>Cristina Dezi<br>Bernardo Martins",
+      "Field<br>Speculative design",
+      "Role<br>Art direction<br>Branding<br>Spatial design<br>Visual design<br>Interaction design<br>Prototyping<br>Photography",
+      "Team<br>Filippo Rosati (creative direction)<br>Pietro Forino (interaction design)<br>Daniela Gentile (research)<br>Nicola Airutti (sound design)<br>Cristina Dezi (fashion design)<br>Bernardo Martins (AI artworks)",
       "Made at<br>Operating System Studio<br>Umanesimo Artificiale",
-      'Exhibithion<br>Jul 2025<br><a href="https://www.videocitta.com//" target="_blank" rel="noopener noreferrer">Videocittà</a>, Rome<br>Jun 2025<br><a href="https://sonar.es/en" target="_blank" rel="noopener noreferrer">Sónar</a>, Barcelona<br>Apr 2025',
+      'Exhibition<br>Jul 2025<br><a href="https://www.videocitta.com/" target="_blank" rel="noopener noreferrer">Videocittà</a>, Rome<br>Jun 2025<br><a href="https://sonar.es/en" target="_blank" rel="noopener noreferrer">Sónar</a>, Barcelona<br>Apr 2025',
     ],
     description:
-      "A non-invasive neural interface developed by N+ Industries to collect\nresidual cognitive activity from the user. Using bone- conducted audio\nstimulation, the system captures neural micro- responses and\nintegrates them into a distributed network. Inspired by a NATO white\npaper stating that “the brain is the new battlefield,” this project\nexplores the intersection of neuroscience and conflict through an\nimmersive and experimental artistic lens. At its core is a pioneering\nenterprise that envisions a future of neuromodulation technologies.\nSpecializing in neuroweapons and NBIC advancements (Nanotechnology,\nBiotechnology, Information Technology, and Cognitive Science), this\nentity develops technologies of control. By presenting these\nunsettling possibilities, the project sparks critical discussions on\nthe future of warfare, human augmentation, and the ethics of cognitive\ncontrol.",
+      "A non-invasive neural interface developed by N+ Industries to collect\nresidual cognitive activity from the user. Using bone-conducted audio\nstimulation, the system captures neural micro-responses and\nintegrates them into a distributed network. Inspired by a NATO white\npaper stating that “the brain is the new battlefield,” this project\nexplores the intersection of neuroscience and conflict through an\nimmersive and experimental artistic lens. At its core is a pioneering\nenterprise that envisions a future of neuromodulation technologies.\nSpecializing in neuroweapons and NBIC advancements (Nanotechnology,\nBiotechnology, Information Technology, and Cognitive Science), this\nentity develops technologies of control. By presenting these\nunsettling possibilities, the project sparks critical discussions on\nthe future of warfare, human augmentation, and the ethics of cognitive\ncontrol.",
     media: [
       {
         type: "image",
         src: "n+/asset/optimized/n-1.webp",
         width: 1700,
         height: 1133,
+      },
+      {
+        type: "video",
+        src: "n+/asset/optimized/wip1-optimized.mp4",
+        mobileSrc: "n+/asset/optimized/wip1-mobile.mp4",
+        width: 1080,
+        height: 1440,
+        unmute: false,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/n+a.webp",
+        width: 1578,
+        height: 1700,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/n+b.webp",
+        width: 1700,
+        height: 1054,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/wip2.webp",
+        width: 1080,
+        height: 1440,
+      },
+      {
+        type: "video",
+        src: "n+/asset/optimized/wip3-optimized.mp4",
+        mobileSrc: "n+/asset/optimized/wip3-mobile.mp4",
+        width: 1080,
+        height: 1440,
+        unmute: false,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/adv1.webp",
+        width: 1360,
+        height: 1700,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/adv2.webp",
+        width: 1360,
+        height: 1700,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/adv3.webp",
+        width: 1360,
+        height: 1700,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/adv4.webp",
+        width: 1360,
+        height: 1700,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/adv5.webp",
+        width: 1360,
+        height: 1700,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/adv6.webp",
+        width: 1360,
+        height: 1700,
+      },
+      {
+        type: "image",
+        src: "n+/asset/optimized/adv7.webp",
+        width: 1360,
+        height: 1700,
       },
       {
         type: "image",
@@ -294,7 +375,9 @@ window.PROJECTS = [
     info: [
       "Field<br>Information design<br>Data vizualization<br>Spatial design",
       "Team<br>Miguel Ernesto Amaya<br>Federico Gajo<br>Giacomo Garetto<br>Francesco Scarfone<br>Emanuel Simionato",
-      "Exhibited at<br>Meet Digital Culture Center, Milan",
+      '<a href="https://www.meetcenter.it/en" target="_blank" rel="noopener noreferrer">Meet Digital Culture Center 2025, Milan</a>',
+      "Exhibited at<br>Cavallerizza Reale 2022, Turin<br>Dock Dora 2022, Turin<br>ELO 2022, Como",
+      "Features<br>Nuovi linguaggi del visual design in Italia 2022",
     ],
     description:
       "Trail cams are video cameras triggered by the movement of animals in\ntheir natural habitats. Initially designed for research and wildlife\nmonitoring, they have since become popular content on social media\nplatforms.\nThe installation investigates how animals, inadvertently turned into\ndigital entities, inhabit the online ecosystem—an environment\ncategorized by humans for human consumption.\nThe project examines 273 trail cam videos shared on major Italian\nsocial platforms between 2021 and 2024. The hashtags used at the\ntime of publication establish connections between them. The\ninstallation presents the videos in chronological order, alongside\ntheir associated hashtags, forming a growing network that reflects\nthe evolution of a digital forest—merging human perceptions with\nanimal presence over time.",
@@ -356,7 +439,7 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2023",
     info: [
-      "Field<br>Web<br>Motion",
+      "Field<br>Web design<br>Motion design",
       "Team<br>Gabriele Donini<br>Diego Massaro<br>Giacomo Scandolara",
       'Made at<br><a href="https://gigadesignstudio.com/" target="_blank" rel="noopener noreferrer">Giga Design Studio</a>',
       'Links<br><a href="https://capsule.global/plaza" target="_blank" rel="noopener noreferrer">capsule.global/plaza</a>',
@@ -399,9 +482,8 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2022",
     info: [
-      "Field<br>Research<br>Editorial<br>Web",
+      "Field<br>Research<br>Editorial design<br>Web design",
       "Team<br>Davide Agostinelli<br>Irene Benecchi<br>Bianca Buratti<br>Alice Dezio<br>Marta Gaggi<br>Giulia Gnessi",
-      "Made at<br>Politecnico di Milano",
       "Exhibited at<br>Cavallerizza Reale 2022<br>Dock Dora 2022<br>Torino Print Club<br>ELO 2022",
       'Links<br><a href="https://enricoisidori.com/draw.html" target="_blank" rel="noopener noreferrer">enricoisidori.com/draw.html</a>',
       "Features<br>Nuovi linguaggi del visual design in Italia , 2022",
@@ -511,7 +593,7 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2023",
     info: [
-      "Field<br>Editorial",
+      "Field<br>Editorial design",
       "Team<br>Gabriele Donini<br>Federico Gajo<br>Diego Massaro<br>Giacomo Scandolara",
       'Made at<br><a href="https://gigadesignstudio.com/" target="_blank" rel="noopener noreferrer">Giga Design Studio</a>',
       'Links<br><a href="https://6am.glass/" target="_blank" rel="noopener noreferrer">6am.glass</a>',
@@ -580,7 +662,7 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2023",
     info: [
-      "Field<br>Research<br>Editorial",
+      "Field<br>Research<br>Editorial design",
       "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
       'Related projects<br><a href="specta/">SPECTA® (Project)</a>',
       "Made at<br>Politecnico di Milano<br>Laboratorio di Sintesi Finale C1",
@@ -820,11 +902,10 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2023",
     info: [
-      'Field<br>Pixel Pushing Exploration<br>Links<br><a href="iterations/inversions.html" target="_blank" rel="noopener noreferrer">iterations/inversions.html</a>',
       'Features<br><a href="https://gpu.gallery/" target="_blank" rel="noopener noreferrer">Gpu Gallery</a>, 2023',
     ],
     description:
-      "Iteration of a continuous inversion transformation of archival material, at the maximum frequency that the machine allows.\nField\nPixel Pushing Exploration\nLinks\niterations/inversions.html",
+      "Iteration of a continuous inversion transformation of archival material, at the maximum frequency that the machine allows.",
     media: [
       {
         type: "image",
@@ -859,7 +940,8 @@ window.PROJECTS = [
     info: [
       'Links<br><a href="f.html" target="_blank" rel="noopener noreferrer">f.html (Generator)</a>',
     ],
-    description: "",
+    description:
+      "These are photographs taken precisely at random: coordinates, time, height, orientation, rotations, and camera settings are randomly generated. The ranges of the coordinates correspond to a certain area, while the ranges of height, orientation, rotations, and settings correspond to the physical possibilities of the camera and tripod. Once the data has been generated, one has to go to the location corresponding to the coordinates, position the tripod according to the given height, orientation, and rotations, set the aperture, shutter speed, and ISO as described, and shoot at the appointed time.\n\nYou have to be a passive operator of the camera who becomes a photographer, author, body – you have to follow instructions – become a machine. The photo's metadata has been generated before they were taken. It is not the aesthetic will that dictates the data the machine produces, but it is the data the machine produces that dictates the aesthetic will.",
     media: [
       {
         type: "image",
@@ -996,7 +1078,7 @@ window.PROJECTS = [
     date: "2021",
     info: [],
     description:
-      'Dadi in plastica bianca stampati a laser, si presentano come oggetti\nalterati, altri: sono una alternativa tra le tante possibili. Ogni cosa\npotrebbe essere qualunque altra, ma si presenta come assoluta: "Un\nmiracolo che non stupisce quanto dovrebbe: la mano ha in verità meno di\nsei dita, però più di quattro". (Szymborska).',
+      '12x12x12mm\n\nMade from two white plastic dice and then laser printed, they present themselves as altered objects, others: they are one alternative among many possible ones. Each thing could be any other, but it presents itself as absolute: "A miracle that does not amaze as much as it should: the hand has in truth less than six fingers, yet more than four" Szymborska, 1986).',
     media: [
       {
         type: "image",

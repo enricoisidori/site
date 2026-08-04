@@ -377,6 +377,11 @@ a.btn-aqua:visited {
   margin-bottom: 16pt;
 }
 
+.imgpro-container > picture {
+  display: block;
+  margin-bottom: 16pt;
+}
+
 .video-small {
   width: 50%;
   max-width: 50%;
