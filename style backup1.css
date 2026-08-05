@@ -10,7 +10,7 @@
   line-height: 18pt;
   box-sizing: border-box;
   /* cursor: none !important; */
-  cursor: url("./asset/svg/dot.svg") !important;
+  cursor: url("./assets/shared/svg/dot.svg") !important;
 }
 
 html {
@@ -26,7 +26,7 @@ html {
 
 body {
   margin: 0;
-  cursor: url("./asset/svg/dot.svg");
+  cursor: url("./assets/shared/svg/dot.svg");
 }
 
 video::-webkit-media-controls {

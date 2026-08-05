@@ -11,6 +11,11 @@ body.about-page #content-scroll * {
   font: inherit;
 }
 
+html.about-embedded body.about-page #aleph-stage,
+html.about-embedded body.about-page .about-navigation {
+  display: none;
+}
+
 body.about-page ::selection {
   color: #f00;
   background: transparent;
@@ -71,7 +76,8 @@ body.about-page #content-scroll .about-navigation > span {
 }
 
 /* Content */
-body.about-page #content-scroll > .col-12 {
+body.about-page #content-scroll > .col-12,
+body.about-page #about-view > .col-12 {
   padding-top: 0 !important;
   text-align: center;
   text-shadow:

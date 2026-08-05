@@ -2,7 +2,7 @@
   if (!document.body.classList.contains("about-page")) return;
 
   const workLink = document.querySelector(
-    '.about-navigation .page-link[href="work.html"]',
+    '.about-navigation .page-link[href="../work.html"]',
   );
   if (!workLink) return;
 
@@ -22,7 +22,7 @@
     if (Array.isArray(window.PROJECTS)) return Promise.resolve(window.PROJECTS);
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "projects-data.js";
+      script.src = "../projects-data.js";
       script.onload = () => resolve(window.PROJECTS || []);
       script.onerror = reject;
       document.head.appendChild(script);

@@ -37,6 +37,15 @@
     if (whiteBg) return;
     try {
       sessionStorage.setItem(
+        "aleph_transition_geometry",
+        JSON.stringify({
+          viewportWidth: window.innerWidth,
+          viewportHeight: window.innerHeight,
+          canvasWidth: CW,
+          canvasHeight: CH,
+        }),
+      );
+      sessionStorage.setItem(
         "aleph_transition_bg",
         canvas.toDataURL("image/jpeg", 0.82),
       );
@@ -228,8 +237,27 @@
 
   const ctx = canvas.getContext("2d");
 
-  const CW = 480,
-    CH = 270;
+  let previousGeometry = null;
+  try {
+    previousGeometry = JSON.parse(
+      sessionStorage.getItem("aleph_transition_geometry") || "null",
+    );
+  } catch (_) {}
+
+  const currentViewportWidth = Math.max(window.innerWidth, 1);
+  const currentViewportHeight = Math.max(window.innerHeight, 1);
+  const sameViewport =
+    previousGeometry &&
+    Math.abs(previousGeometry.viewportWidth - currentViewportWidth) <= 1 &&
+    Math.abs(previousGeometry.viewportHeight - currentViewportHeight) <= 1;
+  const reusableGeometry =
+    sameViewport &&
+    Number.isFinite(previousGeometry.canvasWidth) &&
+    Number.isFinite(previousGeometry.canvasHeight);
+  const CW = reusableGeometry ? previousGeometry.canvasWidth : 480;
+  const CH = reusableGeometry
+    ? previousGeometry.canvasHeight
+    : Math.max(1, Math.round(CW * (currentViewportHeight / currentViewportWidth)));
   canvas.width = CW;
   canvas.height = CH;
 
@@ -530,12 +558,12 @@
   }
 
   function bootFromCache() {
-    const cachedImage =
-      sessionStorage.getItem("aleph_transition_bg") ||
-      localStorage.getItem("aleph_last_url");
+    const transitionFrame = sessionStorage.getItem("aleph_transition_bg");
+    const cachedImage = transitionFrame || localStorage.getItem("aleph_last_url");
     if (!cachedImage) return Promise.resolve(false);
     return new Promise((resolve) => {
       const im = new Image();
+      let triedTransitionFrame = cachedImage === transitionFrame;
       im.crossOrigin = "anonymous";
       im.onload = () => {
         try {
@@ -548,7 +576,14 @@
           resolve(false);
         }
       };
-      im.onerror = () => resolve(false);
+      im.onerror = () => {
+        if (!triedTransitionFrame && transitionFrame) {
+          triedTransitionFrame = true;
+          im.src = transitionFrame;
+          return;
+        }
+        resolve(false);
+      };
       im.src = cachedImage;
     });
   }

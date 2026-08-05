@@ -1,7 +1,7 @@
 /* Resto del CSS */
 @font-face {
   font-family: "Times NR Seven MT Std";
-  src: url("asset/font/Times%20NR%20Seven%20MT%20Std%20Bold.otf") format("opentype");
+  src: url("assets/font/Times%20NR%20Seven%20MT%20Std%20Bold.otf") format("opentype");
   font-style: normal;
   font-weight: 700;
 }
@@ -400,7 +400,8 @@ a.btn-aqua:visited {
   height: auto;
 }
 
-.video-unmute-btn {
+.video-unmute-btn,
+.video-long-btn {
   position: absolute;
   top: 0;
   left: 0;
@@ -419,8 +420,51 @@ a.btn-aqua:visited {
   user-select: none;
 }
 
-.video-unmute:hover .video-unmute-btn {
+.video-unmute:hover .video-unmute-btn,
+.video-long:hover .video-long-btn {
   opacity: 1;
+  pointer-events: auto;
+}
+
+/* Video lunghi: controlli nello stesso punto e con lo stesso stile di Unmute. */
+.video-long {
+  position: relative;
+}
+
+.video-long-btn {
+  z-index: 1;
+}
+
+/* Normally the site hides native video controls. The complete SPECTA film is
+   the intentional exception: while fullscreen, retain the browser controls. */
+.video-long video[controls]::-webkit-media-controls {
+  display: flex;
+}
+
+.video-long video[controls]::-webkit-media-controls-panel {
+  display: flex !important;
+  font: initial !important;
+  font-family: initial !important;
+  text-shadow: none !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+.video-long video[controls]::-webkit-media-controls-play-button,
+.video-long video[controls]::-webkit-media-controls-start-playback-button {
+  display: flex !important;
+}
+
+.video-long video:fullscreen {
+  font: initial !important;
+  font-family: initial !important;
+  text-shadow: none !important;
+}
+
+@media (pointer: coarse) {
+  .video-long-btn {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .imgpro {
@@ -1066,6 +1110,27 @@ html[data-aleph-background="off"] body.about-page.has-canvas .about-navigation .
 body.has-canvas #content-scroll a,
 body.has-canvas #content-scroll p {
   user-select: text;
+}
+
+body[data-site-view="about"] .projects-navigation,
+body[data-site-view="about"] #projects-list,
+body[data-site-view="about"] .projects-contacts {
+  display: none !important;
+}
+
+body[data-site-view="work"] .about-navigation,
+body[data-site-view="work"] #about-view {
+  display: none !important;
+}
+
+.projects-navigation[hidden],
+.about-navigation[hidden] {
+  display: none !important;
+}
+
+#about-view {
+  width: 100%;
+  min-height: 100%;
 }
 
 /* Header sticky in cima al content-scroll (che è fixed nel viewport).

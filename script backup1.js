@@ -1,4 +1,4 @@
-document.documentElement.style.cursor = 'url("./asset/svg/dot.svg"), auto';
+document.documentElement.style.cursor = 'url("./assets/shared/svg/dot.svg"), auto';
 
 //CAMBIA PAGINA IN AUTOMATICO
 // var caseList = ["progetto.html", "progetto-1.html", "progetto-2.html"];

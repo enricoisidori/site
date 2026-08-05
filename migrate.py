@@ -28,9 +28,9 @@ HEAD_TEMPLATE = """<!doctype html>
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>{title} — Enrico Isidori</title>
-    <link rel="icon" type="image/png" href="../asset/svg/cyan.png" />
-    <link rel="shortcut icon" type="image/png" href="../asset/svg/cyan.png" />
-    <link rel="apple-touch-icon" href="../asset/svg/cyan.png" />
+    <link rel="icon" type="image/png" href="../assets/shared/svg/cyan.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/shared/svg/cyan.png" />
+    <link rel="apple-touch-icon" href="../assets/shared/svg/cyan.png" />
     <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/helvetica-lt-narrow" />
     <link rel="stylesheet" href="https://use.typekit.net/vhk8wid.css" />
     <link rel="stylesheet" href="../style.css" />
@@ -94,8 +94,8 @@ def extract_title(body):
 
 
 def rewrite_paths(body):
-    # Path globali: asset/, style.css, script.js → ../asset/, etc.
-    body = re.sub(r'(["\'])asset/', r'\1../asset/', body)
+    # Path globali: assets/shared/, style.css, script.js → ../assets/shared/, etc.
+    body = re.sub(r'(["\'])assets/shared/', r'\1../assets/shared/', body)
     body = re.sub(r'(["\'])style\.css', r'\1../style.css', body)
     body = re.sub(r'(["\'])script\.js', r'\1../script.js', body)
     body = re.sub(r'(["\'])home\.html', r'\1../home.html', body)
@@ -110,14 +110,14 @@ def rewrite_paths(body):
             body,
         )
 
-    # Also rewrite specta.pdf and similar root files: ./asset/... handled above,
+    # Also rewrite specta.pdf and similar root files: ./assets/shared/... handled above,
     # but bare *.pdf or *.html references at root level need ../
     # Only if not already starting with ../ or http or mailto or #
     def root_ref(m):
         prefix, val = m.group(1), m.group(2)
         if val.startswith(("http://", "https://", "mailto:", "#", "../", "/", "./")):
             return m.group(0)
-        # Skip already-rewritten asset/style/script
+        # Skip already-rewritten assets/shared/style/script
         return f'{prefix}../{val}'
 
     body = re.sub(

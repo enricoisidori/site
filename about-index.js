@@ -14,7 +14,8 @@
   orderedProjects.forEach((project) => {
     const link = document.createElement("a");
     const year = yearFor(project);
-    link.href = `work.html#${encodeURIComponent(project.slug)}`;
+    const hash = project.slug === "n+" ? project.slug : encodeURIComponent(project.slug);
+    link.href = `../work.html#${hash}`;
     link.textContent = `${project.title} ${year || "—"}`;
     fragment.append(link, document.createElement("br"));
   });

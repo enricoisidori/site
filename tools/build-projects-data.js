@@ -187,8 +187,8 @@ if (!projects.some((project) => project.sourcePage === `${offDisciplinePath}/`))
       return {
         type: "image",
         src: fs.existsSync(optimizedPath)
-          ? `${offDisciplinePath}/asset/optimized/${optimized}`
-          : `${offDisciplinePath}/asset/${file}`,
+          ? `${offDisciplinePath}/assets/shared/optimized/${optimized}`
+          : `${offDisciplinePath}/assets/shared/${file}`,
       };
     });
 

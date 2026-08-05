@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
+  if (window.location.protocol === "file:") {
+    document.querySelectorAll("a[data-local-href]").forEach((link) => {
+      link.href = link.dataset.localHref;
+    });
+  }
+
   const filterButtons = document.querySelectorAll(".btn[data-filter]");
   const items = document.querySelectorAll(
     ".artistpage, .designerpage, .digitalpage"

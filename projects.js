@@ -11,56 +11,56 @@
   const SCROLL_HINT_RATIO = 0.5;
   const SCROLL_HINT_SCROLL_FACTOR = 1;
   const VIDEO_DIMENSIONS = {
-    "asset/rhytuals/image/02-motion-optimized.mp4": [720, 1280],
-    "asset/rhytuals/image/02-motion-mobile.mp4": [608, 1080],
-    "asset/rhytuals/image/r-14-optimized.mp4": [1312, 1920],
-    "asset/rhytuals/image/r-14-mobile.mp4": [874, 1280],
-    "asset/imageofabook/7-optimized.mp4": [1440, 1920],
-    "asset/imageofabook/7-mobile.mp4": [960, 1280],
-    "digitalforest/asset/03-optimized.mp4": [1700, 1214],
-    "digitalforest/asset/03-mobile.mp4": [1080, 772],
-    "digitalforest/asset/04-optimized.mp4": [956, 1700],
-    "digitalforest/asset/04-mobile.mp4": [608, 1080],
-    "digitalforest/asset/05-optimized.mp4": [1700, 956],
-    "digitalforest/asset/05-mobile.mp4": [1080, 608],
-    "digitalforest/asset/06-optimized.mp4": [1700, 956],
-    "digitalforest/asset/06-mobile.mp4": [1080, 608],
-    "digitalforest/asset/07-optimized.mp4": [1700, 1214],
-    "digitalforest/asset/07-mobile.mp4": [1080, 772],
-    "digitalforest/asset/09-optimized.mp4": [1700, 1214],
-    "digitalforest/asset/09-mobile.mp4": [1080, 772],
-    "capsule/asset/desktop-optimized.mp4": [1700, 956],
-    "capsule/asset/desktop-mobile.mp4": [1080, 608],
-    "capsule/asset/4-optimized.mp4": [1700, 1700],
-    "capsule/asset/4-mobile.mp4": [1080, 1080],
-    "capsule/asset/3-optimized.mp4": [1700, 1700],
-    "capsule/asset/3-mobile.mp4": [1080, 1080],
-    "capsule/asset/2-optimized.mp4": [1080, 1080],
-    "capsule/asset/2-mobile.mp4": [1080, 1080],
-    "capsule/asset/1-optimized.mp4": [1700, 1700],
-    "capsule/asset/1-mobile.mp4": [1080, 1080],
-    "drawaline/asset/cover.mp4": [1266, 844],
-    "drawaline/asset/cover-mobile.mp4": [1080, 720],
-    "drawaline/asset/1-optimized.mp4": [1700, 1276],
-    "drawaline/asset/1-mobile.mp4": [1080, 810],
-    "drawaline/asset/2-optimized.mp4": [1700, 1276],
-    "drawaline/asset/2-mobile.mp4": [1080, 810],
-    "drawaline/asset/3-optimized.mp4": [1700, 1276],
-    "drawaline/asset/3-mobile.mp4": [1080, 810],
-    "6am/asset/6am1-optimized.mp4": [1202, 1700],
-    "6am/asset/6am1-mobile.mp4": [762, 1080],
-    "6am/asset/6am2-optimized.mp4": [720, 1280],
-    "6am/asset/6am2-mobile.mp4": [608, 1080],
-    "spectathesis/asset/spectathesis-optimized.mp4": [1700, 1134],
-    "spectathesis/asset/spectathesis-mobile.mp4": [1080, 720],
-    "specta/asset/SPECTA-optimized.mp4": [1700, 956],
-    "specta/asset/SPECTA-mobile.mp4": [1080, 608],
-    "pixelpushing/asset/Iterationsinversions-optimized.mp4": [1700, 956],
-    "pixelpushing/asset/Iterationsinversions-mobile.mp4": [1080, 608],
-    "pixelpushing/asset/istallationview-optimized.mp4": [956, 1700],
-    "pixelpushing/asset/istallationview-mobile.mp4": [608, 1080],
-    "corpomacchina/asset/f-optimized.mp4": [1700, 1134],
-    "corpomacchina/asset/f-mobile.mp4": [1080, 720],
+    "assets/rhytuals/image/02-motion-optimized.mp4": [720, 1280],
+    "assets/rhytuals/image/02-motion-mobile.mp4": [608, 1080],
+    "assets/rhytuals/image/r-14-optimized.mp4": [1312, 1920],
+    "assets/rhytuals/image/r-14-mobile.mp4": [874, 1280],
+    "assets/imageofabook/7-optimized.mp4": [1440, 1920],
+    "assets/imageofabook/7-mobile.mp4": [960, 1280],
+    "assets/digitalforest/03-optimized.mp4": [1700, 1214],
+    "assets/digitalforest/03-mobile.mp4": [1080, 772],
+    "assets/digitalforest/04-optimized.mp4": [956, 1700],
+    "assets/digitalforest/04-mobile.mp4": [608, 1080],
+    "assets/digitalforest/05-optimized.mp4": [1700, 956],
+    "assets/digitalforest/05-mobile.mp4": [1080, 608],
+    "assets/digitalforest/06-optimized.mp4": [1700, 956],
+    "assets/digitalforest/06-mobile.mp4": [1080, 608],
+    "assets/digitalforest/07-optimized.mp4": [1700, 1214],
+    "assets/digitalforest/07-mobile.mp4": [1080, 772],
+    "assets/digitalforest/09-optimized.mp4": [1700, 1214],
+    "assets/digitalforest/09-mobile.mp4": [1080, 772],
+    "assets/capsule/desktop-optimized.mp4": [1700, 956],
+    "assets/capsule/desktop-mobile.mp4": [1080, 608],
+    "assets/capsule/4-optimized.mp4": [1700, 1700],
+    "assets/capsule/4-mobile.mp4": [1080, 1080],
+    "assets/capsule/3-optimized.mp4": [1700, 1700],
+    "assets/capsule/3-mobile.mp4": [1080, 1080],
+    "assets/capsule/2-optimized.mp4": [1080, 1080],
+    "assets/capsule/2-mobile.mp4": [1080, 1080],
+    "assets/capsule/1-optimized.mp4": [1700, 1700],
+    "assets/capsule/1-mobile.mp4": [1080, 1080],
+    "assets/drawaline/cover.mp4": [1266, 844],
+    "assets/drawaline/cover-mobile.mp4": [1080, 720],
+    "assets/drawaline/1-optimized.mp4": [1700, 1276],
+    "assets/drawaline/1-mobile.mp4": [1080, 810],
+    "assets/drawaline/2-optimized.mp4": [1700, 1276],
+    "assets/drawaline/2-mobile.mp4": [1080, 810],
+    "assets/drawaline/3-optimized.mp4": [1700, 1276],
+    "assets/drawaline/3-mobile.mp4": [1080, 810],
+    "assets/6am/6am1-optimized.mp4": [1202, 1700],
+    "assets/6am/6am1-mobile.mp4": [762, 1080],
+    "assets/6am/6am2-optimized.mp4": [720, 1280],
+    "assets/6am/6am2-mobile.mp4": [608, 1080],
+    "assets/spectathesis/spectathesis-optimized.mp4": [1700, 1134],
+    "assets/spectathesis/spectathesis-mobile.mp4": [1080, 720],
+    "assets/specta/SPECTA-optimized.mp4": [1700, 956],
+    "assets/specta/SPECTA-mobile.mp4": [1080, 608],
+    "assets/pixelpushing/Iterationsinversions-optimized.mp4": [1700, 956],
+    "assets/pixelpushing/Iterationsinversions-mobile.mp4": [1080, 608],
+    "assets/pixelpushing/istallationview-optimized.mp4": [956, 1700],
+    "assets/pixelpushing/istallationview-mobile.mp4": [608, 1080],
+    "assets/corpomacchina/f-optimized.mp4": [1700, 1134],
+    "assets/corpomacchina/f-mobile.mp4": [1080, 720],
   };
   let focusedRow = null;
   let scrollHintFrame = null;
@@ -73,10 +73,11 @@
   }
 
   function setHash(slug) {
+    const hash = slug === "n+" ? slug : encodeURIComponent(slug);
     history.replaceState(
       null,
       "",
-      `${location.pathname}${location.search}#${encodeURIComponent(slug)}`,
+      `${location.pathname}${location.search}#${hash}`,
     );
   }
 
@@ -358,6 +359,10 @@
 
     button.type = "button";
     button.className = "project-media project-media-image";
+    if (media.fillRatio) {
+      button.classList.add("project-media-fill");
+      button.dataset.fillRatio = String(media.fillRatio);
+    }
     button.setAttribute("aria-label", `Close ${project.title}`);
     button.setAttribute("aria-pressed", "false");
     button.addEventListener("click", (event) => handleMediaClick(event, project));
@@ -448,6 +453,7 @@
     wrapper.className = "project-media project-media-video";
     if (mediaIndex === 0) wrapper.classList.add("project-media-cover-video");
     if (media.unmute) wrapper.classList.add("video-unmute");
+    if (media.longVideo) wrapper.classList.add("video-long");
     wrapper.addEventListener("click", (event) => handleMediaClick(event, project));
     if (placeholder) {
       wrapper.style.setProperty("--project-placeholder", `url("${placeholder}")`);
@@ -487,7 +493,11 @@
       if (mediaIndex === 0) video.poster = poster;
       else video.dataset.poster = poster;
     }
-    if (mediaIndex === 0) {
+    if (media.longVideo) {
+      video.preload = "metadata";
+      video.src = media.preview;
+      video.dataset.longSrc = media.src;
+    } else if (mediaIndex === 0) {
       video.preload = "auto";
       video.src = getVideoSource(media);
     } else {
@@ -501,6 +511,50 @@
       button.className = "video-unmute-btn";
       button.textContent = "Unmute";
       button.setAttribute("aria-pressed", "false");
+      wrapper.appendChild(button);
+    }
+    if (media.longVideo) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "video-long-btn";
+      button.textContent = "Watch full video";
+      const resetLongVideo = () => {
+        video.pause();
+        video.controls = false;
+        video.loop = true;
+        video.muted = true;
+        delete video.dataset.longLoaded;
+        video.src = media.preview;
+        video.load();
+        video.play().catch(() => {});
+      };
+      const playLongVideo = () => {
+        if (!video.dataset.longLoaded) {
+          video.dataset.longLoaded = "true";
+          video.pause();
+          video.loop = false;
+          video.muted = false;
+          video.controls = true;
+          video.src = video.dataset.longSrc;
+          video.load();
+        }
+        video.play().catch(() => {});
+      };
+
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        playLongVideo();
+        video.requestFullscreen?.().catch(() => {});
+      });
+      document.addEventListener("fullscreenchange", () => {
+        if (document.fullscreenElement !== video && video.dataset.longLoaded) {
+          resetLongVideo();
+        }
+      });
+      video.addEventListener("webkitendfullscreen", () => {
+        if (video.dataset.longLoaded) resetLongVideo();
+      });
       wrapper.appendChild(button);
     }
     return wrapper;
@@ -520,6 +574,12 @@
       date.className = "project-date";
       date.textContent = project.date;
       details.appendChild(date);
+    }
+    if (project.dimensions) {
+      const dimensions = document.createElement("p");
+      dimensions.className = "project-dimensions";
+      dimensions.textContent = project.dimensions;
+      details.appendChild(dimensions);
     }
     if (project.description) {
       const description = document.createElement("p");
@@ -545,7 +605,7 @@
     track.addEventListener(
       "click",
       (event) => {
-        if (event.target.closest(".video-unmute-btn")) return;
+        if (event.target.closest(":is(.video-unmute-btn, .video-long-btn)")) return;
         event.preventDefault();
         event.stopImmediatePropagation();
         event.stopPropagation();
@@ -586,7 +646,7 @@
 
     track.addEventListener("pointerdown", (event) => {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
-      if (event.target.closest(".video-unmute-btn")) return;
+      if (event.target.closest(":is(.video-unmute-btn, .video-long-btn)")) return;
       mouseDrag = {
         pointerId: event.pointerId,
         startX: event.clientX,
@@ -637,7 +697,7 @@
 
     const cursor = document.createElement("img");
     cursor.className = "project-info-cursor";
-    cursor.src = "asset/svg/info.svg";
+    cursor.src = "assets/shared/svg/info.svg";
     cursor.alt = "";
     cursor.setAttribute("aria-hidden", "true");
     document.body.appendChild(cursor);
@@ -645,7 +705,7 @@
     const hide = () => cursor.classList.remove("is-visible");
     const show = (event) => {
       if (event.pointerType && event.pointerType !== "mouse") return;
-      if (event.target.closest(".video-unmute-btn")) {
+      if (event.target.closest(":is(.video-unmute-btn, .video-long-btn)")) {
         hide();
         return;
       }
@@ -850,10 +910,15 @@
   }
 
   renderProjects();
-  setupProjectInfoCursor();
   syncTrackGeometry();
   window.addEventListener("resize", requestMediaGeometrySync, { passive: true });
-  if (location.hash) {
+  // A layout resize can happen without a reliable window resize event (for
+  // example when a browser panel or the mobile viewport changes). Observe the
+  // scroll container itself so every open track is measured again.
+  if ("ResizeObserver" in window && scrollRoot) {
+    new ResizeObserver(requestMediaGeometrySync).observe(scrollRoot);
+  }
+  if (location.hash && location.hash !== "#about") {
     const initialSlug = decodeURIComponent(location.hash.slice(1));
     const initialRow = rowsBySlug.get(initialSlug);
     if (initialRow) focusProject(initialRow);
@@ -871,6 +936,7 @@
   };
   window.addEventListener("hashchange", () => {
     const slug = decodeURIComponent(location.hash.slice(1));
+    if (slug === "about") return;
     if (rowsBySlug.has(slug)) openProject(slug, false);
     else removeHash();
   });

@@ -1,6 +1,6 @@
 (function () {
   try {
-    const isControlledPage = /\/(?:work|about)\.html$/.test(
+    const isControlledPage = /\/(?:work\.html|about(?:\/index\.html)?\/?)$/.test(
       window.location.pathname,
     );
     const navigation = performance.getEntriesByType("navigation")[0];
@@ -10,7 +10,6 @@
       // Work/About share a state while navigating, but an explicit refresh
       // always begins again from ON.
       sessionStorage.removeItem("aleph_control_state");
-      return;
     }
     if (isControlledPage) {
       const saved = JSON.parse(

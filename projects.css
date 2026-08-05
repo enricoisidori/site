@@ -270,9 +270,8 @@ html[data-aleph-background] body.projects-page #content-scroll .project-details 
   .project-track,
   .project-track *,
   .project-row > .project-cover,
-  .project-row > .project-cover *,
-  .project-track.is-dragging {
-    cursor: none !important;
+  .project-row > .project-cover * {
+    cursor: pointer !important;
   }
 }
 
@@ -336,6 +335,13 @@ html[data-aleph-background] body.projects-page #content-scroll .project-details 
   cursor: pointer;
 }
 
+.project-media-image.project-media-fill img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
 .project-media-video {
   position: relative;
   width: auto;
@@ -390,7 +396,7 @@ html[data-aleph-background] body.projects-page #content-scroll .project-details 
 }
 
 html[data-aleph-background] body.projects-page.has-canvas #content-scroll
-  .video-unmute-btn {
+  :is(.video-unmute-btn, .video-long-btn) {
   pointer-events: auto;
   cursor: pointer;
   color: #fff !important;
@@ -399,10 +405,26 @@ html[data-aleph-background] body.projects-page.has-canvas #content-scroll
   text-shadow: none !important;
 }
 
+/* The long-video trigger must retain the same difference treatment even
+   before the canvas state has been established. */
+body.projects-page #content-scroll .video-long-btn {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  mix-blend-mode: difference !important;
+  text-shadow: none !important;
+}
+
 html[data-aleph-background] body.projects-page.has-canvas #content-scroll
-  .video-unmute-btn:hover,
+  :is(.video-unmute-btn, .video-long-btn):hover,
 html[data-aleph-background] body.projects-page.has-canvas #content-scroll
-  .video-unmute-btn:focus-visible {
+  :is(.video-unmute-btn, .video-long-btn):focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+}
+
+body.projects-page #content-scroll .video-long-btn:hover,
+body.projects-page #content-scroll .video-long-btn:focus-visible {
   color: #f00 !important;
   -webkit-text-fill-color: #f00 !important;
   mix-blend-mode: normal !important;
@@ -424,6 +446,7 @@ html[data-aleph-background] body.projects-page.has-canvas #content-scroll
 }
 
 .project-date,
+.project-dimensions,
 .project-info,
 .project-description {
   width: 50%;
@@ -459,6 +482,7 @@ html[data-aleph-background] body.projects-page.has-canvas #content-scroll
   }
 
   .project-date,
+  .project-dimensions,
   .project-info,
   .project-description {
     width: 100%;
