@@ -285,7 +285,7 @@
           const frame = Commons.preloaded.length > 0 ? Commons.preloaded.shift() : null;
           if (frame && frame.img && frame.img.src) {
             img.src = frame.img.src;
-            setFavicon(frame.img.src);
+            setFavicon("/assets/shared/projects-grid-favicon.png");
             currentPageUrl = frame.pageUrl || "";
             img.dataset.commonsPage = frame.id
               ? `https://commons.wikimedia.org/wiki/${encodeURIComponent(

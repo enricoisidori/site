@@ -1,0 +1,59 @@
+/* Optional site style. Set data-aleph-style="base" on <html> to use it.
+   Without that attribute (or with "overload") the existing visual system is
+   untouched. */
+html[data-aleph-style="base"] body.has-canvas ::selection {
+  color: #000 !important;
+  background: transparent;
+}
+
+html[data-aleph-style="base"] body.has-canvas ::-moz-selection {
+  color: #000 !important;
+  background: transparent;
+}
+
+html[data-aleph-style="base"][data-aleph-background="off"]
+  body.has-canvas
+  #content-scroll,
+html[data-aleph-style="base"][data-aleph-background="off"]
+  body.has-canvas
+  #content-scroll * {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+  -webkit-text-stroke: 0 !important;
+}
+
+html[data-aleph-style="base"][data-aleph-background="off"]
+  body.has-canvas
+  :is(.projects-navigation, .about-navigation)
+  > :is(a, span, button),
+html[data-aleph-style="base"][data-aleph-background="off"]
+  body.has-canvas
+  .aleph-symbol-toggle {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+}
+
+html[data-aleph-style="base"][data-aleph-background="off"]
+  body.has-canvas
+  #content-scroll
+  :is(a, button):hover,
+html[data-aleph-style="base"][data-aleph-background="off"]
+  body.has-canvas
+  #content-scroll
+  :is(a, button):focus-visible,
+html[data-aleph-style="base"][data-aleph-background="off"]
+  body.has-canvas
+  :is(.projects-navigation, .about-navigation)
+  > :is(a, span, button):hover,
+html[data-aleph-style="base"][data-aleph-background="off"]
+  body.has-canvas
+  :is(.projects-navigation, .about-navigation)
+  > :is(a, span, button):focus-visible {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  mix-blend-mode: normal !important;
+}

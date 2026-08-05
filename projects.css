@@ -414,6 +414,22 @@ body.projects-page #content-scroll .video-long-btn {
   text-shadow: none !important;
 }
 
+html[data-aleph-background="on"] body.projects-page.has-canvas #content-scroll
+  :is(.video-unmute-btn, .video-long-btn) {
+  color: #000 !important;
+  -webkit-text-fill-color: #000 !important;
+  mix-blend-mode: normal !important;
+  text-shadow: var(--project-text-shadow) !important;
+}
+
+html[data-aleph-background="off"] body.projects-page.has-canvas #content-scroll
+  :is(.video-unmute-btn, .video-long-btn) {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  mix-blend-mode: difference !important;
+  text-shadow: none !important;
+}
+
 html[data-aleph-background] body.projects-page.has-canvas #content-scroll
   :is(.video-unmute-btn, .video-long-btn):hover,
 html[data-aleph-background] body.projects-page.has-canvas #content-scroll
@@ -428,6 +444,15 @@ body.projects-page #content-scroll .video-long-btn:focus-visible {
   color: #f00 !important;
   -webkit-text-fill-color: #f00 !important;
   mix-blend-mode: normal !important;
+}
+
+@media (pointer: coarse) {
+  .video-unmute-btn::after,
+  .video-long-btn::after {
+    position: absolute;
+    inset: -12px;
+    content: "";
+  }
 }
 
 /* Project details */

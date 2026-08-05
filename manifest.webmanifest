@@ -8,12 +8,12 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "assets/shared/svg/aleph-icon-192.png",
-      "sizes": "192x192",
+      "src": "assets/shared/projects-grid-favicon.png",
+      "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "assets/shared/svg/aleph-icon-512.png",
+      "src": "assets/shared/projects-grid-favicon.png",
       "sizes": "512x512",
       "type": "image/png"
     }

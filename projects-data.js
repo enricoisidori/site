@@ -227,8 +227,8 @@ window.PROJECTS = [
     categories: ["designerpage", "artistpage"],
     date: "2025",
     info: [
-      "Field<br>Speculative design",
-      "Role<br>Art direction<br>Branding<br>Spatial design<br>Visual design<br>Interaction design<br>Prototyping<br>Photography",
+      "Field<br>Speculative",
+      "Role<br>Art direction<br>Branding<br>Spatial design<br>Visual<br>Interaction<br>Prototyping<br>Photography",
       "Team<br>Filippo Rosati (creative direction)<br>Pietro Forino (interaction design)<br>Daniela Gentile (research)<br>Nicola Airutti (sound design)<br>Cristina Dezi (fashion design)<br>Bernardo Martins (AI artworks)",
       "Made at<br>Operating System Studio<br>Umanesimo Artificiale",
       'Exhibited at<br><a href="https://www.videocitta.com/" target="_blank" rel="noopener noreferrer">Videocittà</a> 2025, Rome<br><a href="https://sonar.es/en" target="_blank" rel="noopener noreferrer">Sónar</a>+D 2025, Barcelona',
@@ -456,22 +456,22 @@ window.PROJECTS = [
         type: "video",
         src: "assets/drawaline/cover.mp4",
         poster: "assets/drawaline/optimized/cover-poster.webp",
-        unmute: true,
+        unmute: false,
       },
       {
         type: "video",
         src: "assets/drawaline/1-optimized.mp4",
-        unmute: true,
+        unmute: false,
       },
       {
         type: "video",
         src: "assets/drawaline/2-optimized.mp4",
-        unmute: true,
+        unmute: false,
       },
       {
         type: "video",
         src: "assets/drawaline/3-optimized.mp4",
-        unmute: true,
+        unmute: false,
       },
       {
         type: "image",
@@ -658,7 +658,7 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2023",
     info: [
-      "Field<br>Speculative design<br>Branding<br>Graphic<br>Interaction<br>Interface<br>Experience<br>Exhibition<br>Packaging<br>Photography<br>Copywriting<br>Video Making<br>Coding<br>Prototyping<br>Research<br>Editorial",
+      "Field<br>Speculative<br>Branding<br>Graphic<br>Interaction<br>Interface<br>Experience<br>Exhibition<br>Packaging<br>Photography<br>Copywriting<br>Video Making<br>Coding<br>Prototyping<br>Research<br>Editorial",
       "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
       "Made at<br>Politecnico di Milano<br>Laboratorio di Sintesi Finale C1",
       'Link<br><a href="specta.pdf" target="_blank" rel="noopener noreferrer">SPECTA.pdf</a>',
@@ -668,6 +668,8 @@ window.PROJECTS = [
     description:
       "Rocks are indifferent to climate change because it has always existed for\nthem. The project explores it from their perspective. Their stratifications,\naccumulated over millions of years, constitute an archive of the planet’s\nclimatic history: a non-judgmental account of the catastrophes that have\ncyclically disrupted living beings.\n\nFrom this reflection, the fictional brand Litia is born. Its mission is to\ncounter eco-anxiety: the feeling of distress caused by awareness of the ongoing\nclimate crisis. Its product, Specta, silences screens displaying climate-related\nimagery. When lifted and rotated in space, it transforms anxiety-inducing images\ninto slow, calming stratifications similar to those of rock formations, allowing\nviewers to experience climate change through the impassive perspective of rocks.",
     media: [
+      { type: "image", src: "assets/specta/optimized/specta-s1.webp", width: 1662, height: 1108 },
+      { type: "image", src: "assets/specta/optimized/specta-s2.webp", width: 1920, height: 1441 },
       {
         type: "video",
         src: "assets/specta/SPECTA-optimized.mp4",
@@ -682,8 +684,6 @@ window.PROJECTS = [
         width: 1920,
         height: 1080,
       },
-      { type: "image", src: "assets/specta/optimized/specta-s1.webp", width: 1662, height: 1108 },
-      { type: "image", src: "assets/specta/optimized/specta-s2.webp", width: 1920, height: 1441 },
       { type: "image", src: "assets/specta/optimized/specta-s3.webp", width: 1920, height: 1280 },
       { type: "image", src: "assets/specta/optimized/specta-s4.webp", width: 1700, height: 1134 },
       { type: "image", src: "assets/specta/optimized/specta-s5.webp", width: 1920, height: 1280 },
@@ -731,6 +731,7 @@ window.PROJECTS = [
   },
   {
     slug: "corpo-macchina",
+    hidden: true,
     sourcePage: "corpomacchina/",
     title: "Corpo macchina",
     categories: ["artistpage"],

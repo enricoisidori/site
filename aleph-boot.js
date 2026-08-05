@@ -3,19 +3,28 @@
     const isControlledPage = /\/(?:work\.html|about(?:\/index\.html)?\/?)$/.test(
       window.location.pathname,
     );
+    const configuredStyle = document.documentElement.dataset.alephStyle;
+    const storedStyle = sessionStorage.getItem("aleph_style");
+    const baseStyle =
+      configuredStyle === "base" ||
+      (!configuredStyle && storedStyle === "base");
+    document.documentElement.dataset.alephStyle = baseStyle ? "base" : "overload";
+    if (configuredStyle && storedStyle && configuredStyle !== storedStyle) {
+      sessionStorage.removeItem("aleph_control_state");
+    }
     const navigation = performance.getEntriesByType("navigation")[0];
     const isReload =
       navigation?.type === "reload" || performance.navigation?.type === 1;
     if (isControlledPage && isReload) {
       // Work/About share a state while navigating, but an explicit refresh
-      // always begins again from ON.
+      // always begins again from OFF.
       sessionStorage.removeItem("aleph_control_state");
     }
     if (isControlledPage) {
       const saved = JSON.parse(
         sessionStorage.getItem("aleph_control_state") || "null",
       );
-      if (saved?.backgroundOn === false) return;
+      if (saved?.backgroundOn !== true) return;
     } else if (sessionStorage.getItem("aleph_white_bg") === "1") {
       return;
     }

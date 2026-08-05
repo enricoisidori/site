@@ -53,7 +53,23 @@
   }
 
   const root = document.documentElement;
+  const configuredStyle = root.dataset.alephStyle;
+  const alephStyle =
+    configuredStyle === "base" ||
+    (!isProjectsPage && sessionStorage.getItem("aleph_style") === "base")
+      ? "base"
+      : "overload";
+  root.dataset.alephStyle = alephStyle;
   const CONTROL_STATE_KEY = "aleph_control_state";
+  if (isProjectsPage) {
+    try {
+      const previousStyle = sessionStorage.getItem("aleph_style");
+      if (previousStyle && previousStyle !== alephStyle) {
+        sessionStorage.removeItem(CONTROL_STATE_KEY);
+      }
+      sessionStorage.setItem("aleph_style", alephStyle);
+    } catch (_) {}
+  }
   const navigation = performance.getEntriesByType("navigation")[0];
   const isReload =
     navigation?.type === "reload" || performance.navigation?.type === 1;
@@ -71,10 +87,13 @@
     } catch (_) {}
   }
 
-  // A new session starts ON. Work and About share the chosen state.
+  // Both styles begin OFF; the chosen state then follows Work and About
+  // together for the remainder of the session.
   let backgroundControlEnabled = true;
   let whiteBg = isControlledPage
-    ? savedControlState?.backgroundOn === false
+    ? savedControlState
+      ? savedControlState.backgroundOn === false
+      : true
     : false;
 
   function persistControlState() {

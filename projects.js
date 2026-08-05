@@ -11,8 +11,8 @@
   const SCROLL_HINT_RATIO = 0.5;
   const SCROLL_HINT_SCROLL_FACTOR = 1;
   const VIDEO_DIMENSIONS = {
-    "assets/rhytuals/image/02-motion-optimized.mp4": [720, 1280],
-    "assets/rhytuals/image/02-motion-mobile.mp4": [608, 1080],
+    "assets/rhytuals/image/02-motion-optimized.mp4": [960, 1280],
+    "assets/rhytuals/image/02-motion-mobile.mp4": [720, 960],
     "assets/rhytuals/image/r-14-optimized.mp4": [1312, 1920],
     "assets/rhytuals/image/r-14-mobile.mp4": [874, 1280],
     "assets/imageofabook/7-optimized.mp4": [1440, 1920],
@@ -313,6 +313,10 @@
 
     button.type = "button";
     button.className = "project-cover";
+    if (firstMedia.fillRatio) {
+      button.classList.add("project-cover-fill");
+      button.dataset.fillRatio = String(firstMedia.fillRatio);
+    }
     button.dataset.mediaType = firstMedia.type;
     button.setAttribute("aria-label", `Open ${project.title}`);
     button.setAttribute("aria-expanded", "false");
@@ -724,6 +728,7 @@
 
   function renderProjects() {
     projects.forEach((project, projectIndex) => {
+      if (project.hidden) return;
       const row = document.createElement("section");
       const track = document.createElement("div");
       const cover = createCover(project, projectIndex);
