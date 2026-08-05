@@ -8,14 +8,14 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "assets/shared/projects-grid-favicon.png",
+      "src": "assets/shared/svg/Aleph0.svg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml"
     },
     {
-      "src": "assets/shared/projects-grid-favicon.png",
+      "src": "assets/shared/svg/Aleph0.svg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml"
     }
   ]
 }

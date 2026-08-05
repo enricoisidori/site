@@ -26,7 +26,7 @@ window.PROJECTS = [
       },
       {
         type: "video",
-        src: "assets/rhytuals/image/02-motion-optimized.mp4",
+        src: "assets/rhytuals/02-motion.mp4",
         unmute: false,
       },
       {
@@ -97,7 +97,8 @@ window.PROJECTS = [
       },
       {
         type: "video",
-        src: "assets/rhytuals/image/r-14-optimized.mp4",
+        src: "assets/rhytuals/image/r-14.mp4",
+        mobileSrc: "assets/rhytuals/image/r-14.mp4",
         unmute: false,
       },
     ],
@@ -672,7 +673,8 @@ window.PROJECTS = [
       { type: "image", src: "assets/specta/optimized/specta-s2.webp", width: 1920, height: 1441 },
       {
         type: "video",
-        src: "assets/specta/SPECTA-optimized.mp4",
+        src: "assets/specta/SPECTA.mp4",
+        mobileSrc: "assets/specta/SPECTA.mp4",
         poster: "assets/specta/optimized/specta-s1.webp",
         unmute: true,
       },
@@ -710,12 +712,14 @@ window.PROJECTS = [
         src: "assets/pixelpushing/optimized/preview1.webp",
         width: 1920,
         height: 1080,
+        fillRatio: 3 / 2,
       },
       {
         type: "image",
         src: "assets/pixelpushing/optimized/preview2.webp",
         width: 1920,
         height: 1066,
+        fillRatio: 3 / 2,
       },
       {
         type: "video",

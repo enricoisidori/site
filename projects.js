@@ -11,16 +11,19 @@
   const SCROLL_HINT_RATIO = 0.5;
   const SCROLL_HINT_SCROLL_FACTOR = 1;
   const VIDEO_DIMENSIONS = {
+    "assets/rhytuals/02-motion.mp4": [720, 1280],
     "assets/rhytuals/image/02-motion-optimized.mp4": [960, 1280],
     "assets/rhytuals/image/02-motion-mobile.mp4": [720, 960],
     "assets/rhytuals/image/r-14-optimized.mp4": [1312, 1920],
     "assets/rhytuals/image/r-14-mobile.mp4": [874, 1280],
+    "assets/rhytuals/image/r-14.mp4": [1080, 1580],
     "assets/imageofabook/7-optimized.mp4": [1440, 1920],
     "assets/imageofabook/7-mobile.mp4": [960, 1280],
     "assets/digitalforest/03-optimized.mp4": [1700, 1214],
     "assets/digitalforest/03-mobile.mp4": [1080, 772],
     "assets/digitalforest/04-optimized.mp4": [956, 1700],
     "assets/digitalforest/04-mobile.mp4": [608, 1080],
+    "assets/digitalforest/videoinstallation.mp4": [1920, 1080],
     "assets/digitalforest/05-optimized.mp4": [1700, 956],
     "assets/digitalforest/05-mobile.mp4": [1080, 608],
     "assets/digitalforest/06-optimized.mp4": [1700, 956],
@@ -55,6 +58,7 @@
     "assets/spectathesis/spectathesis-mobile.mp4": [1080, 720],
     "assets/specta/SPECTA-optimized.mp4": [1700, 956],
     "assets/specta/SPECTA-mobile.mp4": [1080, 608],
+    "assets/specta/SPECTA.mp4": [1920, 1080],
     "assets/pixelpushing/Iterationsinversions-optimized.mp4": [1700, 956],
     "assets/pixelpushing/Iterationsinversions-mobile.mp4": [1080, 608],
     "assets/pixelpushing/istallationview-optimized.mp4": [956, 1700],
@@ -397,6 +401,10 @@
     return Math.round(value * pixelRatio) / pixelRatio;
   }
 
+  function setTrackScrollLeft(track, value) {
+    track.scrollLeft = snapToDevicePixel(value);
+  }
+
   function syncMediaBox(wrapper, media) {
     const track = wrapper.closest(".project-track");
     if (!track) return;
@@ -523,6 +531,7 @@
       button.className = "video-long-btn";
       button.textContent = "Watch full video";
       const resetLongVideo = () => {
+        button.hidden = false;
         video.pause();
         video.controls = false;
         video.loop = true;
@@ -534,6 +543,7 @@
       };
       const playLongVideo = () => {
         if (!video.dataset.longLoaded) {
+          button.hidden = true;
           video.dataset.longLoaded = "true";
           video.pause();
           video.loop = false;
@@ -557,6 +567,9 @@
         }
       });
       video.addEventListener("webkitendfullscreen", () => {
+        if (video.dataset.longLoaded) resetLongVideo();
+      });
+      video.addEventListener("ended", () => {
         if (video.dataset.longLoaded) resetLongVideo();
       });
       wrapper.appendChild(button);
@@ -677,7 +690,7 @@
         }
       }
       if (!mouseDrag.moved) return;
-      track.scrollLeft = mouseDrag.startScrollLeft - distance;
+      setTrackScrollLeft(track, mouseDrag.startScrollLeft - distance);
       event.preventDefault();
     });
 
@@ -821,7 +834,10 @@
         stop();
         return;
       }
-      edgeTrack.scrollLeft += edgeDirection * edgeSpeed;
+      setTrackScrollLeft(
+        edgeTrack,
+        edgeTrack.scrollLeft + edgeDirection * edgeSpeed,
+      );
       edgeFrame = window.requestAnimationFrame(scroll);
     }
 
@@ -895,7 +911,10 @@
           scrollDelta * SCROLL_HINT_SCROLL_FACTOR,
           remaining,
         );
-        activeHint.track.scrollLeft += movement;
+        setTrackScrollLeft(
+          activeHint.track,
+          activeHint.track.scrollLeft + movement,
+        );
         scrollDelta -= movement / SCROLL_HINT_SCROLL_FACTOR;
         if (activeHint.track.scrollLeft >= activeHint.target - 1) {
           activeHint = null;

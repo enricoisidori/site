@@ -5,7 +5,7 @@
 
   const yearFor = (project) =>
     Number(String(project.date || "").match(/\b(\d{4})\b/)?.[1]) || 0;
-  const orderedProjects = [...projects].sort(
+  const orderedProjects = projects.filter((project) => !project.hidden).sort(
     (a, b) => yearFor(b) - yearFor(a) || a.title.localeCompare(b.title),
   );
   const fragment = document.createDocumentFragment();
