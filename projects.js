@@ -11,19 +11,20 @@
   const SCROLL_HINT_RATIO = 0.5;
   const SCROLL_HINT_SCROLL_FACTOR = 1;
   const VIDEO_DIMENSIONS = {
-    "assets/rhytuals/02-motion.mp4": [720, 1280],
+    "assets/rhytuals/02-motion-optimized.mp4": [720, 1280],
+    "assets/rhytuals/02-motion-mobile.mp4": [608, 1080],
     "assets/rhytuals/image/02-motion-optimized.mp4": [960, 1280],
     "assets/rhytuals/image/02-motion-mobile.mp4": [720, 960],
-    "assets/rhytuals/image/r-14-optimized.mp4": [1312, 1920],
+    "assets/rhytuals/image/r-14-optimized.mp4": [1080, 1580],
     "assets/rhytuals/image/r-14-mobile.mp4": [874, 1280],
-    "assets/rhytuals/image/r-14.mp4": [1080, 1580],
     "assets/imageofabook/7-optimized.mp4": [1440, 1920],
     "assets/imageofabook/7-mobile.mp4": [960, 1280],
     "assets/digitalforest/03-optimized.mp4": [1700, 1214],
     "assets/digitalforest/03-mobile.mp4": [1080, 772],
     "assets/digitalforest/04-optimized.mp4": [956, 1700],
     "assets/digitalforest/04-mobile.mp4": [608, 1080],
-    "assets/digitalforest/videoinstallation.mp4": [1920, 1080],
+    "assets/digitalforest/videoinstallation-optimized.mp4": [1700, 956],
+    "assets/digitalforest/videoinstallation-mobile.mp4": [1080, 608],
     "assets/digitalforest/05-optimized.mp4": [1700, 956],
     "assets/digitalforest/05-mobile.mp4": [1080, 608],
     "assets/digitalforest/06-optimized.mp4": [1700, 956],
@@ -58,7 +59,6 @@
     "assets/spectathesis/spectathesis-mobile.mp4": [1080, 720],
     "assets/specta/SPECTA-optimized.mp4": [1700, 956],
     "assets/specta/SPECTA-mobile.mp4": [1080, 608],
-    "assets/specta/SPECTA.mp4": [1920, 1080],
     "assets/pixelpushing/Iterationsinversions-optimized.mp4": [1700, 956],
     "assets/pixelpushing/Iterationsinversions-mobile.mp4": [1080, 608],
     "assets/pixelpushing/istallationview-optimized.mp4": [956, 1700],
@@ -111,9 +111,8 @@
     );
   }
 
-  function activateProjectMedia(row) {
+  function activateProjectImages(row) {
     row.querySelectorAll("img[data-src]").forEach((image) => {
-      if (priorityEnabled) image.fetchPriority = "high";
       image.src = image.dataset.src;
       delete image.dataset.src;
     });
@@ -123,64 +122,73 @@
         video.poster = video.dataset.poster;
         delete video.dataset.poster;
       }
+    });
+  }
+
+  function activateProjectVideos(row) {
+    row.querySelectorAll("video").forEach((video) => {
       if (video.dataset.src) {
         video.preload = "auto";
         video.src = video.dataset.src;
         delete video.dataset.src;
       }
-      video.play().catch(() => {});
+      if (video.dataset.inViewport === "true") {
+        video.play().catch(() => {});
+      }
     });
   }
 
-  function preloadProjectLead(row) {
-    if (!priorityEnabled || openedRows.has(row) || row.dataset.leadReady === "true") {
+  function activateProjectMedia(row) {
+    activateProjectImages(row);
+    activateProjectVideos(row);
+  }
+
+  function setupVideoLoading() {
+    const rowsWithVideos = Array.from(rowsBySlug.values()).filter((row) =>
+      row.querySelector("video"),
+    );
+    const videos = rowsWithVideos.flatMap((row) =>
+      Array.from(row.querySelectorAll("video")),
+    );
+
+    if (!("IntersectionObserver" in window)) {
+      rowsWithVideos.forEach(activateProjectVideos);
+      videos.forEach((video) => video.play().catch(() => {}));
       return;
     }
-    row.dataset.leadReady = "true";
-    const leadMedia = Array.from(
-      row.querySelectorAll("img[data-src], video[data-src]"),
-    ).slice(0, 2);
-    leadMedia.forEach((media) => {
-      if (media instanceof HTMLImageElement) {
-        media.fetchPriority = "high";
-      } else {
-        media.preload = "auto";
-      }
-      media.src = media.dataset.src;
-      delete media.dataset.src;
-    });
-  }
 
-  function setupLeadPreloading() {
-    if (!priorityEnabled) return;
-    const start = () => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            preloadProjectLead(entry.target);
-            observer.unobserve(entry.target);
-          });
-        },
-        { root: scrollRoot, rootMargin: "200px 0px", threshold: 0.01 },
-      );
-      rowsBySlug.forEach((row) => {
-        observer.observe(row);
-        row.addEventListener("pointerenter", () => preloadProjectLead(row), {
-          once: true,
-          passive: true,
+    const playbackObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target;
+          video.dataset.inViewport = String(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            if (!video.dataset.src) video.play().catch(() => {});
+          } else if (!video.dataset.longLoaded) {
+            video.pause();
+          }
         });
-        row.addEventListener("focusin", () => preloadProjectLead(row), {
-          once: true,
+      },
+      { root: scrollRoot, threshold: 0.01 },
+    );
+    videos.forEach((video) => playbackObserver.observe(video));
+
+    if (!priorityEnabled) {
+      rowsWithVideos.forEach(activateProjectVideos);
+      return;
+    }
+
+    const loadingObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          activateProjectVideos(entry.target);
+          loadingObserver.unobserve(entry.target);
         });
-        row.addEventListener("pointerdown", () => preloadProjectLead(row), {
-          once: true,
-          passive: true,
-        });
-      });
-    };
-    if (window.__portfolioPriorityReady) start();
-    else window.addEventListener("portfolio:priority-ready", start, { once: true });
+      },
+      { root: scrollRoot, rootMargin: "100% 0px", threshold: 0.01 },
+    );
+    rowsWithVideos.forEach((row) => loadingObserver.observe(row));
   }
 
   function signalCoversReady() {
@@ -506,13 +514,11 @@
       else video.dataset.poster = poster;
     }
     if (media.longVideo) {
-      video.preload = "metadata";
-      video.src = media.preview;
+      video.preload = "none";
+      video.dataset.src = media.preview;
       video.dataset.longSrc = media.src;
-    } else if (mediaIndex === 0) {
-      video.preload = "auto";
-      video.src = getVideoSource(media);
     } else {
+      video.preload = "none";
       video.dataset.src = getVideoSource(media);
     }
     wrapper.appendChild(video);
@@ -539,7 +545,9 @@
         delete video.dataset.longLoaded;
         video.src = media.preview;
         video.load();
-        video.play().catch(() => {});
+        if (video.dataset.inViewport === "true") {
+          video.play().catch(() => {});
+        }
       };
       const playLongVideo = () => {
         if (!video.dataset.longLoaded) {
@@ -789,7 +797,7 @@
       } else {
         row.append(cover, track, details);
       }
-      if (openAllProjects && !isSingleImage) activateProjectMedia(row);
+      if (openAllProjects && !isSingleImage) activateProjectImages(row);
       list.appendChild(row);
       rowsBySlug.set(project.slug, row);
     });
@@ -950,7 +958,7 @@
   }
   setupEdgeScrolling();
   setupVerticalScrollHints();
-  setupLeadPreloading();
+  setupVideoLoading();
   signalCoversReady();
 
   window.closeProjectDetails = () => {

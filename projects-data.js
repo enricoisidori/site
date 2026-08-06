@@ -26,7 +26,7 @@ window.PROJECTS = [
       },
       {
         type: "video",
-        src: "assets/rhytuals/02-motion.mp4",
+        src: "assets/rhytuals/02-motion-optimized.mp4",
         unmute: false,
       },
       {
@@ -97,8 +97,7 @@ window.PROJECTS = [
       },
       {
         type: "video",
-        src: "assets/rhytuals/image/r-14.mp4",
-        mobileSrc: "assets/rhytuals/image/r-14.mp4",
+        src: "assets/rhytuals/image/r-14-optimized.mp4",
         unmute: false,
       },
     ],
@@ -367,8 +366,7 @@ window.PROJECTS = [
       },
       {
         type: "video",
-        src: "assets/digitalforest/videoinstallation.mp4",
-        mobileSrc: "assets/digitalforest/videoinstallation.mp4",
+        src: "assets/digitalforest/videoinstallation-optimized.mp4",
         unmute: true,
       },
       {
@@ -673,8 +671,7 @@ window.PROJECTS = [
       { type: "image", src: "assets/specta/optimized/specta-s2.webp", width: 1920, height: 1441 },
       {
         type: "video",
-        src: "assets/specta/SPECTA.mp4",
-        mobileSrc: "assets/specta/SPECTA.mp4",
+        src: "assets/specta/SPECTA-optimized.mp4",
         poster: "assets/specta/optimized/specta-s1.webp",
         unmute: true,
       },
@@ -912,6 +909,12 @@ window.PROJECTS = [
       {
         type: "image",
         src: "assets/duedadi/optimized/dadiscansioni4.webp",
+        width: 1080,
+        height: 1421,
+      },
+      {
+        type: "image",
+        src: "assets/duedadi/dadiscansioni5.jpg",
         width: 1080,
         height: 1421,
       },
