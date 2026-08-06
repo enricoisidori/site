@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document
-    .querySelectorAll('a[href$="work.html"], a[href$="projects.html"]')
+    .querySelectorAll('a[href$="projects.html"]')
     .forEach((link) => {
       link.addEventListener("click", (event) => {
         localStorage.removeItem("selectedFilter");

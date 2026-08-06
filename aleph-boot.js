@@ -1,8 +1,19 @@
 (function () {
   try {
-    const isControlledPage = /\/(?:work\.html|about(?:\/index\.html)?\/?)$/.test(
-      window.location.pathname,
-    );
+    const pathname = window.location.pathname;
+    const isWorkPage = pathname === "/" || /\/index\.html$/.test(pathname);
+    const isAboutPage = /\/about(?:\/index\.html)?\/?$/.test(pathname);
+    const isControlledPage = isWorkPage || isAboutPage;
+    const canonicalPath = isWorkPage
+      ? pathname.replace(/index\.html$/, "") || "/"
+      : pathname.replace(/\/about\/index\.html$/, "/about/");
+    if (isControlledPage && canonicalPath !== pathname) {
+      window.history.replaceState(
+        null,
+        "",
+        `${canonicalPath}${window.location.search}${window.location.hash}`,
+      );
+    }
     const configuredStyle = document.documentElement.dataset.alephStyle;
     const storedStyle = sessionStorage.getItem("aleph_style");
     const baseStyle =
@@ -21,7 +32,7 @@
       sessionStorage.removeItem("aleph_control_state");
       // A refresh starts from the base URL of the current page, without a
       // project hash or any temporary query state from the previous visit.
-      window.history.replaceState(null, "", window.location.pathname);
+      window.history.replaceState(null, "", canonicalPath);
     }
     if (isControlledPage) {
       const saved = JSON.parse(

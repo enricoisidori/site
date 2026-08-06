@@ -1,9 +1,7 @@
 (function () {
   if (!document.body.classList.contains("about-page")) return;
 
-  const workLink = document.querySelector(
-    '.about-navigation .page-link[href="../work.html"]',
-  );
+  const workLink = document.querySelector('.about-navigation .page-link[href="../"]');
   if (!workLink) return;
 
   let warming = false;

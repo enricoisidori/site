@@ -15,7 +15,7 @@
     const link = document.createElement("a");
     const year = yearFor(project);
     const hash = project.slug === "n+" ? project.slug : encodeURIComponent(project.slug);
-    link.href = `../work.html#${hash}`;
+    link.href = `../#${hash}`;
     link.textContent = `${project.title} ${year || "—"}`;
     fragment.append(link, document.createElement("br"));
   });

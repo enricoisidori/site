@@ -143,11 +143,87 @@
   root.dataset.alephBackground = whiteBg ? "off" : "on";
   root.dataset.alephControl = backgroundControlEnabled ? "enabled" : "locked";
   window.addEventListener("pagehide", cacheTransitionFrame, { passive: true });
+  let alephScrollFrame = null;
+  let cancelAlephScroll = null;
+
+  function scrollUpFromAlephButton() {
+    cancelAlephScroll?.();
+
+    const startTop = contentScroll.scrollTop;
+    const targetTop = 0;
+    const distance = startTop - targetTop;
+    if (distance < 1) return;
+
+    const duration = 1800;
+    const startedAt = performance.now();
+    let cancelled = false;
+    const cancel = () => {
+      cancelled = true;
+      if (alephScrollFrame !== null) {
+        window.cancelAnimationFrame(alephScrollFrame);
+        alephScrollFrame = null;
+      }
+      removeInterruptListeners();
+      if (cancelAlephScroll === cancel) cancelAlephScroll = null;
+    };
+    const interruptKeys = new Set([
+      "ArrowDown",
+      "ArrowUp",
+      "PageDown",
+      "PageUp",
+      "Home",
+      "End",
+      " ",
+    ]);
+    const onKeyDown = (event) => {
+      if (interruptKeys.has(event.key)) cancel();
+    };
+    const removeInterruptListeners = () => {
+      contentScroll.removeEventListener("wheel", cancel, true);
+      contentScroll.removeEventListener("touchstart", cancel, true);
+      contentScroll.removeEventListener("touchmove", cancel, true);
+      contentScroll.removeEventListener("pointerdown", cancel, true);
+      window.removeEventListener("keydown", onKeyDown, true);
+    };
+    const finish = () => {
+      alephScrollFrame = null;
+      removeInterruptListeners();
+      if (cancelAlephScroll === cancel) cancelAlephScroll = null;
+    };
+    const animate = (now) => {
+      if (cancelled) return;
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const easedProgress = 1 - Math.pow(1 - progress, 4);
+      contentScroll.scrollTop = startTop - distance * easedProgress;
+      if (progress < 1) alephScrollFrame = window.requestAnimationFrame(animate);
+      else finish();
+    };
+
+    contentScroll.addEventListener("wheel", cancel, { capture: true, passive: true });
+    contentScroll.addEventListener("touchstart", cancel, {
+      capture: true,
+      passive: true,
+    });
+    contentScroll.addEventListener("touchmove", cancel, {
+      capture: true,
+      passive: true,
+    });
+    contentScroll.addEventListener("pointerdown", cancel, {
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener("keydown", onKeyDown, { capture: true, passive: true });
+    cancelAlephScroll = cancel;
+    alephScrollFrame = window.requestAnimationFrame(animate);
+  }
+
   document.querySelectorAll("[data-aleph-toggle]").forEach((button) => {
     button.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
+      const activatingAleph = whiteBg;
       setBackground(!whiteBg, "button");
+      if (activatingAleph) scrollUpFromAlephButton();
     });
   });
   window.addEventListener("aleph:activate", () => {

@@ -802,6 +802,7 @@
   function setupEdgeScrolling() {
     // Two thirds of the previous 4 cm desktop activation area.
     const desktopEdgeSize = Math.round(((4 / 2.54) * 96 * 2) / 3);
+    const maxEdgeSpeed = 18;
     let edgeTrack = null;
     let edgeDirection = 0;
     let edgeSpeed = 0;
@@ -864,7 +865,10 @@
       edgeTrack = track;
       edgeDirection = atLeft ? -1 : 1;
       const distance = atLeft ? leftDistance : rightDistance;
-      edgeSpeed = Math.max(1, ((edgeSize - distance) / edgeSize) * 10);
+      edgeSpeed = Math.max(
+        1,
+        ((edgeSize - distance) / edgeSize) * maxEdgeSpeed,
+      );
       if (edgeFrame === null) edgeFrame = window.requestAnimationFrame(scroll);
     });
     window.addEventListener("blur", stop);

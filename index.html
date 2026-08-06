@@ -1,346 +1,100 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-aleph-style="overload">
   <head>
-<!-- basically are all random images from wikipedia -->
     <meta charset="UTF-8" />
-    <meta name="description" content="Designer, artist and researcher with an antidisciplinary approach." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
-      name="keywords"
-      content="enrico isidori, isidori, artist, researcher, enrico isidori researcher,unintentionally made, metalinguistic, arte involontartia, arte inintenzionale, antidisciplinary, antidisciplinary design, antidisciplinary designer, communication design, enrico isidori artist, enrico isidori artista, isidori artist, isidori artista, conceptual artist, artista, graphic designer, designer, visual designer, visual unlearning, interactive installations, speculative design, non-human perspectives, descriptive models of design, off-disciplinary, off-disciplinare, design out-of-place, out-of-place design, 
-boundary objects, communication design research, design methodology, 
-disciplinary disobedience, epistemic resistance, design space, approach space, 
-non-linear design process, out-of-phase design, design education, 
-transdisciplinary design, interdisciplinary design, postdisciplinary design, 
-antidisciplinary research, undisciplined design, design theory, 
-issue-based design, project-based design, design lab, synthesis studio, 
-Politecnico di Milano, blurred boundaries, design as a way of doing,
-para-disciplinary design, unbounded design, design approaches"
+      name="description"
+      content="Designer, researcher, and artist working across visual, critical, information, and experiential design."
     />
-    <!-- i just asked AI to give me those tags from my writings c: -->
-
     <meta name="author" content="Enrico Isidori" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="canonical" href="https://enricoisidori.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Enrico Isidori" />
+    <meta property="og:title" content="Enrico Isidori" />
     <meta
-      name="viewport"
-      content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=cover"
+      property="og:description"
+      content="Designer, researcher, and artist working across visual, critical, information, and experiential design."
+    />
+    <meta property="og:url" content="https://enricoisidori.com/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Enrico Isidori" />
+    <meta
+      name="twitter:description"
+      content="Designer, researcher, and artist working across visual, critical, information, and experiential design."
     />
     <title>Enrico Isidori</title>
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="icon" type="image/svg+xml" href="assets/shared/svg/Aleph0.svg" />
-    <link rel="shortcut icon" type="image/svg+xml" href="assets/shared/svg/Aleph0.svg" />
-    <link rel="apple-touch-icon" href="assets/shared/svg/Aleph0.svg" />
-    <link rel="icon" sizes="16x16" type="image/svg+xml" href="assets/shared/svg/Aleph0.svg" />
-    <link rel="icon" sizes="32x32" type="image/svg+xml" href="assets/shared/svg/Aleph0.svg" />
-    <link rel="icon" sizes="192x192" type="image/svg+xml" href="assets/shared/svg/Aleph0.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/shared/svg/Aleph0.svg" />
-    <link rel="preconnect" href="https://commons.wikimedia.org" crossorigin />
-    <script src="aleph-boot.js?v=20260815-index-toggle"></script>
-    <script defer src="aleph.js?v=20260815-boundary-overscroll"></script>
-    <link rel="stylesheet" href="style.css?v=20260815-nav-backdrop-layer" />
-    <style>
-      :root {
-        --content-top-offset: calc(env(safe-area-inset-top, 0px) + 2.5px);
-      }
-
-      /* Sfondo: position fixed + inset 0.
-         Il browser calcola le dimensioni da tutte e 4 le direzioni,
-         senza dipendere da unità vh/lvh/dvh che cambiano con la toolbar.
-         Con viewport-fit=cover copre fisicamente tutto lo schermo. */
-      #aleph-stage {
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        background-color: #fff;
-        background-image: var(--aleph-cached-bg, none);
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        overflow: hidden;
-        pointer-events: none;
-      }
-
-      /* Il canvas riempie lo stage con 2px di overscan per evitare
-         micro-gap di sub-pixel rendering sui bordi. */
-      #aleph-canvas {
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        width: calc(100% + 4px);
-        height: calc(100% + 4px);
-        display: block;
-        pointer-events: none;
-        transform: translateZ(0);
-      }
-
-      /* Contenuto: inset 0 + overflow-y auto.
-         Scorre solo il testo, lo sfondo rimane fermo. */
-      #content-scroll {
-        position: fixed;
-        inset: 0;
-        overflow-y: auto;
-        overflow-x: hidden;
-        overscroll-behavior: none;
-        touch-action: pan-y;
-        z-index: 10;
-        padding:
-          var(--content-top-offset)
-          2.5px
-          2.5px
-          2.5px;
-      }
-
-      #content-scroll > .col-12 {
-        position: relative;
-        text-shadow:
-          0 0 2px #fff,
-          0 0 4px #fff,
-          0 0 12px #fff;
-        user-select: none;
-      }
-      #content-scroll > .col-12 * {
-        user-select: text;
-      }
-
-      a:link,
-      a:visited,
-      a:hover,
-      a:active {
-        color: #000;
-      }
-
-      body.home-page,
-      body.home-page * {
-        font-size: 14px;
-        line-height: 16px;
-      }
-    </style>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="assets/shared/svg/Aleph0.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/shared/svg/aleph-icon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/shared/svg/aleph-icon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/shared/svg/aleph-icon-180.png" />
+    <script src="aleph-boot.js?v=20260806-root-routes"></script>
+    <link
+      rel="stylesheet"
+      href="style.css?v=20260806-mobile-gallery-touch"
+    />
+    <link
+      rel="stylesheet"
+      href="projects.css?v=20260806-mobile-gallery-touch"
+    />
+    <link rel="stylesheet" href="base.css?v=20260805-base-selection" />
   </head>
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.1/jquery.min.js"></script>
-
-  <body class="home-page has-canvas">
+  <!-- Set project-priority to "off" and aleph-work-mode to "full" or "off" for A/B tests. -->
+  <body
+    class="has-canvas projects-page"
+    data-site-view="work"
+    data-project-priority="on"
+    data-projects-open="all"
+    data-aleph-work-mode="light"
+  >
     <div id="aleph-stage">
       <canvas id="aleph-canvas"></canvas>
     </div>
 
-    <div class="btn-aqua-stack">
-      <!-- <a class="btn-aqua primary" href="mailto:enrico.isidori@gmail.com"
-        ><span>Get in touch</span></a
-      > -->
-      <!-- <a
-        class="btn-aqua primary"
-        href="https://www.instagram.com/enrico.isidori/"
-        target="_blank"
-        rel="noopener noreferrer"
-        ><span>Instagram</span></a
-      > -->
-    </div>
+    <nav class="projects-navigation" aria-label="Primary navigation">
+      <a
+        class="site-name"
+        href="about/"
+        data-local-href="about/index.html"
+        data-nav-role="route"
+        >Enrico Isidori</a
+      >
+      <div class="projects-navigation-filters" aria-hidden="true">
+        <span id="design" class="btn" data-filter="designerpage">Design</span>
+        <span id="art" class="btn" data-filter="artistpage">Art</span>
+      </div>
+      <a
+        class="page-link"
+        href="about/"
+        data-local-href="about/index.html"
+        data-nav-role="route"
+        >About</a
+      >
+    </nav>
 
     <div id="content-scroll">
-    <div class="col-12">
-      <span>Enrico Isidori</span><br />
-      <a href="https://www.instagram.com/enrico.isidori/" target="_blank"
-        >@enrico.isidori</a
-      ><br />
-      <a href="mailto:enrico.isidori@gmail.com">enrico.isidori@gmail.com</a><br />
+      <main id="projects-list" aria-label="Projects"></main>
 
-      <br />
-      <p class="outdent">
-        Designer, artist, researcher with a concept-driven approach grounded in visual inquiry.
-      </p>
-      <p class="outdent">
-        <span class="outdent">
-          Design practice spans visual, exhibition, interaction,
-          data-information, brand, graphic, editorial, motion, web, creative-art direction,
-          strategy, creative coding, diagram making, rabbit-holing and
-          doomscrolling.
-        </span>
-        <span class="outdent">
-          Artistic practice investigates the potential of objects activated
-          through minimal interventions.
-        </span>
-        <span class="outdent">
-          Research practice delves into non-disciplinary approaches and
-          non-linear design processes.
-        </span>
-      </p>
-  
-      <p class="outdent">
-        <a href="mailto:enrico.isidori@gmail.com">Get in touch</a> for commissions, collaborations, or an exchange of ideas.
-      </p>
-      <p class="outdent">&nbsp;</p>
-    
- 
-      <!-- <p class="outdent">
-        Design practice centers on interactive installations, focusing on the
-        conceptual aspects of projects. It also spans exhibition, editorial,
-        motion, and web design.
-      </p>
-      <p class="outdent">
-        Artistic practice investigates the narrative potential of objects,
-        activated through minimal interventions, metalinguistic operations, and
-        acts of re-signification.
-      </p>
-      <p class="outdent">
-        Academic research delves into speculative design and visual culture,
-        exploring non-human perspectives and descriptive models of design
-        processes.
-        <br /><br />
-      </p> -->
-
-
-      <!-- Born in Rome, based in Milan. <br /><br /> -->
-
-      <p class="outdent">
-        Work<br />
-
-
- 
-     2026—current <br />
-            Freelancer, Milan-based <br />
-            2025—2026 <br />
-        <a
-          href="https://www.instagram.com/operatingsystem_studio/"
-          target="_blank"
-          >Operating System Studio</a
-        > & 
-        <a
-          href="https://www.instagram.com/umanesimo.artificiale/"
-          target="_blank"
-          >Umanesimo Artificiale</a
-        >, Designer <br />
- 2023 <br />
-        <a href="https://gigadesignstudio.com/" target="_blank"
-          >Giga Design Studio</a
-        >, Visual Designer
-      </p>
-    <p class="outdent">
-      Teaching<br />
-       2026—current <br />
-        <a
-          href="https://www.ied.edu/courses/turin/master-of-arts/communication-and-creative-technologies"
-          target="_blank"
-        >
-          Communication and Creative Technologies</a
-        >, IED Torino, Teacher<br />
-         2023—current<br />
-        <a
-          href="https://www.researchgate.net/profile/Enrico_Isidori"
-          target="_blank"
-        >
-          Antidisciplinary Communication Design Lab</a
-        >, Politecnico di Milano, Teaching and Research Assistant<br />
-       
-</p>
-      <p class="outdent">
-        Publications <br />
-           2026 <br />
-Antidisciplinary Communication Design: A case of studio-based practice for producing embodied, explicit, and discursive knowledge, SID
-        <br />
-        2026 <br />
-        Antidisciplinary design as epistemic resistance: Critical and political
-        agency in communication design education, Progetto Grafico
-        <br />
-
-        2025 <br />
-        Conspiracy Fiction as a Tool for Critical Thinking: Designing Narratives
-        to Reflect on the Contemporary Information System, Cumulus
-        <br />
-        2024 <br />
-
-        Anthropogenic Narratives: Imagination and Anti-Disciplinarity for the
-        Communication of Non-Human Perspectives, MDA
-      </p>
-
-      <p class="outdent">
-        Exhibitions<br />
-        Jul 2025<br />
-        <a href="https://www.videocitta.com//" target="_blank">Videocittà</a>,
-        Rome<br />
-        Jun 2025<br />
-        <a href="https://sonar.es/en" target="_blank">Sónar</a>, Barcelona<br />
-        Apr 2025 <br />
-        <a href="https://www.salonemilano.it/en" target="_blank"
-          >Salone Satellite</a
-        >, Rho <br />
-
-        Feb 2025<br />
-        <a href="https://www.meetcenter.it/en" target="_blank">Meet</a>,
-        Milan<br />
-        Apr 2024 <br />
-        <a href="https://www.fabbricadelvapore.org/" target="_blank"
-          >Fabbrica del Vapore</a
-        >, Milan <br />
-        Mar 2023 <br />
-
-        <a href="https://triennale.org" target="_blank">Triennale</a>, Milan
-        <br />
-        Sep 2022 <br />
-        <a href="https://www.cavallerizza.to.it/" target="_blank"
-          >Cavallerizza Reale</a
-        >, Turin<br />
-        <!-- May 2022 <br />
-                <a href="   https://www.elo2022.com/" target="_blank"
-    >
-        Electronic Literature Conference</a>, Como
-      </p> -->
-
-     
-
-            <p class="outdent">
-        Lectures & Conferences<br />
-        24 Jun 2026<br />
-        Design Doing, Società Italiana di Design, Bolzano  <br />
-        15 Feb 2026 <br />
-        Post-Computing Lab, Elisava, Barcelona  <br />
-            6 Jun 2025<br />
-Ethical Leadership: A New Frontier for Design, Nantes<br />
-        15 Mar 2025 <br />
-        Symposium on Antidisciplinary, Transmedia Research Institute, Politecnico di Milano, Milan <br />
-   9 May 2024<br />
-Environmental Design 4th International Conference, Ginosa
-
-</p>
-      
-
-    </p>
-      <p class="outdent">
-        Features<br />
-
-        May 2025 <br />
-        <a href="https://www.bellariafilmfestival.org/ " target="_blank"
-          >Bellaria Film Festival</a
-        >
-        <br />
-       
-        Nov 2024 <br />
-        <a href="http://www.cdsaawards.com/en/" target="_blank"
-          >CDSA Awards</a
-        >
-        <br />
-        May 2024 <br />
-        <a
-          href="https://www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer"
-          target="_blank"
-          >Pittogramma</a
-        >
-        <br />
-        Sep 2022 <br />
-        <a
-          href="https://www.graphicdays.it/neologia/category/in-mostra/"
-          target="_blank"
-          >Graphic Days</a
-        >
-      </p>
-
-       <p class="outdent">
-        Education <br />
-        BA & MA Communication Design, Politecnico di Milano<br /><br />
-      </p>
-
-      <div style="display: block; float: left; width: 100%; height: 50vh"></div>
-    <div style="display: block; float: left; height: 10px; width: 100%"></div>
+      <footer class="projects-contacts">
+        <div class="projects-contact-links">
+          <a href="mailto:enrico.isidori@gmail.com"
+            >enrico.isidori@gmail.com</a
+          ><br />
+          <a href="https://www.instagram.com/enrico.isidori/" target="_blank"
+            >@enrico.isidori</a
+          >
+        </div>
+      </footer>
     </div>
-    </div>
+
+    <script src="projects-data.js?v=20260806-imageofabook-2-3-2"></script>
+    <script src="projects-placeholders.js?v=20260728-specta-n-plus-media"></script>
+    <script src="projects.js?v=20260806-edge-speed"></script>
+    <script src="script.js"></script>
+    <script src="video-unmute.js"></script>
+    <script src="aleph.js?v=20260806-aleph-scroll"></script>
   </body>
 </html>
