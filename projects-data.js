@@ -188,14 +188,14 @@ window.PROJECTS = [
     media: [
       {
         type: "image",
-        src: "assets/imageofabook/optimized/1.webp",
-        width: 1275,
-        height: 1700,
+        src: "assets/imageofabook/optimized/2-3-2.webp",
+        width: 2305,
+        height: 3458,
       },
       {
         type: "image",
-        src: "assets/imageofabook/optimized/2.webp",
-        width: 1276,
+        src: "assets/imageofabook/optimized/1.webp",
+        width: 1275,
         height: 1700,
       },
       {
@@ -207,15 +207,15 @@ window.PROJECTS = [
       },
       {
         type: "image",
-        src: "assets/imageofabook/optimized/4.webp",
-        width: 1700,
-        height: 1430,
-      },
-      {
-        type: "image",
         src: "assets/imageofabook/optimized/4b.webp",
         width: 1275,
         height: 1700,
+      },
+      {
+        type: "image",
+        src: "assets/imageofabook/optimized/4.webp",
+        width: 1700,
+        height: 1430,
       },
       {
         type: "video",

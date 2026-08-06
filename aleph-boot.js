@@ -19,6 +19,9 @@
       // Work/About share a state while navigating, but an explicit refresh
       // always begins again from OFF.
       sessionStorage.removeItem("aleph_control_state");
+      // A refresh starts from the base URL of the current page, without a
+      // project hash or any temporary query state from the previous visit.
+      window.history.replaceState(null, "", window.location.pathname);
     }
     if (isControlledPage) {
       const saved = JSON.parse(
