@@ -105,7 +105,7 @@ window.PROJECTS = [
   {
     slug: "off-discipline",
     sourcePage: "offdisicpline/",
-    title: "Off Discipline",
+    title: "Off-discipline",
     categories: ["designerpage"],
     date: "2026",
     info: [
@@ -118,56 +118,60 @@ window.PROJECTS = [
       {
         type: "image",
         src: "assets/off-discipline/optimized/off1.webp",
-        width: 1440,
-        height: 1920,
+        width: 1700,
+        height: 1134,
       },
       {
-        type: "image",
-        src: "assets/off-discipline/optimized/off2.webp",
-        width: 1440,
-        height: 1920,
+        type: "video",
+        src: "assets/off-discipline/optimized/off2-optimized.mp4",
+        mobileSrc: "assets/off-discipline/optimized/off2-mobile.mp4",
+        width: 1080,
+        height: 1440,
+        unmute: false,
       },
       {
         type: "image",
         src: "assets/off-discipline/optimized/off3.webp",
-        width: 1440,
-        height: 1920,
+        width: 1700,
+        height: 1511,
       },
       {
         type: "image",
         src: "assets/off-discipline/optimized/off4.webp",
-        width: 1440,
-        height: 1920,
+        width: 1688,
+        height: 1344,
       },
       {
         type: "image",
         src: "assets/off-discipline/optimized/off5.webp",
-        width: 1439,
-        height: 1920,
+        width: 1675,
+        height: 1306,
+      },
+      {
+        type: "image",
+        src: "assets/off-discipline/optimized/off5b.webp",
+        width: 1276,
+        height: 1700,
+      },
+      {
+        type: "image",
+        src: "assets/off-discipline/optimized/off5c.webp",
+        width: 1276,
+        height: 1700,
       },
       {
         type: "image",
         src: "assets/off-discipline/optimized/off6.webp",
-        width: 1439,
-        height: 1920,
+        width: 1700,
+        height: 1228,
       },
       {
-        type: "image",
-        src: "assets/off-discipline/optimized/off7.webp",
-        width: 1440,
-        height: 1920,
-      },
-      {
-        type: "image",
-        src: "assets/off-discipline/optimized/off8.webp",
-        width: 1440,
-        height: 1920,
-      },
-      {
-        type: "image",
-        src: "assets/off-discipline/optimized/off9.webp",
-        width: 1440,
-        height: 1920,
+        type: "video",
+        src: "assets/off-discipline/optimized/off7b-optimized.mp4",
+        mobileSrc: "assets/off-discipline/optimized/off7b-mobile.mp4",
+        width: 716,
+        height: 956,
+        unmute: false,
       },
     ],
   },
@@ -230,8 +234,8 @@ window.PROJECTS = [
       "Field<br>Speculative",
       "Role<br>Art direction<br>Branding<br>Spatial design<br>Visual<br>Interaction<br>Prototyping<br>Photography",
       "Team<br>Filippo Rosati (creative direction)<br>Pietro Forino (interaction design)<br>Daniela Gentile (research)<br>Nicola Airutti (sound design)<br>Cristina Dezi (fashion design)<br>Bernardo Martins (AI artworks)",
-      "Made at<br>Operating System Studio<br>Umanesimo Artificiale",
-      'Exhibited at<br><a href="https://www.videocitta.com/" target="_blank" rel="noopener noreferrer">Videocittà</a> 2025, Rome<br><a href="https://sonar.es/en" target="_blank" rel="noopener noreferrer">Sónar</a>+D 2025, Barcelona',
+      'Made at<br><a href="https://www.instagram.com/umanesimo.artificiale/" target="_blank" rel="noopener noreferrer">Umanesimo Artificiale</a> & <a href="https://www.instagram.com/operatingsystem_studio/" target="_blank" rel="noopener noreferrer">Operating System Studio</a>',
+      'Exhibited at<br><a href="https://www.videocitta.com/" target="_blank" rel="noopener noreferrer">Videocittà</a> 2025, Rome<br><a href="https://sonar.es/en" target="_blank" rel="noopener noreferrer">Sónar</a> 2025, Barcelona',
     ],
     description:
       "A non-invasive neural interface developed by N+ Industries to collect\nresidual cognitive activity from the user. Using bone-conducted audio\nstimulation, the system captures neural micro-responses and\nintegrates them into a distributed network. Inspired by a NATO white\npaper stating that “the brain is the new battlefield,” this project\nexplores the intersection of neuroscience and conflict through an\nimmersive and experimental artistic lens. At its core is a pioneering\nenterprise that envisions a future of neuromodulation technologies.\nSpecializing in neuroweapons and NBIC advancements (Nanotechnology,\nBiotechnology, Information Technology, and Cognitive Science), this\nentity develops technologies of control. By presenting these\nunsettling possibilities, the project sparks critical discussions on\nthe future of warfare, human augmentation, and the ethics of cognitive\ncontrol.",
@@ -264,6 +268,28 @@ window.PROJECTS = [
       },
       {
         type: "image",
+        src: "assets/n-plus/optimized/wip2.webp",
+        width: 1080,
+        height: 1111,
+      },
+      {
+        type: "video",
+        src: "assets/n-plus/optimized/wip3-optimized.mp4",
+        mobileSrc: "assets/n-plus/optimized/wip3-mobile.mp4",
+        width: 1080,
+        height: 1440,
+        unmute: false,
+      },
+      {
+        type: "video",
+        src: "assets/n-plus/optimized/n-process-optimized.mp4",
+        mobileSrc: "assets/n-plus/optimized/n-process-mobile.mp4",
+        width: 1080,
+        height: 1440,
+        unmute: false,
+      },
+      {
+        type: "image",
         src: "assets/n-plus/optimized/adv-detail.webp",
         width: 1700,
         height: 1134,
@@ -279,20 +305,6 @@ window.PROJECTS = [
         src: "assets/n-plus/optimized/adv2.webp",
         width: 1360,
         height: 1700,
-      },
-      {
-        type: "image",
-        src: "assets/n-plus/optimized/wip2.webp",
-        width: 1080,
-        height: 1111,
-      },
-      {
-        type: "video",
-        src: "assets/n-plus/optimized/wip3-optimized.mp4",
-        mobileSrc: "assets/n-plus/optimized/wip3-mobile.mp4",
-        width: 1080,
-        height: 1440,
-        unmute: false,
       },
       {
         type: "image",
@@ -335,7 +347,7 @@ window.PROJECTS = [
     info: [
       "Field<br>Information<br>Data visualization<br>Spatial",
       "Team<br>Miguel Ernesto Amaya<br>Federico Gajo<br>Giacomo Garetto<br>Francesco Scarfone<br>Emanuel Simionato",
-      'Exhibited at<br><a href="https://www.meetcenter.it/en" target="_blank" rel="noopener noreferrer">Meet Digital Culture Center</a> 2025, Milan',
+      'Exhibited at<br><a href="https://www.meetcenter.it/en" target="_blank" rel="noopener noreferrer">Meet</a> 2025, Milan',
     ],
     description:
       "Trail cams are video cameras triggered by the movement of animals in\ntheir natural habitats. Initially designed for research and wildlife\nmonitoring, they have since become popular content on social media\nplatforms.\nThe installation investigates how animals, inadvertently turned into\ndigital entities, inhabit the online ecosystem—an environment\ncategorized by humans for human consumption.\nThe project examines 273 trail cam videos shared on major Italian\nsocial platforms between 2021 and 2024. The hashtags used at the\ntime of publication establish connections between them. The\ninstallation presents the videos in chronological order, alongside\ntheir associated hashtags, forming a growing network that reflects\nthe evolution of a digital forest—merging human perceptions with\nanimal presence over time.",
@@ -446,7 +458,7 @@ window.PROJECTS = [
       "Team<br>Davide Agostinelli<br>Irene Benecchi<br>Bianca Buratti<br>Alice Dezio<br>Marta Gaggi<br>Giulia Gnessi",
       "Exhibited at<br>Cavallerizza Reale 2022, Turin<br>Dock Dora 2022, Turin<br>Torino Print Club 2022, Turin<br>ELO 2022, Como",
       'Link<br><a href="https://enricoisidori.com/draw.html" target="_blank" rel="noopener noreferrer">enricoisidori.com/draw.html</a>',
-      "Features<br>Nuovi linguaggi del visual design in Italia, 2022",
+      "Features<br>Nuovi linguaggi del visual design in Italia 2022",
     ],
     description:
       "This book is a collection of strangers’ lines on a blank sheet of paper.\n“Draw a line from one side of the page to the other” was the instruction\ngiven to 100 passers-by, along with the invitation to freely express\nthemselves on the surface. Where one line ends, another begins—they are\nindividual expressions and a single participatory work. To complete the\nbook, the owner of each copy is asked to draw their own line on the cover,\nthus becoming part of the project. The book has a soundtrack generated by\nassociating the lines with sound frequencies. By scrolling through the\npages and listening to the corresponding sound, the reader takes a journey\ninto people’s emotions.",
@@ -642,7 +654,7 @@ window.PROJECTS = [
         src: "assets/spectathesis/spectathesis-optimized.mp4",
         unmute: false,
       },
-      ...[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14].map((number) => ({
+      ...[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13].map((number) => ({
         type: "image",
         src: `assets/spectathesis/optimized/thesis${number}.webp`,
         width: 1920,
@@ -661,14 +673,24 @@ window.PROJECTS = [
       "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
       "Made at<br>Politecnico di Milano<br>Laboratorio di Sintesi Finale C1",
       'Link<br><a href="specta.pdf" target="_blank" rel="noopener noreferrer">SPECTA.pdf</a>',
-      'Exhibited at<br>Interdependence 2024, Fabbrica del Vapore, Milan<br>Anthropogenic Narratives 2023, <a href="https://triennale.org" target="_blank" rel="noopener noreferrer">Triennale Milano</a>, Milan',
-      "Features<br>Pittogramma, 2024<br>CDSA Awards International Media Art Creativity Competition, 2024",
+      'Exhibited at<br><a href="https://www.salonemilano.it/en" target="_blank" rel="noopener noreferrer">Salone Satellite</a> 2025, Rho<br><a href="https://www.fabbricadelvapore.org/" target="_blank" rel="noopener noreferrer">Fabbrica del Vapore</a> 2024, Milan<br><a href="https://triennale.org" target="_blank" rel="noopener noreferrer">Triennale</a> 2023, Milan',
+      "Features<br>Pittogramma, 2024<br>CDSA Awards International Media Art Creativity Competition 2024",
     ],
     description:
       "Rocks are indifferent to climate change because it has always existed for\nthem. The project explores it from their perspective. Their stratifications,\naccumulated over millions of years, constitute an archive of the planet’s\nclimatic history: a non-judgmental account of the catastrophes that have\ncyclically disrupted living beings.\n\nFrom this reflection, the fictional brand Litia is born. Its mission is to\ncounter eco-anxiety: the feeling of distress caused by awareness of the ongoing\nclimate crisis. Its product, Specta, silences screens displaying climate-related\nimagery. When lifted and rotated in space, it transforms anxiety-inducing images\ninto slow, calming stratifications similar to those of rock formations, allowing\nviewers to experience climate change through the impassive perspective of rocks.",
     media: [
-      { type: "image", src: "assets/specta/optimized/specta-s1.webp", width: 1662, height: 1108 },
-      { type: "image", src: "assets/specta/optimized/specta-s2.webp", width: 1920, height: 1441 },
+      {
+        type: "image",
+        src: "assets/specta/optimized/specta-s1.webp",
+        width: 1662,
+        height: 1108,
+      },
+      {
+        type: "image",
+        src: "assets/specta/optimized/specta-s2.webp",
+        width: 1920,
+        height: 1441,
+      },
       {
         type: "video",
         src: "assets/specta/SPECTA-optimized.mp4",
@@ -683,12 +705,30 @@ window.PROJECTS = [
         width: 1920,
         height: 1080,
       },
-      { type: "image", src: "assets/specta/optimized/specta-s3.webp", width: 1920, height: 1280 },
-      { type: "image", src: "assets/specta/optimized/specta-s4.webp", width: 1700, height: 1134 },
-      { type: "image", src: "assets/specta/optimized/specta-s5.webp", width: 1920, height: 1280 },
-      { type: "image", src: "assets/specta/optimized/specta-s6.webp", width: 1080, height: 1620 },
-      { type: "image", src: "assets/specta/optimized/specta-s7.webp", width: 1920, height: 1280 },
-      { type: "image", src: "assets/specta/optimized/specta-s8.webp", width: 1920, height: 1280 },
+      {
+        type: "image",
+        src: "assets/specta/optimized/specta-s3.webp",
+        width: 1920,
+        height: 1280,
+      },
+      {
+        type: "image",
+        src: "assets/specta/optimized/specta-s4.webp",
+        width: 1700,
+        height: 1134,
+      },
+      {
+        type: "image",
+        src: "assets/specta/optimized/specta-s5.webp",
+        width: 1920,
+        height: 1280,
+      },
+      {
+        type: "image",
+        src: "assets/specta/optimized/specta-s8.webp",
+        width: 1920,
+        height: 1280,
+      },
     ],
   },
   {
@@ -698,7 +738,7 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2023",
     info: [
-      'Features<br><a href="https://gpu.gallery/" target="_blank" rel="noopener noreferrer">GPU Gallery</a>, 2023',
+      'Features<br><a href="https://gpu.gallery/" target="_blank" rel="noopener noreferrer">GPU Gallery</a> 2023',
       'Link<br><a href="iterations/inversions.html" target="_blank" rel="noopener noreferrer">iterations/Inversions.html</a>',
     ],
     description:
@@ -717,11 +757,6 @@ window.PROJECTS = [
         width: 1920,
         height: 1066,
         fillRatio: 3 / 2,
-      },
-      {
-        type: "video",
-        src: "assets/pixelpushing/Iterationsinversions-optimized.mp4",
-        unmute: false,
       },
       {
         type: "video",
@@ -922,7 +957,9 @@ window.PROJECTS = [
   },
 ];
 
-const spectaProject = window.PROJECTS.find((project) => project.slug === "specta");
+const spectaProject = window.PROJECTS.find(
+  (project) => project.slug === "specta",
+);
 const spectaThesis = window.PROJECTS.find(
   (project) => project.slug === "specta-thesis",
 );
@@ -939,6 +976,7 @@ const PROJECT_ORDER = [
   "n+",
   "rhytuals",
   "off-discipline",
+  "specta",
   "image-of-a-book",
 ];
 
