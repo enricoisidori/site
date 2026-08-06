@@ -160,10 +160,9 @@
       (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
-        const resetUrl = new URL(
-          isProjectsPage ? window.location.href : link.href,
-          window.location.href,
-        );
+        // The site name is the cross-page route: Work → About and
+        // About → Work. Keep its destination while clearing state.
+        const resetUrl = new URL(link.href, window.location.href);
         resetUrl.search = "";
         resetUrl.hash = "";
         window.location.replace(resetUrl.href);

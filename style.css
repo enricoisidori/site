@@ -844,7 +844,9 @@ body.has-canvas #content-scroll {
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: none;
-  touch-action: pan-y;
+  /* Let nested project galleries claim horizontal gestures, including when
+     the vertical scroller is already at its bottom edge. */
+  touch-action: auto;
   z-index: 0;
   padding: var(--content-top-offset) 5px;
 }

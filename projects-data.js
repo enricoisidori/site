@@ -138,14 +138,14 @@ window.PROJECTS = [
       {
         type: "image",
         src: "assets/off-discipline/optimized/off4.webp",
-        width: 1688,
-        height: 1344,
+        width: 1700,
+        height: 1355,
       },
       {
         type: "image",
         src: "assets/off-discipline/optimized/off5.webp",
-        width: 1675,
-        height: 1306,
+        width: 1700,
+        height: 1326,
       },
       {
         type: "image",
@@ -421,7 +421,7 @@ window.PROJECTS = [
     media: [
       {
         type: "video",
-        src: "assets/capsule/desktop-optimized.mp4",
+        src: "assets/capsule/desktop-cover-optimized.mp4",
         unmute: false,
         poster: "assets/capsule/optimized/med.webp",
       },

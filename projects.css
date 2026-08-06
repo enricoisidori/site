@@ -84,6 +84,19 @@ body.projects-page .projects-navigation > .page-link {
   right: var(--project-gap);
 }
 
+/* The site name is a route link on both desktop and mobile. Keep its hover
+   and keyboard-focus state consistent with the other navigation link. */
+body.projects-page .projects-navigation > .site-name:hover,
+body.projects-page .projects-navigation > .site-name:focus-visible,
+html[data-aleph-background] body.projects-page
+  .projects-navigation > .site-name:hover,
+html[data-aleph-background] body.projects-page
+  .projects-navigation > .site-name:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+}
+
 body.projects-page #content-scroll .projects-navigation-filters .btn,
 body.projects-page #content-scroll .projects-navigation-filters .btn.active {
   display: block;
@@ -201,6 +214,8 @@ body.projects-page #content-scroll .projects-navigation .btn.active {
   overflow-x: auto;
   overflow-y: hidden;
   gap: 0;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
   cursor: pointer;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -377,13 +392,6 @@ html[data-aleph-background] body.projects-page #content-scroll .project-details 
 .project-media-cover-video video {
   width: 100%;
   height: 100%;
-}
-
-.project-row[data-project-slug="capsule-plaza"]
-  .project-media-cover-video
-  video {
-  object-fit: cover;
-  object-position: center;
 }
 
 .project-cover img,

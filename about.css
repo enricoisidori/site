@@ -51,6 +51,23 @@ body.about-page .about-navigation > .page-link {
   right: 5px;
 }
 
+body.about-page .about-navigation > .site-name:hover,
+body.about-page .about-navigation > .site-name:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+}
+
+/* This intentionally outranks the shared canvas-navigation reset. */
+html[data-aleph-background] body.about-page.has-canvas
+  .about-navigation > .site-name:hover,
+html[data-aleph-background] body.about-page.has-canvas
+  .about-navigation > .site-name:focus-visible {
+  color: #f00 !important;
+  -webkit-text-fill-color: #f00 !important;
+  mix-blend-mode: normal !important;
+}
+
 body.has-canvas #content-scroll .about-navigation *,
 body.about-page .about-navigation * {
   text-shadow:

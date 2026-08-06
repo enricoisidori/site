@@ -33,8 +33,8 @@
     "assets/digitalforest/07-mobile.mp4": [1080, 772],
     "assets/digitalforest/09-optimized.mp4": [1700, 1214],
     "assets/digitalforest/09-mobile.mp4": [1080, 772],
-    "assets/capsule/desktop-optimized.mp4": [1700, 956],
-    "assets/capsule/desktop-mobile.mp4": [1080, 608],
+    "assets/capsule/desktop-cover-optimized.mp4": [1434, 956],
+    "assets/capsule/desktop-cover-mobile.mp4": [912, 608],
     "assets/capsule/4-optimized.mp4": [1700, 1700],
     "assets/capsule/4-mobile.mp4": [1080, 1080],
     "assets/capsule/3-optimized.mp4": [1700, 1700],
@@ -485,11 +485,7 @@
     if (dimensions) {
       video.width = dimensions[0];
       video.height = dimensions[1];
-      wrapper.dataset.fillRatio = String(
-        project.slug === "capsule-plaza" && mediaIndex === 0
-          ? 3 / 2
-          : dimensions[0] / dimensions[1],
-      );
+      wrapper.dataset.fillRatio = String(dimensions[0] / dimensions[1]);
     }
     video.addEventListener(
       "loadedmetadata",
@@ -928,6 +924,7 @@
           activeHint = null;
         }
       }
+
     }
 
     scrollRoot.addEventListener(
