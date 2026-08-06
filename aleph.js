@@ -143,79 +143,6 @@
   root.dataset.alephBackground = whiteBg ? "off" : "on";
   root.dataset.alephControl = backgroundControlEnabled ? "enabled" : "locked";
   window.addEventListener("pagehide", cacheTransitionFrame, { passive: true });
-  let alephScrollFrame = null;
-  let cancelAlephScroll = null;
-
-  function scrollUpFromAlephButton() {
-    cancelAlephScroll?.();
-
-    const startTop = contentScroll.scrollTop;
-    const targetTop = 0;
-    const distance = startTop - targetTop;
-    if (distance < 1) return;
-
-    const duration = 1800;
-    const startedAt = performance.now();
-    let cancelled = false;
-    const cancel = () => {
-      cancelled = true;
-      if (alephScrollFrame !== null) {
-        window.cancelAnimationFrame(alephScrollFrame);
-        alephScrollFrame = null;
-      }
-      removeInterruptListeners();
-      if (cancelAlephScroll === cancel) cancelAlephScroll = null;
-    };
-    const interruptKeys = new Set([
-      "ArrowDown",
-      "ArrowUp",
-      "PageDown",
-      "PageUp",
-      "Home",
-      "End",
-      " ",
-    ]);
-    const onKeyDown = (event) => {
-      if (interruptKeys.has(event.key)) cancel();
-    };
-    const removeInterruptListeners = () => {
-      contentScroll.removeEventListener("wheel", cancel, true);
-      contentScroll.removeEventListener("touchstart", cancel, true);
-      contentScroll.removeEventListener("touchmove", cancel, true);
-      contentScroll.removeEventListener("pointerdown", cancel, true);
-      window.removeEventListener("keydown", onKeyDown, true);
-    };
-    const finish = () => {
-      alephScrollFrame = null;
-      removeInterruptListeners();
-      if (cancelAlephScroll === cancel) cancelAlephScroll = null;
-    };
-    const animate = (now) => {
-      if (cancelled) return;
-      const progress = Math.min((now - startedAt) / duration, 1);
-      const easedProgress = 1 - Math.pow(1 - progress, 4);
-      contentScroll.scrollTop = startTop - distance * easedProgress;
-      if (progress < 1) alephScrollFrame = window.requestAnimationFrame(animate);
-      else finish();
-    };
-
-    contentScroll.addEventListener("wheel", cancel, { capture: true, passive: true });
-    contentScroll.addEventListener("touchstart", cancel, {
-      capture: true,
-      passive: true,
-    });
-    contentScroll.addEventListener("touchmove", cancel, {
-      capture: true,
-      passive: true,
-    });
-    contentScroll.addEventListener("pointerdown", cancel, {
-      capture: true,
-      passive: true,
-    });
-    window.addEventListener("keydown", onKeyDown, { capture: true, passive: true });
-    cancelAlephScroll = cancel;
-    alephScrollFrame = window.requestAnimationFrame(animate);
-  }
 
   document.querySelectorAll("[data-aleph-toggle]").forEach((button) => {
     button.addEventListener("click", (event) => {
@@ -223,7 +150,7 @@
       event.stopPropagation();
       const activatingAleph = whiteBg;
       setBackground(!whiteBg, "button");
-      if (activatingAleph) scrollUpFromAlephButton();
+      if (activatingAleph) showNextAlephImage();
     });
   });
   window.addEventListener("aleph:activate", () => {
@@ -236,8 +163,7 @@
       (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
-        // The site name is the cross-page route: Work → About and
-        // About → Work. Keep its destination while clearing state.
+        // The site name always returns to the Work page.
         const resetUrl = new URL(link.href, window.location.href);
         resetUrl.search = "";
         resetUrl.hash = "";
@@ -494,6 +420,7 @@
   let scrollAccum = 0;
   let lastScrollY = 0;
   let rafPending = false;
+  let advanceRequested = false;
 
   function drawImageCover(targetCtx, img, width, height) {
     const sourceWidth = img.naturalWidth || img.width;
@@ -568,6 +495,17 @@
     }
   }
 
+  function showNextAlephImage() {
+    advanceRequested = true;
+    if (!imgCurrent || !imgNext) {
+      prepareNextImage();
+      return;
+    }
+    advanceRequested = false;
+    transitionProgress = 1;
+    scheduleRender();
+  }
+
   function prepareNextImage() {
     if (imgNext) return;
     if (Commons.preloaded.length === 0) {
@@ -592,6 +530,11 @@
       Commons.urlsQueue.length < Math.floor(maxBuffer / 2)
     )
       ensureCommonsBuffer(maxBuffer);
+    if (advanceRequested) {
+      advanceRequested = false;
+      transitionProgress = 1;
+      scheduleRender();
+    }
     pumpPreload();
   }
 

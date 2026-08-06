@@ -22,8 +22,9 @@ header,
 } */
 
 * {
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-family: "Helvetica Neue", "helvetica-neue-lt-pro", Helvetica, sans-serif;
   font-weight: 500;
+  font-synthesis: none;
   font-size: 14px;
   line-height: 16px;
   box-sizing: border-box;
@@ -944,6 +945,12 @@ body.has-canvas #content-scroll * {
   }
 }
 
+.aleph-symbol-toggle,
+.aleph-inline-symbol {
+  font-family: "Noto Sans Symbols 2", "Noto Sans Math", "Segoe UI Symbol", "helvetica-neue-lt-pro", Helvetica, sans-serif;
+  font-variant-emoji: text;
+}
+
 .aleph-symbol-toggle {
   display: block;
   width: max-content;
@@ -955,7 +962,6 @@ body.has-canvas #content-scroll * {
   color: #000;
   cursor: pointer;
   font: inherit;
-  font-variant-emoji: text;
   line-height: inherit;
   white-space: nowrap;
 }

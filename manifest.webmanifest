@@ -8,17 +8,17 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "assets/shared/svg/aleph-icon-192.png",
+      "src": "assets/shared/svg/favicon-red-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "assets/shared/svg/aleph-icon-512.png",
+      "src": "assets/shared/svg/favicon-red-512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "assets/shared/svg/Aleph0.svg",
+      "src": "assets/shared/svg/favicon-red.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }

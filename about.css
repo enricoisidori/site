@@ -1,8 +1,9 @@
 /* Page typography */
 body.about-page {
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-family: "Helvetica Neue", "helvetica-neue-lt-pro", Helvetica, sans-serif;
   font-size: 14px;
   font-weight: 500;
+  font-synthesis: none;
   line-height: 16px;
 }
 
