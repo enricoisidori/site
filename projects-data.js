@@ -627,41 +627,7 @@ window.PROJECTS = [
       },
     ],
   },
-  {
-    slug: "specta-thesis",
-    sourcePage: "spectathesis/",
-    title: "SPECTA® (Thesis)",
-    categories: ["designerpage"],
-    date: "2023",
-    info: [
-      "Field<br>Research<br>Editorial",
-      "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
-      'Related projects<br><a href="specta/">SPECTA® (Project)</a>',
-      "Made at<br>Politecnico di Milano<br>Laboratorio di Sintesi Finale C1",
-      'Link<br><a href="specta.pdf" target="_blank" rel="noopener noreferrer">SPECTA.pdf</a>',
-    ],
-    description:
-      "“Specta è frutto di un processo creativo durato sei mesi che ha coinvolto diversi ambiti: branding, grafica, coding, UX design, interaction design, video making, prototipazione, copywriting, fotografia, web design e packaging design. È stata una progettazione complessa: nei seguenti paragrafi verranno districati il tempo e lo spazio progettuale attraversati.\n\nIl progetto sarà esaminato dal punto di vista temporale, attraverso la sequenza delle azioni e l’analisi dei modelli e della loro classificazione; e dal punto di vista spaziale, attraverso il perimetro delle discipline e le mappature del loro rapporto interdisciplinare. Il design è tanto uno stato, un oggetto fermo, un artefatto nello spazio, quanto un verbo, un’azione, un processo che si sviluppa nel tempo (Doblin, 1987).\n\nLa volontà di questo elaborato è restituire l’esperienza di progetto come vero e proprio laboratorio: una sperimentazione progettuale. Lo scopo di questo capitolo è mettere alla prova la teoria attraverso Specta e proporre un modello frutto di questa esperienza” (p. 10).",
-    media: [
-      {
-        type: "image",
-        src: "assets/spectathesis/optimized/thesis0.webp",
-        width: 1080,
-        height: 1440,
-      },
-      {
-        type: "video",
-        src: "assets/spectathesis/spectathesis-optimized.mp4",
-        unmute: false,
-      },
-      ...[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13].map((number) => ({
-        type: "image",
-        src: `assets/spectathesis/optimized/thesis${number}.webp`,
-        width: 1920,
-        height: 1280,
-      })),
-    ],
-  },
+
   {
     slug: "specta",
     sourcePage: "specta/",
@@ -671,7 +637,7 @@ window.PROJECTS = [
     info: [
       "Field<br>Speculative<br>Branding<br>Graphic<br>Interaction<br>Interface<br>Experience<br>Exhibition<br>Packaging<br>Photography<br>Copywriting<br>Video Making<br>Coding<br>Prototyping<br>Research<br>Editorial",
       "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
-      "Made at<br>Politecnico di Milano<br>Laboratorio di Sintesi Finale C1",
+
       'Link<br><a href="specta.pdf" target="_blank" rel="noopener noreferrer">SPECTA.pdf</a>',
       'Exhibited at<br><a href="https://www.salonemilano.it/en" target="_blank" rel="noopener noreferrer">Salone Satellite</a> 2025, Rho<br><a href="https://www.fabbricadelvapore.org/" target="_blank" rel="noopener noreferrer">Fabbrica del Vapore</a> 2024, Milan<br><a href="https://triennale.org" target="_blank" rel="noopener noreferrer">Triennale</a> 2023, Milan',
       "Features<br>Pittogramma, 2024<br>CDSA Awards International Media Art Creativity Competition 2024",
