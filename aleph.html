@@ -14,6 +14,7 @@
         height: 100%;
         background: #000;
         overflow: hidden;
+        cursor: none;
       }
       #stage {
         position: fixed;
@@ -28,7 +29,7 @@
         image-rendering: auto;
         user-select: none;
         -webkit-user-drag: none;
-        cursor: pointer;
+        cursor: none;
       }
       /* HUD UI rimossa: comandi restano attivi via tastiera */
     </style>
@@ -244,9 +245,6 @@
 
       function setPlaying(p) {
         playing = !!p;
-        img.title = playing
-          ? "Clicca per mettere in pausa"
-          : "Clicca per aprire la pagina Wikipedia dell'immagine";
         if (stateEl) stateEl.textContent = playing ? "PLAY" : "PAUSE";
         if (playing) restart();
         else stop();

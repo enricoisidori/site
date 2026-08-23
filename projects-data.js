@@ -695,6 +695,23 @@ window.PROJECTS = [
         width: 1920,
         height: 1280,
       },
+      {
+        type: "image",
+        src: "assets/spectathesis/optimized/thesis0.webp",
+        width: 1080,
+        height: 1440,
+      },
+      {
+        type: "video",
+        src: "assets/spectathesis/spectathesis-optimized.mp4",
+        unmute: false,
+      },
+      ...[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13].map((number) => ({
+        type: "image",
+        src: `assets/spectathesis/optimized/thesis${number}.webp`,
+        width: 1920,
+        height: 1280,
+      })),
     ],
   },
   {
