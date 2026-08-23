@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Realities</title><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css"></head>
+<body><div id="save-feedback" role="status" aria-live="polite">saved</div><main>
+  <section class="controls"><input id="search" type="search" placeholder="search" autocomplete="off" aria-label="search"><div class="filters" id="category-filters"></div><div class="filters" id="location-filters"><button class="filter-button star-filter" id="star-filter" type="button" aria-label="starred only" aria-pressed="false">★</button><button class="filter-button hide-filter" id="hide-filter" type="button" aria-label="show hidden" aria-pressed="false">—</button></div></section><div id="controls-spacer" aria-hidden="true"></div>
+  <section class="grid" id="grid" aria-label="archive"></section><button id="back-to-top" type="button">back to top</button>
+</main>
+<template id="card-template"><article class="card"><div class="card-media"></div><div class="card-body"><h2></h2><p class="card-tags"></p><div class="card-links"></div></div></article></template>
+<dialog id="editor"><form method="dialog" id="edit-form"><div class="form-grid" id="form-fields"></div><div class="form-actions"><button type="button" id="delete-record">delete</button><button type="button" id="cancel-edit">close</button><button value="default">save</button></div></form></dialog>
+<script src="archive-data.js"></script><script src="app.js"></script><script src="archive-ui-overrides.js"></script><script src="feedback.js"></script>
+</body></html>

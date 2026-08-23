@@ -1,0 +1,15 @@
+.DS_Store
+.vscode/
+.claude/
+
+# Realities working archive (the deployable copy is /realities)
+realities/screen/
+realities/.codex_work/
+realities/scripts/
+realities/REALITIES_ARCHIVE.xlsx
+realities/*.inspect.ndjson
+realities/server.mjs
+realities/index-iframe.html
+
+# Local-only caches and review material
+realities/media/uncategorized/
