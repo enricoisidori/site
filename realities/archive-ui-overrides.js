@@ -70,8 +70,8 @@ form.addEventListener("submit", () => {
 
 for (const record of base.filter(record => record.entityType === "Agency")) {
   if (!overrides[record.id]) continue;
-  overrides[record.id].entityType = "Agency";
-  overrides[record.id].field = "";
+  overrides[record.id].entityType = "Studio";
+  overrides[record.id].field = "art direction";
 }
 localStorage.setItem("realities-overrides", JSON.stringify(overrides));
 

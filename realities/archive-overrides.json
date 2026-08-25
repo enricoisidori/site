@@ -369,8 +369,8 @@
   "R-0007": {
     "id": "R-0007",
     "name": "Circular Agency",
-    "entityType": "Agency",
-    "field": "",
+    "entityType": "Studio",
+    "field": "art direction",
     "period": "Contemporary",
     "based": "milan",
     "country": "italy",
@@ -1128,8 +1128,8 @@
   "R-0058": {
     "id": "R-0058",
     "name": "316 Agency",
-    "entityType": "Agency",
-    "field": "",
+    "entityType": "Studio",
+    "field": "art direction",
     "period": "Contemporary",
     "based": "amsterdam",
     "country": "abroad",
