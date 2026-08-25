@@ -1,0 +1,1123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<idPkg:Story xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" DOMVersion="21.2">
+	<Story Self="u12d" UserText="true" IsEndnoteStory="false" AppliedTOCStyle="n" TrackChanges="false" StoryTitle="$ID/" AppliedNamedGrid="n">
+		<StoryPreference OpticalMarginAlignment="false" OpticalMarginSize="12" FrameType="TextFrameType" StoryOrientation="Horizontal" StoryDirection="LeftToRightDirection" />
+		<InCopyExportOption IncludeGraphicProxies="true" IncludeAllResources="false" />
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Curriculum vitae	</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Name	Enrico Isidori	</Withtent>
+				<Br />
+				<Withtent>Email	</Withtent>
+				<HyperlinkTextSource Self="u3d1" Name="Hyperlink 5" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>enrico.isidori@gmail.com</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>Website	</Withtent>
+				<HyperlinkTextSource Self="u84a" Name="Hyperlink 81" Hidden="false" AppliedCharacterStyle="n">
+					<Withtent>enricoisidori.com</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>Instagram	</Withtent>
+				<HyperlinkTextSource Self="u3e4" Name="Hyperlink 6" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>@enrico.isidori</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>Profile	Designer, researcher and artist working across visual, critical and experiential design through non-disciplinary approaches and non-linear processes.</Withtent>
+				<Br />
+				<Withtent>Location	Milano</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title" SpaceBefore="10.9017857142963" SpaceAfter="10.9017857142963" RuleAboveLineWeight="0.9910714285723908" RuleBelowLineWeight="0.9910714285723908" ParagraphBorderBottomOffset="5.45151715411103" ParagraphBorderTopLeftCornerRadius="11.94630845551982" ParagraphBorderTopRightCornerRadius="11.94630845551982" ParagraphBorderBottomLeftCornerRadius="11.94630845551982" ParagraphBorderBottomRightCornerRadius="11.94630845551982" ParagraphShadingTopLeftCornerRadius="11.94630845551982" ParagraphShadingTopRightCornerRadius="11.94630845551982" ParagraphShadingBottomLeftCornerRadius="11.94630845551982" ParagraphShadingBottomRightCornerRadius="11.94630845551982" ParagraphBorderBottomLineWeight="0.49776285231332584">
+			<Properties>
+				<SameParaStyleSpacing type="unit">-0.9359190556492993</SameParaStyleSpacing>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>Professional experience</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info" RuleAboveLineWeight="0.9910714285723908" RuleBelowLineWeight="0.9910714285723908" ParagraphBorderTopLeftCornerRadius="11.94630845551982" ParagraphBorderTopRightCornerRadius="11.94630845551982" ParagraphBorderBottomLeftCornerRadius="11.94630845551982" ParagraphBorderBottomRightCornerRadius="11.94630845551982" ParagraphShadingTopLeftCornerRadius="11.94630845551982" ParagraphShadingTopRightCornerRadius="11.94630845551982" ParagraphShadingBottomLeftCornerRadius="11.94630845551982" ParagraphShadingBottomRightCornerRadius="11.94630845551982" ParagraphBorderTopLineWeight="0.9955257046266517" ParagraphBorderBottomLineWeight="0.9955257046266517" ParagraphBorderLeftLineWeight="0.9955257046266517" ParagraphBorderRightLineWeight="0.9955257046266517">
+			<Properties>
+				<SameParaStyleSpacing type="unit">-0.9359190556492993</SameParaStyleSpacing>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>2026 — present	Freelance designer</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Activities 	Design and research in graphic, exhibition and information design.</Withtent>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Br />
+				<Withtent>2025 — 2026	Interdisciplinary designer At 	</Withtent>
+				<HyperlinkTextSource Self="u89a" Name="Hyperlink 15" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Operating System Studio</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> e </Withtent>
+				<HyperlinkTextSource Self="u89b" Name="Hyperlink 16" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Umanesimo Artificiale</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> Studio and association developing projects on the relationship between human and artificial intelligences, fostering dialogue among art, technology and society.</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info" RuleAboveLineWeight="0.9910714285723908" RuleBelowLineWeight="0.9910714285723908" ParagraphBorderTopLeftCornerRadius="11.94630845551982" ParagraphBorderTopRightCornerRadius="11.94630845551982" ParagraphBorderBottomLeftCornerRadius="11.94630845551982" ParagraphBorderBottomRightCornerRadius="11.94630845551982" ParagraphShadingTopLeftCornerRadius="11.94630845551982" ParagraphShadingTopRightCornerRadius="11.94630845551982" ParagraphShadingBottomLeftCornerRadius="11.94630845551982" ParagraphShadingBottomRightCornerRadius="11.94630845551982" ParagraphBorderTopLineWeight="0.9955257046266517" ParagraphBorderBottomLineWeight="0.9955257046266517" ParagraphBorderLeftLineWeight="0.9955257046266517" ParagraphBorderRightLineWeight="0.9955257046266517">
+			<Properties>
+				<SameParaStyleSpacing type="unit">-0.9359190556492993</SameParaStyleSpacing>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>	Activities	Research projects, interactive installations, exhibition design, performing and digital arts</Withtent>
+				<Br />
+				<Withtent>	Selected project	</Withtent>
+				<HyperlinkTextSource Self="u899" Name="Hyperlink 77" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>N+ Industries: Cognitive Supremacy</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> (</Withtent>
+				<HyperlinkTextSource Self="u898" Name="Hyperlink 79" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Videocittà</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> 2025, </Withtent>
+				<HyperlinkTextSource Self="u89c" Name="Hyperlink 78" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Sónar +D</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> 2025)</Withtent>
+				<Br />
+				<Br />
+				<Withtent>2023 — 2024 	Visual designer At	</Withtent>
+				<HyperlinkTextSource Self="u896" Name="Hyperlink 17" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Giga Design Studio</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Milano Studio with a multidisciplinary approach to design, technology and strategic communication, focused on realizzazione di sistemi interattivi, identità di marca e piattaforme cross-mediali. Activities 	Graphic design, web design, motion design, design editoriale, visual identity</Withtent>
+				<Br />
+				<Withtent>	Selected projects	</Withtent>
+				<HyperlinkTextSource Self="u895" Name="Hyperlink 75" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Capsule Plaza</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, </Withtent>
+				<HyperlinkTextSource Self="u897" Name="Hyperlink 74" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>6AM</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, </Withtent>
+				<HyperlinkTextSource Self="u894" Name="Hyperlink 73" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>The North Face</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, </Withtent>
+				<HyperlinkTextSource Self="u89d" Name="Hyperlink 76" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Bid(s) for Survival</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Teaching</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>March — July 2026	Lecturer</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>At 	Digital Applications for Art (Data Visualization), Communication and Creative Technologies, IED, Turin.</Withtent>
+				<Br />
+				<Withtent>Field	Critical data design, information design, computational methods, communication design </Withtent>
+				<Br />
+				<Withtent>Faculty	Antonella Autuori</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/elenco">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Activities	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>–  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Lezioni teoriche e didattica laboratoriale</Withtent>
+				<Br />
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>–  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Revisione dei progetti</Withtent>
+				<Br />
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>–  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Co-progettazione e sviluppo iterativo dei progetti</Withtent>
+				<Br />
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info" RuleAboveLineWeight="0.9910714285723908" RuleBelowLineWeight="0.9910714285723908" ParagraphBorderTopLeftCornerRadius="11.94630845551982" ParagraphBorderTopRightCornerRadius="11.94630845551982" ParagraphBorderBottomLeftCornerRadius="11.94630845551982" ParagraphBorderBottomRightCornerRadius="11.94630845551982" ParagraphShadingTopLeftCornerRadius="11.94630845551982" ParagraphShadingTopRightCornerRadius="11.94630845551982" ParagraphShadingBottomLeftCornerRadius="11.94630845551982" ParagraphShadingBottomRightCornerRadius="11.94630845551982" ParagraphBorderTopLineWeight="0.9955257046266517" ParagraphBorderBottomLineWeight="0.9955257046266517" ParagraphBorderLeftLineWeight="0.9955257046266517" ParagraphBorderRightLineWeight="0.9955257046266517">
+			<Properties>
+				<SameParaStyleSpacing type="unit">-0.9359190556492993</SameParaStyleSpacing>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>August 2025 	Trainer</Withtent>
+				<Br />
+				<Withtent>	At	</Withtent>
+				<HyperlinkTextSource Self="u891" Name="Hyperlink 72" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>BridgeAI — Innovate UK</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>	Piattaforma dedicata alla formazione sull’uso creativo e critico dell’intelligenza artificiale.</Withtent>
+				<Br />
+				<Withtent>	Activities	Sviluppo e conduzione di lezioni teorico-pratiche in corsi online</Withtent>
+				<Br />
+				<Withtent>	Courses 	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>Prompt to Picture: Creating Images with AI</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Br />
+				<Withtent>		</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>Prompt to Motion: Creating Videos with AI</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>September 2023 — present	Teaching assistant </Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>At	Laboratorio di Sintesi Finale C1 (Antidisciplinary Communication Design Lab), Design della Comunicazione, Politecnico di Milano </Withtent>
+				<Br />
+				<Withtent>Field	Critical design, speculative design, interaction design, communication design, exhibition design </Withtent>
+				<Br />
+				<Withtent>Faculty 	Francesco E. Guida, Pietro Buffa, Alessandro Masserdotti e Giacomo Scandolara</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/elenco">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Activities 	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>–  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Supporto alla didattica laboratoriale e frontale </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>–  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Tutoring agli studenti durante lo sviluppo dei progetti  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>–  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Revisione e valutazione dei progetti </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>–  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Activities di ricerca a corredo delle esperienze didattiche</Withtent>
+				<Br />
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>–  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Curatela e coordinamento dei progetti espositivi del Laboratorio:</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>Undeclared: Highlighting hidden conflicts through communication and speculative design,  </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<HyperlinkTextSource Self="u892" Name="Hyperlink 80" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Dotdotdot</Withtent>
+				</HyperlinkTextSource>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>, 2026</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u890" Name="Hyperlink 44" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Anthropogenic Scenarios: Nature vs Human Matters – Narratives through Design</Withtent>
+				</HyperlinkTextSource>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>, </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u893" Name="Hyperlink 45" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Salone Satellite</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, </Withtent>
+				<HyperlinkTextSource Self="u88e" Name="Hyperlink 46" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Salone del Mobile</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>,</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent> 2025 </Withtent>
+				<HyperlinkTextSource Self="u88f" Name="Hyperlink 47" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Believe It or Not: Speculating on (un)real conspiracy theories</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<HyperlinkTextSource Self="u88c" Name="Hyperlink 49" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Dotdotdot</Withtent>
+				</HyperlinkTextSource>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>, 2025 </Withtent>
+				<HyperlinkTextSource Self="u88d" Name="Hyperlink 48" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Raw Scenarios: Reflecting on human overconsumption</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<HyperlinkTextSource Self="u88b" Name="Hyperlink 50" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Dotdotdot</Withtent>
+				</HyperlinkTextSource>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Withtent>, 2024	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Academic publications</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>2026	Guida, F. E., &amp; Isidori, E. (in press). </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" FontStyle="Book Italic">
+				<Withtent>Antidisciplinary communication design: A case of studio-Basicd practice for producing embodied, explicit, and discursive knowledge.</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent> In Proceedings of the SID 2026 Annual Withference: Design Doing. Società Italiana di Design.</Withtent>
+				<Br />
+				<Br />
+				<Withtent>2026	Guida, F. E., Isidori, E., &amp; Tranti, C. (2026). </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" FontStyle="Book Italic">
+				<Withtent>Antidisciplinary design as epistemic resistance: Critical and political agency in communication design education.</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent> Project Grafico Journal, 23(42), 194–217.  </Withtent>
+				<HyperlinkTextSource Self="u84d" Name="Hyperlink 82" Hidden="false" AppliedCharacterStyle="n">
+					<Withtent>https://doi.org/10.82068/pgjournal.2026.23.42.08</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Br />
+				<Withtent>2025	Esposito, M., Guida, F. E., Isidori, E., &amp; Tranti, C. (2025). </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" FontStyle="Book Italic">
+				<Withtent>Withspiracy fiction as a tool for critical thinking: Designing embodied narratives Basicd on conspiracy theories to reflect on contemporary issues and communication design.</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent> In Ethical Leadership: A New Frontier for Design (Cumulus Withference Proceedings Series, No. 14, pp. 1618–1634). Cumulus Association. </Withtent>
+				<HyperlinkTextSource Self="u850" Name="Hyperlink 83" Hidden="false" AppliedCharacterStyle="n">
+					<Withtent>https://hdl.handle.net/11311/1309667</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Br />
+				<Withtent>2024	Esposito, M., Guida, F. E., Isidori, E., &amp; Tranti, C. (2024). </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" FontStyle="Book Italic">
+				<Withtent>Anthropogenic narratives: Imagination and anti-disciplinarity for the communication of non-human perspectives.</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent> In M. Bisson (Ed.), Environmental Design: Withference Proceedings of the 4th International Withference on Environmental Design (pp. 585–597). Palermo University Press. </Withtent>
+				<HyperlinkTextSource Self="u853" Name="Hyperlink 84" Hidden="false" AppliedCharacterStyle="n">
+					<Withtent>https://hdl.handle.net/11311/1267084</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Withferences </Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>25 June 2026	Design Doing, Società Italiana di Design, Unibz, Bolzano</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Withtributionson	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" FontStyle="Book Italic">
+				<Withtent>Antidisciplinary communication design: A case of studio-Basicd practice for producing embodied, explicit, and discursive knowledge.</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>3 — 7 June 2025	</Withtent>
+				<HyperlinkTextSource Self="u4d3" Name="Hyperlink 18" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Ethical Leadership: A New Frontier for Design, Cumulus Nantes 2025</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Nantes</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Withtributionson	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<Withtent>Withspiracy Fiction as a Tool for Critical Thinking: Designing Narratives to Reflect on the Withtemporary Information System</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>9 — 11 May 2024	</Withtent>
+				<HyperlinkTextSource Self="u4dd" Name="Hyperlink 19" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Environmental Design 4th International Withference on Environmental Design, MDA</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Ginosa</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Withtributionson</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<Withtent>	Anthropogenic Narratives. Imagination and Anti-Disciplinarity for the Communication of Non-Human Perspectives</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Lectures </Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>15 February 2026	Out-of-Place Discipline, Out-of-Phase Processes Lecture a Elisava, School of Design &amp; Engineering con Post computing Lab</Withtent>
+				<Br />
+				<Withtent>	Withtributionson	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" FontStyle="Book Italic">
+				<Withtent>OFF-DISCIPLINE: Out-of-Place Design Withdition</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>	</Withtent>
+				<Br />
+				<Withtent>	</Withtent>
+				<Br />
+				<Withtent>15 March 2025	</Withtent>
+				<HyperlinkTextSource Self="u844" Name="Hyperlink 14" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Symposium on Antidisciplinary, Milano </Withtent>
+				</HyperlinkTextSource>
+				<Withtent> Lecture e organizzazione con </Withtent>
+				<HyperlinkTextSource Self="u845" Name="Hyperlink 10" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Transmedia Research Institute</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> e Laboratorio di Sintesi Finale C1, Design della Comunicazione, Politecnico di Milano, in collaborazione con </Withtent>
+				<HyperlinkTextSource Self="u842" Name="Hyperlink 12" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>2050+</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> e </Withtent>
+				<HyperlinkTextSource Self="u843" Name="Hyperlink 11" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Dotdotdot</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>. </Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Withtributions</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<Withtent>	Anthropogenic Narratives. Imagination and Anti-Disciplinarity for the Communication of Non-Human Perspectives </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>e</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<Withtent> Withspiracy Fiction as a Tool for Critical Thinking: Designing Narratives to Reflect on the Withtemporary Information System</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" Tracking="20">
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title" SpaceBefore="10.9017857142963" SpaceAfter="10.9017857142963" RuleAboveLineWeight="0.9910714285723908" RuleBelowLineWeight="0.9910714285723908" ParagraphBorderBottomOffset="5.45151715411103" ParagraphBorderTopLeftCornerRadius="11.94630845551982" ParagraphBorderTopRightCornerRadius="11.94630845551982" ParagraphBorderBottomLeftCornerRadius="11.94630845551982" ParagraphBorderBottomRightCornerRadius="11.94630845551982" ParagraphShadingTopLeftCornerRadius="11.94630845551982" ParagraphShadingTopRightCornerRadius="11.94630845551982" ParagraphShadingBottomLeftCornerRadius="11.94630845551982" ParagraphShadingBottomRightCornerRadius="11.94630845551982" ParagraphBorderBottomLineWeight="0.49776285231332584">
+			<Properties>
+				<SameParaStyleSpacing type="unit">-0.9359190556492993</SameParaStyleSpacing>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>Exhibitions</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info" RuleAboveLineWeight="0.9910714285723908" RuleBelowLineWeight="0.9910714285723908" ParagraphBorderTopLeftCornerRadius="11.94630845551982" ParagraphBorderTopRightCornerRadius="11.94630845551982" ParagraphBorderBottomLeftCornerRadius="11.94630845551982" ParagraphBorderBottomRightCornerRadius="11.94630845551982" ParagraphShadingTopLeftCornerRadius="11.94630845551982" ParagraphShadingTopRightCornerRadius="11.94630845551982" ParagraphShadingBottomLeftCornerRadius="11.94630845551982" ParagraphShadingBottomRightCornerRadius="11.94630845551982" ParagraphBorderTopLineWeight="0.9955257046266517" ParagraphBorderBottomLineWeight="0.9955257046266517" ParagraphBorderLeftLineWeight="0.9955257046266517" ParagraphBorderRightLineWeight="0.9955257046266517">
+			<Properties>
+				<SameParaStyleSpacing type="unit">-0.9359190556492993</SameParaStyleSpacing>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>3 — 6 July 2025	</Withtent>
+				<HyperlinkTextSource Self="u4fa" Name="Hyperlink 21" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Videocittà</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, </Withtent>
+				<HyperlinkTextSource Self="u505" Name="Hyperlink 22" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Agorà Expo</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Roma Festival internazionale dedicato all’audiovisivo e alle immagini in movimento, punto di riferimento europeo per arte digitale, tecnologia e innovazione attraverso proiezioni, installazioni immersive e performance. Installation project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u510" Name="Hyperlink 23" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>N+ Industries: Cognitive Supremacy</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> </Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Br />
+				<Withtent>	With 	Operating System Studio</Withtent>
+				<Br />
+				<Withtent>	Activities	Partecipazione in qualità di espositore</Withtent>
+				<Br />
+				<Br />
+				<Withtent>12 — 14 June 2025	</Withtent>
+				<HyperlinkTextSource Self="u51f" Name="Hyperlink 25" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Sónar +D</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Barcellona</Withtent>
+				<Br />
+				<Withtent>	Festival internazionale riconosciuto a livello mondiale che esplora l’innovazione digitale in design, arte e musica elettronica attraverso ricerca e progetti sperimentali. Installation project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u515" Name="Hyperlink 24" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>N+ Industries: Cognitive Supremacy</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>  </Withtent>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>	With 	Operating System Studio</Withtent>
+				<Br />
+				<Withtent>	Activities	Partecipazione in qualità di espositore</Withtent>
+				<Br />
+				<Br />
+				<Withtent>7 — 11 May 2025	</Withtent>
+				<HyperlinkTextSource Self="u52a" Name="Hyperlink 26" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Bellaria Film Festival</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> Storico festival indipendente dedicato a ricerca audiovisiva, documentari e linguaggi sperimentali. Section	</Withtent>
+				<HyperlinkTextSource Self="u535" Name="Hyperlink 27" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>La natura ci guarda — Tre minuti a tema fisso</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> Project audiovisivo 	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u54b" Name="Hyperlink 29" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Tu non mi guardi mai là dove io ti vedo</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> </Withtent>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>	With 	</Withtent>
+				<HyperlinkTextSource Self="u540" Name="Hyperlink 28" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Guidone Apulia Factory</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>	Activities	Partecipazione in qualità di autore</Withtent>
+				<Br />
+				<Br />
+				<Withtent>8 — 13 April 2025 	</Withtent>
+				<HyperlinkTextSource Self="u556" Name="Hyperlink 30" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Salone Satellite</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, </Withtent>
+				<HyperlinkTextSource Self="u561" Name="Hyperlink 31" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Salone del Mobile</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Rho Evento internazionale e piattaforma di riferimento per sperimentazione, innovazione nel settore del design. Installation project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u6c1" Name="Hyperlink 71" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Specta — Your personal eco-anxiety silencer</Withtent>
+				</HyperlinkTextSource>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent> Exhibition	</Withtent>
+				<HyperlinkTextSource Self="u577" Name="Hyperlink 33" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Anthropogenic Scenarios: Nature vs Human Matters: Narratives through Design</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> With 	Laboratorio di Sintesi Finale C1, Design della Comunicazione, Politecnico di Milano </Withtent>
+				<Br />
+				<Withtent>	Activities	Partecipazione in qualità di espositore e curatore dell’allestimento della mostra  </Withtent>
+				<Br />
+				<Br />
+				<Withtent>9 April — 29 May 2025	</Withtent>
+				<HyperlinkTextSource Self="u56c" Name="Hyperlink 32" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>DesignxDesigners, Fuorisalone</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Milano</Withtent>
+				<Br />
+				<Withtent>	Exhibition collettiva di progetti didattici in occasione della Milano Design Week nel circuito del Fuorisalone. Project 	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u592" Name="Hyperlink 35" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Digital_Forest — Four years of human categorization of trail cam footage </Withtent>
+				</HyperlinkTextSource>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>With 	DensityDesign Lab   Activities	Partecipazione in qualità di espositore</Withtent>
+				<Br />
+				<Br />
+				<Withtent>25 February — 9 March 2025	Meet — Digital Culture Center, Milano Centro internazionale per l’arte e la cultura digitale, dedicato a mostre immersive e esperienze multimediali. Installation project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>Digital_Forest — Four years of human</Withtent>
+				<Withtent> categorization of trail cam footage</Withtent>
+				<Br />
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>Exhibition	</Withtent>
+				<HyperlinkTextSource Self="u59f" Name="Hyperlink 36" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Liked, Trapped, Shared. Digital encounters with biodiversity</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> With	</Withtent>
+				<HyperlinkTextSource Self="u5ab" Name="Hyperlink 37" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>DensityDesign Lab</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>   Activities	Partecipazione in qualità di espositore</Withtent>
+				<Br />
+				<Br />
+				<Withtent>16 — 21 April 2024	</Withtent>
+				<HyperlinkTextSource Self="u5c3" Name="Hyperlink 40" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Fabbrica del Vapore</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Milano Venue culturale, nell’ambito della Design Week, ospita mostre, installazioni e progetti di arte e design. Exhibition	</Withtent>
+				<HyperlinkTextSource Self="u5b8" Name="Hyperlink 39" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Interdependence — Designing Relationships</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>	With	Politecnico di Milano Project 	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u6bf" Name="Hyperlink 70" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Specta — Your personal eco-anxiety silencer</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>Activities	Partecipazione in qualità di espositore</Withtent>
+				<Br />
+				<Br />
+				<Withtent>22 March 2023 	</Withtent>
+				<HyperlinkTextSource Self="u5ce" Name="Hyperlink 41" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Triennale Milano</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> Istituzione culturale internazionale dedicata al design, all’arte e all’architettura contemporanea.</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info" RuleAboveLineWeight="0.9910714285723908" RuleBelowLineWeight="0.9910714285723908" ParagraphBorderTopLeftCornerRadius="11.94630845551982" ParagraphBorderTopRightCornerRadius="11.94630845551982" ParagraphBorderBottomLeftCornerRadius="11.94630845551982" ParagraphBorderBottomRightCornerRadius="11.94630845551982" ParagraphShadingTopLeftCornerRadius="11.94630845551982" ParagraphShadingTopRightCornerRadius="11.94630845551982" ParagraphShadingBottomLeftCornerRadius="11.94630845551982" ParagraphShadingBottomRightCornerRadius="11.94630845551982" ParagraphBorderTopLineWeight="0.9955257046266517" ParagraphBorderBottomLineWeight="0.9955257046266517" ParagraphBorderLeftLineWeight="0.9955257046266517" ParagraphBorderRightLineWeight="0.9955257046266517">
+			<Properties>
+				<SameParaStyleSpacing type="unit">-0.9359190556492993</SameParaStyleSpacing>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Withtent>Venue	Salone d’Onore</Withtent>
+				<Br />
+				<Withtent>Exhibition	</Withtent>
+				<HyperlinkTextSource Self="u5d9" Name="Hyperlink 42" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Anthropogenic Narratives: Non-Human Perspectives</Withtent>
+					<Br />
+				</HyperlinkTextSource>
+				<Withtent>Installation project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<HyperlinkTextSource Self="u6bd" Name="Hyperlink 69" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Specta — Your personal eco-anxiety silencer</Withtent>
+				</HyperlinkTextSource>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" PointSize="7.928571428579127" HorizontalScale="100.90090090080292" StrokeWeight="0.9955257046266517" MiterLimit="3.9821028185066067" RubyFontSize="-0.9910714285723908" RubyXScale="100.90090090080292" KentenFontSize="-0.9910714285723908" KentenXScale="100.90090090080292">
+				<Properties>
+					<Leading type="unit">10.9017857142963</Leading>
+				</Properties>
+				<Br />
+				<Withtent>With 	Laboratorio di Sintesi Finale C1, Design della Comunicazione, Politecnico di Milano </Withtent>
+				<Br />
+				<Withtent>Activities	Partecipazione in qualità di espositore e curatore del progetto grafico della mostra</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>17 — 18 September 2022	</Withtent>
+				<HyperlinkTextSource Self="u609" Name="Hyperlink 51" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Graphic Days</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Torino</Withtent>
+				<Br />
+				<Withtent>	Festival internazionale dedicato al design della comunicazione visiva, con mostre, workshop e installazioni che esplorano il ruolo della grafica nella cultura contemporanea.</Withtent>
+				<Br />
+				<Withtent>	Venues 	Cavallerizza Reale, Docks Dora, Torino Print Club				 Exhibition	</Withtent>
+				<HyperlinkTextSource Self="u614" Name="Hyperlink 52" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Neologia — Nuovi linguaggi del visual design in Italia</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>	Editorial project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u620" Name="Hyperlink 53" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Draw a line from one side of the page to the other</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>	Activities	Partecipazione in qualità di espositore</Withtent>
+				<Br />
+				<Br />
+				<Withtent>30 May — 1 June 2022	</Withtent>
+				<HyperlinkTextSource Self="u631" Name="Hyperlink 56" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>ELO — International Withference on Electronic Literature</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Como</Withtent>
+				<Br />
+				<Withtent>	Evento internazionale dedicato alla letteratura elettronica e alle pratiche sperimentali di scrittura digitale.</Withtent>
+				<Br />
+				<Withtent>	Editorial project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u625" Name="Hyperlink 54" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Draw a line from one side of the page to the other</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>	Activities	Partecipazione in qualità di espositore</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Education</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>2023 — 2026 	Laurea Magistrale in Design della Comunicazione, Politecnico di Milano, Scuola del Design</Withtent>
+				<Br />
+				<Withtent>	Grade	110/110 </Withtent>
+				<Br />
+				<Withtent>	Title	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" FontStyle="Book Italic">
+				<Withtent>OFF-DISCIPLINE: Out-of-Place Design Withdition</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Field	Metodologie non convenzionali, approcci progettuali, processi non lineari, antidisciplinare, postdisciplinare</Withtent>
+				<Br />
+				<Withtent>Supervisor	Prof. Francesco E. Guida</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>2024	Programma Erasmus presso </Withtent>
+				<HyperlinkTextSource Self="u8bb" Name="Hyperlink 3" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>École Nationale Supérieure des Arts Appliqués et des Métiers d’Art</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Parigi Areas of study	Tipografia, tecniche di stampa, AI generativa</Withtent>
+				<Br />
+				<Withtent>	Duration	6 mesi</Withtent>
+				<Br />
+				<Br />
+				<Withtent>2021 — 2023 	Laurea Triennale in Design della Comunicazione, </Withtent>
+				<HyperlinkTextSource Self="u8bc" Name="Hyperlink 4" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Politecnico di Milano, Scuola del Design</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> Grade	110/110 con lode</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Title	</Withtent>
+				<HyperlinkTextSource Self="u8ba" Name="Hyperlink 7" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Specta: Your personal eco-anxiety silencer</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>Field	Design della comunicazione, design speculativo, design dell’interazione, fictional branding, prototipazione rapida, eco-ansia, non umano, anti-biocentrismo</Withtent>
+				<Br />
+				<Withtent>Withtext 	Laboratorio di Sintesi Finale C1</Withtent>
+				<Br />
+				<Withtent>Supervisor	Prof. Francesco E. Guida</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>2015 — 2021	Diploma di Maturità Scientifica, Liceo Bertrand Russell, Roma Grade	100/100</Withtent>
+				<Br />
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Awards and recognition</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>August 2025	Pubblicazione su </Withtent>
+				<HyperlinkTextSource Self="u63c" Name="Hyperlink 57" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Withtemporary Type</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>	Piattaforma e archivio dedicato alla tipografia contemporanea; raccoglie e promuove progetti innovativi di type design a livello internazionale.</Withtent>
+				<Br />
+				<Withtent>	Editorial project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u648" Name="Hyperlink 58" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Rhytuals: Collective Rhythms</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>2025 — 2026	Pubblicazione su </Withtent>
+				<HyperlinkTextSource Self="u653" Name="Hyperlink 59" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>VisualBleed</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Withtent>	Piattaforma internazionale di ricerca e sviluppo in arte e design che promuove nuove narrazioni creative attraverso mostre, progetti editoriali e collaborazioni.</Withtent>
+				<Br />
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic" FontStyle="Book">
+				<Withtent>Research project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]" FontStyle="Book Italic">
+				<Withtent>OFF-DISCIPLINE: Out-of-Place Design Withdition</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>	Installation project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u65e" Name="Hyperlink 60" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>N+ Industries: Cognitive Supremacy</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> </Withtent>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>	Editorial project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u669" Name="Hyperlink 61" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Rhytuals: Collective Rhythms</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> </Withtent>
+				<Br />
+				<Withtent>	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>November 2024 	</Withtent>
+				<HyperlinkTextSource Self="u6ba" Name="Hyperlink 68" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>CDSA Awards — International Media Art Creativity Competition</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Hangzhou</Withtent>
+				<Br />
+				<Withtent>	Premio internazionale dedicato alla media art, organizzato dalla China Academy of Art.</Withtent>
+				<Br />
+				<Withtent>	Project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u6a7" Name="Hyperlink 67" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Specta — Your personal eco-anxiety silencer</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>May 2024 	Pubblicazione su </Withtent>
+				<HyperlinkTextSource Self="u678" Name="Hyperlink 64" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Pittogramma</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> Piattaforma italiana di graphic design che promuove giovani talenti e progetti emergenti. Project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u684" Name="Hyperlink 62" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Specta — Your personal eco-anxiety silencer</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>November 2023	Pubblicazione su </Withtent>
+				<HyperlinkTextSource Self="u68e" Name="Hyperlink 63" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Gpu Gallery</Withtent>
+				</HyperlinkTextSource>
+				<Withtent> Showcase dedicato all’arte digitale e ai linguaggi visivi sperimentali. Project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u699" Name="Hyperlink 65" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Iterations/inversions</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>September 2022 	Selezione </Withtent>
+				<HyperlinkTextSource Self="u6a4" Name="Hyperlink 66" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Neologia — Nuovi linguaggi del visual design in Italia</Withtent>
+				</HyperlinkTextSource>
+				<Withtent>, Torino</Withtent>
+				<Br />
+				<Withtent>	Rassegna dedicata alle tendenze emergenti del visual design italiano, che esplora nuovi linguaggi, pratiche e prospettive della comunicazione visiva contemporanea.</Withtent>
+				<Br />
+				<Withtent>	Editorial project	</Withtent>
+			</CharacterStyleRange>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/italic">
+				<HyperlinkTextSource Self="u627" Name="Hyperlink 55" Hidden="false" AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+					<Withtent>Draw a line from one side of the page to the other</Withtent>
+				</HyperlinkTextSource>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Language skills</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Certifications	ETS TOEIC Certificate	870/990</Withtent>
+				<Br />
+				<Withtent>	</Withtent>
+				<Br />
+				<Withtent>English language 	Reading	Advanced</Withtent>
+				<Br />
+				<Withtent>	Writing	Advanced</Withtent>
+				<Br />
+				<Withtent>	Speaking	Advanced </Withtent>
+				<Br />
+				<Br />
+				<Withtent>French language	Reading	Basic</Withtent>
+				<Br />
+				<Withtent>	Writing	Basic</Withtent>
+				<Br />
+				<Withtent>	Speaking	Basic </Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/sub-info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Italian language	Native speaker</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<Properties>
+				<TabList type="list">
+					<ListItem type="record">
+						<Alignment type="enumeration">LeftAlign</Alignment>
+						<AlignmentCharacter type="string">.</AlignmentCharacter>
+						<Leader type="string"></Leader>
+						<Position type="unit">283.46456692913387</Position>
+					</ListItem>
+				</TabList>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/$ID/NormalParagraphStyle">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Withtent>Milan, July 2026</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/Info">
+			<Properties>
+				<TabList type="list">
+					<ListItem type="record">
+						<Alignment type="enumeration">LeftAlign</Alignment>
+						<AlignmentCharacter type="string">.</AlignmentCharacter>
+						<Leader type="string"></Leader>
+						<Position type="unit">283.46456692913387</Position>
+					</ListItem>
+				</TabList>
+			</Properties>
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Br />
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+	</Story>
+</idPkg:Story>

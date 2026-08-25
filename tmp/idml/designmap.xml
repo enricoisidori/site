@@ -1,0 +1,719 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?aid style="50" type="document" readerVersion="6.0" featureSet="257" product="21.2(30)" ?>
+<Document xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" DOMVersion="21.2" Self="d" StoryList="u116 u12d u8c4 ub0" Name="cv_en.indd" ZeroPoint="0 0" ActiveLayer="ucb" CMYKProfile="U.S. Web Coated (SWOP) v2" RGBProfile="sRGB IEC61966-2.1" SolidColorIntent="UseColorSettings" AfterBlendingIntent="UseColorSettings" DefaultImageIntent="UseColorSettings" RGBPolicy="PreserveEmbeddedProfiles" CMYKPolicy="CombinationOfPreserveAndSafeCmyk" AccurateLABSpots="false" AppliedMathMLFontSize="10" AppliedMathMLRgbColor="0 0 0" TintValue="100" PreferMathMLInEpubExport="false">
+	<Properties>
+		<Label>
+			<KeyValuePair Key="kAdobeDPS_Version" Value="2" />
+		</Label>
+		<AppliedMathMLSwatch type="enumeration">Nothing</AppliedMathMLSwatch>
+	</Properties>
+	<Language Self="Language/$ID/English%3a USA" Name="$ID/English: USA" SingleQuotes="‘’" DoubleQuotes="“”" PrimaryLanguageName="$ID/English" SublanguageName="$ID/USA" Id="269" HyphenationVendor="Hunspell" SpellingVendor="Hunspell" />
+	<Language Self="Language/$ID/Italian" Name="$ID/Italian" SingleQuotes="‘’" DoubleQuotes="“”" PrimaryLanguageName="$ID/Italian" SublanguageName="$ID/" Id="281" HyphenationVendor="Hunspell" SpellingVendor="Hunspell" />
+	<idPkg:Graphic src="Resources/Graphic.xml" />
+	<idPkg:Fonts src="Resources/Fonts.xml" />
+	<idPkg:Styles src="Resources/Styles.xml" />
+	<NumberingList Self="NumberingList/$ID/[Default]" Name="$ID/[Default]" ContinueNumbersAcrossStories="false" ContinueNumbersAcrossDocuments="false" />
+	<NamedGrid Self="NamedGrid/$ID/[Page Grid]" Name="$ID/[Page Grid]">
+		<GridDataInformation FontStyle="Regular" PointSize="12" CharacterAki="0" LineAki="9" HorizontalScale="100" VerticalScale="100" LineAlignment="LeftOrTopLineJustify" GridAlignment="AlignEmCenter" CharacterAlignment="AlignEmCenter">
+			<Properties>
+				<AppliedFont type="string">Minion Pro</AppliedFont>
+			</Properties>
+		</GridDataInformation>
+	</NamedGrid>
+	<ConditionalTextPreference ShowConditionIndicators="ShowIndicators" ActiveConditionSet="n" />
+	<idPkg:Preferences src="Resources/Preferences.xml" />
+	<EndnoteOption EndnoteTitle="Endnotes" EndnoteTitleStyle="ParagraphStyle/$ID/NormalParagraphStyle" StartEndnoteNumberAt="1" EndnoteMarkerStyle="CharacterStyle/$ID/[No character style]" EndnoteTextStyle="ParagraphStyle/$ID/NormalParagraphStyle" EndnoteSeparatorText="&#x9;" EndnotePrefix="" EndnoteSuffix="">
+		<Properties>
+			<EndnoteNumberingStyle type="enumeration">Arabic</EndnoteNumberingStyle>
+			<RestartEndnoteNumbering type="enumeration">Continuous</RestartEndnoteNumbering>
+			<EndnoteMarkerPositioning type="enumeration">SuperscriptMarker</EndnoteMarkerPositioning>
+			<ScopeValue type="enumeration">EndnoteDocumentScope</ScopeValue>
+			<FrameCreateOption type="enumeration">NewPage</FrameCreateOption>
+			<ShowEndnotePrefixSuffix type="enumeration">NoPrefixSuffix</ShowEndnotePrefixSuffix>
+		</Properties>
+	</EndnoteOption>
+	<TextFrameFootnoteOptionsObject EnableOverrides="false" SpanFootnotesAcross="false" MinimumSpacingOption="12" SpaceBetweenFootnotes="6" />
+	<LinkedStoryOption UpdateWhileSaving="false" WarnOnUpdateOfEditedStory="true" RemoveForcedLineBreaks="false" ApplyStyleMappings="false" />
+	<LinkedPageItemOption UpdateLinkWhileSaving="false" WarnOnUpdateOfEditedPageItem="true" PreserveSizeAndShape="false" PreserveAppearance="false" PreserveInteractivity="false" PreserveFrameContent="false" PreserveOthers="false" />
+	<WatermarkPreference WatermarkVisibility="false" WatermarkDoPrint="false" WatermarkDrawInBack="true" WatermarkText="" WatermarkFontFamily="Minion Pro" WatermarkFontStyle="Regular" WatermarkFontPointSize="48" WatermarkOpacity="50" WatermarkRotation="0" WatermarkHorizontalPosition="WatermarkHCenter" WatermarkHorizontalOffset="0" WatermarkVerticalPosition="WatermarkVCenter" WatermarkVerticalOffset="0">
+		<Properties>
+			<WatermarkFontColor type="enumeration">Black</WatermarkFontColor>
+		</Properties>
+	</WatermarkPreference>
+	<TaggedPDFPreference StructureOrder="UseXMLStructure" />
+	<AdjustLayoutPreference EnableAdjustLayout="false" AllowLockedObjectsToAdjust="true" AllowFontSizeAndLeadingAdjustment="false" ImposeFontSizeRestriction="false" MinimumFontSize="6" MaximumFontSize="324" EnableAutoAdjustMargins="false" />
+	<HTMLFXLExportPreference EpubPageRange="" EpubPageRangeFormat="ExportAllPages" />
+	<PublishExportPreference PublishCover="FirstPage" CoverImageFile="" PublishPageRange="" PublishPageRangeFormat="ExportAllPages" ImageConversion="Automatic" ImageExportResolution="Ppi96" PublishDescription="" PublishFileName="" PublishFormat="PublishByPages" CoverPage="$ID/" GIFOptionsPalette="AdaptivePalette" JPEGOptionsQuality="High" PublishPdf="false" />
+	<Html5ExportPreference TextExportFormat="HtmlTag" CopyFonts="false" />
+	<TextVariable Self="dTextVariablen&lt;?AID 001b?&gt;TV XRefChapterNumber" Name="&lt;?AID 001b?&gt;TV XRefChapterNumber" VariableType="XrefChapterNumberType" />
+	<TextVariable Self="dTextVariablen&lt;?AID 001b?&gt;TV XRefPageNumber" Name="&lt;?AID 001b?&gt;TV XRefPageNumber" VariableType="XrefPageNumberType" />
+	<TextVariable Self="dTextVariablenChapter Number" Name="Chapter Number" VariableType="ChapterNumberType">
+		<ChapterNumberVariablePreference TextBefore="" Format="Current" TextAfter="" />
+	</TextVariable>
+	<TextVariable Self="dTextVariablenCreation Date" Name="Creation Date" VariableType="CreationDateType">
+		<DateVariablePreference TextBefore="" Format="MM/dd/yy" TextAfter="" />
+	</TextVariable>
+	<TextVariable Self="dTextVariablenFile Name" Name="File Name" VariableType="FileNameType">
+		<FileNameVariablePreference TextBefore="" IncludePath="false" IncludeExtension="false" TextAfter="" />
+	</TextVariable>
+	<TextVariable Self="dTextVariablenImage Name" Name="Image Name" VariableType="LiveCaptionType">
+		<CaptionMetadataVariablePreference TextBefore="" MetadataProviderName="$ID/#LinkInfoNameStr" TextAfter="" />
+	</TextVariable>
+	<TextVariable Self="dTextVariablenLast Page Number" Name="Last Page Number" VariableType="LastPageNumberType">
+		<PageNumberVariablePreference TextBefore="" Format="Current" TextAfter="" Scope="SectionScope" />
+	</TextVariable>
+	<TextVariable Self="dTextVariablenModification Date" Name="Modification Date" VariableType="ModificationDateType">
+		<DateVariablePreference TextBefore="" Format="MMMM d, yyyy h:mm aa" TextAfter="" />
+	</TextVariable>
+	<TextVariable Self="dTextVariablenOutput Date" Name="Output Date" VariableType="OutputDateType">
+		<DateVariablePreference TextBefore="" Format="MM/dd/yy" TextAfter="" />
+	</TextVariable>
+	<TextVariable Self="dTextVariablenRunning Header" Name="Running Header" VariableType="MatchParagraphStyleType">
+		<MatchParagraphStylePreference TextBefore="" TextAfter="" AppliedParagraphStyle="ParagraphStyle/$ID/NormalParagraphStyle" SearchStrategy="FirstOnPage" ChangeCase="None" DeleteEndPunctuation="false" />
+	</TextVariable>
+	<idPkg:Tags src="XML/Tags.xml" />
+	<Layer Self="ucb" Name="Layer 1" Visible="true" Locked="false" IgnoreWrap="false" ShowGuides="true" LockGuides="false" UI="true" Expendable="true" Printable="true">
+		<Properties>
+			<LayerColor type="enumeration">LightBlue</LayerColor>
+		</Properties>
+	</Layer>
+	<idPkg:MasterSpread src="MasterSpreads/MasterSpread_ud5.xml" />
+	<idPkg:Spread src="Spreads/Spread_uce.xml" />
+	<idPkg:Spread src="Spreads/Spread_u187.xml" />
+	<idPkg:Spread src="Spreads/Spread_u327.xml" />
+	<idPkg:Spread src="Spreads/Spread_u7b9.xml" />
+	<Section Self="ud4" Length="4" Name="" ContinueNumbering="true" IncludeSectionPrefix="false" Marker="" PageStart="ud3" SectionPrefix="" AlternateLayoutLength="4" AlternateLayout="A4 V">
+		<Properties>
+			<PageNumberStyle type="enumeration">Arabic</PageNumberStyle>
+		</Properties>
+	</Section>
+	<DocumentUser Self="dDocumentUser0" UserName="$ID/Unknown User Name">
+		<Properties>
+			<UserColor type="enumeration">Gold</UserColor>
+		</Properties>
+	</DocumentUser>
+	<CrossReferenceFormat Self="u9e" Name="Full Paragraph &amp; Page Number" AppliedCharacterStyle="n">
+		<BuildingBlock Self="u9eBuildingBlock0" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="u9eBuildingBlock1" BlockType="FullParagraphBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="u9eBuildingBlock2" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot; on page " AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="u9eBuildingBlock3" BlockType="PageNumberBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<CrossReferenceFormat Self="u9f" Name="Full Paragraph" AppliedCharacterStyle="n">
+		<BuildingBlock Self="u9fBuildingBlock0" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="u9fBuildingBlock1" BlockType="FullParagraphBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="u9fBuildingBlock2" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<CrossReferenceFormat Self="ua0" Name="Paragraph Text &amp; Page Number" AppliedCharacterStyle="n">
+		<BuildingBlock Self="ua0BuildingBlock0" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua0BuildingBlock1" BlockType="ParagraphTextBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua0BuildingBlock2" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot; on page " AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua0BuildingBlock3" BlockType="PageNumberBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<CrossReferenceFormat Self="ua1" Name="Paragraph Text" AppliedCharacterStyle="n">
+		<BuildingBlock Self="ua1BuildingBlock0" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua1BuildingBlock1" BlockType="ParagraphTextBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua1BuildingBlock2" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<CrossReferenceFormat Self="ua2" Name="Paragraph Number &amp; Page Number" AppliedCharacterStyle="n">
+		<BuildingBlock Self="ua2BuildingBlock0" BlockType="ParagraphNumberBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua2BuildingBlock1" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText=" on page " AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua2BuildingBlock2" BlockType="PageNumberBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<CrossReferenceFormat Self="ua3" Name="Paragraph Number" AppliedCharacterStyle="n">
+		<BuildingBlock Self="ua3BuildingBlock0" BlockType="ParagraphNumberBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<CrossReferenceFormat Self="ua4" Name="Text Anchor Name &amp; Page Number" AppliedCharacterStyle="n">
+		<BuildingBlock Self="ua4BuildingBlock0" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua4BuildingBlock1" BlockType="BookmarkNameBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua4BuildingBlock2" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot; on page " AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua4BuildingBlock3" BlockType="PageNumberBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<CrossReferenceFormat Self="ua5" Name="Text Anchor Name" AppliedCharacterStyle="n">
+		<BuildingBlock Self="ua5BuildingBlock0" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua5BuildingBlock1" BlockType="BookmarkNameBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua5BuildingBlock2" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="&quot;" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<CrossReferenceFormat Self="ua6" Name="Page Number" AppliedCharacterStyle="n">
+		<BuildingBlock Self="ua6BuildingBlock0" BlockType="CustomStringBuildingBlock" AppliedCharacterStyle="n" CustomText="page " AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+		<BuildingBlock Self="ua6BuildingBlock1" BlockType="PageNumberBuildingBlock" AppliedCharacterStyle="n" CustomText="$ID/" AppliedDelimiter="$ID/" IncludeDelimiter="false" />
+	</CrossReferenceFormat>
+	<idPkg:BackingStory src="XML/BackingStory.xml" />
+	<idPkg:Story src="Stories/Story_u8c4.xml" />
+	<idPkg:Story src="Stories/Story_u12d.xml" />
+	<idPkg:Story src="Stories/Story_u116.xml" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer" Name="https://www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer" DestinationURL="https://www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer" Hidden="false" DestinationUniqueKey="1" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//cdsaawards.com/" Name="https://cdsaawards.com/" DestinationURL="https://cdsaawards.com/" Hidden="false" DestinationUniqueKey="2" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//visualbleed.com/feed" Name="https://visualbleed.com/feed" DestinationURL="https://visualbleed.com/feed" Hidden="false" DestinationUniqueKey="3" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//enricoisidori.com/specta.pdf" Name="https://enricoisidori.com/specta.pdf" DestinationURL="https://enricoisidori.com/specta.pdf" Hidden="false" DestinationUniqueKey="4" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/mailto%3aenrico.isidori@gmail.com" Name="mailto:enrico.isidori@gmail.com" DestinationURL="mailto:enrico.isidori@gmail.com" Hidden="false" DestinationUniqueKey="5" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/enrico.isidori@gmail.com" Name="enrico.isidori@gmail.com" DestinationURL="mailto:enrico.isidori%40gmail.com?subject=" Hidden="false" DestinationUniqueKey="6" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/enrico.isidori/" Name="https://www.instagram.com/enrico.isidori/" DestinationURL="https://www.instagram.com/enrico.isidori/" Hidden="false" DestinationUniqueKey="7" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//ensaama.net/" Name="https://ensaama.net/" DestinationURL="https://ensaama.net/" Hidden="false" DestinationUniqueKey="8" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.design.polimi.it/" Name="https://www.design.polimi.it/" DestinationURL="https://www.design.polimi.it/" Hidden="false" DestinationUniqueKey="9" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//cumulusnantes2025.design/" Name="https://cumulusnantes2025.design/" DestinationURL="https://cumulusnantes2025.design/" Hidden="false" DestinationUniqueKey="10" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//re.public.polimi.it/handle/11311/1268015" Name="https://re.public.polimi.it/handle/11311/1268015" DestinationURL="https://re.public.polimi.it/handle/11311/1268015" Hidden="false" DestinationUniqueKey="11" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.transmediaresearch.institute/" Name="https://www.transmediaresearch.institute/" DestinationURL="https://www.transmediaresearch.institute/" Hidden="false" DestinationUniqueKey="12" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//2050.plus/" Name="https://2050.plus/" DestinationURL="https://2050.plus/" Hidden="false" DestinationUniqueKey="13" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.dotdotdot.it/" Name="https://www.dotdotdot.it/" DestinationURL="https://www.dotdotdot.it/" Hidden="false" DestinationUniqueKey="14" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.transmediaresearch.institute/program.html" Name="https://www.transmediaresearch.institute/program.html" DestinationURL="https://www.transmediaresearch.institute/program.html" Hidden="false" DestinationUniqueKey="15" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//operatingsystem.studio/" Name="https://operatingsystem.studio/" DestinationURL="https://operatingsystem.studio/" Hidden="false" DestinationUniqueKey="16" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/umanesimo.artificiale/" Name="https://www.instagram.com/umanesimo.artificiale/" DestinationURL="https://www.instagram.com/umanesimo.artificiale/" Hidden="false" DestinationUniqueKey="17" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//gigadesignstudio.com/" Name="https://gigadesignstudio.com/" DestinationURL="https://gigadesignstudio.com/" Hidden="false" DestinationUniqueKey="18" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//hdl.handle.net/11311/1268015" Name="https://hdl.handle.net/11311/1268015" DestinationURL="https://hdl.handle.net/11311/1268015" Hidden="false" DestinationUniqueKey="19" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.videocitta.com/" Name="https://www.videocitta.com/" DestinationURL="https://www.videocitta.com/" Hidden="false" DestinationUniqueKey="20" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.videocitta.com/agora-pro-expo-2025/" Name="https://www.videocitta.com/agora-pro-expo-2025/" DestinationURL="https://www.videocitta.com/agora-pro-expo-2025/" Hidden="false" DestinationUniqueKey="21" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/p/DMQUcNxIoBA/?img_index=1" Name="https://www.instagram.com/p/DMQUcNxIoBA/?img_index=1" DestinationURL="https://www.instagram.com/p/DMQUcNxIoBA/?img_index=1" Hidden="false" DestinationUniqueKey="22" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//sonar.es/es/programa/sonar-d" Name="https://sonar.es/es/programa/sonar-d" DestinationURL="https://sonar.es/es/programa/sonar-d" Hidden="false" DestinationUniqueKey="23" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.bellariafilmfestival.org/" Name="https://www.bellariafilmfestival.org/" DestinationURL="https://www.bellariafilmfestival.org/" Hidden="false" DestinationUniqueKey="24" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.bellariafilmfestival.org/programma/1752-2/" Name="https://www.bellariafilmfestival.org/programma/1752-2/" DestinationURL="https://www.bellariafilmfestival.org/programma/1752-2/" Hidden="false" DestinationUniqueKey="25" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//filmitalia.org/it/production/171848/" Name="https://filmitalia.org/it/production/171848/" DestinationURL="https://filmitalia.org/it/production/171848/" Hidden="false" DestinationUniqueKey="26" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.mymovies.it/one/movie/18058-tu-non-mi-guardi/" Name="https://www.mymovies.it/one/movie/18058-tu-non-mi-guardi/" DestinationURL="https://www.mymovies.it/one/movie/18058-tu-non-mi-guardi/" Hidden="false" DestinationUniqueKey="27" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.salonemilano.it/en/exhibitions/salonesatellite" Name="https://www.salonemilano.it/en/exhibitions/salonesatellite" DestinationURL="https://www.salonemilano.it/en/exhibitions/salonesatellite" Hidden="false" DestinationUniqueKey="28" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.salonemilano.it/it" Name="https://www.salonemilano.it/it" DestinationURL="https://www.salonemilano.it/it" Hidden="false" DestinationUniqueKey="29" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.fuorisalone.it/it/2025/eventi/6068/DesignXDesigners" Name="https://www.fuorisalone.it/it/2025/eventi/6068/DesignXDesigners" DestinationURL="https://www.fuorisalone.it/it/2025/eventi/6068/DesignXDesigners" Hidden="false" DestinationUniqueKey="30" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/p/DIJoh6XIG6C/" Name="https://www.instagram.com/p/DIJoh6XIG6C/" DestinationURL="https://www.instagram.com/p/DIJoh6XIG6C/" Hidden="false" DestinationUniqueKey="31" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/p/DNRAKJ6M6M_/?img_index=1" Name="https://www.instagram.com/p/DNRAKJ6M6M_/?img_index=1" DestinationURL="https://www.instagram.com/p/DNRAKJ6M6M_/?img_index=1" Hidden="false" DestinationUniqueKey="33" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//liked-trapped-shared.densitydesign.org/it" Name="https://liked-trapped-shared.densitydesign.org/it" DestinationURL="https://liked-trapped-shared.densitydesign.org/it" Hidden="false" DestinationUniqueKey="34" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//densitydesign.org/" Name="https://densitydesign.org/" DestinationURL="https://densitydesign.org/" Hidden="false" DestinationUniqueKey="35" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.interdependence.polimi.it/2024/index.html" Name="https://www.interdependence.polimi.it/2024/index.html" DestinationURL="https://www.interdependence.polimi.it/2024/index.html" Hidden="false" DestinationUniqueKey="36" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.fabbricadelvapore.org/" Name="https://www.fabbricadelvapore.org/" DestinationURL="https://www.fabbricadelvapore.org/" Hidden="false" DestinationUniqueKey="37" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//triennale.org/" Name="https://triennale.org/" DestinationURL="https://triennale.org/" Hidden="false" DestinationUniqueKey="38" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//triennale.org/eventi/anthropogenic-narratives-experiencing-human" Name="https://triennale.org/eventi/anthropogenic-narratives-experiencing-human" DestinationURL="https://triennale.org/eventi/anthropogenic-narratives-experiencing-human" Hidden="false" DestinationUniqueKey="39" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.antidisciplinarylab.it/believeitornot/" Name="https://www.antidisciplinarylab.it/believeitornot/" DestinationURL="https://www.antidisciplinarylab.it/believeitornot/" Hidden="false" DestinationUniqueKey="40" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.antidisciplinarylab.it/rawscenarios/" Name="https://www.antidisciplinarylab.it/rawscenarios/" DestinationURL="https://www.antidisciplinarylab.it/rawscenarios/" Hidden="false" DestinationUniqueKey="41" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.graphicdays.it/2022/en/homepage-2/" Name="https://www.graphicdays.it/2022/en/homepage-2/" DestinationURL="https://www.graphicdays.it/2022/en/homepage-2/" Hidden="false" DestinationUniqueKey="42" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.graphicdays.it/2022/graphicdays/neologia-2/" Name="https://www.graphicdays.it/2022/graphicdays/neologia-2/" DestinationURL="https://www.graphicdays.it/2022/graphicdays/neologia-2/" Hidden="false" DestinationUniqueKey="43" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.graphicdays.it/neologia/category/in-mostra/" Name="https://www.graphicdays.it/neologia/category/in-mostra/" DestinationURL="https://www.graphicdays.it/neologia/category/in-mostra/" Hidden="false" DestinationUniqueKey="44" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.elo2022.com/" Name="https://www.elo2022.com/" DestinationURL="https://www.elo2022.com/" Hidden="false" DestinationUniqueKey="45" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/contemporarytype/" Name="https://www.instagram.com/contemporarytype/" DestinationURL="https://www.instagram.com/contemporarytype/" Hidden="false" DestinationUniqueKey="46" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/p/DNEtfUVoJ0D/?img_index=1" Name="https://www.instagram.com/p/DNEtfUVoJ0D/?img_index=1" DestinationURL="https://www.instagram.com/p/DNEtfUVoJ0D/?img_index=1" Hidden="false" DestinationUniqueKey="47" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//visualbleed.com/" Name="https://visualbleed.com/" DestinationURL="https://visualbleed.com/" Hidden="false" DestinationUniqueKey="48" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/p/DMUmD92Iesu/?img_index=1" Name="https://www.instagram.com/p/DMUmD92Iesu/?img_index=1" DestinationURL="https://www.instagram.com/p/DMUmD92Iesu/?img_index=1" Hidden="false" DestinationUniqueKey="49" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/p/DGSt6rXCcwn/?img_index=1" Name="https://www.instagram.com/p/DGSt6rXCcwn/?img_index=1" DestinationURL="https://www.instagram.com/p/DGSt6rXCcwn/?img_index=1" Hidden="false" DestinationUniqueKey="50" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.pittogramma.xyz/en" Name="https://www.pittogramma.xyz/en" DestinationURL="https://www.pittogramma.xyz/en" Hidden="false" DestinationUniqueKey="51" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/gpu.gallery/" Name="https://www.instagram.com/gpu.gallery/" DestinationURL="https://www.instagram.com/gpu.gallery/" Hidden="false" DestinationUniqueKey="52" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.instagram.com/p/CztltXCIiIl/" Name="https://www.instagram.com/p/CztltXCIiIl/" DestinationURL="https://www.instagram.com/p/CztltXCIiIl/" Hidden="false" DestinationUniqueKey="53" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//www.graphicdays.it/neologia/" Name="https://www.graphicdays.it/neologia/" DestinationURL="https://www.graphicdays.it/neologia/" Hidden="false" DestinationUniqueKey="54" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//iuk-business-connect.org.uk/programme/bridgeai/" Name="https://iuk-business-connect.org.uk/programme/bridgeai/" DestinationURL="https://iuk-business-connect.org.uk/programme/bridgeai/" Hidden="false" DestinationUniqueKey="55" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//gigadesignstudio.com/projects/the-north-face" Name="https://gigadesignstudio.com/projects/the-north-face" DestinationURL="https://gigadesignstudio.com/projects/the-north-face" Hidden="false" DestinationUniqueKey="56" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//6am.glass/" Name="https://6am.glass/" DestinationURL="https://6am.glass/" Hidden="false" DestinationUniqueKey="57" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//gigadesignstudio.com/projects/capsule" Name="https://gigadesignstudio.com/projects/capsule" DestinationURL="https://gigadesignstudio.com/projects/capsule" Hidden="false" DestinationUniqueKey="58" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/https%3a//gigadesignstudio.com/projects/bids-for-survival" Name="https://gigadesignstudio.com/projects/bids-for-survival" DestinationURL="https://gigadesignstudio.com/projects/bids-for-survival" Hidden="false" DestinationUniqueKey="59" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/URL 1" Name="URL 1" DestinationURL="https://doi.org/10.82068/pgjournal.2026.23.42.08" Hidden="true" DestinationUniqueKey="61" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/URL 1" Name="URL 1" DestinationURL="https://hdl.handle.net/11311/1309667" Hidden="true" DestinationUniqueKey="62" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/URL 1" Name="URL 1" DestinationURL="https://hdl.handle.net/11311/1267084" Hidden="true" DestinationUniqueKey="63" />
+	<HyperlinkURLDestination Self="HyperlinkURLDestination/http%3a//enricoisidori.com" Name="http://enricoisidori.com" DestinationURL="http://enricoisidori.com" Hidden="true" DestinationUniqueKey="64" />
+	<Hyperlink Self="u3d2" Name="enrico.isidori@gmail.com" Source="u3d1" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="6" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/enrico.isidori@gmail.com</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u3e5" Name="@enrico.isidori" Source="u3e4" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="7" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/enrico.isidori/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u4d4" Name="Ethical Leadership: A New Frontier for Design, Cumulus Nantes 2025" Source="u4d3" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="10" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//cumulusnantes2025.design/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u4de" Name="Environmental Design 4th International Conference on Environmental Design, MDA" Source="u4dd" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="19" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//hdl.handle.net/11311/1268015</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u4fb" Name="Videocittà" Source="u4fa" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="20" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.videocitta.com/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u506" Name="Agorà Expo" Source="u505" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="21" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.videocitta.com/agora-pro-expo-2025/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u511" Name="N+ Industries: Cognitive Supremacy" Source="u510" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="22" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DMQUcNxIoBA/?img_index=1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u516" Name="N+ Industries: Cognitive Supremacy 1" Source="u515" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="22" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DMQUcNxIoBA/?img_index=1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u520" Name="Sónar +D" Source="u51f" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="23" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//sonar.es/es/programa/sonar-d</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u52b" Name="Bellaria Film Festival" Source="u52a" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="24" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.bellariafilmfestival.org/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u536" Name="La natura ci guarda - Tre minuti a tema fisso" Source="u535" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="25" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.bellariafilmfestival.org/programma/1752-2/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u541" Name="Guidone Apulia Factory" Source="u540" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="26" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//filmitalia.org/it/production/171848/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u54c" Name="Tu non mi guardi mai là dove io ti vedo" Source="u54b" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="27" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.mymovies.it/one/movie/18058-tu-non-mi-guardi/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u557" Name="Salone Satellite" Source="u556" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="28" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.salonemilano.it/en/exhibitions/salonesatellite</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u562" Name="Salone del Mobile" Source="u561" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="29" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.salonemilano.it/it</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u56d" Name="DesignxDesigners, Fuorisalone" Source="u56c" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="30" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.fuorisalone.it/it/2025/eventi/6068/DesignXDesigners</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u578" Name="Anthropogenic Scenarios: Nature vs Human Matters: Narratives through Design" Source="u577" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="31" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DIJoh6XIG6C/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u594" Name="Digital_Forest - Four years of human categorization of trail cam footage" Source="u592" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="33" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DNRAKJ6M6M_/?img_index=1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u5a0" Name="Liked, Trapped, Shared. Digital encounters with biodiversity" Source="u59f" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="34" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//liked-trapped-shared.densitydesign.org/it</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u5ac" Name="DensityDesign Lab" Source="u5ab" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="35" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//densitydesign.org/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u5b9" Name="Interdependence - Designing Relationships" Source="u5b8" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="36" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.interdependence.polimi.it/2024/index.html</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u5c4" Name="Fabbrica del Vapore" Source="u5c3" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="37" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.fabbricadelvapore.org/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u5cf" Name="Triennale Milano" Source="u5ce" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="38" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//triennale.org/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u5da" Name="Anthropogenic Narratives: Communicating and Experiencing Non-Human  Perspectives" Source="u5d9" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="39" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//triennale.org/eventi/anthropogenic-narratives-experiencing-human</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u60a" Name="Graphic Days" Source="u609" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="42" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.graphicdays.it/2022/en/homepage-2/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u615" Name="Neologia - Nuovi linguaggi del visual design in Italia" Source="u614" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="43" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.graphicdays.it/2022/graphicdays/neologia-2/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u621" Name="Draw a line from one side of the page to the other" Source="u620" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="44" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.graphicdays.it/neologia/category/in-mostra/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u626" Name="Draw a line from one side of the page to the other 1" Source="u625" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="44" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.graphicdays.it/neologia/category/in-mostra/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u628" Name="Draw a line from one side of the page to the other 2" Source="u627" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="44" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.graphicdays.it/neologia/category/in-mostra/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u632" Name="ELO - International Conference on Electronic Literature" Source="u631" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="45" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.elo2022.com/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u63d" Name="Contemporary Type" Source="u63c" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="46" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/contemporarytype/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u649" Name="Rhytuals: Collective Rhythms" Source="u648" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="47" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DNEtfUVoJ0D/?img_index=1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u654" Name="VisualBleed" Source="u653" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="48" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//visualbleed.com/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u65f" Name="N+ Industries: Cognitive Supremacy 2" Source="u65e" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="49" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DMUmD92Iesu/?img_index=1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u66a" Name="Rhytuals: Collective Rhythms 1" Source="u669" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="50" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DGSt6rXCcwn/?img_index=1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u679" Name="Pittogramma" Source="u678" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="51" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.pittogramma.xyz/en</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u685" Name="Specta - Your personal eco-anxiety silencer 1" Source="u684" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="1" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u68f" Name="Gpu Gallery" Source="u68e" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="52" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/gpu.gallery/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u69a" Name="Iterations/inversions" Source="u699" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="53" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/CztltXCIiIl/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u6a5" Name="Neologia - Nuovi linguaggi del visual design in Italia 1" Source="u6a4" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="54" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.graphicdays.it/neologia/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u6a9" Name="Specta - Your personal eco-anxiety silencer 2" Source="u6a7" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="1" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u6bb" Name="CDSA Awards - International Media Art Creativity Competition" Source="u6ba" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="2" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//cdsaawards.com/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u6be" Name="Specta - Your personal eco-anxiety silencer 3" Source="u6bd" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="1" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u6c0" Name="Specta - Your personal eco-anxiety silencer 4" Source="u6bf" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="1" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u6c2" Name="Specta - Your personal eco-anxiety silencer 5" Source="u6c1" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="1" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.pittogramma.xyz/it/progetti/specta-your-personal-eco-anxiety-silencer</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u846" Name="Transmedia Research Institute" Source="u845" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="12" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.transmediaresearch.institute/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u847" Name="Symposium on Antidisciplinary, Milano" Source="u844" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="15" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.transmediaresearch.institute/program.html</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u848" Name="Dotdotdot" Source="u843" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="14" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.dotdotdot.it/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u849" Name="2050+" Source="u842" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="13" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//2050.plus/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u84c" Name="Hyperlink" Source="u84a" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="64" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/http%3a//enricoisidori.com</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u84f" Name="Hyperlink 1" Source="u84d" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="61" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/URL 1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u852" Name="Hyperlink 2" Source="u850" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="62" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/URL 1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u855" Name="Hyperlink 3" Source="u853" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="63" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/URL 1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8a2" Name="Bid(s) for Survival" Source="u89d" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="59" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//gigadesignstudio.com/projects/bids-for-survival</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8a3" Name="Sónar +D 1" Source="u89c" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="23" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//sonar.es/es/programa/sonar-d</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8a4" Name="Umanesimo Artificiale" Source="u89b" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="17" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/umanesimo.artificiale/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8a5" Name="Operating System Studio" Source="u89a" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="16" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//operatingsystem.studio/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8a6" Name="N+ Industries: Cognitive Supremacy 3" Source="u899" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="22" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DMQUcNxIoBA/?img_index=1</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8a7" Name="Videocittà 1" Source="u898" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="20" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.videocitta.com/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8a8" Name="6AM" Source="u897" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="57" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//6am.glass/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8a9" Name="Giga Design Studio" Source="u896" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="18" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//gigadesignstudio.com/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8aa" Name="Capsule Plaza" Source="u895" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="58" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//gigadesignstudio.com/projects/capsule</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8ab" Name="Urban Exploration - The North Face" Source="u894" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="56" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//gigadesignstudio.com/projects/the-north-face</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8ac" Name="Salone Satellite 1" Source="u893" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="28" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.salonemilano.it/en/exhibitions/salonesatellite</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8ad" Name="Dotdotdot 3" Source="u892" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="14" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.dotdotdot.it/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8ae" Name="BridgeAI - Innovate UK" Source="u891" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="55" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//iuk-business-connect.org.uk/programme/bridgeai/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8af" Name="Anthropogenic Scenarios: Nature vs Human Matters: Narratives through Design 1" Source="u890" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="31" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.instagram.com/p/DIJoh6XIG6C/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8b0" Name="Believe It or Not: Speculating on (un)real conspiracy theories" Source="u88f" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="40" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.antidisciplinarylab.it/believeitornot/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8b1" Name="Salone del Mobile 1" Source="u88e" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="29" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.salonemilano.it/it</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8b2" Name="Raw Scenarios: Reflecting on Human Overconsumption" Source="u88d" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="41" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.antidisciplinarylab.it/rawscenarios/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8b3" Name="Dotdotdot 1" Source="u88c" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="14" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.dotdotdot.it/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8b4" Name="Dotdotdot 2" Source="u88b" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="14" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.dotdotdot.it/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8bd" Name="Politecnico di Milano, Scuola del Design" Source="u8bc" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="9" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//www.design.polimi.it/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8be" Name="École Nationale Supérieure des Arts Appliqués et des Métiers d’Art" Source="u8bb" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="8" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//ensaama.net/</Destination>
+		</Properties>
+	</Hyperlink>
+	<Hyperlink Self="u8bf" Name="Specta - Your personal eco-anxiety silencer" Source="u8ba" Visible="false" Highlight="None" Width="Thin" BorderStyle="Solid" Hidden="false" DestinationUniqueKey="4" EpubAriaRole="" HypherlinkAltText="">
+		<Properties>
+			<BorderColor type="enumeration">Black</BorderColor>
+			<Destination type="object">HyperlinkURLDestination/https%3a//enricoisidori.com/specta.pdf</Destination>
+		</Properties>
+	</Hyperlink>
+	<ColorGroup Self="ColorGroup/[Root Color Group]" Name="[Root Color Group]" IsRootColorGroup="true">
+		<ColorGroupSwatch Self="u18ColorGroupSwatch0" SwatchItemRef="Swatch/None" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch1" SwatchItemRef="Color/Registration" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch2" SwatchItemRef="Color/Paper" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch3" SwatchItemRef="Color/Black" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch4" SwatchItemRef="Color/C=100 M=0 Y=0 K=0" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch5" SwatchItemRef="Color/C=0 M=100 Y=0 K=0" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch6" SwatchItemRef="Color/C=0 M=0 Y=100 K=0" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch7" SwatchItemRef="Color/C=15 M=100 Y=100 K=0" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch8" SwatchItemRef="Color/C=75 M=5 Y=100 K=0" />
+		<ColorGroupSwatch Self="u18ColorGroupSwatch9" SwatchItemRef="Color/C=100 M=90 Y=10 K=0" />
+	</ColorGroup>
+	<IndexingSortOption Self="dIndexingSortOptionnkIndexGroup_Symbol" Name="$ID/kIndexGroup_Symbol" Include="true" Priority="0" HeaderType="Nothing" />
+	<IndexingSortOption Self="dIndexingSortOptionnkIndexGroup_Alphabet" Name="$ID/kIndexGroup_Alphabet" Include="true" Priority="1" HeaderType="BasicLatin" />
+	<IndexingSortOption Self="dIndexingSortOptionnkIndexGroup_Numeric" Name="$ID/kIndexGroup_Numeric" Include="false" Priority="2" HeaderType="Nothing" />
+	<IndexingSortOption Self="dIndexingSortOptionnkWRIndexGroup_GreekAlphabet" Name="$ID/kWRIndexGroup_GreekAlphabet" Include="false" Priority="3" HeaderType="Nothing" />
+	<IndexingSortOption Self="dIndexingSortOptionnkWRIndexGroup_CyrillicAlphabet" Name="$ID/kWRIndexGroup_CyrillicAlphabet" Include="false" Priority="4" HeaderType="Russian" />
+	<IndexingSortOption Self="dIndexingSortOptionnkIndexGroup_Kana" Name="$ID/kIndexGroup_Kana" Include="false" Priority="5" HeaderType="HiraganaAll" />
+	<IndexingSortOption Self="dIndexingSortOptionnkIndexGroup_Chinese" Name="$ID/kIndexGroup_Chinese" Include="false" Priority="6" HeaderType="ChinesePinyin" />
+	<IndexingSortOption Self="dIndexingSortOptionnkIndexGroup_Korean" Name="$ID/kIndexGroup_Korean" Include="false" Priority="7" HeaderType="KoreanConsonant" />
+	<IndexingSortOption Self="dIndexingSortOptionnkWRIndexGroup_ArabicAlphabet" Name="$ID/kWRIndexGroup_ArabicAlphabet" Include="false" Priority="8" HeaderType="Nothing" />
+	<IndexingSortOption Self="dIndexingSortOptionnkWRIndexGroup_HebrewAlphabet" Name="$ID/kWRIndexGroup_HebrewAlphabet" Include="false" Priority="9" HeaderType="Nothing" />
+	<ABullet Self="dABullet0" CharacterType="UnicodeOnly" CharacterValue="8226">
+		<Properties>
+			<BulletsFont type="string">$ID/</BulletsFont>
+			<BulletsFontStyle type="string">$ID/</BulletsFontStyle>
+		</Properties>
+	</ABullet>
+	<ABullet Self="dABullet1" CharacterType="UnicodeOnly" CharacterValue="42">
+		<Properties>
+			<BulletsFont type="string">$ID/</BulletsFont>
+			<BulletsFontStyle type="string">$ID/</BulletsFontStyle>
+		</Properties>
+	</ABullet>
+	<ABullet Self="dABullet2" CharacterType="UnicodeOnly" CharacterValue="9674">
+		<Properties>
+			<BulletsFont type="string">$ID/</BulletsFont>
+			<BulletsFontStyle type="string">$ID/</BulletsFontStyle>
+		</Properties>
+	</ABullet>
+	<ABullet Self="dABullet3" CharacterType="UnicodeWithFont" CharacterValue="187">
+		<Properties>
+			<BulletsFont type="string">Myriad Pro</BulletsFont>
+			<BulletsFontStyle type="string">$ID/Regular</BulletsFontStyle>
+		</Properties>
+	</ABullet>
+	<ABullet Self="dABullet4" CharacterType="GlyphWithFont" CharacterValue="503">
+		<Properties>
+			<BulletsFont type="string">Minion Pro</BulletsFont>
+			<BulletsFontStyle type="string">$ID/Regular</BulletsFontStyle>
+		</Properties>
+	</ABullet>
+	<ABullet Self="dABullet5" CharacterType="GlyphWithFont" CharacterValue="1431">
+		<Properties>
+			<BulletsFont type="string">Suisse Intl (OTF)</BulletsFont>
+			<BulletsFontStyle type="string">Book</BulletsFontStyle>
+		</Properties>
+	</ABullet>
+	<Assignment Self="udc" Name="$ID/UnassignedInCopy" UserName="$ID/" ExportOptions="AssignedSpreads" IncludeLinksWhenPackage="true" FilePath="$ID/">
+		<Properties>
+			<FrameColor type="enumeration">Nothing</FrameColor>
+		</Properties>
+	</Assignment>
+</Document>

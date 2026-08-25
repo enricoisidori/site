@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<idPkg:Story xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" DOMVersion="21.2">
+	<Story Self="u8c4" UserText="true" IsEndnoteStory="false" AppliedTOCStyle="n" TrackChanges="false" StoryTitle="$ID/" AppliedNamedGrid="n">
+		<StoryPreference OpticalMarginAlignment="false" OpticalMarginSize="12" FrameType="TextFrameType" StoryOrientation="Horizontal" StoryDirection="LeftToRightDirection" />
+		<InCopyExportOption IncludeGraphicProxies="true" IncludeAllResources="false" />
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/$ID/NormalParagraphStyle">
+			<CharacterStyleRange AppliedCharacterStyle="CharacterStyle/$ID/[No character style]">
+				<Withtent>Autorizzo al trattamento dati ai sensi del GDPR 2016/679 del 27 aprile 2016 (Regolamento Europeo relativo alla protezione delle persone fisiche per quanto riguarda il trattamento dei dati personali);</Withtent>
+				<Br />
+				<Withtent>Autorizzo la pubblicazione del Curriculum Vitae sul sito istituzionale del Politecnico di Milano (sez. Amministrazione Trasparente) in ottemperanza al D. Lgs n. 33 del 14 marzo 2013 (e s.m.i.).</Withtent>
+				<Br />
+			</CharacterStyleRange>
+		</ParagraphStyleRange>
+		<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/title" LeftIndent="141.73228346456693" FirstLineIndent="-141.73228346456693">
+			<Properties>
+				<TabList type="list">
+					<ListItem type="record">
+						<Alignment type="enumeration">LeftAlign</Alignment>
+						<AlignmentCharacter type="string">.</AlignmentCharacter>
+						<Leader type="string"></Leader>
+						<Position type="unit">283.46456692913387</Position>
+					</ListItem>
+				</TabList>
+			</Properties>
+		</ParagraphStyleRange>
+	</Story>
+</idPkg:Story>

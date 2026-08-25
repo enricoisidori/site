@@ -231,8 +231,8 @@ window.PROJECTS = [
     categories: ["designerpage", "artistpage"],
     date: "2025",
     info: [
-      "Field<br>Speculative",
-      "Role<br>Art direction<br>Branding<br>Spatial design<br>Visual<br>Interaction<br>Prototyping<br>Photography",
+      "Field<br>Critical<br>Speculative",
+      "Role<br>Art direction<br>Branding<br>Spatial<br>Visual<br>Interaction<br>Prototyping<br>Photography",
       "Team<br>Filippo Rosati (creative direction)<br>Pietro Forino (interaction design)<br>Daniela Gentile (research)<br>Nicola Airutti (sound design)<br>Cristina Dezi (fashion design)<br>Bernardo Martins (AI artworks)",
       'Made at<br><a href="https://www.instagram.com/umanesimo.artificiale/" target="_blank" rel="noopener noreferrer">Umanesimo Artificiale</a> & <a href="https://www.instagram.com/operatingsystem_studio/" target="_blank" rel="noopener noreferrer">Operating System Studio</a>',
       'Exhibited at<br><a href="https://www.videocitta.com/" target="_blank" rel="noopener noreferrer">Videocittà</a> 2025, Rome<br><a href="https://sonar.es/en" target="_blank" rel="noopener noreferrer">Sónar</a> 2025, Barcelona',
@@ -345,7 +345,7 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2025",
     info: [
-      "Field<br>Information<br>Data visualization<br>Spatial",
+      "Field<br>Information<br>Data visualization<br>Spatial<br>Research",
       "Team<br>Miguel Ernesto Amaya<br>Federico Gajo<br>Giacomo Garetto<br>Francesco Scarfone<br>Emanuel Simionato",
       'Exhibited at<br><a href="https://www.meetcenter.it/en" target="_blank" rel="noopener noreferrer">Meet</a> 2025, Milan',
     ],
@@ -635,7 +635,7 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2023",
     info: [
-      "Field<br>Speculative<br>Branding<br>Graphic<br>Interaction<br>Interface<br>Experience<br>Exhibition<br>Packaging<br>Photography<br>Copywriting<br>Video Making<br>Coding<br>Prototyping<br>Research<br>Editorial",
+      "Field<br>Critical<br>Speculative<br>Branding<br>Graphic<br>Interaction<br>Exhibition<br>Packaging<br>Photography<br>Copywriting<br>Video Making<br>Prototyping<br>Research<br>Editorial",
       "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
 
       'Link<br><a href="specta.pdf" target="_blank" rel="noopener noreferrer">SPECTA.pdf</a>',
