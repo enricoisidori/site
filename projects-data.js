@@ -232,10 +232,10 @@ window.PROJECTS = [
     date: "2025",
     info: [
       "Field<br>Critical<br>Speculative",
-      "Role<br>Art direction<br>Branding<br>Spatial<br>Visual<br>Interaction<br>Prototyping<br>Photography",
+      "Role<br>Art direction<br>Branding<br>Spatial<br>Exhibition<br>Visual<br>Interactive<br>Prototyping<br>Photography",
       "Team<br>Filippo Rosati (creative direction)<br>Pietro Forino (interaction design)<br>Daniela Gentile (research)<br>Nicola Airutti (sound design)<br>Cristina Dezi (fashion design)<br>Bernardo Martins (AI artworks)",
       'Made at<br><a href="https://www.instagram.com/umanesimo.artificiale/" target="_blank" rel="noopener noreferrer">Umanesimo Artificiale</a> & <a href="https://www.instagram.com/operatingsystem_studio/" target="_blank" rel="noopener noreferrer">Operating System Studio</a>',
-      'Exhibited at<br><a href="https://www.videocitta.com/" target="_blank" rel="noopener noreferrer">Videocittà</a> 2025, Rome<br><a href="https://sonar.es/en" target="_blank" rel="noopener noreferrer">Sónar</a> 2025, Barcelona',
+      'Exhibited at<br><a href="https://www.videocitta.com/" target="_blank" rel="noopener noreferrer">Videocittà</a> 2025<br><a href="https://sonar.es/en" target="_blank" rel="noopener noreferrer">Sónar</a> 2025',
     ],
     description:
       "A non-invasive neural interface developed by N+ Industries to collect\nresidual cognitive activity from the user. Using bone-conducted audio\nstimulation, the system captures neural micro-responses and\nintegrates them into a distributed network. Inspired by a NATO white\npaper stating that “the brain is the new battlefield,” this project\nexplores the intersection of neuroscience and conflict through an\nimmersive and experimental artistic lens. At its core is a pioneering\nenterprise that envisions a future of neuromodulation technologies.\nSpecializing in neuroweapons and NBIC advancements (Nanotechnology,\nBiotechnology, Information Technology, and Cognitive Science), this\nentity develops technologies of control. By presenting these\nunsettling possibilities, the project sparks critical discussions on\nthe future of warfare, human augmentation, and the ethics of cognitive\ncontrol.",
@@ -345,9 +345,9 @@ window.PROJECTS = [
     categories: ["designerpage"],
     date: "2025",
     info: [
-      "Field<br>Information<br>Data visualization<br>Spatial<br>Research",
+      "Field<br>Information<br>Data visualization<br>Spatial<br>Exhibition<br>Research",
       "Team<br>Miguel Ernesto Amaya<br>Federico Gajo<br>Giacomo Garetto<br>Francesco Scarfone<br>Emanuel Simionato",
-      'Exhibited at<br><a href="https://www.meetcenter.it/en" target="_blank" rel="noopener noreferrer">Meet</a> 2025, Milan',
+      'Exhibited at<br><a href="https://www.meetcenter.it/en" target="_blank" rel="noopener noreferrer">Meet</a> 2025',
     ],
     description:
       "Trail cams are video cameras triggered by the movement of animals in\ntheir natural habitats. Initially designed for research and wildlife\nmonitoring, they have since become popular content on social media\nplatforms.\nThe installation investigates how animals, inadvertently turned into\ndigital entities, inhabit the online ecosystem—an environment\ncategorized by humans for human consumption.\nThe project examines 273 trail cam videos shared on major Italian\nsocial platforms between 2021 and 2024. The hashtags used at the\ntime of publication establish connections between them. The\ninstallation presents the videos in chronological order, alongside\ntheir associated hashtags, forming a growing network that reflects\nthe evolution of a digital forest—merging human perceptions with\nanimal presence over time.",
@@ -456,7 +456,7 @@ window.PROJECTS = [
     info: [
       "Field<br>Research<br>Editorial<br>Web",
       "Team<br>Davide Agostinelli<br>Irene Benecchi<br>Bianca Buratti<br>Alice Dezio<br>Marta Gaggi<br>Giulia Gnessi",
-      "Exhibited at<br>Cavallerizza Reale 2022, Turin<br>Dock Dora 2022, Turin<br>Torino Print Club 2022, Turin<br>ELO 2022, Como",
+      "Exhibited at<br>Cavallerizza Reale 2022<br>Dock Dora 2022<br>Torino Print Club 2022<br>ELO 2022",
       'Link<br><a href="https://enricoisidori.com/draw.html" target="_blank" rel="noopener noreferrer">enricoisidori.com/draw.html</a>',
       "Features<br>Nuovi linguaggi del visual design in Italia 2022",
     ],
@@ -639,7 +639,7 @@ window.PROJECTS = [
       "Team<br>Francesco Bonetti<br>Federico Gajo<br>Emiliano Garibaldi<br>Cecilia Pizzagalli<br>Camilla Tosi",
 
       'Link<br><a href="specta.pdf" target="_blank" rel="noopener noreferrer">SPECTA.pdf</a>',
-      'Exhibited at<br><a href="https://www.salonemilano.it/en" target="_blank" rel="noopener noreferrer">Salone Satellite</a> 2025, Rho<br><a href="https://www.fabbricadelvapore.org/" target="_blank" rel="noopener noreferrer">Fabbrica del Vapore</a> 2024, Milan<br><a href="https://triennale.org" target="_blank" rel="noopener noreferrer">Triennale</a> 2023, Milan',
+      'Exhibited at<br><a href="https://www.salonemilano.it/en" target="_blank" rel="noopener noreferrer">Salone Satellite</a> 2025<br><a href="https://www.fabbricadelvapore.org/" target="_blank" rel="noopener noreferrer">Fabbrica del Vapore</a> 2024<br><a href="https://triennale.org" target="_blank" rel="noopener noreferrer">Triennale</a> 2023',
       "Features<br>Pittogramma, 2024<br>CDSA Awards International Media Art Creativity Competition 2024",
     ],
     description:
