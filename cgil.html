@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CGIL — Domanda 1</title>
+  <style>
+    @font-face { font-family: "Futura Condensed"; src: url("assets/font/Futura Bold Condensed.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+    @font-face { font-family: "Suisse Works"; src: url("assets/font/Suisse Works Book.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: "Suisse Works"; src: url("assets/font/Suisse Works Bold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
+    :root { --red: #e52a20; --ink: #111; --muted: #9a9a9a; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: #fff; color: var(--ink); font-family: "Suisse Works", serif; }
+    canvas { position: fixed; inset: 0; display: block; opacity: 0; transition: opacity .8s ease; }
+    body.is-revealed canvas, body.stage-active canvas { opacity: 1; }
+    .progress-bar { position: fixed; z-index: 12; top: 0; left: 0; width: 100%; height: 4px; background: #e4e4e4; }
+    .progress-bar span { display: block; width: calc(100% / 12); height: 100%; background: var(--red); transition: width .25s linear; }
+    .selection {
+      position: fixed; inset: 0; z-index: 3; overflow: auto; padding: 22px 24px 104px;
+      background: #fff; transition: opacity .65s ease, transform .75s cubic-bezier(.22,.8,.2,1);
+    }
+    body.is-revealed .selection { opacity: 0; transform: none; pointer-events: none; transition: none; }
+    body.stage-active .selection { background: transparent; }
+    .panel { width: min(800px,100%); margin: -4px auto 0; text-align: center; }
+    .number { margin: 0 0 10px; color: var(--red); font: 700 clamp(15px,1.5vw,21px)/1 "Suisse Works", serif; letter-spacing: .02em; }
+    h1 { max-width: 780px; margin: 0 auto; padding-top: 4px; font: 700 clamp(33px,4.8vw,76px)/.95 "Futura Condensed", sans-serif; letter-spacing: .005em; text-transform: uppercase; }
+    .instruction { margin: 4px 0 20px; color: #8a8a8a; font: 400 clamp(17px,1.5vw,22px)/1.25 "Suisse Works", serif; letter-spacing: 0; }
+    .options { width: min(570px,100%); margin: 0 auto; text-align: left; }
+    .answer-row { display: grid; grid-template-columns: minmax(0,1fr) 26px; gap: 14px; align-items: center; }
+    .answer-row:not(:has(.info)) { grid-template-columns: minmax(0,1fr); }
+    .option { width: 100%; display: grid; grid-template-columns: 19px minmax(0,1fr); gap: 13px; align-items: center; padding: 8px 0; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: 400 clamp(18px,1.8vw,27px)/1 "Suisse Works", serif; letter-spacing: .01em; }
+    .option-square { width: 18px; height: 18px; border: 1px solid var(--ink); background: #fff; }
+    .option:hover .option-square, .option:focus-visible .option-square { border-color: var(--red); background: var(--red); }
+    .option.is-selected .option-square { border-color: var(--red); background: var(--red); }
+    .option.is-selected { color: var(--ink); }
+    .info { width: 23px; height: 23px; padding: 0; border: 1px solid #a7a7a7; border-radius: 50%; background: transparent; color: #555; cursor: pointer; font: 700 13px/1 Georgia,serif; }
+    .info:hover, .info:focus-visible { border-color: var(--red); color: var(--red); }
+    .sliders, .rankings { width: min(620px,100%); margin: 0 auto; text-align: left; }
+    .slider-row, .ranking-row { display: grid; grid-template-columns: minmax(0,1fr) 180px 34px; gap: 16px; align-items: center; padding: 9px 0; }
+    .slider-row label, .ranking-row label { font: 400 clamp(16px,1.45vw,22px)/1.08 "Suisse Works", serif; }
+    .slider-row output, .ranking-row output { color: var(--red); font: 700 15px/1 "Suisse Works", serif; text-align: right; }
+    input[type="range"] { width: 100%; accent-color: var(--red); }
+    .compass { position: relative; width: min(480px,76vw); aspect-ratio: 1; margin: 0 auto; border: 1px solid #111; cursor: crosshair; background: linear-gradient(90deg,transparent calc(50% - .5px),#aaa calc(50% - .5px),#aaa calc(50% + .5px),transparent calc(50% + .5px)),linear-gradient(0deg,transparent calc(50% - .5px),#aaa calc(50% - .5px),#aaa calc(50% + .5px),transparent calc(50% + .5px)); }
+    .compass-dot { position:absolute; width:16px; height:16px; background:var(--red); transform:translate(-50%,-50%); pointer-events:none; }
+    .compass-label { position:absolute; color:#777; font:400 12px/1.1 "Suisse Works",serif; }
+    .compass-label.left { left:-8px; top:50%; transform:translate(-100%,-50%); text-align:right; } .compass-label.right { right:-8px; top:50%; transform:translate(100%,-50%); } .compass-label.top { top:-9px; left:50%; transform:translate(-50%,-100%); } .compass-label.bottom { bottom:-9px; left:50%; transform:translate(-50%,100%); }
+    .nav { position: fixed; z-index: 12; bottom: 28px; left: 32px; right: 32px; display: flex; align-items: center; justify-content: space-between; }
+    .back, .next { border: 0; cursor: pointer; font: 700 19px/1 "Suisse Works", serif; letter-spacing: .03em; transition: transform .08s linear; }
+    .back { padding: 9px 0; background: transparent; color: #111; }
+    .back:hover, .back:focus-visible { color: #111; transform: translateY(-5px); }
+    .next { min-width: 132px; padding: 14px 18px 13px; border: 1px solid var(--red); background: var(--red); color: #fff; }
+    .next:hover:not(:disabled), .next:focus-visible:not(:disabled) { border-color: var(--red); background: var(--red); color: #fff; transform: translateY(-5px); }
+    .next:disabled { border-color: #d9d9d9; background: #d9d9d9; color: #fff; cursor: default; }
+    dialog { position: fixed; inset: 50% 24px auto; width: min(610px,calc(100vw - 48px)); margin: 0 auto; border: 0; border-radius: 0; padding: 0; background: transparent; box-shadow: none; transform: translateY(-50%); }
+    dialog::backdrop { background: rgba(255,255,255,.78); backdrop-filter: blur(7px); }
+    dialog h2 { display: block; margin: 0 0 5px; font: 700 clamp(27px,3.2vw,44px)/1.05 "Suisse Works", serif; text-transform: none; }
+    dialog p { display: block; margin: 0; font: 400 18px/1.42 "Suisse Works",serif; }
+    .visual-question { position: fixed; z-index: 4; top: 26px; left: 50%; width: max-content; max-width: calc(100vw - 40px); margin: 0; color: var(--ink); font: 700 clamp(15px,1.8vw,26px)/1 "Futura Condensed", sans-serif; text-align: center; text-transform: uppercase; white-space: nowrap; opacity: 0; pointer-events: none; transform: translateX(-50%); transition: opacity .3s linear; }
+    .visual-caption { position: fixed; z-index: 4; top: 58px; left: 50%; margin: 0; color: #8a8a8a; font: 400 15px/1 "Suisse Works", serif; white-space: nowrap; opacity: 0; pointer-events: none; transform: translateX(-50%); transition: opacity .3s linear; }
+    body.is-revealed .visual-question, body.is-revealed .visual-caption { opacity: 1; }
+    @media (max-width: 680px) { .selection { padding: 20px 20px 92px; } h1 { font-size: clamp(32px,10vw,50px); } .instruction { margin-bottom: 26px; } .option { font-size: 21px; padding: 9px 0; } .nav { left: 20px; right: 20px; bottom: 18px; } dialog { inset: 50% 20px auto; width: calc(100vw - 40px); } .visual-question { top: 20px; max-width: calc(100vw - 32px); font-size: 18px; } }
+  </style>
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/" } }
+  </script>
+</head>
+<body>
+  <div class="progress-bar" aria-label="Avanzamento"><span id="progress"></span></div>
+  <p class="visual-question" id="visual-question"></p><p class="visual-caption">Risposte degli altri utenti</p>
+  <main class="selection"><div class="panel" id="question-panel"></div></main>
+  <nav class="nav" aria-label="Navigazione"><button class="back" type="button">Indietro</button><button class="next" id="next" type="button" disabled>Prosegui</button></nav>
+  <dialog id="info-dialog"><h2 id="info-title"></h2><p id="info-text"></p></dialog>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import * as CANNON from 'https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js';
+
+    const answers = [
+      'Riduzione dell’orario di lavoro', 'Diritto di sciopero', 'Contrattazione collettiva', 'Statuto dei lavoratori',
+      'Ferie retribuite', 'Pensioni e tutele previdenziali', 'Tutele sulla salute e sicurezza', 'Diritto alla formazione'
+    ];
+    const percentages = [18, 11, 16, 13, 8, 10, 15, 9];
+    const histories = [
+      'A partire dal 1889 con il congresso fondativo della Seconda Internazionale l’orizzonte rivendicativo del movimento europeo diventa la giornata lavorativa di otto ore.',
+      'Nel 1900 lo sciopero generale di Genova, proclamato contro la chiusura della Camera del Lavoro, costrinse il prefetto a ritirare il provvedimento e affermò la libertà di organizzazione e di lotta sindacale.',
+      'Nel 1906 la contrattazione diventa collettiva grazie all’accordo aziendale firmato dalla FIOM con l’Itala di Torino.',
+      'Nel 1970 lo Statuto dei lavoratori rafforzò i diritti sindacali e la tutela delle condizioni nei luoghi di lavoro.',
+      'Nel 1948 la Costituzione sancì il diritto irrinunciabile dei lavoratori alle ferie annuali retribuite.',
+      'Nel 1898 nacque la Cassa nazionale di previdenza, primo passo verso un sistema pubblico di tutela dei lavoratori contro invalidità e vecchiaia.',
+      'Nel 2008 il Testo unico sulla sicurezza ha riordinato e rafforzato le norme per la tutela della salute sul lavoro e i diritti di partecipazione e rappresentanza per la prevenzione.',
+      'Il diritto alla formazione permanente è uno dei pilastri del programma fondamentale della CGIL dal 1991.'
+    ];
+    const panel = document.querySelector('#question-panel');
+    const next = document.querySelector('#next');
+    const back = document.querySelector('.back');
+    const progress = document.querySelector('#progress');
+    const infoDialog = document.querySelector('#info-dialog');
+    const visualQuestion = document.querySelector('#visual-question');
+    const questionData = [
+      { title: 'Quale conquista sindacale del Novecento ritieni oggi più importante?', instruction: 'Scelta singola', type: 'single' },
+      { title: 'Cosa dovrebbe significare “avere successo” nel lavoro?', instruction: 'Regola gli slider', type: 'sliders' },
+      { title: 'Come ritieni l’impatto delle nuove tecnologie e dell’Intelligenza Artificiale nel tuo lavoro?', instruction: 'Posizionati rispetto agli assi', type: 'compass', axes: ['Facilita il mio lavoro', 'Non facilita il mio lavoro', 'Alleggerisce il carico di lavoro', 'Aumenta il carico di lavoro'] },
+      { title: 'Quale equilibrio dovrebbe cercare il lavoro contemporaneo?', instruction: 'Posizionati rispetto agli assi', type: 'compass', axes: ['Competizione', 'Cooperazione', 'Produttività', 'Benessere'] },
+      { title: 'Quali rischi peseranno maggiormente nel lavoro del futuro?', instruction: 'Regola gli slider', type: 'ranking' },
+      { title: 'Quali temi dovrebbe affrontare prioritariamente il sindacato nei prossimi anni?', instruction: 'Scegli tre priorità', type: 'multiple' }
+    ];
+    const successLabels = ['Guadagnare bene', 'Essere soddisfatti', 'Avere responsabilità', 'Essere riconosciuti', 'Avere tempo per sé', 'Fare qualcosa di utile'];
+    const risks = ['Perdita di posti a causa dell’automazione', 'Aumento della precarietà', 'Controllo digitale dei lavoratori', 'Isolamento nel lavoro da remoto', 'Disuguaglianze economiche', 'Necessità continua di aggiornarsi', 'Perdita di posti di lavoro nei settori più inquinanti'];
+    const priorities = ['Aumentare i salari', 'Lotta alla precarietà', 'Migliorare la sicurezza sul lavoro', 'Ridurre le disuguaglianze', 'Governare la trasformazione tecnologica', 'Governare la transizione ecologica', 'Rafforzare la democrazia'];
+    const values = [17,17,17,17,16,16], ranks = [1,2,3,4,5,6,7], chosen = [];
+    const requestedQuestion = Number(new URLSearchParams(location.search).get('q'));
+    let selected = -1, revealed = false, questionIndex = requestedQuestion >= 1 && requestedQuestion <= 6 ? requestedQuestion - 1 : 0;
+
+    function pageChrome() { const question = questionData[questionIndex]; return `<p class="number">${questionIndex + 1} di 6</p><h1>${question.title}</h1><p class="instruction">${question.instruction}</p>`; }
+    function setNav(enabled) { next.disabled = !enabled; next.textContent = questionIndex === 5 ? 'Concludi' : 'Prosegui'; const canGoBack = questionIndex > 0 || revealed; back.disabled = !canGoBack; back.style.opacity = canGoBack ? '1' : '.25'; const step = questionIndex * 2 + 1; progress.style.width = `${step / 12 * 100}%`; document.querySelector('.progress-bar').setAttribute('aria-label', `Avanzamento: passaggio ${step} di 12`); }
+    function renderQuestion() {
+      const type = questionData[questionIndex].type; panel.innerHTML = pageChrome();
+      if (type === 'single') renderSingle();
+      if (type === 'sliders') renderSliders();
+      if (type === 'compass') renderCompass(questionData[questionIndex].axes);
+      if (type === 'ranking') renderRanking();
+      if (type === 'multiple') renderMultiple();
+      setNav(type === 'sliders' || type === 'ranking');
+      if (type === 'sliders') requestAnimationFrame(setupSliderStage);
+      if (type === 'compass') requestAnimationFrame(() => setupCompassStage(questionIndex));
+    }
+    function renderSingle() {
+      const options = document.createElement('div'); options.className='options';
+      answers.forEach((answer,index)=>{ const row=document.createElement('div');row.className='answer-row';const choose=document.createElement('button');choose.type='button';choose.className='option';choose.innerHTML=`<span class="option-square" aria-hidden="true"></span><span>${answer}</span>`;choose.addEventListener('click',()=>{selected=index;[...options.children].forEach((item,i)=>item.querySelector('.option').classList.toggle('is-selected',i===index));setNav(true);});const info=document.createElement('button');info.type='button';info.className='info';info.textContent='i';info.setAttribute('aria-label',`Approfondimento: ${answer}`);info.addEventListener('click',()=>{document.querySelector('#info-title').textContent=answer;document.querySelector('#info-text').textContent=histories[index];infoDialog.showModal();});row.append(choose,info);options.append(row);}); panel.append(options);
+    }
+    function renderSliders() { const root=document.createElement('div');root.className='sliders';successLabels.forEach((label,index)=>{const row=document.createElement('div');row.className='slider-row';row.innerHTML=`<label for="s-${index}">${label}</label><input id="s-${index}" type="range" min="0" max="100" value="${values[index]}"><output>${values[index]}%</output>`;row.querySelector('input').addEventListener('input',event=>redistribute(index,Number(event.target.value),root));root.append(row);});panel.append(root); }
+    function redistribute(changed,nextValue,root) { const remainder=100-nextValue, indices=values.map((_,i)=>i).filter(i=>i!==changed), total=indices.reduce((sum,i)=>sum+values[i],0);let used=0;indices.forEach((i,order)=>{values[i]=order===indices.length-1?remainder-used:Math.round(remainder*(total?values[i]/total:1/indices.length));used+=values[i];});values[changed]=nextValue;[...root.children].forEach((row,i)=>{row.querySelector('input').value=values[i];row.querySelector('output').textContent=`${values[i]}%`;});alignSliderCubes(); }
+    const compassPoints = [{x:50,y:50,set:false},{x:50,y:50,set:false}];
+    function renderCompass(axes) { const compass=document.createElement('div');compass.className='compass';compass.innerHTML=`<span class="compass-label left">${axes[0]}</span><span class="compass-label right">${axes[1]}</span><span class="compass-label top">${axes[2]}</span><span class="compass-label bottom">${axes[3]}</span><span class="compass-dot"></span>`;const dot=compass.querySelector('.compass-dot'),slot=questionIndex-2,stored=compassPoints[slot];dot.style.left=`${stored.x}%`;dot.style.top=`${stored.y}%`;const place=event=>{const rect=compass.getBoundingClientRect();stored.x=Math.max(4,Math.min(96,(event.clientX-rect.left)/rect.width*100));stored.y=Math.max(4,Math.min(96,(event.clientY-rect.top)/rect.height*100));stored.set=true;dot.style.left=`${stored.x}%`;dot.style.top=`${stored.y}%`;setNav(true);updateCompassPreviewStage();};compass.addEventListener('pointerdown',event=>{compass.setPointerCapture(event.pointerId);place(event);});compass.addEventListener('pointermove',event=>{if(event.buttons)place(event);});panel.append(compass); }
+    function renderRanking() { const root=document.createElement('div');root.className='rankings';risks.forEach((risk,index)=>{const row=document.createElement('div');row.className='ranking-row';row.innerHTML=`<label for="r-${index}">${risk}</label><input id="r-${index}" type="range" min="1" max="7" step="1" value="${ranks[index]}"><output>${ranks[index]}</output>`;row.querySelector('input').addEventListener('input',event=>{const nextRank=Number(event.target.value),old=ranks[index],other=ranks.indexOf(nextRank);if(other!==-1&&other!==index)ranks[other]=old;ranks[index]=nextRank;[...root.children].forEach((entry,i)=>{entry.querySelector('input').value=ranks[i];entry.querySelector('output').textContent=ranks[i];});});root.append(row);});panel.append(root); }
+    function renderMultiple() { const options=document.createElement('div');options.className='options';priorities.forEach((priority,index)=>{const row=document.createElement('div');row.className='answer-row';const choose=document.createElement('button');choose.type='button';choose.className='option';choose.innerHTML=`<span class="option-square" aria-hidden="true"></span><span>${priority}</span>`;choose.addEventListener('click',()=>{const at=chosen.indexOf(index);if(at>=0)chosen.splice(at,1);else if(chosen.length<3)chosen.push(index);[...options.children].forEach((item,i)=>{const isChosen=chosen.includes(i);item.querySelector('.option').classList.toggle('is-selected',isChosen);item.querySelector('.option').style.pointerEvents=chosen.length===3&&!isChosen?'none':'';});setNav(chosen.length===3);});row.append(choose);options.append(row);});panel.append(options); }
+    function goTo(index) { questionIndex=Math.max(0,Math.min(5,index));resetScene();renderQuestion(); }
+    infoDialog.addEventListener('click', () => infoDialog.close());
+
+    const scene = new THREE.Scene(); scene.background = new THREE.Color(0xffffff);
+    const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, .1, 80); camera.position.set(0, 1.6, 16);
+    const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; document.body.prepend(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement); controls.target.set(0, .2, 0); controls.enableDamping = true; controls.dampingFactor = .055; controls.minDistance = 9; controls.maxDistance = 24; controls.enabled = false;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xb8b8b8, 2.2));
+    const sun = new THREE.DirectionalLight(0xffffff, 4); sun.position.set(-8, 12, 9); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left=-12; sun.shadow.camera.right=12; sun.shadow.camera.top=12; sun.shadow.camera.bottom=-12; scene.add(sun);
+    const displayFloor = new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.ShadowMaterial({color:0x000000,opacity:.13,transparent:true})); displayFloor.rotation.x=-Math.PI/2; displayFloor.position.y=-3.5; displayFloor.receiveShadow=true; scene.add(displayFloor);
+    const world = new CANNON.World({ gravity: new CANNON.Vec3(0, 0, 0) }); world.solver.iterations = 14;
+    const physicsMaterial = new CANNON.Material('cubes'); const boundaryMaterial = new CANNON.Material('boundary');
+    world.addContactMaterial(new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, { friction: .12, restitution: .38 })); world.addContactMaterial(new CANNON.ContactMaterial(physicsMaterial, boundaryMaterial, { friction: .08, restitution: .44 }));
+    function boundary(position, halfExtents) { const body = new CANNON.Body({ mass: 0, material: boundaryMaterial, position: new CANNON.Vec3(...position), shape: new CANNON.Box(new CANNON.Vec3(...halfExtents)) }); world.addBody(body); }
+    boundary([0, -4.9, 0], [8, .1, 5.5]); boundary([0, 5.5, 0], [8, .1, 5.5]); boundary([-8.1, .3, 0], [.1, 5, 5.5]); boundary([8.1, .3, 0], [.1, 5, 5.5]); boundary([0, .3, -5.6], [8, 5, .1]); boundary([0, .3, 5.6], [8, 5, .1]);
+    const redMaterials = [new THREE.MeshStandardMaterial({ color: 0xee2e23, roughness: .38 }), new THREE.MeshStandardMaterial({ color: 0xd9251b, roughness: .48 }), new THREE.MeshStandardMaterial({ color: 0xff4436, roughness: .34 })];
+    // Materiale vetroso leggero: sfrutta Three.js già caricato, senza rifrazione
+    // costosa né asset esterni, quindi resta fluido anche sui dispositivi meno potenti.
+    const displayMaterials = [0xee2e23,0xd9251b,0xff4436].map(color => new THREE.MeshPhysicalMaterial({ color, roughness: .16, metalness: .03, clearcoat: 1, clearcoatRoughness: .07, reflectivity: .65 }));
+    const cubes = [], labels = [];
+    function makeLabel(answer, percentage) { const canvas = document.createElement('canvas'); canvas.width = 900; canvas.height = 190; const context = canvas.getContext('2d'); context.textAlign = 'center'; context.textBaseline = 'middle'; context.fillStyle = '#151515'; context.font = '700 38px "Suisse Works", serif'; const words = answer.split(' '); let first = '', second = ''; words.forEach(word => { if ((`${first} ${word}`).trim().length < 25 || !first) first = `${first} ${word}`.trim(); else second = `${second} ${word}`.trim(); }); context.fillText(first, 450, 50); if (second) context.fillText(second, 450, 94); context.font = '700 44px "Suisse Works", serif'; context.fillText(`${percentage}%`, 450, 151); const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false })); sprite.scale.set(4.2, .9, 1); sprite.visible = false; scene.add(sprite); return sprite; }
+    const cubeSizes = [3.45, 1.05, 3.05, 1.45, .82, 1.24, 2.72, .68];
+    const displayPositions = [[-4.6,-.9],[4.5,-2.6],[2.4,.8],[-6.2,2.7],[4.8,2.25],[-1.8,3.25],[-.35,-3.15],[6.2,.15]];
+    percentages.forEach((percentage, index) => { const size = cubeSizes[index]; const material = displayMaterials[index % displayMaterials.length].clone(); const mesh = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), material); mesh.castShadow = true; mesh.receiveShadow = true; mesh.scale.setScalar(.01); mesh.visible = false; scene.add(mesh); const [x,z] = displayPositions[index], y = -3.5 + size / 2; const body = new CANNON.Body({ mass: size * size, material: physicsMaterial, shape: new CANNON.Box(new CANNON.Vec3(size / 2, size / 2, size / 2)), position: new CANNON.Vec3(x, y, z) }); world.addBody(body); body.sleep(); const home = new THREE.Vector3(x, y, z), rotation = new THREE.Euler(0, -.28 + index * .21, 0), label = makeLabel(answers[index], percentage); cubes.push({ mesh, body, size, home, rotation, phase: index * 1.73 }); labels.push(label); });
+    let stage = null;
+    const stageFloor = -4.05, topCamera = new THREE.Vector3(0, 29, .01), topTarget = new THREE.Vector3(0, stageFloor, 0);
+    const finalSliderCamera = new THREE.Vector3(0, 20, 17), finalSliderTarget = new THREE.Vector3(0, 1.5, 0);
+    const finalCompassCamera = new THREE.Vector3(15, 13, 17), finalCompassTarget = new THREE.Vector3(1.3, -2.2, 1.4);
+    function clearStage() { if (!stage) return; stage.bodies.forEach(body => world.removeBody(body)); scene.remove(stage.group); world.gravity.set(0,0,0); stage = null; document.body.classList.remove('stage-active'); }
+    function makeStageCube(size, material = redMaterials[0]) { const mesh = new THREE.Mesh(new THREE.BoxGeometry(size,size,size),material);mesh.castShadow=true;mesh.receiveShadow=true;return mesh; }
+    function setupSliderStage() {
+      if (stage?.type === 'slider') { alignSliderCubes(); return; }
+      clearStage(); document.body.classList.add('stage-active');
+      const group = new THREE.Group(); stage={type:'slider',group,bodies:[],confirmed:false,transition:0,selection:[],history:[]}; scene.add(group);
+      camera.position.copy(topCamera); controls.target.copy(topTarget); camera.lookAt(topTarget); controls.enabled=false;
+      values.forEach((value,index)=>{const mesh=makeStageCube(.72,redMaterials[index%3]);mesh.scale.set(.7+value/105,.025,.7+value/105);group.add(mesh);stage.selection.push({mesh,home:new THREE.Vector3(),target:new THREE.Vector3(),size:.7+value/105});});
+      const positions=[-6,-3.6,-1.2,1.2,3.6,6], counts=[7,10,6,8,9,5];
+      positions.forEach((x,column)=>{const tower=new THREE.Group();tower.visible=false;let y=stageFloor;for(let level=0;level<counts[column];level++){const size=.48+((column*7+level*5)%5)*.035,mesh=makeStageCube(size,redMaterials[(column+level)%3]);y+=size/2;mesh.userData.baseY=y;mesh.position.y=y+.55;tower.add(mesh);y+=size/2;}tower.position.x=x;group.add(tower);stage.history.push({tower,height:y});});
+      alignSliderCubes();
+    }
+    function alignSliderCubes() {
+      if (!stage || stage.type!=='slider' || stage.confirmed) return;
+      camera.position.copy(topCamera);camera.lookAt(topTarget);camera.updateMatrixWorld();const raycaster=new THREE.Raycaster(),plane=new THREE.Plane(new THREE.Vector3(0,1,0),-stageFloor),point=new THREE.Vector3();const panelRect=panel.getBoundingClientRect(),desiredX=Math.min(innerWidth-42,panelRect.right+Math.min(120,innerWidth*.1)),inputs=[...panel.querySelectorAll('input')];
+      stage.selection.forEach((item,index)=>{const rect=inputs[index].getBoundingClientRect(),pointer=new THREE.Vector2(desiredX/innerWidth*2-1,-(rect.top+rect.height/2)/innerHeight*2+1);raycaster.setFromCamera(pointer,camera);if(raycaster.ray.intersectPlane(plane,point)){item.home.copy(point);item.mesh.position.copy(point);item.size=.7+values[index]/105;item.mesh.scale.set(item.size,.025,item.size);}});
+    }
+    function confirmSliderStage() {
+      stage.confirmed=true; document.body.classList.add('is-revealed'); stage.history.forEach(item=>item.tower.visible=true);const positions=[-6,-3.6,-1.2,1.2,3.6,6];
+      stage.selection.forEach((item,index)=>{item.target.set(positions[index],stage.history[index].height+.36*item.size,0);item.mesh.material=redMaterials[index%3];});next.textContent='Prosegui';
+    }
+    function setupCompassStage(question) {
+      if(stage?.type==='compass'&&stage.question===question){updateCompassPreviewStage();return;}
+      clearStage();document.body.classList.add('stage-active');const group=new THREE.Group();stage={type:'compass',question,group,bodies:[],confirmed:false,transition:0,preview:null,fallers:[],spawnClock:0,spawned:0};scene.add(group);
+      camera.position.copy(topCamera);controls.target.copy(topTarget);camera.lookAt(topTarget);controls.enabled=false;
+      const board=new THREE.Mesh(new THREE.BoxGeometry(14,.16,14),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.94}));board.position.y=stageFloor+.08;board.receiveShadow=true;group.add(board);
+      const lineMaterial=new THREE.LineBasicMaterial({color:0x111111,transparent:true,opacity:.7});const horizontal=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-7,stageFloor+.18,0),new THREE.Vector3(7,stageFloor+.18,0)]);const vertical=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,stageFloor+.18,-7),new THREE.Vector3(0,stageFloor+.18,7)]);group.add(new THREE.Line(horizontal,lineMaterial),new THREE.Line(vertical,lineMaterial));
+      const preview=makeStageCube(.62,new THREE.MeshBasicMaterial({color:0xe52a20,transparent:true,opacity:.32}));preview.scale.y=.025;preview.position.y=stageFloor+.2;group.add(preview);stage.preview=preview;updateCompassPreviewStage();
+    }
+    function updateCompassPreviewStage() { if(!stage||stage.type!=='compass'||stage.confirmed)return;const point=compassPoints[stage.question-2];stage.preview.position.x=(point.x-50)/50*6.25;stage.preview.position.z=(point.y-50)/50*6.25; }
+    function addCompassFaller(x,z,size,selected=false) { const mesh=makeStageCube(size,selected?redMaterials[2]:redMaterials[stage.spawned%3]);mesh.position.set(x,10+Math.random()*4,z);mesh.rotation.set(Math.random(),Math.random(),Math.random());stage.group.add(mesh);const body=new CANNON.Body({mass:size*1.35,material:physicsMaterial,shape:new CANNON.Box(new CANNON.Vec3(size/2,size/2,size/2)),position:new CANNON.Vec3(x,mesh.position.y,z),angularDamping:.18,linearDamping:.015});body.angularVelocity.set((Math.random()-.5)*1.2,(Math.random()-.5)*1.2,(Math.random()-.5)*1.2);world.addBody(body);stage.bodies.push(body);stage.fallers.push({mesh,body}); }
+    function confirmCompassStage() {
+      stage.confirmed=true;stage.preview.visible=false;document.body.classList.add('is-revealed');world.gravity.set(0,-13.5,0);const ground=new CANNON.Body({mass:0,material:boundaryMaterial,shape:new CANNON.Box(new CANNON.Vec3(7,.1,7)),position:new CANNON.Vec3(0,stageFloor,0)});world.addBody(ground);stage.bodies.push(ground);const point=compassPoints[stage.question-2];addCompassFaller((point.x-50)/50*6.1,(point.y-50)/50*6.1,.78,true);stage.spawned=1;next.textContent='Prosegui';
+    }
+    function animateStage(delta) {
+      if(!stage)return;
+      if(stage.type==='slider'&&stage.confirmed){stage.transition=Math.min(1,stage.transition+delta*.95);const e=1-Math.pow(1-stage.transition,3);camera.position.lerpVectors(topCamera,finalSliderCamera,e);controls.target.lerpVectors(topTarget,finalSliderTarget,e);stage.selection.forEach(item=>{item.mesh.position.lerpVectors(item.home,item.target,e);item.mesh.scale.y=THREE.MathUtils.lerp(.025,item.size,e);});stage.history.forEach(({tower})=>tower.children.forEach((mesh,index)=>{const a=Math.max(0,Math.min(1,e*1.3-index*.025));mesh.position.y=mesh.userData.baseY+.55*(1-a);}));}
+      if(stage.type==='compass'&&stage.confirmed){stage.transition=Math.min(1,stage.transition+delta*.82);const e=1-Math.pow(1-stage.transition,3);camera.position.lerpVectors(topCamera,finalCompassCamera,e);controls.target.lerpVectors(topTarget,finalCompassTarget,e);stage.spawnClock+=delta;if(stage.spawnClock>.23&&stage.spawned<52){stage.spawnClock=0;const centers=stage.question===2?[[-2.7,-2.1],[2.8,-1.5],[-1.7,2.7],[2.8,2.6]]:[[-2.7,-2.5],[2.7,-2.4],[-2.1,2.6],[2.7,2.7]],center=centers[stage.spawned%4];addCompassFaller(center[0]+(Math.random()-.5)*1.8,center[1]+(Math.random()-.5)*1.8,.48+Math.random()*.16);stage.spawned++;}world.step(1/60,delta,4);stage.fallers.forEach(({mesh,body})=>{mesh.position.copy(body.position);mesh.quaternion.copy(body.quaternion);});}
+    }
+    let revealProgress = 0;
+    function reveal() { revealed = true; revealProgress = 1; setNav(true); progress.style.width = `${2 / 12 * 100}%`; document.querySelector('.progress-bar').setAttribute('aria-label', 'Avanzamento: passaggio 2 di 12'); visualQuestion.textContent = questionData[questionIndex].title; document.body.classList.add('is-revealed'); next.setAttribute('aria-label', 'Prosegui alla domanda 2'); cubes.forEach(({ mesh }) => { mesh.visible = true; }); controls.enabled = true; }
+    function resetScene() { clearStage();revealed=false;revealProgress=0;visualQuestion.textContent='';controls.enabled=false;camera.position.set(0,1.6,16);controls.target.set(0,.2,0);document.body.classList.remove('is-revealed');cubes.forEach(({mesh,body})=>{mesh.visible=false;body.sleep();});labels.forEach(label=>label.visible=false); }
+    next.addEventListener('click', () => { if(questionIndex===0){ if(!revealed)reveal();else location.href='cgil-02.html'; }else if(questionIndex===1||questionIndex===2||questionIndex===3){ if(!stage?.confirmed){ if(questionIndex===1)confirmSliderStage();else confirmCompassStage(); }else goTo(questionIndex+1); }else if(questionIndex<5)goTo(questionIndex+1);else next.disabled=true; });
+    back.addEventListener('click',()=>{if(questionIndex===0&&revealed){resetScene();renderQuestion();return;}if(questionIndex>0)goTo(questionIndex-1);});
+    const clock = new THREE.Clock();
+    function animate() { requestAnimationFrame(animate); const delta = Math.min(clock.getDelta(), .05); if (revealed) { cubes.forEach(({ mesh, size, home, rotation }, index) => { mesh.position.copy(home); mesh.rotation.copy(rotation); mesh.scale.setScalar(1); const label = labels[index]; label.visible = true; label.position.set(mesh.position.x, mesh.position.y + size * .72 + .7, mesh.position.z); }); } else animateStage(delta); controls.update(); renderer.render(scene, camera); }
+    animate();
+    renderQuestion();
+    addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); });
+  </script>
+</body>
+</html>

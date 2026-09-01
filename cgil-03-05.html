@@ -5,13 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cooperazione / Benessere — 3D</title>
   <style>
+    @font-face { font-family: "Futura Condensed"; src: url("assets/font/Futura Bold Condensed.otf") format("opentype"); font-weight: 700; }
+    @font-face { font-family: "Suisse Works"; src: url("assets/font/Suisse Works Book.otf") format("opentype"); font-weight: 400; }
+    @font-face { font-family: "Suisse Works"; src: url("assets/font/Suisse Works Bold.otf") format("opentype"); font-weight: 700; }
     * { box-sizing: border-box; }
     html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
     body {
       background: #fff;
       color: #151515;
-      font-family: Georgia, "Times New Roman", Times, serif;
+      font-family: "Suisse Works", serif;
     }
+    .progress-bar { position: fixed; z-index: 7; top: 0; left: 0; width: 100%; height: 4px; background: #e4e4e4; }
+    .progress-bar span { display: block; height: 100%; background: #e52a20; transition: width .25s linear; }
     canvas { display: block; }
     .ui {
       position: fixed;
@@ -19,102 +24,60 @@
       z-index: 2;
       pointer-events: none;
     }
+    .question-panel { position:absolute; top:22px; left:0; right:0; width:min(800px,calc(100vw - 48px)); margin:0 auto; text-align:center; }
+    .number { margin:0 0 10px; color:#e52a20; text-align:center; font:700 clamp(15px,1.5vw,21px)/1 "Suisse Works",serif; }
     .title {
-      position: absolute;
-      top: 28px;
-      left: 28px;
-      margin: 0;
-      max-width: 490px;
-      font-size: clamp(18px, 1.75vw, 27px);
-      font-weight: 700;
-      line-height: 1.03;
-      letter-spacing: -.025em;
-    }
-    .title span {
-      display: block;
-      margin-top: 10px;
-      font-size: .49em;
-      letter-spacing: .06em;
+      margin:0 auto;
+      text-align: center;
+      font: 700 clamp(33px,4.8vw,76px)/.95 "Futura Condensed", sans-serif;
+      letter-spacing: .005em;
       text-transform: uppercase;
     }
+    .instruction { margin:4px 0 0; color:#8a8a8a; text-align:center; font:400 clamp(17px,1.5vw,22px)/1.25 "Suisse Works",serif; transition:opacity .25s linear; }
+    .ui.is-visual .number, .ui.is-visual .instruction { display:none; }
+    .ui.is-visual .question-panel { top:26px; width:max-content; max-width:calc(100vw - 40px); }
+    .ui.is-visual .title { width:max-content; max-width:calc(100vw - 40px); font-size:clamp(18px,2vw,30px); white-space:nowrap; }
     .hint {
-      position: absolute;
-      left: 28px;
-      bottom: 76px;
+      display:none;
       margin: 0;
       color: #6d6d6d;
-      font-size: 11px;
+      font: 400 13px/1.4 "Suisse Works", serif;
       line-height: 1.55;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-    .counter {
-      position: absolute;
-      left: 50%;
-      bottom: 48px;
-      transform: translateX(-50%);
-      color: #555;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .04em;
-      opacity: 0;
-      transition: opacity .8s ease;
+      letter-spacing: 0;
+      text-transform: none;
     }
     .others-caption {
       position: absolute;
       left: 50%;
-      bottom: 82px;
+      top: 64px;
       margin: 0;
       transform: translateX(-50%) translateY(8px);
-      color: #151515;
-      font-size: clamp(13px, 1.25vw, 17px);
-      font-weight: 900;
-      letter-spacing: -.02em;
+      color: #8a8a8a;
+      font:400 15px/1 "Suisse Works",serif;
       opacity: 0;
       transition: opacity .8s ease, transform .8s ease;
       white-space: nowrap;
     }
     .others-caption.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .counter.visible { opacity: 1; }
-    #reset {
-      position: absolute;
-      right: 28px;
-      top: 86px;
-      pointer-events: auto;
-      border: 1px solid #d4d4d4;
-      border-radius: 0;
-      background: rgba(255,255,255,.9);
-      color: #151515;
-      padding: 9px 15px;
-      font: 700 11px Georgia, "Times New Roman", serif;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-    #reset:hover { border-color: #111; }
     .nav-button {
-      position: absolute; bottom: 24px; width: 50px; height: 50px; display: grid; place-items: center;
+      position: absolute; bottom:28px; min-width:0; min-height:0; display:grid; place-items:center;
       pointer-events: auto;
-      border: 1px solid #171717; background: #fff; color: #171717; text-decoration: none;
-      font: 400 24px/1 Arial, sans-serif; transition: color .2s ease, background .2s ease;
+      border: 0; background: transparent; color: #171717; text-decoration: none;
+      font: 700 19px/1 "Suisse Works",serif; transition: transform .08s linear;
     }
-    .nav-button:hover { color: #fff; background: #e52a20; border-color: #e52a20; }
-    .nav-button.previous { left: 28px; }
-    .nav-button.next { right: 28px; }
-    .flow-progress {
-      position: absolute; right: 94px; bottom: 42px;
-      font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-    }
+    .nav-button:hover { transform: translateY(-5px); }
+    .nav-button.previous { left:32px; padding:9px 0; }
+    .nav-button.next { right:32px; min-width:132px; padding:14px 18px 13px; border:1px solid #e52a20; background:#e52a20; color:#fff; }
     @media (max-width: 680px) {
-      .title { top: 20px; left: 20px; max-width: 290px; }
-      .hint { left: 20px; bottom: 48px; font-size: 9px; }
-      .counter { bottom: 43px; font-size: 11px; }
-      #reset { right: 20px; top: 76px; }
-      .others-caption { bottom: 74px; font-size: 12px; }
+      .question-panel { top:20px; width:calc(100vw - 40px); }
+      .title { font-size:clamp(32px,10vw,50px); }
+      .instruction { font-size:17px; }
+      .ui.is-visual .question-panel { top:20px; max-width:calc(100vw - 32px); }
+      .ui.is-visual .title { max-width:calc(100vw - 32px); font-size:18px; }
+      .others-caption { top:48px; font-size:13px; }
       .nav-button { bottom: 18px; }
       .nav-button.previous { left: 20px; }
       .nav-button.next { right: 20px; }
-      .flow-progress { right: 82px; bottom: 36px; }
     }
     .error {
       display: none;
@@ -138,15 +101,13 @@
   </script>
 </head>
 <body>
+  <div class="progress-bar" id="progress-bar" aria-label="Avanzamento"><span id="progress"></span></div>
   <div class="ui">
-    <h1 class="title" id="question-title"></h1>
-    <a class="nav-button previous" id="previous-question" href="#" aria-label="Domanda precedente">←</a>
-    <span class="flow-progress" id="question-progress">5 / 6</span>
-    <a class="nav-button next" id="next-question" href="#" aria-label="Domanda successiva">→</a>
+    <div class="question-panel"><p class="number" id="question-number"></p><h1 class="title" id="question-title"></h1><p class="instruction" id="instruction"></p></div>
+    <a class="nav-button previous" id="previous-question" href="#" aria-label="Domanda precedente">Indietro</a>
+    <a class="nav-button next" id="next-question" href="#" aria-label="Domanda successiva">Prosegui</a>
     <p class="hint" id="hint">Muovi il mouse sul piano<br>per scegliere la tua posizione</p>
-    <span class="counter" id="counter"></span>
-    <p class="others-caption" id="others-caption">Tutti gli altri si sono posizionati qui.</p>
-    <button id="reset" type="button">Ricomincia</button>
+    <p class="others-caption" id="others-caption">Risposte degli altri utenti</p>
   </div>
   <div class="error" id="error">
     Impossibile caricare la scena 3D.<br>
@@ -160,31 +121,37 @@
 
     const compassConfigs = {
       3: {
-        title: '3. Come ritieni l’impatto delle nuove tecnologie nel tuo lavoro?',
+        title: '3. Come ritieni l’impatto delle nuove tecnologie e dell’Intelligenza Artificiale nel tuo lavoro?',
         axes: ['Facilita il mio lavoro', 'Non facilita il mio lavoro', 'Alleggerisce il carico di lavoro', 'Aumenta il carico di lavoro']
       },
       4: {
-        title: '4. Le tue condizioni di lavoro:',
-        axes: ['Nei prossimi anni miglioreranno', 'Nei prossimi anni peggioreranno', 'Negli ultimi anni sono migliorate', 'Negli ultimi anni sono peggiorate']
+        title: '4. Quale equilibrio dovrebbe cercare il lavoro contemporaneo?',
+        axes: ['Competizione', 'Cooperazione', 'Produttività', 'Benessere']
       },
       5: {
-        title: '5. Quale equilibrio dovrebbe cercare il lavoro contemporaneo?',
-        axes: ['Competizione', 'Cooperazione', 'Produttività', 'Benessere']
+        title: '5. Quali rischi peseranno maggiormente nel lavoro del futuro?',
+        axes: ['Perdita di posti a causa dell’automazione', 'Aumento della precarietà', 'Controllo digitale dei lavoratori', 'Disuguaglianze economiche']
       }
     };
     const questionNumber = Number(new URLSearchParams(location.search).get('q')) || 5;
     const compassConfig = compassConfigs[questionNumber] || compassConfigs[5];
     const questionHref = number => {
-      if (number === 1) return 'red-cubes-question-1.html';
-      if (number === 6) return 'red-cubes-placeholder.html?q=6';
-      if (number === 2) return 'red-cubes-priorities.html';
-      return `red-cubes-compass.html?q=${number}`;
+      if (number === 1) return 'cgil.html';
+      if (number === 6) return 'cgil.html?q=6';
+      if (number === 2) return 'cgil-02.html';
+      return `cgil-03-05.html?q=${number}`;
     };
     document.title = `${compassConfig.title} — Compass`;
-    document.querySelector('#question-title').innerHTML = `${compassConfig.title}<span>Posizionati rispetto ai 4 assi</span>`;
-    document.querySelector('#question-progress').textContent = `${questionNumber} / 6`;
+    document.querySelector('#question-number').textContent = `${questionNumber} di 6`;
+    document.querySelector('#question-title').textContent = compassConfig.title.replace(/^\d+\.\s*/, '');
+    document.querySelector('#instruction').textContent = questionNumber === 5 ? 'Regola gli slider' : 'Posizionati rispetto agli assi';
     document.querySelector('#previous-question').href = questionHref(questionNumber - 1);
     document.querySelector('#next-question').href = questionHref(questionNumber + 1);
+    const progress = document.querySelector('#progress');
+    const progressBar = document.querySelector('#progress-bar');
+    const questionStep = questionNumber * 2 - 1;
+    progress.style.width = `${questionStep / 12 * 100}%`;
+    progressBar.setAttribute('aria-label', `Avanzamento: passaggio ${questionStep} di 12`);
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xffffff);
@@ -234,23 +201,16 @@
     sun.shadow.bias = -0.0004;
     scene.add(sun);
 
-    // Un unico piano continuo sotto la bussola.
-    const board = new THREE.Group();
-    const boardGeometry = new THREE.BoxGeometry(14, 0.16, 14);
-    const boardMesh = new THREE.Mesh(
-      boardGeometry,
-      new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.94, metalness: 0 })
+    // Pavimento bianco continuo: gli assi definiscono lo spazio, le ombre
+    // mantengono il legame con la visualizzazione successiva.
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(2000,2000),
+      new THREE.ShadowMaterial({color:0x000000,opacity:.13,transparent:true})
     );
-    boardMesh.position.y = -0.12;
-    boardMesh.receiveShadow = true;
-    board.add(boardMesh);
-    const boardOutline = new THREE.LineSegments(
-      new THREE.EdgesGeometry(boardGeometry),
-      new THREE.LineBasicMaterial({ color: 0x242424, transparent: true, opacity: 0.52 })
-    );
-    boardOutline.position.copy(boardMesh.position);
-    board.add(boardOutline);
-    scene.add(board);
+    floor.rotation.x=-Math.PI/2;
+    floor.position.y=-.12;
+    floor.receiveShadow=true;
+    scene.add(floor);
 
     // Quattro assi reali sul piano: frecce dal centro e parole alle estremità.
     const axes = new THREE.Group();
@@ -295,7 +255,7 @@
       }
       let fontSize = isLong ? 54 : 62;
       do {
-        context.font = `700 ${fontSize}px Georgia, Times New Roman, serif`;
+        context.font = `700 ${fontSize}px "Suisse Works", serif`;
         fontSize -= 2;
       } while (Math.max(...lines.map(line => context.measureText(line).width)) > 900 && fontSize > 34);
       context.textAlign = 'center';
@@ -391,7 +351,6 @@
     let cameraTransition = 0;
     let otherWait = -1;
     const hint = document.querySelector('#hint');
-    const counter = document.querySelector('#counter');
     const othersCaption = document.querySelector('#others-caption');
     function spawnCube(delayHeight = 0) {
       if (cubes.length >= maxCubes) return;
@@ -431,7 +390,6 @@
       world.addBody(body);
       cubes.push({ mesh, body });
       spawnIndex++;
-      counter.textContent = `${cubes.length} risposte`;
     }
 
     function clearCubes() {
@@ -443,8 +401,6 @@
       cubes.length = 0;
       spawnIndex = 0;
       spawnClock = 0;
-      counter.textContent = '';
-      counter.classList.remove('visible');
     }
 
     // Nella vista zenitale l'hover è volutamente un solo quadrato piatto.
@@ -486,6 +442,9 @@
     function placeMyCube() {
       if (hasPlaced || !preview.visible) return;
       hasPlaced = true;
+      document.querySelector('.ui').classList.add('is-visual');
+      progress.style.width = `${questionNumber * 2 / 12 * 100}%`;
+      progressBar.setAttribute('aria-label', `Avanzamento: passaggio ${questionNumber * 2} di 12`);
       preview.visible = false;
       renderer.domElement.style.cursor = 'grab';
       const material = new THREE.MeshStandardMaterial({
@@ -531,6 +490,9 @@
         myCubeBody = null;
       }
       hasPlaced = false;
+      document.querySelector('.ui').classList.remove('is-visual');
+      progress.style.width = `${questionStep / 12 * 100}%`;
+      progressBar.setAttribute('aria-label', `Avanzamento: passaggio ${questionStep} di 12`);
       revealOthers = false;
       myCubeFade = 0;
       otherWait = -1;
@@ -556,7 +518,6 @@
       pointerDown = null;
       if (moved < 6) placeMyCube();
     });
-    document.querySelector('#reset').addEventListener('click', resetExperience);
     resetExperience();
 
     const clock = new THREE.Clock();
@@ -592,7 +553,6 @@
         if (otherWait <= 0 && otherWait > -1 && !revealOthers) {
           revealOthers = true;
           othersCaption.classList.add('visible');
-          counter.classList.add('visible');
           for (let i = 0; i < 4; i++) spawnCube(i * 0.45);
         }
       }

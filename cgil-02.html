@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Priorità del lavoro — cubi rossi</title>
+  <style>
+    @font-face { font-family: "Futura Condensed"; src: url("assets/font/Futura Bold Condensed.otf") format("opentype"); font-weight: 700; }
+    @font-face { font-family: "Suisse Works"; src: url("assets/font/Suisse Works Book.otf") format("opentype"); font-weight: 400; }
+    @font-face { font-family: "Suisse Works"; src: url("assets/font/Suisse Works Bold.otf") format("opentype"); font-weight: 700; }
+    :root { --red: #e52a20; --ink: #171717; --slider-height: min(31vh,250px); }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: #fff; color: var(--ink); font-family: "Suisse Works", serif; }
+    .progress-bar { position: fixed; z-index: 8; top: 0; left: 0; width: 100%; height: 4px; background: #e4e4e4; }
+    .progress-bar span { display: block; width: 25%; height: 100%; background: var(--red); transition: width .25s linear; }
+    canvas { position: fixed; inset: 0; display: block; }
+    .interface { position: fixed; inset: 0; z-index: 2; pointer-events: none; transition: opacity .55s ease, transform .7s cubic-bezier(.22,.8,.2,1); }
+    .interface.is-confirmed { opacity: 0; transform: translateY(-18px); }
+    .panel { position: absolute; top: 22px; left: 0; right: 0; width: min(900px,calc(100vw - 48px)); margin: 0 auto; text-align: center; }
+    .number { margin: 0 0 10px; color: var(--red); font: 700 clamp(15px,1.5vw,21px)/1 "Suisse Works",serif; }
+    h1 { max-width: 780px; margin: 0 auto; font: 700 clamp(33px,4.8vw,76px)/.95 "Futura Condensed", sans-serif; letter-spacing: .005em; text-transform: uppercase; }
+    .intro { margin: 4px 0 20px; color: #8a8a8a; font: 400 clamp(17px,1.5vw,22px)/1.25 "Suisse Works",serif; }
+    .choices { width: min(760px,100%); margin: 0 auto; display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: clamp(12px,3vw,34px); align-items: end; }
+    .choice { display: flex; min-width: 0; flex-direction: column; align-items: center; padding: 9px 0; }
+    .choice-head { display: flex; min-height: 55px; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
+    .choice label { font-size: clamp(14px,1.45vw,21px); line-height: 1.05; font-weight: 400; letter-spacing: 0; }
+    output { color: var(--red); font-family: "Suisse Works", serif; font-size: 13px; font-weight: 700; }
+    .vertical-scale { position: relative; width: 30px; height: calc(var(--slider-height) + 96px); margin-top: 22px; }
+    .vertical-slider { position: absolute; top: 0; left: 50%; width: 18px; height: var(--slider-height); transform: translateX(-50%); }
+    .vertical-slider input[type="range"] {
+      appearance: none; -webkit-appearance: none; position: absolute; top: 50%; left: 50%;
+      width: var(--slider-height); height: 18px; margin: 0; transform: translate(-50%,-50%) rotate(-90deg);
+      background: transparent; pointer-events: auto; cursor: ns-resize;
+    }
+    .vertical-slider input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 1px; background: var(--ink); }
+    .vertical-slider input[type="range"]::-moz-range-track { width: 100%; height: 1px; background: var(--ink); }
+    .vertical-slider input[type="range"]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; margin-top: -8.5px; border: 1px solid var(--ink); border-radius: 0; background: #fff; }
+    .vertical-slider input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 1px solid var(--ink); border-radius: 0; background: #fff; }
+    .nav-button {
+      position: fixed; z-index: 7; bottom: 28px; min-width: 0; min-height: 0; display: grid; place-items: center;
+      border: 0; border-radius: 0; background: transparent; color: var(--ink); padding: 9px 0;
+      text-decoration: none; font: 700 19px/1 "Suisse Works",serif; cursor: pointer;
+      transition: transform .08s linear;
+    }
+    .nav-button.previous { left: 32px; }
+    .nav-button.next { right: 32px; min-width: 132px; padding: 14px 18px 13px; border: 1px solid var(--red); background: var(--red); color: #fff; }
+    .nav-button:hover { transform: translateY(-5px); }
+    .flow-progress { display: none; }
+    .scene-caption { position: fixed; z-index: 3; top: 26px; left: 50%; width: max-content; max-width: calc(100vw - 40px); margin: 0; text-align: center; opacity: 0; transform: translateX(-50%); transition: opacity .3s linear; pointer-events: none; }
+    .scene-caption.visible { opacity: 1; }
+    .scene-caption strong { display: block; font: 700 clamp(15px,1.8vw,26px)/1 "Futura Condensed", sans-serif; text-transform: uppercase; white-space: nowrap; }
+    .scene-caption span { display: block; margin-top: 8px; color: #8a8a8a; font: 400 15px/1 "Suisse Works",serif; }
+    @media (max-width: 680px) {
+      :root { --slider-height: min(28vh,210px); }
+      .panel { top: 20px; width: calc(100vw - 40px); }
+      h1 { font-size: clamp(32px,10vw,50px); max-width: 100%; }
+      .intro { margin-bottom: 21px; font-size: 17px; }
+      .choices { gap: 9px; }
+      .choice { padding: 10px 0 11px; }
+      .choice label { font-size: 13px; }
+      .nav-button { bottom: 18px; }
+      .nav-button.previous { left: 20px; }
+      .nav-button.next { right: 20px; }
+      .scene-caption { top: 20px; max-width: calc(100vw - 32px); }
+    }
+  </style>
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <div class="progress-bar" aria-label="Avanzamento: passaggio 3 di 12"><span id="progress"></span></div>
+  <div class="interface" id="interface">
+    <main class="panel">
+      <p class="number">2 di 6</p>
+      <h1>Cosa dovrebbe significare “avere successo” nel lavoro?</h1>
+      <p class="intro">Regola gli slider</p>
+      <div class="choices" id="choices"></div>
+    </main>
+  </div>
+  <a class="nav-button previous" id="previous" href="cgil.html" aria-label="Domanda precedente">Indietro</a>
+  <span class="flow-progress">3 / 12</span>
+  <button class="nav-button next" id="confirm" type="button" aria-label="Conferma e continua">Prosegui</button>
+  <p class="scene-caption" id="scene-caption"><strong>Cosa dovrebbe significare “avere successo” nel lavoro?</strong><span>Risposta media degli altri utenti</span></p>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const qualities = [
+      'Guadagnare bene',
+      'Essere soddisfatti',
+      'Avere responsabilità',
+      'Essere riconosciuti',
+      'Avere tempo per sé',
+      'Fare qualcosa di utile'
+    ];
+    const TOTAL = 100;
+    const values = Array(6).fill(TOTAL / 6);
+    const choices = document.querySelector('#choices');
+    const interfaceEl = document.querySelector('#interface');
+    const caption = document.querySelector('#scene-caption');
+    const previous = document.querySelector('#previous');
+    const progress = document.querySelector('#progress');
+    let confirmed = false;
+
+    qualities.forEach((quality, index) => {
+      const row = document.createElement('div');
+      row.className = 'choice';
+      row.innerHTML = `
+        <div class="choice-head"><label for="range-${index}">${quality}</label><output id="output-${index}">${Math.floor(values[index])}%</output></div>
+        <div class="vertical-scale"><div class="vertical-slider"><input id="range-${index}" type="range" min="0" max="${TOTAL}" step="0.1" value="${values[index]}" aria-label="${quality}"></div></div>
+      `;
+      choices.append(row);
+      row.querySelector('input').addEventListener('input', event => redistribute(index, Number(event.target.value)));
+    });
+
+    function redistribute(changed, nextValue) {
+      const oldValue = values[changed];
+      const others = values.map((_, index) => index).filter(index => index !== changed);
+      const maxValue = oldValue + others.reduce((sum, index) => sum + values[index], 0);
+      const target = Math.max(0, Math.min(maxValue, nextValue));
+      const delta = target - oldValue;
+      if (delta > 0) {
+        let remaining = delta;
+        while (remaining > .0001) {
+          const active = others.filter(index => values[index] > .0001);
+          if (!active.length) break;
+          const share = remaining / active.length;
+          let moved = 0;
+          active.forEach(index => { const amount = Math.min(share, values[index]); values[index] -= amount; moved += amount; });
+          remaining -= moved;
+        }
+        values[changed] = oldValue + delta - remaining;
+      } else if (delta < 0) {
+        const active = others.filter(index => values[index] > .0001);
+        const recipients = active.length ? active : others;
+        recipients.forEach(index => { values[index] += -delta / recipients.length; });
+        values[changed] = target;
+      }
+      values.forEach((value, index) => {
+        if (Math.abs(value) < .0001) values[index] = 0;
+        if (Math.abs(TOTAL - value) < .0001) values[index] = TOTAL;
+      });
+      // Corregge esclusivamente gli arrotondamenti in virgola mobile: il totale
+      // resta sempre esattamente 100, anche quando un selettore arriva al massimo.
+      values[changed] += TOTAL - values.reduce((sum, value) => sum + value, 0);
+      updateInterface();
+    }
+
+    function updateInterface() {
+      values.forEach((value, index) => {
+        document.querySelector(`#range-${index}`).value = value;
+        document.querySelector(`#output-${index}`).textContent = `${Math.floor(value + .00001)}%`;
+      });
+      updateTowers();
+    }
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+    scene.fog = new THREE.Fog(0xffffff, 26, 48);
+    const camera = new THREE.PerspectiveCamera(34, innerWidth / innerHeight, .1, 100);
+    // La distribuzione inizia come una lettura zenitale; confermando, la camera
+    // si inclina e rivela che le quattro ripartizioni hanno profondità e altezza.
+    const initialCamera = new THREE.Vector3(0, 29, .01);
+    const finalCamera = new THREE.Vector3(0, 23, 17);
+    const initialTarget = new THREE.Vector3(0, 0, 0);
+    const finalTarget = new THREE.Vector3(0, 4.8, 0);
+    camera.position.copy(initialCamera);
+    camera.lookAt(initialTarget);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.03;
+    document.body.prepend(renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.copy(initialTarget);
+    controls.enableDamping = true;
+    controls.dampingFactor = .055;
+    controls.minDistance = 11;
+    controls.maxDistance = 34;
+    controls.enabled = false;
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xb4b4b4, 2.1));
+    const sun = new THREE.DirectionalLight(0xffffff, 3.4);
+    sun.position.set(-8, 18, 10);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -12; sun.shadow.camera.right = 12;
+    sun.shadow.camera.top = 12; sun.shadow.camera.bottom = -12;
+    scene.add(sun);
+
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(2000, 2000),
+      new THREE.ShadowMaterial({ color: 0x000000, opacity: .13, transparent: true })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    const redMaterials = [
+      new THREE.MeshStandardMaterial({ color: 0xf13328, roughness: .43 }),
+      new THREE.MeshStandardMaterial({ color: 0xd62219, roughness: .5 }),
+      new THREE.MeshStandardMaterial({ color: 0xff4538, roughness: .38 })
+    ];
+    const selectionMaterial = new THREE.MeshStandardMaterial({ color: 0xe52a20, roughness: .44 });
+    const cubeGeometry = new THREE.BoxGeometry(.72, .72, .72);
+    const towerPositions = [[-7, 0], [-4.2, 0], [-1.4, 0], [1.4, 0], [4.2, 0], [7, 0]];
+    const previousCounts = [11, 16, 8, 13, 10, 7];
+    const selectionPositions = qualities.map(() => [0, 0]);
+    const selectionCubes = selectionPositions.map(([x, z], index) => {
+      const cube = new THREE.Mesh(cubeGeometry, selectionMaterial);
+      cube.castShadow = false;
+      cube.receiveShadow = false;
+      scene.add(cube);
+      return cube;
+    });
+    const alignmentRaycaster = new THREE.Raycaster();
+    const alignmentPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const alignmentPoint = new THREE.Vector3();
+    function alignSelectionSquares() {
+      if (confirmed) return;
+      camera.updateMatrixWorld();
+      document.querySelectorAll('.vertical-slider').forEach((slider, index) => {
+        const rect = slider.getBoundingClientRect();
+        const screenX = rect.left + rect.width / 2;
+        const screenY = rect.bottom + 66;
+        alignmentRaycaster.setFromCamera(new THREE.Vector2(
+          screenX / innerWidth * 2 - 1,
+          -(screenY / innerHeight) * 2 + 1
+        ), camera);
+        if (!alignmentRaycaster.ray.intersectPlane(alignmentPlane, alignmentPoint)) return;
+        const x = alignmentPoint.x;
+        const z = alignmentPoint.z;
+        selectionPositions[index][0] = x;
+        selectionPositions[index][1] = z;
+        towerPositions[index][0] = x;
+        towerPositions[index][1] = z;
+        if (towers[index]) towers[index].group.position.set(x, 0, z);
+        if (towerLabels[index]) towerLabels[index].position.set(x, .2, z + 1.35);
+      });
+    }
+    const towers = towerPositions.map(([x, z], index) => {
+      const group = new THREE.Group();
+      group.position.set(x, 0, z);
+      const cubes = [];
+      let stackHeight = 0;
+      let historyHeight = 0;
+      for (let level = 0; level < 20; level++) {
+        const size = .34 + ((index * 7 + level * 5) % 8) * .095;
+        const cube = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), redMaterials[(index + level) % redMaterials.length]);
+        cube.position.y = stackHeight + size / 2;
+        cube.castShadow = true; cube.receiveShadow = true;
+        group.add(cube); cubes.push({ mesh: cube, size, baseY: cube.position.y });
+        stackHeight += size;
+        if (level + 1 === previousCounts[index]) historyHeight = stackHeight;
+      }
+      scene.add(group);
+      group.visible = false;
+      return { group, cubes, historyHeight };
+    });
+
+    const towerLabels = [];
+    function makeLabel(text, index) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 900; canvas.height = 190;
+      const context = canvas.getContext('2d');
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false }));
+      sprite.scale.set(4.8, 1, 1);
+      sprite.userData = { context, texture, text, index };
+      return sprite;
+    }
+    function drawLabel(label) { const { context, texture, text, index } = label.userData; context.clearRect(0,0,900,190); context.fillStyle='#171717'; context.textAlign='center'; context.textBaseline='middle'; context.font='700 38px "Suisse Works", serif'; context.fillText(text,450,65); context.font='700 42px "Suisse Works", serif'; context.fillText(`${Math.floor(values[index])}%`,450,128); texture.needsUpdate=true; }
+    towerPositions.forEach(([x, z], index) => {
+      const label = makeLabel(qualities[index], index);
+      drawLabel(label);
+      label.position.set(x, .2, z + 1.35);
+      label.visible = false;
+      scene.add(label);
+      towerLabels.push(label);
+    });
+
+    function updateTowers() {
+      towers.forEach((tower, towerIndex) => {
+        const active = previousCounts[towerIndex];
+        tower.cubes.forEach((cube, level) => {
+          cube.mesh.visible = level < active;
+          cube.mesh.scale.setScalar(1);
+        });
+      });
+      selectionCubes.forEach((cube, index) => {
+        const size = .56 + values[index] / 78;
+        cube.visible = !confirmed;
+        cube.scale.set(size, .025, size);
+        cube.castShadow = false;
+        cube.receiveShadow = false;
+        const [x, z] = selectionPositions[index];
+        cube.position.set(x, .015, z);
+      });
+    }
+
+    let transition = 0;
+    document.querySelector('#confirm').addEventListener('click', () => {
+      if (confirmed) {
+        location.href = 'cgil-03-05.html?q=3';
+        return;
+      }
+      confirmed = true;
+      towers.forEach(tower => { tower.group.visible = true; });
+      towerLabels.forEach(label => { drawLabel(label); label.visible = true; });
+      interfaceEl.classList.add('is-confirmed');
+      caption.classList.add('visible');
+      progress.style.width = '33.333%';
+      document.querySelector('.progress-bar').setAttribute('aria-label', 'Avanzamento: passaggio 4 di 12');
+      document.querySelector('#confirm').setAttribute('aria-label', 'Vai alla domanda 3');
+    });
+    function returnToQuestion() {
+      confirmed = false;
+      transition = 0;
+      controls.enabled = false;
+      controls.target.copy(initialTarget);
+      towers.forEach(tower => { tower.group.visible = false; });
+      towerLabels.forEach(label => { label.visible = false; });
+      interfaceEl.classList.remove('is-confirmed');
+      caption.classList.remove('visible');
+      progress.style.width = '25%';
+      document.querySelector('.progress-bar').setAttribute('aria-label', 'Avanzamento: passaggio 3 di 12');
+      document.querySelector('#confirm').setAttribute('aria-label', 'Conferma e continua');
+      alignSelectionSquares();
+      updateTowers();
+    }
+    previous.addEventListener('click', event => { if (!confirmed) return; event.preventDefault(); returnToQuestion(); });
+
+    const clock = new THREE.Clock();
+    const animatedTarget = new THREE.Vector3();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), .05);
+      const goal = confirmed ? 1 : 0;
+      transition += (goal - transition) * Math.min(1, delta * 2.1);
+      const eased = transition * transition * (3 - 2 * transition);
+      animatedTarget.lerpVectors(initialTarget, finalTarget, eased);
+      if (!controls.enabled) {
+        camera.position.lerpVectors(initialCamera, finalCamera, eased);
+        camera.lookAt(animatedTarget);
+      }
+      selectionCubes.forEach((cube, index) => {
+        if (confirmed) { cube.visible = false; return; }
+        const size = .56 + values[index] / 78;
+        const [x, z] = selectionPositions[index];
+        cube.position.set(x, .015, z);
+        cube.scale.set(size, .025, size);
+      });
+      towers.forEach(tower => tower.cubes.forEach(cube => {
+        if (!cube.mesh.visible) return;
+        cube.mesh.scale.setScalar(1);
+        cube.mesh.position.y = cube.baseY;
+      }));
+      if (confirmed && transition > .985 && !controls.enabled) {
+        controls.target.copy(finalTarget);
+        controls.enabled = true;
+      }
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    alignSelectionSquares();
+    updateInterface();
+    animate();
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      requestAnimationFrame(() => {
+        alignSelectionSquares();
+        updateTowers();
+      });
+    });
+  </script>
+</body>
+</html>
