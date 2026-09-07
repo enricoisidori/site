@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grid Step Clusters</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: #171411; }
+    canvas { display: block; width: 100%; height: 100%; cursor: default; }
+  </style>
+</head>
+<body>
+  <canvas id="field" aria-label="Interactive grid particle field"></canvas>
+
+  <script>
+    'use strict';
+
+    const packedMode = new URLSearchParams(window.location.search).has('packed');
+    const CONFIG = {
+      background: '#171411',
+      red: '#e52a20',
+      label: '#ffffff',
+      squareSize: packedMode ? 12 : 7,
+      gridSize: packedMode ? 12 : 15,
+      clusterCount: 8,
+      clusterDensity: 42,
+      interactionRadius: 205,
+      jumpCells: 9,
+      sweepImpulse: 72,
+      springStrength: 0.09,
+      damping: 0.84,
+      maximumVelocity: 165,
+      positionSleepThreshold: 0.09,
+      velocitySleepThreshold: 0.04
+    };
+
+    const canvas = document.querySelector('#field');
+    const context = canvas.getContext('2d', { alpha: false });
+    const squares = [];
+    const labels = [];
+    const pointer = { x: -9999, y: -9999, hasPosition: false };
+    let width = 0;
+    let height = 0;
+    let framePending = false;
+    let lastTime = 0;
+
+    const clusters = [
+      { x: .13, y: .18, rx: .085, ry: .07, density: .8, label: 'CLUSTER 01' },
+      { x: .36, y: .15, rx: .115, ry: .08, density: 1.08, label: 'CLUSTER 02' },
+      { x: .68, y: .18, rx: .075, ry: .11, density: .7, label: 'CLUSTER 03' },
+      { x: .87, y: .3, rx: .09, ry: .07, density: .88, label: 'CLUSTER 04' },
+      { x: .19, y: .55, rx: .11, ry: .09, density: 1.05, label: 'CLUSTER 05' },
+      { x: .5, y: .49, rx: .07, ry: .125, density: .72, label: 'CLUSTER 06' },
+      { x: .73, y: .61, rx: .14, ry: .075, density: 1.15, label: 'CLUSTER 07' },
+      { x: .41, y: .81, rx: .12, ry: .065, density: .9, label: 'CLUSTER 08' }
+    ];
+
+    function seededRandom(seed) {
+      let value = seed >>> 0;
+      return () => {
+        value += 0x6D2B79F5;
+        let result = value;
+        result = Math.imul(result ^ result >>> 15, result | 1);
+        result ^= result + Math.imul(result ^ result >>> 7, result | 61);
+        return ((result ^ result >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function snap(value) {
+      return Math.round(value / CONFIG.gridSize) * CONFIG.gridSize;
+    }
+
+    function limitX(value) {
+      return Math.max(CONFIG.gridSize, Math.min(width - CONFIG.gridSize, snap(value)));
+    }
+
+    function limitY(value) {
+      return Math.max(CONFIG.gridSize, Math.min(height - CONFIG.gridSize, snap(value)));
+    }
+
+    function createBody(homeX, homeY, kind, random, text = '') {
+      return {
+        homeX, homeY,
+        // motion coordinates stay continuous for the spring; x/y are always snapped display slots.
+        motionX: homeX, motionY: homeY, x: homeX, y: homeY,
+        targetX: homeX, targetY: homeY,
+        vx: 0, vy: 0, kind, text,
+        mass: .8 + random() * .55,
+        spring: CONFIG.springStrength * (.78 + random() * .45),
+        damping: CONFIG.damping + (random() - .5) * .04,
+        returning: false,
+        outboundSpeed: 0,
+        bias: (random() - .5) * .7,
+        biasX: random() * 2 - 1,
+        biasY: random() * 2 - 1
+      };
+    }
+
+    function createComposition() {
+      squares.length = 0;
+      labels.length = 0;
+      const random = seededRandom(0x51EAD); // a fixed score for a deliberately still composition
+      const occupied = new Set();
+
+      clusters.slice(0, CONFIG.clusterCount).forEach((cluster) => {
+        const centerX = snap(width * cluster.x);
+        const centerY = snap(height * cluster.y);
+        const radiusX = Math.max(CONFIG.gridSize * 3, width * cluster.rx);
+        const radiusY = Math.max(CONFIG.gridSize * 3, height * cluster.ry);
+        const count = Math.round(CONFIG.clusterDensity * cluster.density);
+        const localCells = [];
+        let seedX = centerX;
+        let seedY = centerY;
+        for (let row = -4; row <= 4 && occupied.has(`${seedX}:${seedY}`); row++) {
+          for (let column = -4; column <= 4 && occupied.has(`${seedX}:${seedY}`); column++) {
+            const candidateX = limitX(centerX + column * CONFIG.gridSize);
+            const candidateY = limitY(centerY + row * CONFIG.gridSize);
+            if (!occupied.has(`${candidateX}:${candidateY}`)) {
+              seedX = candidateX;
+              seedY = candidateY;
+            }
+          }
+        }
+        const seedKey = `${seedX}:${seedY}`;
+        occupied.add(seedKey);
+        localCells.push({ x: seedX, y: seedY });
+        squares.push(createBody(seedX, seedY, 'square', random));
+
+        let placed = localCells.length;
+        let tries = 0;
+
+        while (placed < count && tries < count * 15) {
+          tries += 1;
+          const neighbor = localCells[Math.floor(random() * localCells.length)];
+          const direction = Math.floor(random() * 4);
+          const homeX = limitX(neighbor.x + (direction === 0 ? CONFIG.gridSize : direction === 1 ? -CONFIG.gridSize : 0));
+          const homeY = limitY(neighbor.y + (direction === 2 ? CONFIG.gridSize : direction === 3 ? -CONFIG.gridSize : 0));
+          const offsetX = homeX - centerX;
+          const offsetY = homeY - centerY;
+          if ((offsetX * offsetX) / (radiusX * radiusX) + (offsetY * offsetY) / (radiusY * radiusY) > 1.08) continue;
+          const key = `${homeX}:${homeY}`;
+          if (occupied.has(key)) continue;
+          occupied.add(key);
+          localCells.push({ x: homeX, y: homeY });
+          squares.push(createBody(homeX, homeY, 'square', random));
+          placed += 1;
+        }
+
+        const labelY = limitY(centerY + radiusY + CONFIG.gridSize * 2.4);
+        labels.push(createBody(limitX(centerX), labelY, 'label', random, cluster.label));
+      });
+    }
+
+    function resize() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      createComposition();
+      draw();
+    }
+
+    function requestFrame() {
+      if (!framePending) {
+        framePending = true;
+        requestAnimationFrame(step);
+      }
+    }
+
+    function movePointer(event) {
+      const rectangle = canvas.getBoundingClientRect();
+      const nextX = event.clientX - rectangle.left;
+      const nextY = event.clientY - rectangle.top;
+      const travel = pointer.hasPosition ? Math.hypot(nextX - pointer.x, nextY - pointer.y) : 0;
+      pointer.x = nextX;
+      pointer.y = nextY;
+      pointer.hasPosition = true;
+      if (travel > 0) jumpFromPointer(travel);
+      requestFrame();
+    }
+
+    function returnHome() {
+      pointer.hasPosition = false;
+      for (const body of [...squares, ...labels]) beginReturn(body);
+      requestFrame();
+    }
+
+    function beginReturn(body) {
+      if (body.returning) return;
+      body.targetX = body.homeX;
+      body.targetY = body.homeY;
+      body.returning = true;
+
+      const homeX = body.homeX - body.motionX;
+      const homeY = body.homeY - body.motionY;
+      const distance = Math.hypot(homeX, homeY);
+      if (distance > CONFIG.positionSleepThreshold && body.outboundSpeed > 0) {
+        const speed = Math.min(CONFIG.maximumVelocity, body.outboundSpeed);
+        body.vx = homeX / distance * speed;
+        body.vy = homeY / distance * speed;
+      }
+    }
+
+    function jumpFromPointer(travel) {
+      const travelFactor = .65 + Math.min(1, travel / 18);
+      for (const body of [...squares, ...labels]) {
+        const dx = body.x - pointer.x;
+        const dy = body.y - pointer.y;
+        const distance = Math.hypot(dx, dy);
+        if (distance >= CONFIG.interactionRadius) continue;
+
+        const closeness = 1 - distance / CONFIG.interactionRadius;
+        const awayX = distance ? dx / distance : body.biasX;
+        const awayY = distance ? dy / distance : body.biasY;
+        const directionX = awayX * Math.cos(body.bias) - awayY * Math.sin(body.bias) + body.biasX * .18;
+        const directionY = awayX * Math.sin(body.bias) + awayY * Math.cos(body.bias) + body.biasY * .18;
+        const distanceInCells = CONFIG.jumpCells * closeness * travelFactor;
+        body.targetX = limitX(body.x + directionX * distanceInCells * CONFIG.gridSize);
+        body.targetY = limitY(body.y + directionY * distanceInCells * CONFIG.gridSize);
+        body.returning = false;
+        const impulse = CONFIG.sweepImpulse * closeness * travelFactor / body.mass;
+        body.vx += directionX * impulse;
+        body.vy += directionY * impulse;
+        body.outboundSpeed = Math.min(CONFIG.maximumVelocity, Math.hypot(body.vx, body.vy));
+      }
+    }
+
+    function updateBody(body, delta) {
+      const forceX = (body.targetX - body.motionX) * body.spring;
+      const forceY = (body.targetY - body.motionY) * body.spring;
+      body.vx = (body.vx + forceX / body.mass * delta) * body.damping;
+      body.vy = (body.vy + forceY / body.mass * delta) * body.damping;
+      const speed = Math.hypot(body.vx, body.vy);
+      if (speed > CONFIG.maximumVelocity) {
+        body.vx *= CONFIG.maximumVelocity / speed;
+        body.vy *= CONFIG.maximumVelocity / speed;
+      }
+      body.motionX += body.vx * delta;
+      body.motionY += body.vy * delta;
+      // The spring is fluid internally, but the visible world has no in-between positions.
+      body.x = limitX(body.motionX);
+      body.y = limitY(body.motionY);
+
+      const remainingDistance = Math.hypot(body.targetX - body.motionX, body.targetY - body.motionY);
+      const remainingSpeed = Math.hypot(body.vx, body.vy);
+      if (remainingDistance < CONFIG.positionSleepThreshold && remainingSpeed < CONFIG.velocitySleepThreshold) {
+        body.motionX = body.targetX;
+        body.motionY = body.targetY;
+        body.x = body.targetX;
+        body.y = body.targetY;
+        body.vx = 0;
+        body.vy = 0;
+        return false;
+      }
+      return true;
+    }
+
+    function step(time) {
+      framePending = false;
+      const delta = Math.min(.033, Math.max(.008, (time - lastTime) / 16.666 || 1));
+      lastTime = time;
+      let moving = false;
+      for (const body of [...squares, ...labels]) {
+        const isOutsideRadius = !pointer.hasPosition || Math.hypot(body.x - pointer.x, body.y - pointer.y) > CONFIG.interactionRadius;
+        if (isOutsideRadius) beginReturn(body);
+        moving = updateBody(body, delta) || moving;
+      }
+      draw();
+      if (moving) requestFrame();
+    }
+
+    function draw() {
+      context.fillStyle = CONFIG.background;
+      context.fillRect(0, 0, width, height);
+      context.fillStyle = CONFIG.red;
+      const half = CONFIG.squareSize / 2;
+      for (const square of squares) {
+        context.fillRect(Math.round(square.x - half), Math.round(square.y - half), CONFIG.squareSize, CONFIG.squareSize);
+      }
+      context.fillStyle = CONFIG.label;
+      context.font = '10px Helvetica, Arial, sans-serif';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      for (const label of labels) context.fillText(label.text, Math.round(label.x), Math.round(label.y));
+    }
+
+    canvas.addEventListener('pointermove', movePointer, { passive: true });
+    canvas.addEventListener('pointerenter', movePointer, { passive: true });
+    canvas.addEventListener('pointerleave', returnHome, { passive: true });
+    canvas.addEventListener('pointercancel', returnHome, { passive: true });
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+  </script>
+</body>
+</html>

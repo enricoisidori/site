@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spring Square Clusters</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: #171411; }
+    canvas { display: block; width: 100%; height: 100%; cursor: default; }
+  </style>
+</head>
+<body>
+  <canvas id="field" aria-label="Interactive spring particle field"></canvas>
+
+  <script>
+    'use strict';
+
+    // Tune the behaviour here.
+    const CONFIG = {
+      squareSizeMin: 3,
+      squareSizeMax: 10,
+      red: '#e52a20',
+      background: '#171411',
+      clusterCount: 9,
+      clusterDensity: 74,
+      overlapShare: .42,
+      interactionRadius: 250,
+      repulsionStrength: 56,
+      sweepImpulse: 132,
+      springStrength: 0.065,
+      damping: 0.9,
+      maximumVelocity: 180,
+      positionSleepThreshold: 0.08,
+      velocitySleepThreshold: 0.028
+    };
+
+    const canvas = document.querySelector('#field');
+    const context = canvas.getContext('2d', { alpha: false });
+    const pointer = { x: -9999, y: -9999, active: false, hasPosition: false };
+    const particles = [];
+    let width = 0;
+    let height = 0;
+    let framePending = false;
+    let lastTime = 0;
+
+    // Deliberately irregular cluster positions and proportions.
+    const clusterBlueprint = [
+      { x: .12, y: .18, rx: .09, ry: .06, density: .75 },
+      { x: .34, y: .15, rx: .13, ry: .08, density: 1.15 },
+      { x: .68, y: .16, rx: .08, ry: .11, density: .7 },
+      { x: .86, y: .27, rx: .10, ry: .07, density: .9 },
+      { x: .20, y: .52, rx: .12, ry: .10, density: 1.1 },
+      { x: .49, y: .46, rx: .07, ry: .13, density: .65 },
+      { x: .73, y: .59, rx: .15, ry: .08, density: 1.25 },
+      { x: .37, y: .79, rx: .11, ry: .07, density: .85 },
+      { x: .87, y: .82, rx: .08, ry: .11, density: .7 }
+    ];
+
+    function seededRandom(seed) {
+      let value = seed >>> 0;
+      return () => {
+        value += 0x6D2B79F5;
+        let result = value;
+        result = Math.imul(result ^ result >>> 15, result | 1);
+        result ^= result + Math.imul(result ^ result >>> 7, result | 61);
+        return ((result ^ result >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function resize() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      createParticles();
+      draw();
+    }
+
+    function createParticles() {
+      particles.length = 0;
+      const random = seededRandom(0xC0DE3); // fixed seed: the calm arrangement is always intentional.
+      const inset = Math.max(CONFIG.squareSizeMax * 2, 16);
+      clusterBlueprint.slice(0, CONFIG.clusterCount).forEach((cluster, clusterIndex) => {
+        const count = Math.round(CONFIG.clusterDensity * cluster.density);
+        const centerX = width * cluster.x;
+        const centerY = height * cluster.y;
+        const radiusX = Math.max(28, width * cluster.rx);
+        const radiusY = Math.max(28, height * cluster.ry);
+
+        for (let index = 0; index < count; index++) {
+          let offsetX = 0;
+          let offsetY = 0;
+          // Rejection sampling gives each cluster an uneven, loose elliptical body.
+          do {
+            offsetX = (random() * 2 - 1) * radiusX;
+            offsetY = (random() * 2 - 1) * radiusY;
+          } while ((offsetX * offsetX) / (radiusX * radiusX) + (offsetY * offsetY) / (radiusY * radiusY) > 1);
+
+          // Some squares are deliberately gathered into tighter layers, allowing calm overlaps at rest.
+          if (random() < CONFIG.overlapShare) {
+            const layerScale = .16 + random() * .38;
+            offsetX *= layerScale;
+            offsetY *= layerScale;
+          }
+
+          const homeX = Math.max(inset, Math.min(width - inset, centerX + offsetX));
+          const homeY = Math.max(inset, Math.min(height - inset, centerY + offsetY));
+          particles.push({
+            homeX, homeY,
+            x: homeX, y: homeY,
+            vx: 0, vy: 0,
+            size: CONFIG.squareSizeMin + random() * (CONFIG.squareSizeMax - CONFIG.squareSizeMin),
+            mass: .75 + random() * .8,
+            repulsion: .6 + random() * 1.15,
+            spring: CONFIG.springStrength * (.62 + random() * .9),
+            damping: CONFIG.damping + (random() - .5) * .065,
+            bias: (random() - .5) * .85,
+            biasX: random() * 2 - 1,
+            biasY: random() * 2 - 1,
+            cluster: clusterIndex
+          });
+        }
+      });
+    }
+
+    function requestFrame() {
+      if (!framePending) {
+        framePending = true;
+        requestAnimationFrame(step);
+      }
+    }
+
+    function disturb(event) {
+      const rectangle = canvas.getBoundingClientRect();
+      const nextX = event.clientX - rectangle.left;
+      const nextY = event.clientY - rectangle.top;
+      const travel = pointer.hasPosition ? Math.hypot(nextX - pointer.x, nextY - pointer.y) : 0;
+      pointer.x = nextX;
+      pointer.y = nextY;
+      pointer.active = true;
+      pointer.hasPosition = true;
+      if (travel > 0) applySweepImpulse(travel);
+      requestFrame();
+    }
+
+    function releasePointer() {
+      pointer.active = false;
+      pointer.hasPosition = false;
+      requestFrame();
+    }
+
+    // Mouse movement gives the local field a one-off kick, so particles scatter instead of merely trembling.
+    function applySweepImpulse(travel) {
+      const radius = CONFIG.interactionRadius;
+      const travelFactor = .55 + Math.min(1.25, travel / 16);
+      for (const particle of particles) {
+        const distanceX = particle.x - pointer.x;
+        const distanceY = particle.y - pointer.y;
+        const distance = Math.hypot(distanceX, distanceY);
+        if (distance >= radius) continue;
+
+        const closeness = 1 - distance / radius;
+        const awayX = distance ? distanceX / distance : particle.biasX;
+        const awayY = distance ? distanceY / distance : particle.biasY;
+        const kickX = awayX * Math.cos(particle.bias) - awayY * Math.sin(particle.bias) + particle.biasX * .22;
+        const kickY = awayX * Math.sin(particle.bias) + awayY * Math.cos(particle.bias) + particle.biasY * .22;
+        const kick = CONFIG.sweepImpulse * particle.repulsion * closeness * closeness * travelFactor / particle.mass;
+        particle.vx += kickX * kick;
+        particle.vy += kickY * kick;
+      }
+    }
+
+    function step(time) {
+      framePending = false;
+      const delta = Math.min(.033, Math.max(.008, (time - lastTime) / 16.666 || 1));
+      lastTime = time;
+      const radius = CONFIG.interactionRadius;
+      const radiusSquared = radius * radius;
+      let somethingMoving = false;
+
+      for (const particle of particles) {
+        let forceX = 0;
+        let forceY = 0;
+
+        if (pointer.active) {
+          const distanceX = particle.x - pointer.x;
+          const distanceY = particle.y - pointer.y;
+          const distanceSquared = distanceX * distanceX + distanceY * distanceY;
+
+          if (distanceSquared < radiusSquared) {
+            const distance = Math.sqrt(distanceSquared) || .001;
+            const closeness = 1 - distance / radius;
+            const awayX = distanceX / distance;
+            const awayY = distanceY / distance;
+            // A persistent directional bias gives each square a distinct escape path.
+            const biasedX = awayX * Math.cos(particle.bias) - awayY * Math.sin(particle.bias) + particle.biasX * .28;
+            const biasedY = awayX * Math.sin(particle.bias) + awayY * Math.cos(particle.bias) + particle.biasY * .28;
+            const power = CONFIG.repulsionStrength * particle.repulsion * closeness * closeness;
+            forceX += biasedX * power;
+            forceY += biasedY * power;
+          }
+        }
+
+        // Spring attraction is deterministic: it is the only force away from the cursor.
+        forceX += (particle.homeX - particle.x) * particle.spring;
+        forceY += (particle.homeY - particle.y) * particle.spring;
+
+        particle.vx = (particle.vx + forceX / particle.mass * delta) * particle.damping;
+        particle.vy = (particle.vy + forceY / particle.mass * delta) * particle.damping;
+
+        const speed = Math.hypot(particle.vx, particle.vy);
+        if (speed > CONFIG.maximumVelocity) {
+          const scale = CONFIG.maximumVelocity / speed;
+          particle.vx *= scale;
+          particle.vy *= scale;
+        }
+
+        particle.x += particle.vx * delta;
+        particle.y += particle.vy * delta;
+
+        const homeDistanceX = particle.homeX - particle.x;
+        const homeDistanceY = particle.homeY - particle.y;
+        const remainingDistance = Math.hypot(homeDistanceX, homeDistanceY);
+        const remainingSpeed = Math.hypot(particle.vx, particle.vy);
+
+        // This is the hard sleep condition: the resting arrangement is mathematically static.
+        if (remainingDistance < CONFIG.positionSleepThreshold && remainingSpeed < CONFIG.velocitySleepThreshold) {
+          particle.x = particle.homeX;
+          particle.y = particle.homeY;
+          particle.vx = 0;
+          particle.vy = 0;
+        } else {
+          somethingMoving = true;
+        }
+      }
+
+      draw();
+      if (somethingMoving || pointer.active) requestFrame();
+    }
+
+    function draw() {
+      context.fillStyle = CONFIG.background;
+      context.fillRect(0, 0, width, height);
+      context.fillStyle = CONFIG.red;
+      for (const particle of particles) {
+        const half = particle.size / 2;
+        context.fillRect(Math.round(particle.x - half), Math.round(particle.y - half), Math.round(particle.size), Math.round(particle.size));
+      }
+    }
+
+    canvas.addEventListener('pointermove', disturb, { passive: true });
+    canvas.addEventListener('pointerenter', disturb, { passive: true });
+    canvas.addEventListener('pointerleave', releasePointer, { passive: true });
+    canvas.addEventListener('pointercancel', releasePointer, { passive: true });
+    window.addEventListener('resize', resize, { passive: true });
+
+    resize();
+  </script>
+</body>
+</html>

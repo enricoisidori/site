@@ -5,15 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CGIL — Domanda 1</title>
   <style>
-    @font-face { font-family: "Futura Condensed"; src: url("assets/font/Futura Bold Condensed.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
-    @font-face { font-family: "Suisse Works"; src: url("assets/font/Suisse Works Book.otf") format("opentype"); font-weight: 400; font-style: normal; font-display: swap; }
-    @font-face { font-family: "Suisse Works"; src: url("assets/font/Suisse Works Bold.otf") format("opentype"); font-weight: 700; font-style: normal; font-display: swap; }
     :root { --red: #e52a20; --ink: #111; --muted: #9a9a9a; }
     * { box-sizing: border-box; }
     html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
-    body { background: #fff; color: var(--ink); font-family: "Suisse Works", serif; }
+    body { background: #fff; color: var(--ink); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
     canvas { position: fixed; inset: 0; display: block; opacity: 0; transition: opacity .8s ease; }
-    body.is-revealed canvas, body.stage-active canvas { opacity: 1; }
+    canvas.webgl-canvas { z-index: 0; }
+    body.stage-active canvas.webgl-canvas { opacity: 1; }
+    .visual-flow { position: fixed; inset: 0; z-index: 2; display: none; overflow-x: hidden; overflow-y: auto; background: #f4f2ef; scroll-snap-type: y mandatory; overscroll-behavior: contain; }
+    body.radial-active .visual-flow { display: block; }
+    body.radial-active .visual-question, body.radial-active .visual-caption { display: none; }
+    .visual-panel { position: relative; width: 100%; min-height: 100svh; overflow: hidden; background: #f4f2ef; scroll-snap-align: start; scroll-snap-stop: always; }
+    .visual-panel canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 1; transition: none; }
+    .visual-kind { position: absolute; z-index: 2; top: 22px; left: 24px; margin: 0; color: #151515; font: 700 12px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: .11em; text-transform: uppercase; pointer-events: none; }
+    #treemap-panel .visual-kind { color: #151515; }
+    .visual-index { color: var(--red); margin-right: 10px; }
+    .flow-cue { position: absolute; z-index: 2; left: 50%; bottom: 23px; margin: 0; color: #777; font: 400 12px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; transform: translateX(-50%); pointer-events: none; }
+    @media (max-width: 680px) { .visual-kind { top: 18px; left: 18px; font-size: 10px; } .flow-cue { bottom: 76px; font-size: 10px; } }
     .progress-bar { position: fixed; z-index: 12; top: 0; left: 0; width: 100%; height: 4px; background: #e4e4e4; }
     .progress-bar span { display: block; width: calc(100% / 12); height: 100%; background: var(--red); transition: width .25s linear; }
     .selection {
@@ -23,41 +31,43 @@
     body.is-revealed .selection { opacity: 0; transform: none; pointer-events: none; transition: none; }
     body.stage-active .selection { background: transparent; }
     .panel { width: min(800px,100%); margin: -4px auto 0; text-align: center; }
-    .number { margin: 0 0 10px; color: var(--red); font: 700 clamp(15px,1.5vw,21px)/1 "Suisse Works", serif; letter-spacing: .02em; }
-    h1 { max-width: 780px; margin: 0 auto; padding-top: 4px; font: 700 clamp(33px,4.8vw,76px)/.95 "Futura Condensed", sans-serif; letter-spacing: .005em; text-transform: uppercase; }
-    .instruction { margin: 4px 0 20px; color: #8a8a8a; font: 400 clamp(17px,1.5vw,22px)/1.25 "Suisse Works", serif; letter-spacing: 0; }
+    .number { margin: 0 0 10px; color: var(--red); font: 700 clamp(15px,1.5vw,21px)/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: .02em; }
+    h1 { max-width: 780px; margin: 0 auto; padding-top: 4px; font: 700 clamp(33px,4.8vw,76px)/.95 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: -.025em; text-transform: uppercase; }
+    .instruction { margin: 4px 0 20px; color: #8a8a8a; font: 400 clamp(17px,1.5vw,22px)/1.25 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: 0; }
     .options { width: min(570px,100%); margin: 0 auto; text-align: left; }
     .answer-row { display: grid; grid-template-columns: minmax(0,1fr) 26px; gap: 14px; align-items: center; }
     .answer-row:not(:has(.info)) { grid-template-columns: minmax(0,1fr); }
-    .option { width: 100%; display: grid; grid-template-columns: 19px minmax(0,1fr); gap: 13px; align-items: center; padding: 8px 0; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: 400 clamp(18px,1.8vw,27px)/1 "Suisse Works", serif; letter-spacing: .01em; }
+    .option { width: 100%; display: grid; grid-template-columns: 19px minmax(0,1fr); gap: 13px; align-items: center; padding: 8px 0; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: 400 clamp(18px,1.8vw,27px)/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: .01em; }
     .option-square { width: 18px; height: 18px; border: 1px solid var(--ink); background: #fff; }
     .option:hover .option-square, .option:focus-visible .option-square { border-color: var(--red); background: var(--red); }
     .option.is-selected .option-square { border-color: var(--red); background: var(--red); }
     .option.is-selected { color: var(--ink); }
-    .info { width: 23px; height: 23px; padding: 0; border: 1px solid #a7a7a7; border-radius: 50%; background: transparent; color: #555; cursor: pointer; font: 700 13px/1 Georgia,serif; }
+    .info { width: 23px; height: 23px; padding: 0; border: 1px solid #a7a7a7; border-radius: 50%; background: transparent; color: #555; cursor: pointer; font: 700 13px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; }
     .info:hover, .info:focus-visible { border-color: var(--red); color: var(--red); }
     .sliders, .rankings { width: min(620px,100%); margin: 0 auto; text-align: left; }
     .slider-row, .ranking-row { display: grid; grid-template-columns: minmax(0,1fr) 180px 34px; gap: 16px; align-items: center; padding: 9px 0; }
-    .slider-row label, .ranking-row label { font: 400 clamp(16px,1.45vw,22px)/1.08 "Suisse Works", serif; }
-    .slider-row output, .ranking-row output { color: var(--red); font: 700 15px/1 "Suisse Works", serif; text-align: right; }
+    .slider-row label, .ranking-row label { font: 400 clamp(16px,1.45vw,22px)/1.08 "Helvetica Neue", Helvetica, Arial, sans-serif; }
+    .slider-row output, .ranking-row output { color: var(--red); font: 700 15px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; text-align: right; }
     input[type="range"] { width: 100%; accent-color: var(--red); }
     .compass { position: relative; width: min(480px,76vw); aspect-ratio: 1; margin: 0 auto; border: 1px solid #111; cursor: crosshair; background: linear-gradient(90deg,transparent calc(50% - .5px),#aaa calc(50% - .5px),#aaa calc(50% + .5px),transparent calc(50% + .5px)),linear-gradient(0deg,transparent calc(50% - .5px),#aaa calc(50% - .5px),#aaa calc(50% + .5px),transparent calc(50% + .5px)); }
     .compass-dot { position:absolute; width:16px; height:16px; background:var(--red); transform:translate(-50%,-50%); pointer-events:none; }
-    .compass-label { position:absolute; color:#777; font:400 12px/1.1 "Suisse Works",serif; }
+    .compass-label { position:absolute; color:#777; font:400 12px/1.1 "Helvetica Neue",Helvetica,Arial,sans-serif; }
     .compass-label.left { left:-8px; top:50%; transform:translate(-100%,-50%); text-align:right; } .compass-label.right { right:-8px; top:50%; transform:translate(100%,-50%); } .compass-label.top { top:-9px; left:50%; transform:translate(-50%,-100%); } .compass-label.bottom { bottom:-9px; left:50%; transform:translate(-50%,100%); }
     .nav { position: fixed; z-index: 12; bottom: 28px; left: 32px; right: 32px; display: flex; align-items: center; justify-content: space-between; }
-    .back, .next { border: 0; cursor: pointer; font: 700 19px/1 "Suisse Works", serif; letter-spacing: .03em; transition: transform .08s linear; }
+    .back, .next { border: 0; cursor: pointer; font: 700 19px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: .03em; transition: transform .08s linear; }
     .back { padding: 9px 0; background: transparent; color: #111; }
+    body.on-treemap .back { color: #111; }
     .back:hover, .back:focus-visible { color: #111; transform: translateY(-5px); }
+    body.on-treemap .back:hover, body.on-treemap .back:focus-visible { color: #111; }
     .next { min-width: 132px; padding: 14px 18px 13px; border: 1px solid var(--red); background: var(--red); color: #fff; }
     .next:hover:not(:disabled), .next:focus-visible:not(:disabled) { border-color: var(--red); background: var(--red); color: #fff; transform: translateY(-5px); }
     .next:disabled { border-color: #d9d9d9; background: #d9d9d9; color: #fff; cursor: default; }
     dialog { position: fixed; inset: 50% 24px auto; width: min(610px,calc(100vw - 48px)); margin: 0 auto; border: 0; border-radius: 0; padding: 0; background: transparent; box-shadow: none; transform: translateY(-50%); }
     dialog::backdrop { background: rgba(255,255,255,.78); backdrop-filter: blur(7px); }
-    dialog h2 { display: block; margin: 0 0 5px; font: 700 clamp(27px,3.2vw,44px)/1.05 "Suisse Works", serif; text-transform: none; }
-    dialog p { display: block; margin: 0; font: 400 18px/1.42 "Suisse Works",serif; }
-    .visual-question { position: fixed; z-index: 4; top: 26px; left: 50%; width: max-content; max-width: calc(100vw - 40px); margin: 0; color: var(--ink); font: 700 clamp(15px,1.8vw,26px)/1 "Futura Condensed", sans-serif; text-align: center; text-transform: uppercase; white-space: nowrap; opacity: 0; pointer-events: none; transform: translateX(-50%); transition: opacity .3s linear; }
-    .visual-caption { position: fixed; z-index: 4; top: 58px; left: 50%; margin: 0; color: #8a8a8a; font: 400 15px/1 "Suisse Works", serif; white-space: nowrap; opacity: 0; pointer-events: none; transform: translateX(-50%); transition: opacity .3s linear; }
+    dialog h2 { display: block; margin: 0 0 5px; font: 700 clamp(27px,3.2vw,44px)/1.05 "Helvetica Neue", Helvetica, Arial, sans-serif; text-transform: none; }
+    dialog p { display: block; margin: 0; font: 400 18px/1.42 "Helvetica Neue",Helvetica,Arial,sans-serif; }
+    .visual-question { position: fixed; z-index: 4; top: 26px; left: 50%; width: max-content; max-width: calc(100vw - 40px); margin: 0; color: var(--ink); font: 700 clamp(15px,1.8vw,26px)/1 "Helvetica Neue", Helvetica, Arial, sans-serif; text-align: center; text-transform: uppercase; white-space: nowrap; opacity: 0; pointer-events: none; transform: translateX(-50%); transition: opacity .3s linear; }
+    .visual-caption { position: fixed; z-index: 4; top: 58px; left: 50%; margin: 0; color: #8a8a8a; font: 400 15px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; white-space: nowrap; opacity: 0; pointer-events: none; transform: translateX(-50%); transition: opacity .3s linear; }
     body.is-revealed .visual-question, body.is-revealed .visual-caption { opacity: 1; }
     @media (max-width: 680px) { .selection { padding: 20px 20px 92px; } h1 { font-size: clamp(32px,10vw,50px); } .instruction { margin-bottom: 26px; } .option { font-size: 21px; padding: 9px 0; } .nav { left: 20px; right: 20px; bottom: 18px; } dialog { inset: 50% 20px auto; width: calc(100vw - 40px); } .visual-question { top: 20px; max-width: calc(100vw - 32px); font-size: 18px; } }
   </style>
@@ -66,6 +76,17 @@
   </script>
 </head>
 <body>
+  <div class="visual-flow" id="visual-flow" aria-label="Due visualizzazioni dei risultati">
+    <section class="visual-panel" id="circular-panel">
+      <canvas id="circular-2d" role="img" aria-label="Diagramma chord accordion a otto settori"></canvas>
+      <p class="visual-kind"><span class="visual-index">01</span>Chord / accordion</p>
+      <p class="flow-cue">Scorri per la treemap ↓</p>
+    </section>
+    <section class="visual-panel" id="treemap-panel">
+      <canvas id="treemap-2d" role="img" aria-label="Treemap rettangolare a otto aree graduate"></canvas>
+      <p class="visual-kind"><span class="visual-index">02</span>Treemap / modulare</p>
+    </section>
+  </div>
   <div class="progress-bar" aria-label="Avanzamento"><span id="progress"></span></div>
   <p class="visual-question" id="visual-question"></p><p class="visual-caption">Risposte degli altri utenti</p>
   <main class="selection"><div class="panel" id="question-panel"></div></main>
@@ -141,7 +162,7 @@
 
     const scene = new THREE.Scene(); scene.background = new THREE.Color(0xffffff);
     const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, .1, 80); camera.position.set(0, 1.6, 16);
-    const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; document.body.prepend(renderer.domElement);
+    const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.domElement.className='webgl-canvas'; renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05; document.body.prepend(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement); controls.target.set(0, .2, 0); controls.enableDamping = true; controls.dampingFactor = .055; controls.minDistance = 9; controls.maxDistance = 24; controls.enabled = false;
     scene.add(new THREE.HemisphereLight(0xffffff, 0xb8b8b8, 2.2));
     const sun = new THREE.DirectionalLight(0xffffff, 4); sun.position.set(-8, 12, 9); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left=-12; sun.shadow.camera.right=12; sun.shadow.camera.top=12; sun.shadow.camera.bottom=-12; scene.add(sun);
@@ -152,14 +173,65 @@
     function boundary(position, halfExtents) { const body = new CANNON.Body({ mass: 0, material: boundaryMaterial, position: new CANNON.Vec3(...position), shape: new CANNON.Box(new CANNON.Vec3(...halfExtents)) }); world.addBody(body); }
     boundary([0, -4.9, 0], [8, .1, 5.5]); boundary([0, 5.5, 0], [8, .1, 5.5]); boundary([-8.1, .3, 0], [.1, 5, 5.5]); boundary([8.1, .3, 0], [.1, 5, 5.5]); boundary([0, .3, -5.6], [8, 5, .1]); boundary([0, .3, 5.6], [8, 5, .1]);
     const redMaterials = [new THREE.MeshStandardMaterial({ color: 0xee2e23, roughness: .38 }), new THREE.MeshStandardMaterial({ color: 0xd9251b, roughness: .48 }), new THREE.MeshStandardMaterial({ color: 0xff4436, roughness: .34 })];
-    // Materiale vetroso leggero: sfrutta Three.js già caricato, senza rifrazione
-    // costosa né asset esterni, quindi resta fluido anche sui dispositivi meno potenti.
-    const displayMaterials = [0xee2e23,0xd9251b,0xff4436].map(color => new THREE.MeshPhysicalMaterial({ color, roughness: .16, metalness: .03, clearcoat: 1, clearcoatRoughness: .07, reflectivity: .65 }));
-    const cubes = [], labels = [];
-    function makeLabel(answer, percentage) { const canvas = document.createElement('canvas'); canvas.width = 900; canvas.height = 190; const context = canvas.getContext('2d'); context.textAlign = 'center'; context.textBaseline = 'middle'; context.fillStyle = '#151515'; context.font = '700 38px "Suisse Works", serif'; const words = answer.split(' '); let first = '', second = ''; words.forEach(word => { if ((`${first} ${word}`).trim().length < 25 || !first) first = `${first} ${word}`.trim(); else second = `${second} ${word}`.trim(); }); context.fillText(first, 450, 50); if (second) context.fillText(second, 450, 94); context.font = '700 44px "Suisse Works", serif'; context.fillText(`${percentage}%`, 450, 151); const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false })); sprite.scale.set(4.2, .9, 1); sprite.visible = false; scene.add(sprite); return sprite; }
-    const cubeSizes = [3.45, 1.05, 3.05, 1.45, .82, 1.24, 2.72, .68];
-    const displayPositions = [[-4.6,-.9],[4.5,-2.6],[2.4,.8],[-6.2,2.7],[4.8,2.25],[-1.8,3.25],[-.35,-3.15],[6.2,.15]];
-    percentages.forEach((percentage, index) => { const size = cubeSizes[index]; const material = displayMaterials[index % displayMaterials.length].clone(); const mesh = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), material); mesh.castShadow = true; mesh.receiveShadow = true; mesh.scale.setScalar(.01); mesh.visible = false; scene.add(mesh); const [x,z] = displayPositions[index], y = -3.5 + size / 2; const body = new CANNON.Body({ mass: size * size, material: physicsMaterial, shape: new CANNON.Box(new CANNON.Vec3(size / 2, size / 2, size / 2)), position: new CANNON.Vec3(x, y, z) }); world.addBody(body); body.sleep(); const home = new THREE.Vector3(x, y, z), rotation = new THREE.Euler(0, -.28 + index * .21, 0), label = makeLabel(answers[index], percentage); cubes.push({ mesh, body, size, home, rotation, phase: index * 1.73 }); labels.push(label); });
+    const circularCanvas=document.querySelector('#circular-2d'),treemapCanvas=document.querySelector('#treemap-2d');
+    const circularContext=circularCanvas.getContext('2d'),treemapContext=treemapCanvas.getContext('2d');
+    const visualFlow=document.querySelector('#visual-flow');
+    const stepWeights=[2.2,1.72,1.36,1.08,.86,.68,.54,.43,.34,.27,.21,.17,.135,.105];
+    const sectorHues=[-7,-3,1,5,9,6,2,-4];
+    function fitVisualCanvas(canvas,context) {
+      const rect=canvas.parentElement.getBoundingClientRect(),width=rect.width||innerWidth,height=rect.height||innerHeight,ratio=Math.min(devicePixelRatio,2);canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);context.setTransform(ratio,0,0,ratio,0,0);
+    }
+    function ringPath(context,cx,cy,inner,outer,start,end) {
+      context.beginPath();context.arc(cx,cy,outer,start,end);context.arc(cx,cy,inner,end,start,true);context.closePath();
+    }
+    function splitLabel(context,text,maxWidth) {
+      const words=text.split(' '),lines=[];let line='';words.forEach(word=>{const test=`${line} ${word}`.trim();if(line&&context.measureText(test).width>maxWidth){lines.push(line);line=word;}else line=test;});if(line)lines.push(line);return lines;
+    }
+    function drawCircular(progress) {
+      const context=circularContext,w=circularCanvas.clientWidth,h=circularCanvas.clientHeight,compact=w<700;
+      context.clearRect(0,0,w,h);context.fillStyle='#f4f2ef';context.fillRect(0,0,w,h);
+      const cx=w/2,cy=h/2+(compact?8:12),safeX=compact?82:168,safeY=compact?92:112,baseRadius=Math.min((w-safeX*2)/2,(h-safeY*2)/2,300),gap=.024,total=percentages.reduce((sum,value)=>sum+value,0),available=Math.PI*2-gap*answers.length;
+      const sectors=[],links=[[0,2,11],[0,6,8],[0,7,5],[1,3,7],[1,5,5],[2,4,9],[2,6,7],[3,5,8],[3,7,4],[4,6,5],[5,7,6],[1,6,3]],endpoints=links.map(()=>[]);let cursor=-Math.PI/2;
+      percentages.forEach((value,index)=>{const span=available*value/total,start=cursor,end=start+span,middle=(start+end)/2,thickness=(compact?10:15)+value*(compact?.24:.38);sectors.push({index,start,end,middle,span,thickness});cursor=end+gap;});
+      sectors.forEach(sector=>{const related=[];links.forEach((link,linkIndex)=>{if(link[0]===sector.index)related.push([linkIndex,0,link[2]]);if(link[1]===sector.index)related.push([linkIndex,1,link[2]]);});const weight=related.reduce((sum,item)=>sum+item[2],0);let offset=sector.start+sector.span*.11;related.forEach(([linkIndex,side,value])=>{const span=sector.span*.78*value/weight;endpoints[linkIndex][side]={angle:offset+span/2,width:Math.min(span*.4,.048)};offset+=span;});});
+      const point=(angle,radius)=>({x:cx+Math.cos(angle)*radius,y:cy+Math.sin(angle)*radius});
+      context.save();context.strokeStyle='rgba(21,21,21,.17)';context.lineWidth=.7;[.28,.48,.68].forEach(level=>{context.beginPath();context.arc(cx,cy,baseRadius*level,0,Math.PI*2);context.stroke();});context.restore();
+      links.forEach((link,linkIndex)=>{const local=Math.max(0,Math.min(1,(progress-.08-linkIndex*.025)*2.4));if(!local)return;const [first,second,weight]=link,[a,b]=endpoints[linkIndex],radius=baseRadius-2,a1=point(a.angle-a.width*local,radius),a2=point(a.angle+a.width*local,radius),b1=point(b.angle-b.width*local,radius),b2=point(b.angle+b.width*local,radius),ca=point(a.angle,baseRadius*.21),cb=point(b.angle,baseRadius*.21);
+        context.save();context.globalAlpha=.12+weight*.015;context.fillStyle=indexedColor(first,second);context.beginPath();context.moveTo(a1.x,a1.y);context.bezierCurveTo(ca.x,ca.y,cb.x,cb.y,b1.x,b1.y);context.lineTo(b2.x,b2.y);context.bezierCurveTo(cb.x,cb.y,ca.x,ca.y,a2.x,a2.y);context.closePath();context.fill();context.globalAlpha=.38+weight*.025;context.strokeStyle='#7d1712';context.lineWidth=.35+weight*.12;const am=point(a.angle,radius),bm=point(b.angle,radius);context.beginPath();context.moveTo(am.x,am.y);context.bezierCurveTo(ca.x,ca.y,cb.x,cb.y,bm.x,bm.y);context.stroke();context.restore();
+      });
+      sectors.forEach(sector=>{const local=Math.max(0,Math.min(1,(progress-sector.index*.035)*2));if(!local)return;const outer=baseRadius+sector.thickness*local;ringPath(context,cx,cy,baseRadius,outer,sector.start,sector.start+sector.span*local);const gradient=context.createLinearGradient(cx+Math.cos(sector.middle)*baseRadius,cy+Math.sin(sector.middle)*baseRadius,cx+Math.cos(sector.middle)*outer,cy+Math.sin(sector.middle)*outer);gradient.addColorStop(0,'#8f170f');gradient.addColorStop(.55,'#e5342a');gradient.addColorStop(1,'#f2b6b2');context.fillStyle=gradient;context.fill();context.strokeStyle='#f4f2ef';context.lineWidth=1.5;context.stroke();
+        context.save();context.translate(cx,cy);context.rotate(sector.middle);context.strokeStyle='rgba(21,21,21,.55)';context.lineWidth=.7;for(let tick=0;tick<5;tick++){const position=baseRadius+sector.thickness*.18+tick*sector.thickness*.16;context.beginPath();context.moveTo(position,-2);context.lineTo(position,2);context.stroke();}context.restore();
+        const labelProgress=Math.max(0,Math.min(1,(progress-.35-sector.index*.02)*2.5));if(!labelProgress)return;const labelRadius=outer+(compact?24:39),rawX=cx+Math.cos(sector.middle)*labelRadius,rawY=cy+Math.sin(sector.middle)*labelRadius,horizontal=Math.cos(sector.middle),align=horizontal>.3?'left':horizontal<-.3?'right':'center',labelWidth=compact?75:132,pad=compact?8:16,lx=align==='left'?Math.min(rawX,w-pad-labelWidth):align==='right'?Math.max(rawX,pad+labelWidth):Math.max(pad+labelWidth/2,Math.min(w-pad-labelWidth/2,rawX)),ly=Math.max(compact?48:56,Math.min(h-(compact?64:56),rawY));
+        context.save();context.globalAlpha=labelProgress;context.strokeStyle='rgba(21,21,21,.45)';context.lineWidth=.7;context.beginPath();const anchor=point(sector.middle,outer+3);context.moveTo(anchor.x,anchor.y);context.lineTo(lx,ly);context.stroke();context.textAlign=align;context.textBaseline='middle';context.fillStyle='#151515';context.font=`700 ${compact?9:11.5}px Helvetica, Arial, sans-serif`;const lines=splitLabel(context,answers[sector.index],labelWidth),lineHeight=compact?10.5:13,blockHeight=lines.length*lineHeight+12,startY=ly-blockHeight/2+lineHeight/2;lines.forEach((line,lineIndex)=>context.fillText(line,lx,startY+lineIndex*lineHeight));context.fillStyle='#d52820';context.font=`700 ${compact?10:12}px Helvetica, Arial, sans-serif`;context.fillText(`${percentages[sector.index]}%`,lx,startY+lines.length*lineHeight+1);context.restore();
+      });
+      context.fillStyle='#151515';context.fillRect(cx-13,cy-13,26,26);context.fillStyle='#f4f2ef';context.textAlign='center';context.textBaseline='middle';context.font=`700 ${compact?9:11}px Helvetica, Arial, sans-serif`;context.fillText('8',cx,cy+.5);
+    }
+    function indexedColor(first,second) { const colors=['#d52a20','#b7221a','#e34338','#a61b14'];return colors[(first*3+second)%colors.length]; }
+    function treemapLayout(x,y,width,height) {
+      const compact=width<700,gap=compact?9:15,columnWidth=(width-gap)/2,rowGap=gap,rowWeights=[[.46,.27,.17,.10],[.40,.30,.19,.11]],usableHeight=height-rowGap*3,boxes=[];
+      for(let column=0;column<2;column++){let top=y;for(let row=0;row<4;row++){const slotHeight=usableHeight*rowWeights[column][row],labelHeight=compact?25:31,index=column*4+row;boxes.push({index,x:x+column*(columnWidth+gap),y:top+labelHeight,width:columnWidth,height:Math.max(8,slotHeight-labelHeight),labelY:top,row,column});top+=slotHeight+rowGap;}}
+      return boxes;
+    }
+    function drawTreemap(progress) {
+      const context=treemapContext,w=treemapCanvas.clientWidth,h=treemapCanvas.clientHeight,compact=w<700,margin=compact?24:58,top=compact?62:78,bottom=compact?122:108;
+      context.clearRect(0,0,w,h);context.fillStyle='#f1efeb';context.fillRect(0,0,w,h);
+      const mapWidth=w-margin*2,mapHeight=h-top-bottom,boxes=treemapLayout(margin,top,mapWidth,mapHeight),states=[];
+      boxes.forEach(({index,x,y,width,height,row,column})=>{
+        const local=Math.max(0,Math.min(1,(progress-index*.035)*1.65)),drawHeight=height*(1-Math.pow(1-local,3));states.push({index,x,y,width,height,local});if(!drawHeight)return;
+        context.save();context.beginPath();context.rect(x,y,width,drawHeight);context.clip();
+        const cellSize=compact?8:13,cellGap=compact?1:1.25,gridGradient=context.createLinearGradient(x,y,x,y+height),cellGradient=context.createLinearGradient(x,y,x,y+height);
+        if((index+column)%2){gridGradient.addColorStop(0,'#e53127');gridGradient.addColorStop(.58,'#cf251d');gridGradient.addColorStop(1,'#c4a5a1');cellGradient.addColorStop(0,'#f2493f');cellGradient.addColorStop(.48,'#e85e55');cellGradient.addColorStop(1,'#e1d8d1');}
+        else{gridGradient.addColorStop(0,'#d52820');gridGradient.addColorStop(.42,'#dc3b32');gridGradient.addColorStop(1,'#c6b0ad');cellGradient.addColorStop(0,'#ef443a');cellGradient.addColorStop(.56,'#eaa49f');cellGradient.addColorStop(1,'#e1dad3');}
+        context.fillStyle=gridGradient;context.fillRect(x,y,width,height);context.fillStyle=cellGradient;
+        for(let cellY=y;cellY<y+height;cellY+=cellSize){for(let cellX=x;cellX<x+width;cellX+=cellSize){context.fillRect(cellX,cellY,Math.min(cellSize-cellGap,x+width-cellX),Math.min(cellSize-cellGap,y+height-cellY));}}
+        context.restore();
+      });
+      states.forEach(({index,x,y,width,local})=>{
+        const labelY=boxes[index].labelY,alpha=Math.max(0,Math.min(1,(local-.35)*2)),lineHeight=compact?10:13;context.save();context.globalAlpha=alpha;context.fillStyle='#d52820';context.fillRect(x,labelY+(compact?8:10),compact?11:15,compact?2:3);context.textAlign='left';context.textBaseline='top';context.fillStyle='#151515';context.font=`700 ${compact?9:11.5}px Helvetica, Arial, sans-serif`;const lines=splitLabel(context,answers[index],Math.max(48,width-(compact?15:22))).slice(0,2);lines.forEach((line,lineIndex)=>context.fillText(line,x+(compact?15:22),labelY+lineIndex*lineHeight));context.fillStyle='#d52820';context.font=`700 ${compact?9:11}px Helvetica, Arial, sans-serif`;context.fillText(`${percentages[index]}%`,x+(compact?15:22),labelY+lines.length*lineHeight);context.restore();
+      });
+    }
+    function fitVisuals(){fitVisualCanvas(circularCanvas,circularContext);fitVisualCanvas(treemapCanvas,treemapContext);}
+    fitVisuals();
     let stage = null;
     const stageFloor = -4.05, topCamera = new THREE.Vector3(0, 29, .01), topTarget = new THREE.Vector3(0, stageFloor, 0);
     const finalSliderCamera = new THREE.Vector3(0, 20, 17), finalSliderTarget = new THREE.Vector3(0, 1.5, 0);
@@ -204,15 +276,16 @@
       if(stage.type==='compass'&&stage.confirmed){stage.transition=Math.min(1,stage.transition+delta*.82);const e=1-Math.pow(1-stage.transition,3);camera.position.lerpVectors(topCamera,finalCompassCamera,e);controls.target.lerpVectors(topTarget,finalCompassTarget,e);stage.spawnClock+=delta;if(stage.spawnClock>.23&&stage.spawned<52){stage.spawnClock=0;const centers=stage.question===2?[[-2.7,-2.1],[2.8,-1.5],[-1.7,2.7],[2.8,2.6]]:[[-2.7,-2.5],[2.7,-2.4],[-2.1,2.6],[2.7,2.7]],center=centers[stage.spawned%4];addCompassFaller(center[0]+(Math.random()-.5)*1.8,center[1]+(Math.random()-.5)*1.8,.48+Math.random()*.16);stage.spawned++;}world.step(1/60,delta,4);stage.fallers.forEach(({mesh,body})=>{mesh.position.copy(body.position);mesh.quaternion.copy(body.quaternion);});}
     }
     let revealProgress = 0;
-    function reveal() { revealed = true; revealProgress = 1; setNav(true); progress.style.width = `${2 / 12 * 100}%`; document.querySelector('.progress-bar').setAttribute('aria-label', 'Avanzamento: passaggio 2 di 12'); visualQuestion.textContent = questionData[questionIndex].title; document.body.classList.add('is-revealed'); next.setAttribute('aria-label', 'Prosegui alla domanda 2'); cubes.forEach(({ mesh }) => { mesh.visible = true; }); controls.enabled = true; }
-    function resetScene() { clearStage();revealed=false;revealProgress=0;visualQuestion.textContent='';controls.enabled=false;camera.position.set(0,1.6,16);controls.target.set(0,.2,0);document.body.classList.remove('is-revealed');cubes.forEach(({mesh,body})=>{mesh.visible=false;body.sleep();});labels.forEach(label=>label.visible=false); }
-    next.addEventListener('click', () => { if(questionIndex===0){ if(!revealed)reveal();else location.href='cgil-02.html'; }else if(questionIndex===1||questionIndex===2||questionIndex===3){ if(!stage?.confirmed){ if(questionIndex===1)confirmSliderStage();else confirmCompassStage(); }else goTo(questionIndex+1); }else if(questionIndex<5)goTo(questionIndex+1);else next.disabled=true; });
-    back.addEventListener('click',()=>{if(questionIndex===0&&revealed){resetScene();renderQuestion();return;}if(questionIndex>0)goTo(questionIndex-1);});
+    function reveal() { revealed = true; revealProgress = 0; setNav(true); progress.style.width = `${2 / 12 * 100}%`; document.querySelector('.progress-bar').setAttribute('aria-label', 'Avanzamento: passaggio 2 di 12'); visualQuestion.textContent = questionData[questionIndex].title; document.body.classList.add('is-revealed','radial-active'); visualFlow.scrollTop=0; next.textContent='Visualizzazione 2'; next.setAttribute('aria-label', 'Mostra la visualizzazione treemap'); controls.enabled = false; fitVisuals(); drawCircular(0); drawTreemap(0); }
+    function resetScene() { clearStage();revealed=false;revealProgress=0;visualQuestion.textContent='';controls.enabled=false;camera.position.set(0,1.6,16);controls.target.set(0,.2,0);document.body.classList.remove('is-revealed','radial-active','on-treemap');circularContext.clearRect(0,0,innerWidth,innerHeight);treemapContext.clearRect(0,0,innerWidth,innerHeight); }
+    next.addEventListener('click', () => { if(questionIndex===0){ if(!revealed)reveal();else if(visualFlow.scrollTop<innerHeight*.55){document.querySelector('#treemap-panel').scrollIntoView({behavior:'smooth'});}else location.href='cgil-02.html'; }else if(questionIndex===1||questionIndex===2||questionIndex===3){ if(!stage?.confirmed){ if(questionIndex===1)confirmSliderStage();else confirmCompassStage(); }else goTo(questionIndex+1); }else if(questionIndex<5)goTo(questionIndex+1);else next.disabled=true; });
+    back.addEventListener('click',()=>{if(questionIndex===0&&revealed){if(visualFlow.scrollTop>innerHeight*.55){document.querySelector('#circular-panel').scrollIntoView({behavior:'smooth'});return;}resetScene();renderQuestion();return;}if(questionIndex>0)goTo(questionIndex-1);});
+    visualFlow.addEventListener('scroll',()=>{if(!revealed)return;const onTreemap=visualFlow.scrollTop>innerHeight*.55;document.body.classList.toggle('on-treemap',onTreemap);next.textContent=onTreemap?'Prosegui':'Visualizzazione 2';next.setAttribute('aria-label',onTreemap?'Prosegui alla domanda 2':'Mostra la visualizzazione treemap');});
     const clock = new THREE.Clock();
-    function animate() { requestAnimationFrame(animate); const delta = Math.min(clock.getDelta(), .05); if (revealed) { cubes.forEach(({ mesh, size, home, rotation }, index) => { mesh.position.copy(home); mesh.rotation.copy(rotation); mesh.scale.setScalar(1); const label = labels[index]; label.visible = true; label.position.set(mesh.position.x, mesh.position.y + size * .72 + .7, mesh.position.z); }); } else animateStage(delta); controls.update(); renderer.render(scene, camera); }
+    function animate() { requestAnimationFrame(animate); const delta = Math.min(clock.getDelta(), .05); if (revealed&&document.body.classList.contains('radial-active')) { revealProgress=Math.min(1,revealProgress+delta*.72);drawCircular(revealProgress);drawTreemap(revealProgress); } else animateStage(delta); controls.update(); renderer.render(scene, camera); }
     animate();
     renderQuestion();
-    addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); });
+    addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); fitVisuals(); if(revealed&&document.body.classList.contains('radial-active')){drawCircular(revealProgress);drawTreemap(revealProgress);} });
   </script>
 </body>
 </html>
