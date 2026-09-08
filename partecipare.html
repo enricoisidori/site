@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Partecipare — CGIL · Prototipo</title>
+<style>
+:root{color-scheme:dark;--bg:#141414;--red:#f32620}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:Helvetica,Arial,sans-serif}button,input{font:inherit}button{color:inherit;cursor:pointer;background:none;border:1px solid #888}button:focus-visible,input:focus-visible{outline:2px solid var(--red);outline-offset:5px}button:disabled{opacity:.3;cursor:default}header{text-align:center;padding:18px 24px 0}.brand{font-size:12px;letter-spacing:.04em}.brand strong{font-size:22px}.brand span{border:1px solid #aaa;padding:2px 4px;margin-right:6px}nav{font-size:9px;margin:12px 0 18px;word-spacing:18px}nav b{border-bottom:1px solid white;padding-bottom:5px}#progress{display:grid;grid-template-columns:repeat(12,1fr);border-top:1px solid #777;padding-top:7px;font-size:9px;color:#777}#progress .active{color:white}h1{font-size:clamp(21px,2.3vw,32px);font-weight:400;text-align:center;margin:26px auto 12px;max-width:1100px;padding:0 22px}#hint{text-align:center;font-size:11px;letter-spacing:.05em;min-height:16px;margin:0 0 12px;color:#bbb}.stage{position:relative;width:min(1160px,96vw);height:clamp(450px,65vh,760px);margin:auto}#content{position:absolute;inset:0}canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.node{position:absolute;transform:translate(-50%,-50%);width:170px;text-align:center;font-size:12px}.node button{border:0;width:100%;padding:10px 0}.box{display:block;width:23px;height:23px;border:1px solid #ddd;margin:0 auto 12px}.chosen .box{background:#fff}.node small{display:block;margin-top:9px}.node.result{pointer-events:none}.node.result .box{visibility:hidden}.node.result button{cursor:default}.sliders{width:min(790px,92%);margin:28px auto;display:grid;gap:27px}.row{display:grid;grid-template-columns: minmax(150px,1fr) minmax(120px,1fr) 45px;gap:22px;align-items:center;min-height:45px}.row label{text-align:right;font-size:clamp(13px,1.6vw,22px)}.rail{height:42px;position:relative;background:repeating-linear-gradient(90deg,transparent 0 7px,#777 7px 8px) center/100% 8px no-repeat}.rail:before{content:'';position:absolute;left:0;right:0;top:21px;border-top:1px solid #777}input[type=range]{position:relative;width:100%;margin:0;height:42px;appearance:none;background:transparent;z-index:2}input[type=range]::-webkit-slider-thumb{appearance:none;width:17px;height:17px;background:white;border:0}input[type=range]::-moz-range-thumb{width:17px;height:17px;background:white;border:0;border-radius:0}.row output{font-size:11px}.mean{position:absolute;height:5px;left:0;top:19px;background:white;z-index:3}.yourmark{position:absolute;top:13px;width:1px;height:17px;background:white;z-index:3}.compass{position:absolute;width:min(430px,64vw);height:min(430px,64vw);left:50%;top:49%;transform:translate(-50%,-50%);background:radial-gradient(circle,#666 .7px,transparent 1px) 50% 50%/24px 24px;touch-action:none;cursor:crosshair}.axis-x,.axis-y{position:absolute;background:#ccc;pointer-events:none}.axis-x{height:1px;width:100%;top:50%}.axis-y{width:1px;height:100%;left:50%}.axislabel{position:absolute;font-size:clamp(11px,1.5vw,20px);white-space:nowrap}.left{right:calc(100% + 14px);top:48%}.right{left:calc(100% + 14px);top:48%}.top{bottom:calc(100% + 14px);left:50%;transform:translateX(-50%)}.bottom{top:calc(100% + 14px);left:50%;transform:translateX(-50%)}.marker{position:absolute;width:13px;height:13px;background:white;transform:translate(-50%,-50%);z-index:3}footer{padding:22px 24px 24px;display:grid;grid-template-columns:165px 1fr 165px;gap:22px;align-items:center;border-bottom:1px solid #777;margin:0 16px 12px}footer button{min-height:32px;font-size:11px;text-transform:uppercase}#legend{text-align:center;font-size:10px;color:#bbb;line-height:1.8}.redkey{display:inline-block;width:10px;height:10px;background:var(--red);margin-right:8px}#demo{text-align:center;color:#888;font-size:10px;margin:12px}#done{text-align:center;padding:100px 24px}#done p{color:#aaa}#done button{padding:12px 24px}@media(max-width:650px){.stage{height:570px}.node{width:115px;font-size:10px}.sliders{gap:22px}.row{gap:12px;grid-template-columns:130px 1fr 35px}.compass{width:58vw;height:58vw}.axislabel.left,.axislabel.right{font-size:10px;white-space:normal;width:65px}.axislabel.left{right:calc(100% + 5px);text-align:right}.axislabel.right{left:calc(100% + 5px)}footer{grid-template-columns:95px 1fr 95px;padding:15px 0;gap:10px}#legend{font-size:9px}}
+
+/* Layout follows the supplied Partecipare screens. */
+#progress span{position:relative;padding-bottom:8px;color:white}
+#progress span.current:after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:white}
+#hint{color:white}.node.result button:disabled{opacity:1}.node.result .label-text{color:white}
+.node .info-icon{display:block;font-size:12px;margin-top:8px}
+.node.result .info-icon{display:none}
+.node.result .label-text{position:relative;display:inline-block}
+.sliders{width:min(820px,90%);gap:24px}.row{min-height:51px}
+#content{z-index:2;pointer-events:none}#content button,#content input,.compass{pointer-events:auto}
+canvas{z-index:1}.compass{background:none}
+.compass-dot{position:absolute;width:2px;height:2px;background:#aaa;transform:translate(-50%,-50%);transition:width 100ms steps(3),height 100ms steps(3);pointer-events:none}
+.compass-dot.near{width:11px;height:11px;background:white}
+.node.result .box{margin-bottom:18px}
+footer button{min-height:22px}.legend-wire{display:inline-block;width:17px;height:17px;border:1px solid white;vertical-align:middle;margin-right:8px;background:linear-gradient(45deg,transparent 47%,white 49%,transparent 52%)}
+@media(min-width:900px){header{padding-top:12px}.brand strong{font-size:19px}h1{font-size:26px;margin-top:20px}.stage{width:min(1160px,96vw);height:clamp(460px,68vh,760px)}}
+
+:root{--stroke:#bbb}
+.brand,nav{width:300px;max-width:90vw;margin-left:auto;margin-right:auto}
+.brand{display:flex;align-items:center;justify-content:space-between;font-size:9px;letter-spacing:0;white-space:nowrap}
+.brand span{margin:0;font-size:12px}.brand strong{font-size:22px}
+nav{display:flex;justify-content:space-between;word-spacing:normal;border-top:1px solid var(--stroke);padding-top:7px}
+#progress{background:repeating-linear-gradient(90deg,var(--stroke) 0 1px,transparent 1px calc(100% / 24)) left top/100% 5px no-repeat}
+#progress span.current:after{height:1px}
+footer{position:relative;padding-bottom:30px;border-color:var(--stroke)}
+footer:after{content:'';position:absolute;left:0;right:0;bottom:0;height:6px;background:repeating-linear-gradient(90deg,var(--stroke) 0 1px,transparent 1px calc(100% / 24));pointer-events:none}
+button,.box,.brand span,nav{border-color:var(--stroke)}
+.rail{background:repeating-linear-gradient(90deg,#aaa 0 1px,transparent 1px 2%) center/100% 5px no-repeat}
+.rail:after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,#ddd 0 1px,transparent 1px 10%) center/100% 11px no-repeat}
+.axis-x:after{content:'';position:absolute;left:0;right:0;top:-4px;height:9px;background:repeating-linear-gradient(90deg,#aaa 0 1px,transparent 1px 2%)}
+.axis-y:after{content:'';position:absolute;top:0;bottom:0;left:-4px;width:9px;background:repeating-linear-gradient(0deg,#aaa 0 1px,transparent 1px 2%)}
+.node .info-icon{display:block!important;width:22px;height:22px;margin:4px auto 0;padding:0;border:0;font-size:13px;pointer-events:auto;cursor:pointer}
+#legend{display:flex;justify-content:center;align-items:center;gap:30px;flex-wrap:wrap;color:white;font-size:10px}
+.legend-item{display:flex;align-items:center;gap:10px;text-align:left}
+.legend-sizes{display:flex;align-items:center;gap:5px}.legend-sizes i{display:block;width:12px;height:12px;border:1px solid white;background:linear-gradient(45deg,transparent 47%,white 49%,transparent 52%)}.legend-sizes i:last-child{width:24px;height:24px}
+.legend-lines{display:flex;flex-direction:column;gap:8px;width:65px}.legend-lines i{border-top:1px solid white}.legend-lines i:last-child{border-top-width:3px}
+.legend-mean{width:58px;border-top:5px solid white}
+dialog{width:min(520px,90vw);background:#141414;color:white;border:1px solid #bbb;padding:32px;font:16px/1.65 Helvetica,Arial,sans-serif}
+dialog::backdrop{background:rgba(0,0,0,.65)}dialog h2{font-size:23px;font-weight:400;line-height:1.2;padding-right:24px}dialog button{position:absolute;top:12px;right:12px;border:0;font-size:24px}dialog p{margin-bottom:0}
+@media(max-width:650px){#legend{gap:8px;font-size:8px}.legend-lines{width:25px}.legend-mean{width:25px}.legend-sizes i:last-child{width:18px;height:18px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span>120 ANNI</span><strong>CGIL</strong> L’ESPERIENZA INTERATTIVA</div><nav><span>NAVIGA</span><span>ESPLORA</span><span>ASCOLTA</span><b>PARTECIPA</b></nav><div id="progress"></div></header>
+<main><h1 id="title"></h1><p id="hint"></p><div class="stage" id="stage"><div id="content"></div><canvas id="field" aria-hidden="true"></canvas></div></main>
+<footer><button id="back">Indietro</button><div id="legend"></div><button id="next">Conferma</button></footer>
+<dialog id="info"><button aria-label="Chiudi" id="close-info">×</button><h2 id="info-title"></h2><p id="info-copy"></p></dialog>
+<script>
+'use strict';
+// Canvas coordinates are CSS pixels. Simulation uses a fixed 60 Hz tick.
+const PHYSICS={cell:6,radius:85,kick:7,spring:.035,damping:.84,maxSpeed:20,historyLimit:900};
+const rights=['Riduzione dell’orario di lavoro','Statuto dei lavoratori','Ferie retribuite','Diritto di sciopero','Tutele sulla salute e sicurezza','Diritto alla formazione','Pensioni e tutele previdenziali','Contrattazione collettiva'];
+const histories={
+'Riduzione dell’orario di lavoro':'A partire dal 1889 con il congresso fondativo della Seconda Internazionale l’orizzonte rivendicativo del movimento europeo diventa la giornata lavorativa di otto ore.',
+'Diritto di sciopero':'Nel 1900 lo sciopero generale di Genova, proclamato contro la chiusura della Camera del Lavoro, costrinse il prefetto a ritirare il provvedimento e affermò la libertà di organizzazione e di lotta sindacale.',
+'Contrattazione collettiva':'Nel 1906 la contrattazione diventa collettiva grazie all’accordo aziendale firmato dalla FIOM con l’Itala di Torino.',
+'Statuto dei lavoratori':'Nel 1970 lo Statuto dei lavoratori rafforzò i diritti sindacali e la tutela delle condizioni nei luoghi di lavoro.',
+'Ferie retribuite':'Nel 1948 la Costituzione sancì il diritto irrinunciabile dei lavoratori alle ferie annuali retribuite.',
+'Pensioni e tutele previdenziali':'Nel 1898 nacque la Cassa nazionale di previdenza, primo passo verso un sistema pubblico di tutela dei lavoratori contro invalidità e vecchiaia.',
+'Tutele sulla salute e sicurezza':'Nel 2008 il Testo unico sulla sicurezza ha riordinato e rafforzato le norme per la tutela della salute sul lavoro e i diritti di partecipazione e rappresentanza per la prevenzione.',
+'Diritto alla formazione':'Il diritto alla formazione permanente è uno dei pilastri del programma fondamentale della CGIL dal 1991.'
+};
+const questions=[
+ {type:'choice',title:'Quali sono le conquiste sindacali del Novecento che ritieni oggi più importanti?',labels:rights},
+ {type:'slider',title:'Cosa dovrebbe significare “avere successo” nel lavoro?',labels:['Guadagnare bene','Essere soddisfatti','Avere responsabilità','Essere riconosciuti','Avere tempo per sé','Fare qualcosa di utile']},
+ {type:'compass',title:'Quale equilibrio dovrebbe cercare il lavoro contemporaneo?',axes:['Competizione','Cooperazione','Produttività','Benessere']},
+ {type:'choice',title:'Quali temi dovrebbe affrontare prioritariamente il sindacato nei prossimi anni?',labels:['Aumentare i salari','Lotta alla precarietà','Migliorare la sicurezza sul lavoro','Ridurre le disuguaglianze','Governare la trasformazione tecnologica','Governare la transizione ecologica','Rafforzare la democrazia']},
+ {type:'slider',title:'Quali rischi peseranno maggiormente nel lavoro del futuro?',labels:['Automazione e occupazione','Precarietà','Controllo digitale','Isolamento','Disuguaglianze economiche','Aggiornamento continuo']},
+ {type:'compass',title:'Come ritieni l’impatto delle nuove tecnologie e dell’Intelligenza Artificiale nel tuo lavoro?',axes:['Non facilita il lavoro','Facilita il lavoro','Alleggerisce il carico','Aumenta il carico']}
+];
+// Seeded synthetic respondents: replace with collected data when available.
+function seeded(seed){return()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}}
+function makeDistribution(q,qi){
+ const random=seeded(9031+qi*41),normal=()=>Math.sqrt(-2*Math.log(Math.max(.000001,random())))*Math.cos(2*Math.PI*random());
+ const samples=Array.from({length:400},()=>{
+ if(q.type==='choice'){const pool=q.labels.map((_,i)=>({i,v:-Math.log(Math.max(random(),.00001))/([1.8,.95,1.15,1.65,1.2,.55,1.05,1.35][i])}));return pool.sort((a,b)=>a.v-b.v).slice(0,3).map(x=>x.i)}
+ if(q.type==='slider'){const profile=qi===1?[25,21,6,12,26,10]:[24,25,12,8,19,12];const v=profile.map(n=>Math.max(.3,n*Math.exp(normal()*.48)));const total=v.reduce((a,b)=>a+b);return v.map(n=>n/total*100)}
+ const group=random(),cx=group<.64?.76:group<.87?.53:.26,cy=group<.64?.77:group<.87?.42:.25;
+ return {x:Math.round(Math.max(0,Math.min(1,cx+normal()*.12))*16)/16,y:Math.round(Math.max(0,Math.min(1,cy+normal()*.12))*16)/16};
+ });
+ return {samples,means:q.type==='slider'?q.labels.map((_,i)=>samples.reduce((sum,p)=>sum+p[i],0)/samples.length):[]};
+}
+const distributions=questions.map(makeDistribution);
+const answers=questions.map(q=>({selected:[],values:[17,17,17,17,16,16],point:null}));
+const $=id=>document.getElementById(id), stage=$('stage'), content=$('content'), canvas=$('field'), ctx=canvas.getContext('2d');
+let screen=0,particles=[],links=[],wireframes=[],revealStart=0,w=0,h=0,raf=0,last=0,acc=0;
+const mouse={x:0,y:0,active:false};
+const positions=[[.34,.16],[.5,.045],[.66,.16],[.73,.49],[.68,.79],[.5,.94],[.33,.79],[.27,.49]];
+const result=()=>screen%2===1;
+function render(){
+ cancelAnimationFrame(raf);raf=0;last=0;acc=0;mouse.active=false;particles=[];links=[];
+ $('progress').innerHTML=Array.from({length:12},(_,i)=>`<span class="${i===screen?'current':''}">${Math.floor(i/2)+1}/6</span>`).join('');
+ if(screen===12){$('title').textContent='Grazie per aver partecipato.';$('hint').textContent='Le tue risposte compongono un punto di vista sul lavoro.';content.innerHTML='<div id="done"><p>Hai completato le sei domande.</p><button id="restart">Rivedi le risposte</button></div>';$('restart').onclick=()=>{screen=0;render()};$('next').disabled=true;$('next').textContent='Prosegui';$('back').disabled=false;$('legend').textContent='Fine del percorso';size();return;}
+ const q=questions[Math.floor(screen/2)],a=answers[Math.floor(screen/2)];
+ $('title').textContent=q.title;$('hint').textContent=result()?'':q.type==='choice'?'SELEZIONA TRE RISPOSTE':q.type==='slider'?'REGOLA GLI SLIDER':'POSIZIONATI RISPETTO AGLI ASSI';
+ content.innerHTML='';$('back').disabled=screen===0;$('next').textContent='Prosegui';
+
+ const sizes='<span class="legend-sizes" aria-hidden="true"><i></i><i></i></span>';
+ const first=q.type==='choice'?'RISPOSTE DEGLI ALTRI UTENTI':q.type==='slider'?'RISPOSTA MEDIA DEGLI ALTRI UTENTI':'POSIZIONAMENTO DEGLI ALTRI UTENTI';
+ const second=q.type==='choice'?'COMPRESENZA DELLE RISPOSTE':'CONCENTRAZIONE DELLE RISPOSTE';
+ $('legend').innerHTML=result()?`<span class="legend-item">${q.type==='slider'?'<span class="legend-mean"></span>':sizes}${first} ⓘ</span><span class="legend-item">${q.type==='choice'?'<span class="legend-lines"><i></i><i></i></span>':sizes}${second} ⓘ</span>`:'';
+
+ if(q.type==='choice') q.labels.forEach((label,i)=>{const p=positions[i],node=document.createElement('div');node.className='node'+(result()?' result':'')+(a.selected.includes(i)?' chosen':'');node.style.left=p[0]*100+'%';node.style.top=p[1]*90+5+'%';node.innerHTML=`<button aria-pressed="${a.selected.includes(i)}"><span class="box"></span><span class="label-text">${label}</span></button>${histories[label]?`<button type="button" class="info-icon" aria-label="Informazioni: ${label}">ⓘ</button>`:''}`;node.querySelector('button').disabled=result();node.querySelector('button').onclick=()=>{const index=a.selected.indexOf(i);if(index>=0)a.selected.splice(index,1);else if(a.selected.length<3)a.selected.push(i);render()};const info=node.querySelector('.info-icon');if(info)info.onclick=e=>{e.stopPropagation();$('info-title').textContent=label;$('info-copy').textContent=histories[label];mouse.active=false;$('info').showModal()};content.append(node)});
+ if(q.type==='slider'){
+ const list=document.createElement('div');list.className='sliders';q.labels.forEach((label,i)=>{const row=document.createElement('div');row.className='row';row.innerHTML=`<label for="range-${i}">${label}</label><div class="rail"><input aria-label="${label}" id="range-${i}" type="range" min="0" max="100" value="${a.values[i]}" ${result()?'disabled':''}></div><output>${a.values[i]}%</output>`;row.querySelector('input').oninput=e=>{redistribute(a.values,i,+e.target.value);list.querySelectorAll('.row').forEach((r,j)=>{r.querySelector('input').value=a.values[j];r.querySelector('output').textContent=a.values[j]+'%'})};if(result()){row.querySelector('input').style.visibility='hidden';row.querySelector('.rail').insertAdjacentHTML('beforeend',`<span class="mean" style="width:${distributions[Math.floor(screen/2)].means[i]}%"></span><span class="yourmark" style="left:${a.values[i]}%"></span>`)}list.append(row)});content.append(list);
+ 
+ }
+ if(q.type==='compass'){
+ const comp=document.createElement('div');comp.className='compass';comp.tabIndex=result()?-1:0;comp.setAttribute('role','application');comp.setAttribute('aria-label','Scegli la tua posizione, oppure usa i tasti freccia');comp.innerHTML='<div class="axis-x"></div><div class="axis-y"></div>'+q.axes.map((s,i)=>`<span class="axislabel ${['left','right','top','bottom'][i]}">${s}</span>`).join('')+'<span class="marker"></span>';content.append(comp);
+ for(let y=0;y<=16;y++)for(let x=0;x<=16;x++){const dot=document.createElement('i');dot.className='compass-dot';dot.style.left=x/16*100+'%';dot.style.top=y/16*100+'%';comp.prepend(dot)}
+ comp.addEventListener('pointermove',e=>{if(result())return;const r=comp.getBoundingClientRect();comp.querySelectorAll('.compass-dot').forEach(dot=>{const x=parseFloat(dot.style.left)/100*r.width,y=parseFloat(dot.style.top)/100*r.height;dot.classList.toggle('near',Math.abs(x-(e.clientX-r.left))<r.width/32&&Math.abs(y-(e.clientY-r.top))<r.height/32)})});
+ comp.addEventListener('pointerleave',()=>comp.querySelectorAll('.near').forEach(dot=>dot.classList.remove('near')));
+ const mark=()=>{const dot=comp.querySelector('.marker');dot.hidden=!a.point;if(a.point){dot.style.left=a.point.x*100+'%';dot.style.top=a.point.y*100+'%'}ready()};
+ const place=e=>{const r=comp.getBoundingClientRect();a.point={x:Math.round(Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*16)/16,y:Math.round(Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))*16)/16};mark()};
+ if(!result()){comp.onpointerdown=e=>{comp.setPointerCapture(e.pointerId);place(e)};comp.onpointermove=e=>{if(e.buttons)place(e)};comp.onkeydown=e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();a.point??={x:.5,y:.5};a.point.x=Math.max(0,Math.min(1,a.point.x+(e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0)/16));a.point.y=Math.max(0,Math.min(1,a.point.y+(e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:0)/16));mark()}}mark();
+ }
+ ready();size();
+}
+function ready(){const q=questions[Math.floor(screen/2)],a=answers[Math.floor(screen/2)];if(!q)return;$('next').disabled=!result()&&(q.type==='choice'?a.selected.length!==3:q.type==='compass'?!a.point:false)}
+function redistribute(values,index,value){if(value>=99)value=100;const others=values.map((_,i)=>i).filter(i=>i!==index),total=others.reduce((s,i)=>s+values[i],0),rest=100-value;let used=0;others.forEach((i,j)=>{const v=j===others.length-1?rest-used:Math.floor(rest*(total?values[i]/total:1/others.length));values[i]=v;used+=v});values[index]=value}
+function size(){const r=stage.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);w=r.width;h=r.height;canvas.width=Math.round(w*d);canvas.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);particles=[];links=[];wireframes=[];if(result()&&screen<12){build();buildText();revealStart=performance.now();wake()}draw()}
+function randomUnit(n){const v=Math.sin(n*12.9898+78.233)*43758.5453;return v-Math.floor(v)}
+function cluster(x,y,side,seed=0){const cell=PHYSICS.cell,n=Math.max(2,Math.round(side/cell));wireframes.push({x:Math.round((x-n*cell/2)/cell)*cell,y:Math.round((y-n*cell/2)/cell)*cell,side:n*cell});for(let j=0;j<n;j++)for(let i=0;i<n;i++){const hx=Math.round((x+(i-n/2)*cell)/cell)*cell,hy=Math.round((y+(j-n/2)*cell)/cell)*cell;particles.push({hx,hy,x:hx,y:hy,vx:0,vy:0,history:[],returning:false,delay:300+randomUnit(i*71+j*137+seed*43)*650,duration:1100+randomUnit(i*97+j*43+seed)*750,offsetX:(randomUnit(i*157+j*37+seed*2)-.5)*150,offsetY:(randomUnit(i*43+j*191+seed*3)-.5)*150,phase:randomUnit(i*19+j*73+seed)*6.28,bias:Math.sin(i*17+j*31+seed)*.45})}}
+function build(){
+ const qi=Math.floor(screen/2),q=questions[qi],data=distributions[qi],rect=stage.getBoundingClientRect();
+ if(q.type==='choice'){
+ const counts=q.labels.map((_,i)=>data.samples.filter(p=>p.includes(i)).length),max=Math.max(...counts),centers=[];
+ content.querySelectorAll('.node').forEach((node,i)=>{const r=node.querySelector('.box').getBoundingClientRect(),x=r.x-rect.x+r.width/2,y=r.y-rect.y;centers.push([x,y]);cluster(x,y,Math.sqrt(counts[i]/max)*78,i)});
+ for(let i=0;i<centers.length;i++)for(let j=i+1;j<centers.length;j++){const count=data.samples.filter(p=>p.includes(i)&&p.includes(j)).length;if(count>22)links.push({a:centers[i],b:centers[j],width:1+2*(count/140)})}
+ }
+ if(q.type==='slider')content.querySelectorAll('.rail').forEach((rail,i)=>{
+ const r=rail.getBoundingClientRect(),bins=Array(20).fill(0);data.samples.forEach(p=>bins[Math.min(19,Math.floor(p[i]/5))]++);const max=Math.max(...bins);
+ bins.forEach((count,b)=>{if(count<4)return;cluster(r.left-rect.left+r.width*(b+.5)/20,r.top-rect.top+21,Math.max(6,Math.sqrt(count/max)*48),i*20+b)});
+ });
+ if(q.type==='compass'){
+ const r=content.querySelector('.compass').getBoundingClientRect(),bins=new Map();data.samples.forEach(p=>{const key=p.x+','+p.y;bins.set(key,(bins.get(key)||0)+1)});const max=Math.max(...bins.values());
+ for(const [key,count]of bins){const [x,y]=key.split(',').map(Number);cluster(r.left-rect.left+r.width*x,r.top-rect.top+r.height*y,Math.max(6,Math.sqrt(count/max)*30),x*100+y*200)}
+ }
+}
+function buildText(){
+ const rect=stage.getBoundingClientRect();
+ content.querySelectorAll('.label-text,.row label,.row output,.axislabel').forEach(el=>{
+ el.style.translate='';el.style.color='#fff';const r=el.getBoundingClientRect(),hx=r.left-rect.left+r.width/2,hy=r.top-rect.top+r.height/2;
+ particles.push({hx,hy,x:hx,y:hy,vx:0,vy:0,history:[],returning:false,bias:.12,el,delay:0});
+ });
+}
+function wake(){if(!raf){last=0;raf=requestAnimationFrame(frame)}}
+function pushPointer(e){if(!result())return;const r=stage.getBoundingClientRect();mouse.x=e.clientX-r.left;mouse.y=e.clientY-r.top;mouse.active=true;wake()}
+stage.addEventListener('pointermove',pushPointer);stage.addEventListener('pointerleave',()=>{mouse.active=false;wake()});window.addEventListener('blur',()=>{mouse.active=false;wake()});
+function tick(){let active=false;for(const p of particles){if(!p.el&&performance.now()-revealStart<p.delay+p.duration){active=true;continue}const dx=p.x-mouse.x,dy=p.y-mouse.y,dist=Math.hypot(dx,dy),inside=mouse.active&&dist<PHYSICS.radius;
+ // Once returning, finish the recorded route unless a fresh mouse movement disturbs it again.
+ if(!inside&&p.history.length)p.returning=true;
+ if(p.returning){const previous=p.history.pop();if(previous){p.x=previous[0];p.y=previous[1];p.vx=0;p.vy=0;active=true}else{p.x=p.hx;p.y=p.hy;p.returning=false}continue}
+ if(inside){const f=(1-dist/PHYSICS.radius)**2*PHYSICS.kick,angle=Math.atan2(dy,dx)+p.bias;p.vx+=Math.cos(angle)*f;p.vy+=Math.sin(angle)*f}
+ p.vx=(p.vx+(p.hx-p.x)*PHYSICS.spring)*PHYSICS.damping;p.vy=(p.vy+(p.hy-p.y)*PHYSICS.spring)*PHYSICS.damping;
+ const speed=Math.hypot(p.vx,p.vy);if(speed>PHYSICS.maxSpeed){p.vx*=PHYSICS.maxSpeed/speed;p.vy*=PHYSICS.maxSpeed/speed}
+ if(speed>.04){if(p.history.length<PHYSICS.historyLimit)p.history.push([p.x,p.y]);p.x+=p.vx;p.y+=p.vy;active=true}else if(!inside&&p.history.length){p.returning=true;active=true}
+ }return active}
+function frame(time){raf=0;const elapsed=last?Math.min(50,time-last):1000/60;last=time;acc+=elapsed;let active=false;while(acc>=1000/60){active=tick()||active;acc-=1000/60}draw();if(active||mouse.active||(result()&&performance.now()-revealStart<2900))raf=requestAnimationFrame(frame)}
+function draw(){
+ ctx.clearRect(0,0,w,h);ctx.strokeStyle='#ddd';
+ for(const l of links){ctx.lineWidth=l.width;ctx.beginPath();ctx.moveTo(...l.a);ctx.lineTo(...l.b);ctx.stroke()}
+ const wire=()=>{ctx.lineWidth=1;for(const f of wireframes){ctx.strokeRect(f.x,f.y,f.side,f.side);ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.lineTo(f.x+f.side,f.y+f.side);ctx.moveTo(f.x+f.side,f.y);ctx.lineTo(f.x,f.y+f.side);ctx.stroke();ctx.beginPath();ctx.arc(f.x+f.side/2,f.y+f.side/2,f.side/2,0,Math.PI*2);ctx.stroke()}};
+ wire();ctx.fillStyle='#f32620';const c=PHYSICS.cell,age=performance.now()-revealStart;
+ for(const p of particles){if(p.el){p.el.style.translate=`${Math.round((p.x-p.hx)/c)*c}px ${Math.round((p.y-p.hy)/c)*c}px`;continue}if(age>=p.delay){
+ const t=Math.min(1,(age-p.delay)/p.duration),ease=t*t*t*(t*(6*t-15)+10),residual=1-ease;
+ const hops=Math.floor(t*12),jitter=residual*22;
+ const x=t<1?p.hx+p.offsetX*residual+Math.sin(hops*2.37+p.phase)*jitter:p.x;
+ const y=t<1?p.hy+p.offsetY*residual+Math.cos(hops*1.91+p.phase)*jitter:p.y;
+ ctx.fillRect(Math.round(x/c)*c,Math.round(y/c)*c,c,c);
+ }}
+ // Wireframes stay at home beneath the opaque red pixels; scattering exposes them.
+}
+stage.addEventListener('pointermove',()=>{for(const p of particles)if(p.returning&&Math.hypot(p.x-mouse.x,p.y-mouse.y)<PHYSICS.radius)p.returning=false});
+$('close-info').onclick=()=>$('info').close();
+$('info').addEventListener('click',e=>{if(e.target===$('info')){const r=$('info').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('info').close()}});
+$('next').onclick=()=>{if(screen<12){screen++;render()}};$('back').onclick=()=>{if(screen>0){screen--;render()}};window.addEventListener('resize',()=>{size();wake()});render();
+</script>
+</body></html>
