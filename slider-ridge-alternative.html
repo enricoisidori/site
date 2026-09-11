@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CGIL — Cresta superiore</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#141414;color:#f1f1ed;font-family:Helvetica,Arial,sans-serif}main{min-height:100vh;padding:54px 30px;display:grid;place-items:center}svg{width:min(1120px,96vw);height:auto;overflow:visible}.label{font-size:15px;fill:#f1f1ed}.value{font-size:11px;fill:#aaa}</style>
+</head>
+<body><main><svg id="plot" viewBox="0 0 1200 760" role="img" aria-label="Distribuzioni delle risposte sul significato del successo nel lavoro"></svg></main>
+<script>
+'use strict';
+const svg=document.getElementById('plot'),ns='http://www.w3.org/2000/svg',labels=['Guadagnare bene','Essere soddisfatti','Avere responsabilità','Essere riconosciuti','Avere tempo per sé','Fare qualcosa di utile'],means=[31,18,9,11,27,7],modes=[[[.24,.68,.052],[.78,.09,.026]],[[.13,.63,.046]],[[.07,.6,.038]],[[.19,.56,.048],[.61,.07,.024]],[[.36,.64,.055],[.86,.1,.023]],[[.11,.58,.043]]];
+const make=(name,attrs)=>{const el=document.createElementNS(ns,name);Object.entries(attrs).forEach(([key,value])=>el.setAttribute(key,value));svg.append(el);return el},noise=n=>{const value=Math.sin(n*12.9898+78.233)*43758.5453;return value-Math.floor(value)},ridgePath=points=>{let d=`M ${points[0].x} ${points[0].y}`;for(let i=0;i<points.length-1;i++){const a=points[Math.max(0,i-1)],b=points[i],c=points[i+1],e=points[Math.min(points.length-1,i+2)],c1x=b.x+(c.x-a.x)/5,c1y=b.y+(c.y-a.y)/5,c2x=c.x-(e.x-b.x)/5,c2y=c.y-(e.y-b.y)/5;d+=` C ${c1x} ${c1y} ${c2x} ${c2y} ${c.x} ${c.y}`}return d};
+const left=355,width=720,startY=104,rowStep=105;
+labels.forEach((label,row)=>{const center=startY+row*rowStep,barY=center,base=barY-10,maxAmplitude=rowStep-28,points=[];make('text',{x:left-32,y:center+5,'text-anchor':'end',class:'label'}).textContent=label;make('text',{x:left+width+28,y:center+5,class:'value'}).textContent=`${means[row]}%`;for(let tick=0;tick<=20;tick++){const x=left+width*tick/20,size=tick%4===0?12:tick%2===0?8:4;make('line',{x1:x,y1:barY-size,x2:x,y2:barY+size,stroke:'#f1f1ed','stroke-width':tick%4===0?.85:.55,opacity:tick%4===0?.78:.52})}for(let point=0;point<=160;point++){const x=point/160,density=modes[row].reduce((sum,[mode,weight,spread])=>sum+weight*Math.exp(-Math.pow((x-mode)/spread,2)),0),seed=row*211+point*31,grain=((noise(seed-31)+noise(seed)+noise(seed+31))/3-.5)*.72,texture=(Math.sin(point*1.71+row*2.4)+Math.sin(point*.61-row))*0.12,rawAmplitude=Math.max(0,density*(1+grain+texture))*150,amplitude=Math.min(maxAmplitude,rawAmplitude);points.push({x:left+width*x,y:base-amplitude})}const area=`${ridgePath(points)} L ${left+width} ${base} L ${left} ${base} Z`;make('path',{d:area,fill:'#d7d7d1',opacity:.24});make('path',{d:ridgePath(points),fill:'none',stroke:'#d7d7d1','stroke-width':.9,opacity:.72,'stroke-linecap':'round','stroke-linejoin':'round'});make('rect',{x:left,y:barY-5,width:width*means[row]/100,height:10,fill:'#f1f1ed'})});
+</script>
+</body>
+</html>

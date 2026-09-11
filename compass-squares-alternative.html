@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CGIL — Compass a quadrati</title>
+<style>
+:root{color-scheme:dark;--bg:#141414;--ink:#f1f1ed;--muted:rgba(241,241,237,.22)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Helvetica,Arial,sans-serif;overflow:hidden}
+main{width:100vw;height:100vh;display:grid;place-items:center}.board{position:relative;width:min(76vmin,820px);aspect-ratio:1}
+.guide{position:absolute;inset:0;background-image:linear-gradient(to right,transparent calc(25% - .5px),var(--muted) 25%,transparent calc(25% + .5px),transparent calc(50% - .5px),var(--muted) 50%,transparent calc(50% + .5px),transparent calc(75% - .5px),var(--muted) 75%,transparent calc(75% + .5px)),linear-gradient(to bottom,transparent calc(25% - .5px),var(--muted) 25%,transparent calc(25% + .5px),transparent calc(50% - .5px),var(--muted) 50%,transparent calc(50% + .5px),transparent calc(75% - .5px),var(--muted) 75%,transparent calc(75% + .5px));opacity:.65}
+.axis{position:absolute;background:var(--ink);z-index:2}.axis.x{height:1px;left:-9%;right:-9%;top:50%}.axis.y{width:1px;top:-9%;bottom:-9%;left:50%}
+.axis:before,.axis:after{content:"";position:absolute;width:0;height:0}.axis.x:before{left:-10px;top:-5px;border-right:10px solid var(--ink);border-top:5px solid transparent;border-bottom:5px solid transparent}.axis.x:after{right:-10px;top:-5px;border-left:10px solid var(--ink);border-top:5px solid transparent;border-bottom:5px solid transparent}.axis.y:before{top:-10px;left:-5px;border-bottom:10px solid var(--ink);border-left:5px solid transparent;border-right:5px solid transparent}.axis.y:after{bottom:-10px;left:-5px;border-top:10px solid var(--ink);border-left:5px solid transparent;border-right:5px solid transparent}
+.ticks{position:absolute;inset:-9%;z-index:3;pointer-events:none}.tick{position:absolute;background:var(--ink);opacity:.9}.tick.x{width:1px;height:13px;top:calc(50% - 6px)}.tick.y{width:13px;height:1px;left:calc(50% - 6px)}
+.label{position:absolute;z-index:4;font-size:clamp(15px,2.2vmin,27px);white-space:nowrap}.top{bottom:calc(100% + 22px);left:50%;transform:translateX(-50%)}.bottom{top:calc(100% + 22px);left:50%;transform:translateX(-50%)}.left{right:calc(100% + 31px);top:50%;transform:translateY(-50%)}.right{left:calc(100% + 31px);top:50%;transform:translateY(-50%)}
+.point{position:absolute;width:var(--cell);height:var(--cell);transform:translate(-50%,-50%);background:var(--ink);opacity:var(--alpha);z-index:5}.frame{position:absolute;transform:translate(-50%,-50%);width:var(--size);height:var(--size);border:1px solid rgba(241,241,237,var(--alpha));z-index:6}.frame i{position:absolute;width:5px;height:5px;background:rgba(241,241,237,var(--alpha))}.frame i:nth-child(1){left:-3px;top:-3px}.frame i:nth-child(2){right:-3px;top:-3px}.frame i:nth-child(3){right:-3px;bottom:-3px}.frame i:nth-child(4){left:-3px;bottom:-3px}
+.note{position:fixed;left:24px;bottom:20px;color:rgba(241,241,237,.55);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+</style>
+</head>
+<body><main><section class="board" id="board" aria-label="Compass: competizione e cooperazione, produttività e benessere"><i class="guide"></i><i class="axis x"></i><i class="axis y"></i><span class="label top">Produttività</span><span class="label bottom">Benessere</span><span class="label left">Competizione</span><span class="label right">Cooperazione</span><i class="ticks" id="ticks"></i></section></main><p class="note">Alternativa · concentrazioni delle risposte</p>
+<script>
+const board=document.querySelector('#board'),ticks=document.querySelector('#ticks');
+for(let i=1;i<16;i++){const a=document.createElement('i'),b=document.createElement('i');a.className='tick x';b.className='tick y';a.style.left=b.style.top=`${i/16*100}%`;ticks.append(a,b)}
+// x, y and n encode clustered response concentrations on a discrete 16×16 field.
+const clusters=[
+ {x:3,y:3,shape:[[0,0],[1,0],[0,1],[1,1],[0,2],[1,-1],[2,-1]],fade:0},
+ {x:10,y:2,shape:[[0,0],[1,0],[0,1]],fade:.12},
+ {x:11,y:5,shape:[[0,0],[1,0],[2,0],[3,0],[0,1],[1,1],[2,1],[3,1],[1,2],[2,2],[3,2],[2,3],[3,3],[4,3]],fade:.04},
+ {x:4,y:7,shape:[[0,0],[1,0],[2,0],[0,-1],[0,-2],[1,-2],[1,-3],[2,-3]],fade:.16},
+ {x:7,y:8,shape:[[0,0],[1,0],[2,0],[0,1],[1,1]],fade:.25},
+ {x:12,y:8,shape:[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[1,2],[2,2],[3,2],[1,-1],[1,-2]],fade:.06},
+ {x:5,y:12,shape:[[0,0],[1,0],[0,1],[1,1]],fade:.5},
+ {x:11,y:12,shape:[[0,0],[1,0],[2,0],[3,0],[4,0],[0,1],[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[4,2],[0,3],[1,3],[2,3],[3,3],[4,3],[2,4],[3,4],[4,4],[3,5],[4,5]],fade:0}
+];
+const pct=(v)=>`${(v/16*100).toFixed(3)}%`,add=(className,x,y,style={})=>{const el=document.createElement('i');el.className=className;el.style.left=pct(x+.5);el.style.top=pct(y+.5);Object.entries(style).forEach(([property,value])=>el.style.setProperty(property,value));board.append(el)};
+clusters.forEach((cluster,index)=>{cluster.shape.forEach(([dx,dy],i)=>{const distance=Math.hypot(dx,dy),alpha=Math.max(.18,1-cluster.fade-distance*.15);add('point',cluster.x+dx,cluster.y+dy,{'--cell':'calc(100% / 16 - 2px)','--alpha':alpha.toFixed(2)})});const size=Math.min(5,2+Math.floor(cluster.shape.length/7));for(let n=0;n<Math.min(3,Math.ceil(cluster.shape.length/9));n++){const offset=n*.25,alpha=.35+n*.2;add('frame',cluster.x+size/2-1+offset,cluster.y+size/2-1+offset,{'--size':`calc(${size/16*100}% + ${n*8}px)`,'--alpha':alpha.toFixed(2)})}});
+</script></body></html>
