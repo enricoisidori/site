@@ -89,15 +89,27 @@ body.entry dialog{background:transparent;color:#111;border-color:transparent}bod
 @media(prefers-reduced-motion:reduce){#progress:after,#progress span:after,.node .box,.node .history-open,footer>button,#gallery-link,.gallery-return,.compass-dot,.gallery-card{transition:none}}
 :root{--personal-marker:8px}
 body.entry .node .box,body.entry .node.chosen .box,body.entry .node .choice-toggle:hover .box{position:relative;background:transparent;border-color:#111}
-.node .box:after{content:'';position:absolute;left:50%;top:50%;width:6px;height:6px;background:#111;transform:translate(-50%,-50%) scale(0);transition:transform 220ms ease-out,background-color 180ms ease-out}
+.node .box:after{content:'';position:absolute;left:50%;top:50%;width:var(--personal-marker);height:var(--personal-marker);background:#111;transform:translate(-50%,-50%) scale(0);transition:transform 220ms ease-out,background-color 180ms ease-out}
 .node .choice-toggle:hover .box:after{transform:translate(-50%,-50%) scale(1)}
 .node.chosen .box:after,.node.chosen .choice-toggle:hover .box:after{width:var(--personal-marker);height:var(--personal-marker);background:#e30613;transform:translate(-50%,-50%) scale(1)}
 body.entry .marker{width:var(--personal-marker);height:var(--personal-marker);background:#e30613}
-body.entry .compass-dot.near{width:6px;height:6px;background:#111}
+body.entry .compass-dot.near{width:var(--personal-marker);height:var(--personal-marker);background:#111}
+/* The compass keeps the same small personal marker, framed by the outer
+   selection square used by the multiple-choice questions. */
+body.entry .marker:before{content:'';position:absolute;left:50%;top:50%;width:31.563px;height:31.563px;border:1px solid #111;background:transparent;transform:translate(-50%,-50%);pointer-events:none}
 body.entry input[type=range]::-webkit-slider-thumb{background:linear-gradient(#e30613,#e30613) center/var(--personal-marker) var(--personal-marker) no-repeat #fff;border:1px solid #111}
 body.entry input[type=range]::-moz-range-thumb{background:linear-gradient(#e30613,#e30613) center/var(--personal-marker) var(--personal-marker) no-repeat #fff;border:1px solid #111}
 body.entry input[type=range].at-zero::-webkit-slider-thumb{background:linear-gradient(#111,#111) center/6px 6px no-repeat #fff}
 body.entry input[type=range].at-zero::-moz-range-thumb{background:linear-gradient(#111,#111) center/6px 6px no-repeat #fff}
+/* Only broad, clearly horizontal desktop canvases have enough lateral air
+   for mid-screen navigation. Everything else returns controls to the footer
+   before they can overlap a question or chart. */
+@media (min-width:1200px) and (min-height:820px) and (min-aspect-ratio:3/2){
+ body:not(.conclusion):not(.gallery-focus) footer>#back,
+ body:not(.conclusion):not(.gallery-focus) footer>#next{position:fixed;z-index:12;top:50%;width:calc((100vw - 30px)/6);transform:translateY(-50%)}
+ body:not(.conclusion):not(.gallery-focus) footer>#back{left:15px}
+ body:not(.conclusion):not(.gallery-focus) footer>#next{right:15px}
+}
 </style>
 <style>
 body.conclusion .stage{width:100%;height:70vh;min-height:480px;overflow:hidden;perspective:850px;perspective-origin:50% 45%;touch-action:none}
@@ -233,6 +245,10 @@ body.conclusion #progress:after{visibility:hidden}
 footer>button{font-family:'Times New Roman',Times,serif;font-weight:400;font-size:14px;line-height:18px}
 #gallery-link{font-family:'Times New Roman',Times,serif;font-weight:400}
 @media(max-width:650px){.marker,.compass-dot.near{width:18px;height:18px}}
+/* Personal input marker is deliberately the shared 8px datum, not the
+   larger aggregate/hover target used by earlier compass states. */
+body.entry .marker{width:var(--personal-marker);height:var(--personal-marker)}
+body.entry .compass-dot.near{width:var(--personal-marker);height:var(--personal-marker)}
 </style>
 </head>
 <body>
@@ -472,13 +488,14 @@ function buildAccordionSvg(){
  const arc=(radius,start,end)=>{const a=point(radius,start),b=point(radius,end),large=end-start>Math.PI?1:0;return `M ${a.x} ${a.y} A ${radius} ${radius} 0 ${large} 1 ${b.x} ${b.y}`};
  const total=modules.reduce((sum,value)=>sum+value,0),moduleAngle=Math.PI*2/total,sectors=[];let cursor=-Math.PI/2;
  modules.forEach(units=>{const span=units*moduleAngle,rawStart=cursor;sectors.push({rawStart,start:rawStart+gap,end:rawStart+span-gap,angle:rawStart+span/2,span,units});cursor+=span});
- [inner*.34,inner*.58,inner*.82,outer+20].forEach((radius,index)=>make('circle',{cx,cy,r:radius,fill:'none',stroke:'#f1f1ed','stroke-width':index===3?.7:.5,opacity:index===3?.7:.57,'stroke-dasharray':index===3?'2 4':index===2?'3 5':'2 7'}));
+ const markerRadius=outer+18;
+ [inner*.34,inner*.58,inner*.82,markerRadius].forEach((radius,index)=>make('circle',{cx,cy,r:radius,fill:'none',stroke:'#f1f1ed','stroke-width':index===3?.7:.5,opacity:index===3?.7:.57,'stroke-dasharray':index===3?'2 4':index===2?'3 5':'2 7'}));
  const percentageFor=sector=>sector.units/total*100,bandFor=sector=>3+percentageFor(sector)/100*57,personalSelections=new Set(answers[Math.floor(screen/2)].selected);
  const anchors=sectors.map(sector=>point(outer-bandFor(sector),sector.angle));
  const relations=[[0,3,45],[0,4,38],[0,7,24],[1,2,11],[1,3,8],[1,6,5],[2,4,31],[2,6,12],[3,4,27],[3,7,14],[4,5,10],[5,6,3],[6,7,17],[0,2,18],[1,5,4]];
  relations.filter(([from,to])=>from<anchors.length&&to<anchors.length).forEach(([from,to,weight],index)=>{const a=anchors[from],b=anchors[to],length=Math.hypot(a.x-b.x,a.y-b.y)||1,offset=(index%2?1:-1)*(15+(index%4)*9),mx=cx+(a.x+b.x-2*cx)*.08,my=cy+(a.y+b.y-2*cy)*.08;make('path',{d:`M ${a.x} ${a.y} Q ${mx-offset*(a.y-b.y)/length} ${my+offset*(a.x-b.x)/length} ${b.x} ${b.y}`,fill:'none',stroke:'#f1f1ed','stroke-width':(.25+weight*.048).toFixed(2),opacity:Math.min(.86,.12+weight*.016).toFixed(2)})});
  const labelLines=label=>{const words=label.split(' '),lines=[''];words.forEach(word=>{const line=lines[lines.length-1],next=(line+' '+word).trim();if(next.length>23&&line)lines.push(word);else lines[lines.length-1]=next});return lines};
-sectors.forEach((sector,index)=>{const label=labels[index],anchor=anchors[index],outerPoint=point(outer+18,sector.angle),percentPoint=point(outer+46,sector.angle),labelRadius=outer+76,labelPoint=point(labelRadius,sector.angle),band=bandFor(sector),radius=outer-band/2,cosine=Math.cos(sector.angle),isPersonal=personalSelections.has(index),markerSide=isPersonal?8:3.5;make('path',{d:arc(radius,sector.start,sector.end),fill:'none',stroke:'#f1f1ed','stroke-width':band,opacity:.96});make('line',{x1:anchor.x,y1:anchor.y,x2:outerPoint.x,y2:outerPoint.y,stroke:'#f1f1ed','stroke-width':.7,opacity:1});for(let tick=0;tick<sector.units;tick++){const angle=sector.rawStart+(tick+.5)*moduleAngle,p1=point(outer-6,angle),p2=point(outer+6,angle);make('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:'#f1f1ed','stroke-width':.7,opacity:1})}make('rect',{x:outerPoint.x-markerSide/2,y:outerPoint.y-markerSide/2,width:markerSide,height:markerSide,fill:isPersonal?'#e30613':'#f1f1ed',opacity:isPersonal?1:.72});const percentage=make('text',{x:percentPoint.x,y:percentPoint.y,fill:'#f1f1ed','font-family':'Helvetica,Arial,sans-serif','font-size':mobile?13:13,'text-anchor':'middle','dominant-baseline':'middle'});percentage.textContent=`${mobile?(index+1)+' · ':''}${Math.round(percentageFor(sector))}%`;if(mobile)return;const lines=labelLines(label),text=make('text',{x:labelPoint.x,y:labelPoint.y,fill:'#f1f1ed','font-family':'Helvetica,Arial,sans-serif','font-size':17,'text-anchor':cosine<0?'end':'start',transform:`rotate(${sector.angle*180/Math.PI+(cosine<0?180:0)} ${labelPoint.x} ${labelPoint.y})`});lines.forEach((line,lineIndex)=>{const tspan=document.createElementNS(ns,'tspan');tspan.setAttribute('x',labelPoint.x);tspan.setAttribute('dy',lineIndex?19:lines.length>1?-8:5);tspan.textContent=line;text.append(tspan)})});
+sectors.forEach((sector,index)=>{const label=labels[index],anchor=anchors[index],outerPoint=point(markerRadius,sector.angle),percentPoint=point(outer+46,sector.angle),labelRadius=outer+76,labelPoint=point(labelRadius,sector.angle),band=bandFor(sector),radius=outer-band/2,cosine=Math.cos(sector.angle),isPersonal=personalSelections.has(index),markerSide=isPersonal?8:3.5;make('path',{d:arc(radius,sector.start,sector.end),fill:'none',stroke:'#f1f1ed','stroke-width':band,opacity:.96});make('line',{x1:anchor.x,y1:anchor.y,x2:outerPoint.x,y2:outerPoint.y,stroke:'#f1f1ed','stroke-width':.7,opacity:1});for(let tick=0;tick<sector.units;tick++){const angle=sector.rawStart+(tick+.5)*moduleAngle,p1=point(outer-6,angle),p2=point(outer+6,angle);make('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:'#f1f1ed','stroke-width':.7,opacity:1})}make('rect',{x:outerPoint.x-markerSide/2,y:outerPoint.y-markerSide/2,width:markerSide,height:markerSide,fill:isPersonal?'#e30613':'#f1f1ed',opacity:isPersonal?1:.72});const percentage=make('text',{x:percentPoint.x,y:percentPoint.y,fill:'#f1f1ed','font-family':'Helvetica,Arial,sans-serif','font-size':mobile?13:13,'text-anchor':'middle','dominant-baseline':'middle'});percentage.textContent=`${mobile?(index+1)+' · ':''}${Math.round(percentageFor(sector))}%`;if(mobile)return;const lines=labelLines(label),text=make('text',{x:labelPoint.x,y:labelPoint.y,fill:'#f1f1ed','font-family':'Helvetica,Arial,sans-serif','font-size':17,'text-anchor':cosine<0?'end':'start',transform:`rotate(${sector.angle*180/Math.PI+(cosine<0?180:0)} ${labelPoint.x} ${labelPoint.y})`});lines.forEach((line,lineIndex)=>{const tspan=document.createElementNS(ns,'tspan');tspan.setAttribute('x',labelPoint.x);tspan.setAttribute('dy',lineIndex?19:lines.length>1?-8:5);tspan.textContent=line;text.append(tspan)})});
  content.prepend(svg);
  const bounds=svg.getBBox(),pad=24;
  svg.setAttribute('viewBox',`${bounds.x-pad} ${bounds.y-pad} ${bounds.width+pad*2} ${bounds.height+pad*2}`);
