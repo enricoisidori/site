@@ -99,8 +99,8 @@ body.entry .compass-dot.near{width:var(--personal-marker);height:var(--personal-
 body.entry .marker:before{content:'';position:absolute;left:50%;top:50%;width:31.563px;height:31.563px;border:1px solid #111;background:transparent;transform:translate(-50%,-50%);pointer-events:none}
 body.entry input[type=range]::-webkit-slider-thumb{background:linear-gradient(#e30613,#e30613) center/var(--personal-marker) var(--personal-marker) no-repeat #fff;border:1px solid #111}
 body.entry input[type=range]::-moz-range-thumb{background:linear-gradient(#e30613,#e30613) center/var(--personal-marker) var(--personal-marker) no-repeat #fff;border:1px solid #111}
-body.entry input[type=range].at-zero::-webkit-slider-thumb{background:linear-gradient(#111,#111) center/6px 6px no-repeat #fff}
-body.entry input[type=range].at-zero::-moz-range-thumb{background:linear-gradient(#111,#111) center/6px 6px no-repeat #fff}
+body.entry input[type=range].at-zero::-webkit-slider-thumb{background:linear-gradient(#111,#111) center/var(--personal-marker) var(--personal-marker) no-repeat #fff}
+body.entry input[type=range].at-zero::-moz-range-thumb{background:linear-gradient(#111,#111) center/var(--personal-marker) var(--personal-marker) no-repeat #fff}
 /* Only broad, clearly horizontal desktop canvases have enough lateral air
    for mid-screen navigation. Everything else returns controls to the footer
    before they can overlap a question or chart. */
@@ -249,6 +249,9 @@ footer>button{font-family:'Times New Roman',Times,serif;font-weight:400;font-siz
    larger aggregate/hover target used by earlier compass states. */
 body.entry .marker{width:var(--personal-marker);height:var(--personal-marker)}
 body.entry .compass-dot.near{width:var(--personal-marker);height:var(--personal-marker)}
+.viz-info{display:inline-block;vertical-align:middle;width:17px;height:17px;margin-left:6px;padding:0;border:0;background:url('asset/images/info-figma.svg') center/17px 17px no-repeat;font-size:0;cursor:pointer}
+body:not(.entry) .viz-info{filter:invert(1)}
+.viz-info:hover{opacity:.58}
 </style>
 </head>
 <body>
@@ -293,8 +296,14 @@ function makeDistribution(q,qi){
  return {samples,means:q.type==='slider'?q.labels.map((_,i)=>samples.reduce((sum,p)=>sum+p[i],0)/samples.length):[]};
 }
 const distributions=questions.map(makeDistribution);
-const answers=questions.map(q=>({selected:[],values:q.type==='slider'?q.labels.map(()=>50):[],point:null}));
+const answers=questions.map(q=>({selected:[],values:q.type==='slider'?q.labels.map(()=>0):[],point:null}));
 const $=id=>document.getElementById(id), stage=$('stage'), content=$('content'), canvas=$('field'), ctx=canvas.getContext('2d');
+function openInfo(title,copy){$('info-title').textContent=title;$('info-copy').textContent=copy;$('info').showModal()}
+function visualizationLegend(question){
+ if(question.type==='slider')return 'Le creste mostrano dove si concentrano le risposte degli altri utenti. La barra indica il valore medio; il quadratino rosso, quando presente, segna la tua risposta.';
+ if(question.type==='compass')return 'I quadratini chiari mostrano dove si concentrano le risposte. I riquadri indicano le aree più dense; il quadratino rosso segna la tua posizione.';
+ return 'Le fasce mostrano quanto ciascun tema è stato scelto. Le linee collegano temi scelti spesso insieme; i quadratini rossi indicano le tue risposte.';
+}
 let screen=0,capturing=false,galleryFocus=false,particles=[],links=[],wireframes=[],revealStart=0,w=0,h=0,raf=0,last=0,acc=0,networkState=null,networkFrame=0;
 const mouse={x:0,y:0,active:false};
 const positions=[[.34,.16],[.5,.045],[.66,.16],[.73,.49],[.68,.79],[.5,.94],[.33,.79],[.27,.49]];
@@ -365,6 +374,9 @@ function render(){
  svg.querySelectorAll('rect').forEach((el,i)=>{
   const personal=el.getAttribute('fill')==='#e30613';
   if(personal&&svg.classList.contains('compass-viz'))return;
+  // Slider markers already occupy the same datum as their input thumb; keep
+  // them still instead of replaying a decorative entrance.
+  if(personal&&svg.classList.contains('slider-distribution'))return;
   if(el.hasAttribute('data-bar')){
    el.style.transformBox='fill-box';el.style.transformOrigin='left center';
    motion(el,[{scale:'0 1'},{scale:'1 1'}],{duration:800,delay:Number(el.dataset.bar)*65});return;
@@ -412,7 +424,9 @@ function renderScreen(){
  document.body.classList.toggle('choice-screen',q.type==='choice');
  document.documentElement.style.setProperty('--row-count',q.labels?.length||6);
  document.title=`${Math.floor(screen/2)+1}/6 · ${q.title} — Partecipare`;
- $('title').textContent=q.title;$('hint').textContent=result()?'Risposte degli altri utenti':q.hint||(q.type==='slider'?'Regola gli slider':'Posizionati rispetto agli assi');
+ $('title').textContent=q.title;
+ const hint=$('hint');hint.textContent=result()?'Risposte degli altri utenti':q.hint||(q.type==='slider'?'Regola gli slider':'Posizionati rispetto agli assi');
+ if(result()){const info=document.createElement('button');info.className='viz-info';info.type='button';info.setAttribute('aria-label','Come leggere questa visualizzazione');info.title='Come leggere questa visualizzazione';info.onclick=event=>{event.stopPropagation();openInfo('Come leggere il grafico',visualizationLegend(q))};hint.append(info)}
  content.innerHTML='';$('back').disabled=screen===0;$('next').textContent='Prosegui';
 
  $('legend').innerHTML='';
@@ -431,7 +445,7 @@ function renderScreen(){
    else {flashChoiceHint();return}
    invalidateGallerySnapshots();refreshChoiceNodes(a);ready()
   };
-  if(histories[label]){const info=document.createElement('button');info.className='history-open';info.setAttribute('aria-label',`Approfondisci: ${label}`);info.title='Approfondisci';info.onclick=()=>{$('info-title').textContent=label;$('info-copy').textContent=histories[label];$('info').showModal()};node.append(info)}
+  if(histories[label]){const info=document.createElement('button');info.className='history-open';info.setAttribute('aria-label',`Approfondisci: ${label}`);info.title='Approfondisci';info.onclick=()=>openInfo(label,histories[label]);node.append(info)}
   const count=document.createElement('small');count.className='choice-count';count.textContent=order>=0?`${order+1} di 3`:'';node.append(count);
   content.append(node);
  });
@@ -441,8 +455,8 @@ function renderScreen(){
  }
  if(q.type==='compass'){
  const comp=document.createElement('div');comp.className='compass';comp.tabIndex=result()?-1:0;comp.setAttribute('role','application');comp.setAttribute('aria-label','Scegli la tua posizione, oppure usa i tasti freccia');comp.innerHTML='<div class="axis-x"></div><div class="axis-y"></div>'+q.axes.map((s,i)=>`<span class="axislabel ${['left','right','top','bottom'][i]}">${s}</span>`).join('')+'<span class="marker"></span><i class="compass-arrow arrow-left"></i><i class="compass-arrow arrow-right"></i><i class="compass-arrow arrow-top"></i><i class="compass-arrow arrow-bottom"></i>';content.append(comp);
- for(let y=0;y<=16;y++)for(let x=0;x<=16;x++){const dot=document.createElement('i');dot.className='compass-dot';dot.style.left=x/16*100+'%';dot.style.top=y/16*100+'%';comp.prepend(dot)}
- for(let tick=0;tick<=16;tick++){const x=document.createElement('i'),y=document.createElement('i');x.className='compass-tick x';y.className='compass-tick y';x.style.left=tick/16*100+'%';y.style.top=tick/16*100+'%';comp.append(x,y);if(!result()&&tick%4===0){const vertical=document.createElement('i'),horizontal=document.createElement('i');vertical.className='compass-guide vertical';horizontal.className='compass-guide horizontal';vertical.style.left=tick/16*100+'%';horizontal.style.top=tick/16*100+'%';comp.prepend(vertical,horizontal)}}
+ for(let y=0;y<=16;y++)for(let x=0;x<=16;x++){if(x===8||y===8)continue;const dot=document.createElement('i');dot.className='compass-dot';dot.style.left=x/16*100+'%';dot.style.top=y/16*100+'%';comp.prepend(dot)}
+ for(let tick=0;tick<=16;tick++){if(tick!==0&&tick!==16){const x=document.createElement('i'),y=document.createElement('i');x.className='compass-tick x';y.className='compass-tick y';x.style.left=tick/16*100+'%';y.style.top=tick/16*100+'%';comp.append(x,y)}if(!result()&&tick%4===0){const vertical=document.createElement('i'),horizontal=document.createElement('i');vertical.className='compass-guide vertical';horizontal.className='compass-guide horizontal';vertical.style.left=tick/16*100+'%';horizontal.style.top=tick/16*100+'%';comp.prepend(vertical,horizontal)}}
  comp.addEventListener('pointermove',e=>{if(result())return;const r=comp.getBoundingClientRect();comp.querySelectorAll('.compass-dot').forEach(dot=>{const x=parseFloat(dot.style.left)/100*r.width,y=parseFloat(dot.style.top)/100*r.height;dot.classList.toggle('near',Math.abs(x-(e.clientX-r.left))<r.width/32&&Math.abs(y-(e.clientY-r.top))<r.height/32)})});
  comp.addEventListener('pointerleave',()=>comp.querySelectorAll('.near').forEach(dot=>dot.classList.remove('near')));
  const mark=()=>{const dot=comp.querySelector('.marker');dot.hidden=!a.point;if(a.point){dot.style.left=a.point.x*100+'%';dot.style.top=a.point.y*100+'%'}ready()};
@@ -464,8 +478,8 @@ function flashChoiceHint(){
  if(screen!==0&&screen!==10)return;
  const hint=$('hint');hint.classList.remove('choice-limit');void hint.offsetWidth;hint.classList.add('choice-limit')
 }
-// Every slider begins at 50. Their combined maximum is therefore 50 × rows.
-// It is a ceiling, not a target: the total may stay lower, but never higher.
+// Every slider begins at zero. Their combined maximum is 50 × rows: it is a
+// ceiling, not a target, so the total may remain lower but never exceed it.
 function redistribute(values,index,target){
  values[index]=Math.max(0,Math.min(100,target));
  const maximum=50*values.length;
@@ -566,8 +580,10 @@ function buildSliderDistributionSvg(){
  make('line',{x1:personal,y1:cy-terminal,x2:personal,y2:cy+terminal,stroke:personalInk,'stroke-width':1.2,opacity:1});
  make('rect',{x:personal-terminalSize/2,y:cy-terminal-terminalSize/2,width:terminalSize,height:terminalSize,fill:personalInk,opacity:1});
  make('rect',{x:personal-terminalSize/2,y:cy+terminal-terminalSize/2,width:terminalSize,height:terminalSize,fill:personalInk,opacity:1});
- const userX=x0+box.width*answers[qi].values[index]/100;
- make('rect',{x:userX-4,y:cy-4,width:8,height:8,fill:'#e30613','data-personal':index});
+ const userValue=answers[qi].values[index];
+ // A zero-valued slider is the inactive black input state: it contributes no
+ // personal red marker to the collective distribution.
+ if(userValue>0){const userX=x0+box.width*userValue/100;make('rect',{x:userX-4,y:cy-4,width:8,height:8,fill:'#e30613','data-personal':index})}
  });
  content.prepend(svg);
 }
@@ -582,11 +598,10 @@ function buildCompassSvg(){
  for(let i=0;i<=16;i++){
  const p=i*cell,len=i%4===0?7:3;
  if(i%4===0){make('line',{x1:x0+p,y1:y0,x2:x0+p,y2:y0+s,stroke:ink,'stroke-width':.5,'stroke-dasharray':'2 7',opacity:.2});make('line',{x1:x0,y1:y0+p,x2:x0+s,y2:y0+p,stroke:ink,'stroke-width':.5,'stroke-dasharray':'2 7',opacity:.2});}
- make('line',{x1:x0+p,y1:y0+s/2-len,x2:x0+p,y2:y0+s/2+len,stroke:ink,'stroke-width':.7});
- make('line',{x1:x0+s/2-len,y1:y0+p,x2:x0+s/2+len,y2:y0+p,stroke:ink,'stroke-width':.7});
+ if(i!==0&&i!==16){make('line',{x1:x0+p,y1:y0+s/2-len,x2:x0+p,y2:y0+s/2+len,stroke:ink,'stroke-width':.7});make('line',{x1:x0+s/2-len,y1:y0+p,x2:x0+s/2+len,y2:y0+p,stroke:ink,'stroke-width':.7})}
  }
  // The underlying measuring field remains visible between the clusters.
- for(let gy=0;gy<=16;gy++)for(let gx=0;gx<=16;gx++){const x=x0+gx*cell,y=y0+gy*cell,arm=.9;make('line',{x1:x-arm,y1:y,x2:x+arm,y2:y,stroke:ink,'stroke-width':.55,opacity:.42});make('line',{x1:x,y1:y-arm,x2:x,y2:y+arm,stroke:ink,'stroke-width':.55,opacity:.42});}
+ for(let gy=0;gy<=16;gy++)for(let gx=0;gx<=16;gx++){if(gx===8||gy===8)continue;const x=x0+gx*cell,y=y0+gy*cell,arm=.9;make('line',{x1:x-arm,y1:y,x2:x+arm,y2:y,stroke:ink,'stroke-width':.55,opacity:.42});make('line',{x1:x,y1:y-arm,x2:x,y2:y+arm,stroke:ink,'stroke-width':.55,opacity:.42});}
  // One centered square per occupied cell: density stays readable without random scatter.
  bins.forEach((count,i)=>{if(!count)return;const col=i%16,row=Math.floor(i/16),strength=count/peak,side=2.2+strength*3.2,x=x0+(col+.5)*cell,y=y0+(row+.5)*cell;make('rect',{x:x-side/2,y:y-side/2,width:side,height:side,fill:ink,opacity:.42+strength*.58})});
  // The sole red square is the current user's selected grid position; aggregate
@@ -754,9 +769,9 @@ function buildConclusion(){
  syncScreenHash();
  document.body.classList.remove('entry');document.body.classList.add('conclusion');
  $('title').textContent='';$('hint').textContent='';$('legend').textContent='';$('next').disabled=false;$('next').textContent='Concludi';$('back').disabled=false;
- content.innerHTML='<div class="gallery-space" tabindex="0" aria-label="Sala delle visualizzazioni: muovi il mouse a sinistra o a destra per attraversare i pannelli; usa la rotella per zoomare"><div class="gallery-orbit"></div></div>';
+ content.innerHTML='<div class="gallery-space" tabindex="0" aria-label="Sala delle visualizzazioni: muovi il mouse a sinistra o a destra per attraversare i pannelli, in alto per avvicinarti e in basso per allontanarti"><div class="gallery-orbit"></div></div>';
  const space=content.firstElementChild,orbit=space.firstElementChild,panels=[];
- let travel=galleryPose.travel,zoom=galleryPose.zoom,displayZoom=zoom,drive=0,last=0,mouseDrive=0,zoomDrag=false,dragged=false,dragStartY=0,dragStartZoom=1;
+ let travel=galleryPose.travel,zoom=galleryPose.zoom,displayZoom=zoom,drive=0,last=0,mouseDrive=0,zoomDrag=false,dragged=false,dragStartY=0,dragStartZoom=1,lastPointerY=null;
  [0,1,2,3,4,5].forEach((type,index)=>{
  const panel=document.createElement('button');panel.className='gallery-panel';panel.type='button';
   panel.setAttribute('aria-label',`Visualizzazione ${type+1}, pannello ${index+1}`);
@@ -790,13 +805,15 @@ function buildConclusion(){
   const normalized=(event.clientX-box.left)/box.width*2-1;
   mouseDrive=Math.sign(normalized)*Math.pow(Math.abs(normalized),1.55);
   if(zoomDrag){if(Math.abs(event.clientY-dragStartY)>3)dragged=true;zoom=Math.max(.4,Math.min(2,dragStartZoom+(dragStartY-event.clientY)*.004))}
+  else if(lastPointerY!==null)zoom=Math.max(.4,Math.min(2,zoom-(event.clientY-lastPointerY)*.0025));
+  lastPointerY=event.clientY;
  });
- space.addEventListener('pointerleave',()=>{mouseDrive=0});
+ space.addEventListener('pointerleave',()=>{mouseDrive=0;lastPointerY=null});
  space.addEventListener('pointerdown',event=>{
-  zoomDrag=true;dragged=false;dragStartY=event.clientY;dragStartZoom=zoom;
+  zoomDrag=true;dragged=false;dragStartY=event.clientY;dragStartZoom=zoom;lastPointerY=event.clientY;
   if(!event.target.closest('.gallery-panel'))space.setPointerCapture(event.pointerId);
  });
- space.addEventListener('pointerup',event=>{zoomDrag=false;if(space.hasPointerCapture(event.pointerId))space.releasePointerCapture(event.pointerId);setTimeout(()=>{dragged=false},0)});
+ space.addEventListener('pointerup',event=>{zoomDrag=false;lastPointerY=event.clientY;if(space.hasPointerCapture(event.pointerId))space.releasePointerCapture(event.pointerId);setTimeout(()=>{dragged=false},0)});
  space.addEventListener('pointercancel',()=>{zoomDrag=false});
  space.addEventListener('wheel',event=>{
   event.preventDefault();
