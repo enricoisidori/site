@@ -248,8 +248,10 @@ body.conclusion #progress:after{visibility:hidden}
 #progress span:after{content:'';position:absolute;left:12%;right:12%;bottom:0;height:1px;background:var(--ink);transform:scaleX(0);transform-origin:center;transition:transform .16s ease}
 #progress span.current:after{left:0;right:0}
 #progress span.current:after,#progress span:hover:after{transform:scaleX(1)}
+#progress:before{content:'';position:absolute;right:0;top:0;width:1px;height:5px;background:var(--ink);pointer-events:none}
+footer:before{content:'';position:absolute;right:0;bottom:0;width:1px;height:5px;background:var(--ink);pointer-events:none}
 footer>button{font-family:'Times New Roman',Times,serif;font-weight:400;font-size:14px;line-height:18px}
-#gallery-link{font-family:'Times New Roman',Times,serif;font-weight:400}
+#gallery-link{display:none!important;font-family:'Times New Roman',Times,serif;font-weight:400}
 @media(max-width:650px){.marker,.compass-dot.near{width:18px;height:18px}}
 /* Personal input marker is deliberately the shared 8px datum, not the
    larger aggregate/hover target used by earlier compass states. */
@@ -258,6 +260,67 @@ body.entry .compass-dot.near{width:var(--personal-marker);height:var(--personal-
 .viz-info{display:inline-block;vertical-align:middle;width:17px;height:17px;margin-left:6px;padding:0;border:0;background:url('asset/images/info-figma.svg') center/17px 17px no-repeat;font-size:0;cursor:pointer}
 body:not(.entry) .viz-info{filter:invert(1)}
 .viz-info:hover{opacity:.58}
+/* Mobile is a naturally scrolling document. Each visualization reserves the
+   height it actually needs, so labels never compete with the footer or with
+   neighbouring chart geometry. */
+@media(max-width:720px){
+ html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
+ body{height:auto;min-height:100svh;display:flex;flex-direction:column}
+ header{padding:10px 12px 0}
+ .identity{max-width:calc(100vw - 30px);margin-bottom:17px;background:transparent}
+ .identity img{max-width:100%;height:auto;background:transparent}
+ #progress{height:29px;grid-template-columns:repeat(6,minmax(0,1fr));font-size:10px;line-height:12px;overflow:hidden}
+ #progress span:nth-child(even){display:none}
+ #progress:after{width:calc(100% / 6);transform:translateX(calc(var(--question-phase,0) * 100%))}
+ #progress span.question-current:after{left:0;right:0;transform:scaleX(1)}
+ main{display:block;flex:none;min-height:0}
+ h1{max-width:100%;margin-top:18px;padding:0 18px;font-size:clamp(21px,6vw,25px);line-height:1.16;overflow-wrap:anywhere}
+ #hint{height:auto;min-height:23px;margin:7px 15px 8px;line-height:1.25;white-space:normal}
+ .stage,body.slider-screen .stage,body.compass-screen .stage{display:block;width:calc(100% - 30px);height:auto;min-height:0;flex:none;overflow:visible}
+ body.entry.choice-screen .stage{height:auto;padding:12px 0 20px}
+ body.entry.choice-screen #content{position:relative;inset:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 12px}
+ body.entry.choice-screen .node{position:static;transform:none;width:auto;min-width:0;font-size:14px}
+ .node .label-text,.radial-key li,.row label,.axislabel{overflow-wrap:anywhere;word-break:normal}
+ body:not(.entry).choice-screen .stage{height:580px}
+ .accordion{height:350px;top:8px}
+ .radial-key{top:374px;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;padding:0 8px 0 22px;font-size:11px;line-height:1.25}
+ body.slider-screen .stage{height:calc(var(--row-count) * 76px + 86px)}
+ body.slider-screen .sliders{width:100%;height:calc(100% - 54px);margin:20px auto 34px;gap:0}
+ body.slider-screen .row{grid-template-columns:minmax(88px,29vw) minmax(0,1fr) 29px;gap:9px;min-height:62px}
+ body.slider-screen .row label{font-size:12px;line-height:1.18}
+ body.slider-result .row label{font-size:11px}
+ .row output{font-size:10px}
+ body.compass-screen .stage{height:450px}
+ .compass{width:min(62vw,280px);height:auto;top:49%}
+ .axislabel{font-size:11px;line-height:1.15}
+ .axislabel.left,.axislabel.right{width:60px;font-size:10px}
+ .axislabel.left{right:calc(100% + 7px)}.axislabel.right{left:calc(100% + 7px)}
+ .axislabel.top,.axislabel.bottom{width:min(230px,72vw)}
+ /* The navigation is a fixed mobile control bar. The document itself keeps
+    scrolling, with reserved room below the content rather than moving the
+    controls away from the thumb. */
+ main{padding-bottom:82px}
+ footer{position:fixed;z-index:20;left:0;right:0;bottom:0;flex:none;width:100%;margin:0;padding:10px 15px 17px;grid-template-columns:1fr 1fr;gap:14px;background:var(--bg)}
+ body.entry footer{background:#fff}
+ body.conclusion footer,body.gallery-focus footer{position:relative;left:auto;right:auto;bottom:auto;width:auto;margin:12px 15px 15px;background:transparent}
+ body.conclusion main,body.gallery-focus main{padding-bottom:0}
+ /* The mobile ruler mirrors the desktop cadence: the tall marks close each
+    sixth, and the short centre mark sits over its numbered phase. */
+ #progress{background:repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px calc(100% / 6)) left top/100% 5px no-repeat}
+ #progress:before{height:5px}
+ #progress span:nth-child(odd):before{content:'';position:absolute;left:50%;top:-8px;width:1px;height:3px;background:var(--ink);transform:translateX(-50%);pointer-events:none}
+ footer{border-bottom:0}
+ footer:before,footer:after{display:none}
+ footer>button{width:100%;font-size:14px;min-height:32px}
+ #back{grid-column:1}.footer-center{display:none}.footer-center+#next,#next{grid-column:2}
+ dialog{max-height:calc(100svh - 32px);width:calc(100vw - 32px)}
+ .viz-legend{width:100%}
+ body.conclusion{height:100svh;min-height:0;overflow:hidden}
+ body.conclusion main{display:flex;flex:1}
+ body.conclusion .stage{height:auto;min-height:430px;flex:1}
+ body.gallery-focus{height:auto;min-height:100svh;overflow-y:auto}
+ body.gallery-focus main{display:block}
+}
 </style>
 </head>
 <body>
@@ -407,7 +470,8 @@ function render(){
    Object.assign(marker.style,{position:'absolute',left:'50%',top:'50%',width:'47%',height:'47%',background:personalRed,transform:'translate(-50%,-50%)'});
    traveler.append(marker);document.body.append(traveler);motionOverlays.push(traveler);
    const scaleX=target.width/origin.width,scaleY=target.height/origin.height,dx=target.x-origin.x,dy=target.y-origin.y;
-   const flight=traveler.animate([{transform:'translate3d(0,0,0) scale(1)'},{transform:`translate3d(${dx}px,${dy}px,0) scale(${scaleX},${scaleY})`}],{duration:2000,easing:'cubic-bezier(.12,.2,.08,1)',fill:'forwards'});
+   const destination=`translate3d(${dx}px,${dy}px,0) scale(${scaleX},${scaleY})`;
+   const flight=traveler.animate([{transform:'translate3d(0,0,0) scale(1)'},{transform:destination}],{duration:2000,easing:'cubic-bezier(.12,.2,.08,1)',fill:'forwards'});
    motionAnimations.push(flight);Promise.all([flight.finished,rotationFinished]).then(()=>{frame.style.visibility='';inner.style.visibility='';traveler.remove()}).catch(()=>{frame.style.visibility='';inner.style.visibility='';traveler.remove()});
   });
  }
@@ -467,10 +531,16 @@ function renderScreen(){
  document.body.classList.remove('slider-result','slider-screen','compass-screen');
  document.body.classList.toggle('entry',!result());
  $('hint').classList.remove('choice-limit');
- if(!$('progress').children.length)$('progress').innerHTML=Array.from({length:12},(_,i)=>`<span role="button" tabindex="0" aria-label="Vai alla fase ${Math.floor(i/2)+1}, ${i%2?'visualizzazione':'risposta'}">${Math.floor(i/2)+1}/6</span>`).join('');
- [...$('progress').children].forEach((step,i)=>step.classList.toggle('current',i===screen));
- $('progress').style.setProperty('--phase',Math.min(screen,11));
- [...$('progress').children].forEach((step,index)=>{step.setAttribute('aria-current',index===screen?'step':'false');const go=()=>navigate(index);step.onclick=go;step.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}});
+if(!$('progress').children.length)$('progress').innerHTML=Array.from({length:12},(_,i)=>`<span role="button" tabindex="0" aria-label="Vai alla fase ${Math.floor(i/2)+1}, ${i%2?'visualizzazione':'risposta'}">${Math.floor(i/2)+1}/6</span>`).join('');
+const progressSteps=[...$('progress').children];
+const questionPhase=Math.floor(Math.min(screen,11)/2);
+progressSteps.forEach((step,i)=>{
+ step.classList.toggle('current',i===screen);
+ step.classList.toggle('question-current',Math.floor(i/2)===questionPhase);
+});
+$('progress').style.setProperty('--phase',Math.min(screen,11));
+$('progress').style.setProperty('--question-phase',questionPhase);
+progressSteps.forEach((step,index)=>{step.setAttribute('aria-current',index===screen?'step':'false');const go=()=>navigate(index);step.onclick=go;step.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}});
  $('gallery-link').setAttribute('aria-current',screen===12?'page':'false');
  if(screen===12){buildConclusion();return;}
  const q=questions[Math.floor(screen/2)],a=answers[Math.floor(screen/2)];
