@@ -108,3 +108,10 @@ Licenze variabili per singolo contenuto, leggibili attraverso le fonti.
 - https://www.mediawiki.org/wiki/API:Imageinfo
 - https://commons.wikimedia.org/wiki/Commons:API/MediaWiki
 - https://commons.wikimedia.org/wiki/Help:Search
+
+
+## Hosting statico e video già visti
+
+Ricerca, metadati e MP4 usano gli endpoint ufficiali Archive (`advancedsearch.php`, `/metadata/`, `/cors/`): funzionano sia via HTTP in locale sia su GitHub Pages, senza relay. Pubblica l’intera cartella. In locale puoi usare il launcher o `python3 -m http.server`; l’apertura diretta `file://` richiede invece il launcher per i moduli e il worker.
+
+Gli identificatori incontrati vengono registrati in un insieme senza limite di 40/200 video, persistito in localStorage e condiviso tra Spiral e Dreamachine sullo stesso dominio. La lista informativa può restare limitata senza cancellare questa memoria. I risultati già visti vengono scartati e ricontrollati prima del taglio, comprese le riserve casuali. Anche ricaricando la pagina non vengono proposti di nuovo, finché non cancelli i dati del sito. Domini e dispositivi diversi hanno memorie separate; copie dello stesso film caricate su Archive con identificatori diversi non sono riconoscibili come duplicati da questo controllo. Se lo storage non è disponibile la memoria vale per la sessione corrente.

@@ -1,3 +1,4 @@
+import { createSeenVideos } from './seen.js';
 import { candidates, resolveItem, searchTerms, metadataMatches, searchPlan } from './archive.js';
 import { MIN_VIDEO_SECONDS, MAX_VIDEO_BYTES } from './config.js';
 import { setupInfo } from './info.js';
@@ -10,7 +11,9 @@ canvas.width = 256;
 canvas.height = 256;
 const context = canvas.getContext('2d', { willReadFrequently: true });
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-const recent = [];
+let historyStorage;
+try { historyStorage = window.localStorage; } catch {}
+const seenVideos = createSeenVideos(historyStorage);
 const keywordOrigins = new Map();
 let current = -1;
 let worker;
@@ -129,7 +132,7 @@ async function prepare(item, slot) {
       const start = Math.random() * Math.max(0, video.duration - 30);
       await waitMedia(video, 'seeked', () => { video.currentTime = Math.max(.05, start); });
       if (video.readyState < 3) await waitMedia(video, 'canplay');
-      const filename = new URL(url, location.href).searchParams.get('file');
+      const filename = decodeURIComponent(new URL(url, location.href).pathname.split('/').pop());
       return { item: { ...item, filename }, slot, start: video.currentTime };
     } catch (error) {
       report(error);
@@ -154,13 +157,14 @@ async function next(terms = []) {
     const attempt = { query: term || '(random)', field, status: 'Ricerca…', count: null };
     selection.attempts.push(attempt);
     let items;
-    try { items = await candidates(term, field); } catch (error) { attempt.status = 'Errore archivio'; report(error); continue; }
+    try { items = await candidates(term, field, current < 0); } catch (error) { attempt.status = 'Errore archivio'; report(error); continue; }
     attempt.count = items.length;
     attempt.status = items.length ? 'Verifica e download dei candidati…' : 'Nessun risultato';
-    for (const candidate of items.filter(item => !recent.includes(item.identifier))) {
+    for (const candidate of items.filter(item => !seenVideos.has(item.identifier))) {
       try {
         const item = await resolveItem(candidate);
         if (item) {
+          if (current < 0 && item.bytes > 12 * 1024 * 1024) continue;
           const matches = term ? metadataMatches(item.searchMetadata, term).filter(m => m.key === field) : [];
           if (term && !matches.length) {
             attempt.status = 'Risultato dell’indice scartato: keyword non verificata';
@@ -216,6 +220,11 @@ function decodedFrame(video) {
 }
 
 async function cut(prepared) {
+  if (seenVideos.has(prepared.item.id)) {
+    release(prepared.video || videos[prepared.slot]);
+    throw new Error('Video già incontrato: scartato per mantenere la deriva.');
+  }
+  seenVideos.add(prepared.item.id);
   const incoming = videos[prepared.slot];
   const outgoing = videos[current];
   // Both play muted until incoming has actually decoded a frame.
@@ -230,8 +239,6 @@ async function cut(prepared) {
   if (outgoing) { outgoing.muted = true; release(outgoing); }
   incoming.muted = !sound;
   current = prepared.slot;
-  recent.push(prepared.item.id);
-  if (recent.length > 40) recent.shift();
   state.current = prepared.item;
   state.selection = prepared.selection;
   state.phase = 'playing';
@@ -278,7 +285,7 @@ async function run() {
   // Warmup is shared with the first classification, never a concurrent inference.
   const warmup = vision({ type: 'warmup' }).catch(report);
   while (current < 0) {
-    try { await cut(await next()); }
+    try { status.textContent = 'Ricerca e caricamento di un primo video…'; await cut(await next()); }
     catch (error) {
       report(error);
       status.textContent = 'Archivio non disponibile. Riprovo… (avvia con python3 spiral/server.py)';

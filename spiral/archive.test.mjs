@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { searchQuery, playableFiles, searchTerms, shuffle, candidates, metadataMatches, searchPlan, videoTerms, videoQuery, videoCandidates } from './archive.js';
+import { searchQuery, playableFiles, searchTerms, shuffle, candidates, metadataMatches, searchPlan, videoTerms, videoQuery, videoCandidates, archiveMediaURL, resolveItem } from './archive.js';
 
 test('search terms cannot inject archive query operators', () => {
   const query = searchQuery('dog) OR collection:other *');
@@ -63,7 +63,11 @@ test('video query takes first relevance results and exposes the real total', asy
     assert.equal(result.items[0].identifier,'phone');
     const params = new URL(url,'http://local').searchParams;
     assert.equal(params.get('page'),'1');
-    assert.equal(params.get('sort'),'relevance');
+    assert.equal(new URL(url).origin,'https://archive.org');
+    assert.equal(new URL(url).pathname,'/advancedsearch.php');
+    assert.equal(params.get('output'),'json');
+    assert.equal(params.get('fl[]'),'identifier');
+    assert.equal(params.has('sort[]'),false);
   } finally { globalThis.fetch = original; }
 });
 test('exclude short and oversized films but defer unknown durations to player', () => {
@@ -93,5 +97,30 @@ test('random sampling queries a valid catalog page and handles empty results', a
     assert.ok(Number(page) >= 1 && Number(page) <= 3);
     globalThis.fetch = async () => ({ ok: true, json: async () => ({ response: { numFound: 0 } }) });
     assert.deepEqual(await candidates('unknown'), []);
+  } finally { globalThis.fetch = original; }
+});
+
+
+test('static hosting uses official CORS media and metadata endpoints', async () => {
+  assert.equal(archiveMediaURL('film-id', 'a b/clip ü.mp4'), 'https://archive.org/cors/film-id/a%20b/clip%20%C3%BC.mp4');
+  const original = globalThis.fetch;
+  try {
+    globalThis.fetch = async url => {
+      assert.equal(url, 'https://archive.org/metadata/film-id');
+      return {ok:true,json:async()=>({metadata:{title:'Film'},files:[{name:'clip.mp4',size:'12000'}]})};
+    };
+    const item = await resolveItem({identifier:'film-id'});
+    assert.deepEqual(item.urls,['https://archive.org/cors/film-id/clip.mp4']);
+  } finally { globalThis.fetch = original; }
+});
+
+test('drifting search can continue beyond the first results page', async () => {
+  const original = globalThis.fetch;
+  try {
+    globalThis.fetch = async url => {
+      assert.equal(new URL(url).searchParams.get('page'),'4');
+      return {ok:true,json:async()=>({response:{numFound:100,docs:[]}})};
+    };
+    await videoCandidates('phone', undefined, 4);
   } finally { globalThis.fetch = original; }
 });

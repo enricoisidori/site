@@ -59,20 +59,22 @@ può garantire che ogni keyword produca una successione infinita di risultati.
 
 ## Video / Internet Archive
 
-Seme iniziale dalle collezioni prelinger, home_movies, prelingerhomemovies;
-poi ricerca nel catalogo completo. Advanced Search seleziona
-identificatori; Metadata API risolve MP4 e metadati. Priorità alle derivate 512 kbps.
-Scarta file privati/limitati, video sotto 4 secondi e file oltre 80 MiB: parametri in
-`config.js`. Ogni MP4 è scaricato interamente in un Blob prima del cambio. Due
-lettori: il corrente continua in loop durante inferenza e download. Il taglio
-avviene tra 12 e 60 secondi, con un fotogramma pronto.
-Il vecchio video resta in memoria come riserva del successivo. I corti partono dall'inizio; i lunghi lasciano
-almeno 30 secondi dopo il punto casuale. Il primo avvio attende due download completi di filmati distinti.
+Ricerca e seme casuale nel catalogo video pubblico completo. Advanced Search
+seleziona identificatori; Metadata API risolve MP4 e metadati. Priorità alle
+corrispondenze nel titolo, poi descrizione e soggetti. Scarta file privati,
+video sotto 4 secondi e file oltre 80 MiB (`config.js`). Per il primo filmato
+e la riserva casuale seleziona file sotto 12 MiB e almeno 30 secondi.
 
-Il server Python inoltra JSON e MP4 da Archive e preserva Range/Content-Range;
-serve perché i video verificati non espongono CORS per il canvas. Ascolta soltanto
-su loopback. GitHub Pages da solo non basta per la variante video. Il server è
-un prototipo locale, non un servizio pronto all'esposizione pubblica.
+Ogni MP4 è scaricato interamente in un Blob prima del cambio. Il primo avvio
+attende un solo download. Una nuova riserva casuale viene preparata in parallelo;
+non si torna al video precedente. La ricerca correlata analizza altri fotogrammi
+se necessario, fino a 120 secondi. Se manca il correlato usa la riserva pronta;
+se manca anche quella, il corrente continua in loop fino a un nuovo file pronto.
+
+Le richieste usano direttamente gli endpoint ufficiali Archive:
+`advancedsearch.php`, `/metadata/` e `/cors/`. GitHub Pages è sufficiente e non
+richiede un backend. Il server Python è opzionale per aprire la pagina in locale;
+il relay rimane disponibile ma non viene usato dal lettore.
 
 ## Immagini / Wikimedia Commons
 
@@ -137,3 +139,15 @@ risultato di ricerca può essere scartato se non è riproducibile.
 
 
 Aggiornamento lettore Archive (120 secondi): ricerca su tutto il catalogo pubblico `mediatype:movies`, primi 20 risultati per rilevanza, corrispondenza letterale verificata con priorità titolo/descrizione/soggetti. Avvio con un solo filmato; riserva casuale nuova caricata in parallelo, mai il video precedente. Per avvio e riserva si preferiscono file sotto 12 MiB. Il correlato pronto entra subito (dopo un minimo di scena); dopo 120 secondi si usa la riserva se pronta. Se anche la riserva è ancora in download, il video corrente continua: 120 secondi è un obiettivo, non un limite garantito durante problemi di rete. I video brevi possono ripetersi in questa emergenza. Il pannello I mostra la ricerca in cima, tempo trascorso e stato della riserva; resta nascosto all’avvio.
+
+
+### Pubblicazione statica / GitHub Pages
+
+Carica la cartella `spiral` completa e apri `spiral/index.html` dal sito pubblicato. Non occorre avviare Python né configurare un backend: ricerca, metadati e video vengono richiesti direttamente a Internet Archive. L’endpoint video `/cors/` permette il download e l’analisi dei fotogrammi da un altro dominio; `/download/` può reindirizzare a nodi senza questi permessi. Il server Python rimane opzionale per aprire il sito in locale. Dopo aver pubblicato la correzione ricarica la pagina per scaricare il nuovo JavaScript.
+
+
+## Hosting statico e video già visti
+
+Ricerca, metadati e MP4 usano gli endpoint ufficiali Archive (`advancedsearch.php`, `/metadata/`, `/cors/`): funzionano sia via HTTP in locale sia su GitHub Pages, senza relay. Pubblica l’intera cartella. In locale puoi usare il launcher o `python3 -m http.server`; l’apertura diretta `file://` richiede invece il launcher per i moduli e il worker.
+
+Gli identificatori incontrati vengono registrati in un insieme senza limite di 40/200 video, persistito in localStorage e condiviso tra Spiral e Dreamachine sullo stesso dominio. La lista informativa può restare limitata senza cancellare questa memoria. I risultati già visti vengono scartati e ricontrollati prima del taglio, comprese le riserve casuali. Anche ricaricando la pagina non vengono proposti di nuovo, finché non cancelli i dati del sito. Domini e dispositivi diversi hanno memorie separate; copie dello stesso film caricate su Archive con identificatori diversi non sono riconoscibili come duplicati da questo controllo. Se lo storage non è disponibile la memoria vale per la sessione corrente.

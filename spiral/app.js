@@ -1,3 +1,4 @@
+import { createSeenVideos } from './seen.js';
 import { candidates, resolveItem, metadataMatches, videoTerms, videoCandidates } from './archive.js';
 import { MIN_VIDEO_SECONDS, MAX_VIDEO_BYTES, MAX_SHOT_SECONDS } from './config.js';
 import { setupInfo } from './info.js';
@@ -11,8 +12,11 @@ canvas.width = 256;
 canvas.height = 256;
 const context = canvas.getContext('2d', { willReadFrequently: true });
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-const recent = [];
+let historyStorage;
+try { historyStorage = window.localStorage; } catch {}
+const seenVideos = createSeenVideos(historyStorage);
 const keywordOrigins = new Map();
+const searchPages = new Map();
 let current = -1;
 let worker;
 let requestId = 0;
@@ -140,7 +144,7 @@ async function prepare(item, signal) {
       const start = Math.random() * Math.max(0, video.duration - MAX_SHOT_SECONDS);
       await waitMedia(video, 'seeked', () => { video.currentTime = Math.max(.05, start); }, 25000, signal);
       if (video.readyState < 3) await waitMedia(video, 'canplay', undefined, 25000, signal);
-      const filename = new URL(url, location.href).searchParams.get('file');
+      const filename = decodeURIComponent(new URL(url, location.href).pathname.split('/').pop());
       return { item: { ...item, filename }, video, start: video.currentTime };
     } catch (error) {
       release(video);
@@ -165,12 +169,22 @@ async function next(terms = [], signal, excluded = [], random = false) {
     const attempt = { query: term || '(random)', field: '', status: 'Ricerca in tutto Archive…', count: null, total: null };
     selection.attempts.push(attempt);
     try {
-      const found = initial ? { items: await candidates('', '', true, signal), total: null } : await videoCandidates(term, signal);
+      let found;
+      if (initial) found = { items: await candidates('', '', true, signal), total: null };
+      else {
+        // Move through results instead of repeatedly requesting the same first 20.
+        for (let scan = 0; scan < 5; scan++) {
+          const page = searchPages.get(term) || 1;
+          found = await videoCandidates(term, signal, page);
+          searchPages.set(term, page * 20 >= found.total ? 1 : page + 1);
+          if (found.items.some(item => !seenVideos.has(item.identifier) && !excluded.includes(item.identifier)) || !found.total) break;
+        }
+      }
       signal?.throwIfAborted();
       attempt.count = found.items.length;
       attempt.total = found.total;
       attempt.status = found.items.length ? 'Verifica dei primi risultati…' : 'Nessun risultato';
-      const usable = found.items.filter(item => !recent.includes(item.identifier) && !(random && state.history.some(entry => entry.id === item.identifier)) && !excluded.includes(item.identifier));
+      const usable = found.items.filter(item => !seenVideos.has(item.identifier) && !excluded.includes(item.identifier));
       const resolved = [];
       for (let offset = 0; offset < usable.length; offset += 5) {
         signal?.throwIfAborted();
@@ -193,6 +207,7 @@ async function next(terms = [], signal, excluded = [], random = false) {
           const prepared = await prepare(item, signal);
           if (initial && prepared.video.duration < 30) { release(prepared.video); continue; }
           signal?.throwIfAborted();
+          if (seenVideos.has(item.id)) { release(prepared.video); continue; }
           attempt.status = 'Video pronto';
           const origin = keywordOrigins.get(term);
           Object.assign(selection, {
@@ -240,6 +255,11 @@ function decodedFrame(video) {
 }
 
 async function cut(prepared) {
+  if (seenVideos.has(prepared.item.id)) {
+    release(prepared.video || videos[prepared.slot]);
+    throw new Error('Video già incontrato: scartato per mantenere la deriva.');
+  }
+  seenVideos.add(prepared.item.id);
   const slot = current === 0 ? 1 : 0;
   const incoming = prepared.video;
   const outgoing = videos[current];
@@ -266,8 +286,6 @@ async function cut(prepared) {
   incoming.muted = !sound;
   current = slot;
   state.shotStarted = performance.now();
-  recent.push(prepared.item.id);
-  if (recent.length > 40) recent.shift();
   state.current = prepared.item;
   state.selection = prepared.selection;
   state.phase = 'playing';
@@ -320,11 +338,12 @@ async function run() {
   const warmup = vision({ type: 'warmup' }).catch(report);
   // Start as soon as one film is ready. A fresh random reserve loads in parallel.
   while (current < 0) {
-    try { await cut(await next()); }
+    try { status.textContent = 'Ricerca e caricamento di un primo video…'; await cut(await next()); }
     catch (error) { report(error); status.textContent = 'Archivio non disponibile. Riprovo…'; await sleep(3000); }
   }
   for (;;) {
     const deadline = state.shotDeadline = state.shotStarted + MAX_SHOT_SECONDS * 1000;
+    if (reserve && seenVideos.has(reserve.item.id)) { release(reserve.video); reserve = null; }
     const randomController = new AbortController();
     let randomJob;
     if (!reserve) {

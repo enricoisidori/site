@@ -15,6 +15,6 @@ if (location.protocol === 'file:') {
     console.error('[spiral] App loading failed', error);
     const status = document.querySelector('#status');
     status.hidden = false;
-    status.textContent = 'Impossibile caricare Spiral. Verifica il server locale e ricarica la pagina.';
+    status.textContent = 'Impossibile caricare Spiral. Verifica la connessione e che tutti i file siano stati pubblicati, poi ricarica.';
   });
 }
