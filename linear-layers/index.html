@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linear Layers — laboratorio di sovrapposizioni</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <aside class="panel">
+      <div class="brand"><strong>LINEAR / LAYERS</strong><span>Laboratorio di scritte sovrapposte</span></div>
+      <section>
+        <h2>Composizione</h2>
+        <div class="font-flags"><strong>Font attivi</strong><label><input id="enableExposure" type="checkbox" checked> Exposure Trial</label><label><input id="enableOrtica" type="checkbox"> Ortica Linear</label></div>
+        <label class="field">Testo per nuove scritte<textarea id="newText" rows="2">JACK PURCELL</textarea></label>
+        <div class="button-row"><button id="addLayer" type="button">+ Aggiungi scritta</button><button id="regenerate" type="button">↝ Rigenera caos</button></div>
+        <label class="field">Numero di scritte visibili <output id="countValue"></output><input id="count" type="range" min="1" max="80"></label>
+        <p class="hint">Se riduci il numero, le altre scritte restano salvate e puoi mostrarle di nuovo.</p>
+        <label class="field">Caos globale <output id="chaosValue"></output><input id="chaos" type="range" min="0" max="100"></label>
+        <label class="field">Differenza di scala <output id="scaleSpreadValue"></output><input id="scaleSpread" type="range" min="0" max="100"></label>
+        <label class="field">Rotazioni casuali <output id="angleSpreadValue"></output><input id="angleSpread" type="range" min="0" max="100"></label>
+        <label class="field">Schiarimento verso il davanti <output id="depthValue"></output><input id="depth" type="range" min="0" max="100"></label>
+        <label class="field">Trasparenza complessiva <output id="opacityValue"></output><input id="opacity" type="range" min="0" max="100"></label>
+        <label class="field">Fondo blu <input id="background" type="color"></label>
+      </section>
+      <section>
+        <div class="section-head"><h2>Scritte</h2><span id="layerTotal"></span></div>
+        <p class="hint">Apri una scritta per cambiare testo, font, posizione e deformazione. L’ordine qui è anche l’ordine di sovrapposizione: l’ultima è davanti.</p>
+        <div id="layers"></div>
+      </section>
+      <section>
+        <h2>Esporta</h2>
+        <div class="button-row"><button id="downloadPng" type="button">PNG · 300 dpi</button><button id="downloadSvg" type="button">SVG</button></div>
+        <div class="button-row"><button id="saveJson" type="button">Salva progetto JSON</button><button id="loadJson" type="button">Apri progetto JSON</button></div>
+        <input id="jsonFile" type="file" accept="application/json,.json" hidden>
+        <button id="reset" class="quiet" type="button">Ripristina la composizione iniziale</button>
+        <p id="saveStatus" class="hint" role="status"></p>
+      </section>
+    </aside>
+    <div class="workspace">
+      <div class="workspace-head"><span>ANTEPRIMA · 17 × 24 CM</span><span>Exposure Trial · font locali</span></div>
+      <div class="paper"><svg id="art" viewBox="0 0 850 1200" role="img" aria-label="Composizione tipografica blu"></svg></div>
+      <div class="workspace-foot">Clicca una scritta nell’anteprima per aprire i suoi controlli · trascinala per spostarla</div>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

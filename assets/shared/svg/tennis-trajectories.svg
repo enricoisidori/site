@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900" height="600" fill="none">
+  <title>Tennis ball trajectories</title>
+  <desc>Three stylised tennis ball paths with bounces and direction arrows.</desc>
+  <g stroke="#173B4A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Cross-court shot -->
+    <path d="M82 486C175 415 221 182 386 232C520 273 505 463 658 410C724 387 778 309 828 184" stroke-dasharray="11 15"/>
+    <path d="M828 184l-5 27m5-27l-26 9"/>
+    <!-- Passing shot -->
+    <path d="M80 126C209 93 255 406 442 380C621 355 640 148 816 94" stroke="#679CB9" stroke-dasharray="11 15"/>
+    <path d="M816 94l-12 25m12-25l-27 2" stroke="#679CB9"/>
+    <!-- Lob -->
+    <path d="M144 512C196 349 363 119 544 136C689 150 748 242 764 349" stroke="#3B7185" stroke-dasharray="11 15"/>
+    <path d="M764 349l-23-15m23 15l4-27" stroke="#3B7185"/>
+  </g>
+
+  <!-- Ball positions and bounce marks -->
+  <g fill="#E9F04A" stroke="#173B4A" stroke-width="5">
+    <circle cx="82" cy="486" r="16"/>
+    <circle cx="442" cy="380" r="16"/>
+    <circle cx="764" cy="349" r="16"/>
+  </g>
+  <g stroke="#173B4A" stroke-width="5" stroke-linecap="round">
+    <path d="M416 410l-18 16m42-12l-12 20m39-26l-3 22"/>
+    <path d="M641 435l-14 17m36-12l-8 20m34-27l-1 22"/>
+  </g>
+</svg>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Spiral</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main aria-label="Montaggio video generativo">
+    <video playsinline muted loop preload="auto" disablepictureinpicture aria-hidden="true"></video>
+    <video playsinline muted loop preload="auto" disablepictureinpicture aria-hidden="true"></video>
+  </main>
+  <p id="status" role="status">Ricerca di un primo frammento…</p>
+  <div id="words" hidden aria-label="Parole riconosciute nel fotogramma"></div>
+  <aside id="info" hidden aria-label="Informazioni sul video e riconoscimento immagini">
+    <header><strong>SPIRAL / osservatorio</strong><span>I per nascondere</span></header>
+    <h2>Ricerca del prossimo video / in corso</h2>
+    <ul id="info-search-attempts"></ul>
+    <section class="info-selection">
+      <h2>Come è stato scelto il video attuale</h2>
+      <p id="info-chain"></p>
+      <p id="info-reason"></p>
+      <p id="info-match"></p>
+      <details><summary>Tentativi che hanno portato a questo video</summary><ul id="info-selection-attempts"></ul></details>
+    </section>
+    <dl id="info-fields"></dl>
+    <figure id="info-frame" hidden>
+      <img id="info-image" alt="Fotogramma usato dal modello per riconoscere gli oggetti">
+      <figcaption id="info-caption"></figcaption>
+    </figure>
+    <h2>Oggetti riconosciuti / confidenza</h2>
+    <ul id="info-predictions"></ul>
+    <p id="info-error" hidden></p>
+  </aside>
+  <script src="./bootstrap.js"></script>
+</body>
+</html>

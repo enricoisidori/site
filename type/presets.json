@@ -1,0 +1,696 @@
+{
+  "version": 1,
+  "current": {
+    "controls": {
+      "copy": "Some icons come with expectations. The Jack Purcell comes with possibilities. There are no instructions attached to a smile.",
+      "ink": "#191919",
+      "paper": "#ffffff",
+      "font": "Exposure Trial",
+      "uppercase": false,
+      "wildFontsOn": false,
+      "": false,
+      "size": "85",
+      "weight": "0",
+      "tracking": "100",
+      "leading": "120",
+      "align": "center",
+      "margin": "9",
+      "globalScaleX": "100",
+      "globalScaleY": "100",
+      "globalRotate": "0",
+      "globalMoveX": "0",
+      "globalMoveY": "0",
+      "moveXOn": false,
+      "moveX": "30",
+      "moveYOn": false,
+      "moveY": "34",
+      "rotateOn": false,
+      "rotate": "15",
+      "scaleXOn": false,
+      "scaleX": "30",
+      "scaleYOn": false,
+      "scaleY": "25",
+      "skewOn": false,
+      "skew": "12",
+      "format": "book"
+    },
+    "active": [
+      "Poster anni ’60",
+      "Editoriale e serif",
+      "Contemporanei interessanti"
+    ],
+    "enabledFonts": [
+      "Abril Fatface",
+      "Alfa Slab One",
+      "Bevan",
+      "Bodoni Moda",
+      "Bowlby One SC",
+      "Bricolage Grotesque",
+      "Cardo",
+      "Climate Crisis",
+      "Cormorant Garamond",
+      "DM Mono",
+      "DM Serif Display",
+      "EB Garamond",
+      "Epunda Slab",
+      "Fascinate",
+      "Fascinate Inline",
+      "Forum",
+      "Fraunces",
+      "Gabarito",
+      "Geist",
+      "Instrument Sans",
+      "Instrument Serif",
+      "Khand",
+      "Lexend",
+      "Libre Baskerville",
+      "Limelight",
+      "Literata",
+      "Lora",
+      "Merriweather",
+      "Modak",
+      "Newsreader",
+      "Old Standard TT",
+      "Onest",
+      "Playfair Display",
+      "Playwrite AU SA",
+      "Prata",
+      "Recursive",
+      "Red Hat Display",
+      "Righteous",
+      "Risque",
+      "Schibsted Grotesk",
+      "Shrikhand",
+      "Sometype Mono",
+      "Sora",
+      "Spectral",
+      "Ultra",
+      "Vidaloka",
+      "Yeseva One"
+    ],
+    "overrides": [
+      [
+        "Abril Fatface",
+        true
+      ],
+      [
+        "Alfa Slab One",
+        true
+      ],
+      [
+        "Almendra",
+        false
+      ],
+      [
+        "Amatic SC",
+        false
+      ],
+      [
+        "Anonymous Pro",
+        false
+      ],
+      [
+        "Anton",
+        false
+      ],
+      [
+        "Archivo Black",
+        false
+      ],
+      [
+        "Azeret Mono",
+        false
+      ],
+      [
+        "Bai Jamjuree",
+        false
+      ],
+      [
+        "Barlow",
+        false
+      ],
+      [
+        "Barlow Condensed",
+        false
+      ],
+      [
+        "Bebas Neue",
+        false
+      ],
+      [
+        "Bevan",
+        true
+      ],
+      [
+        "Black Ops One",
+        false
+      ],
+      [
+        "Bodoni Moda",
+        true
+      ],
+      [
+        "Bowlby One SC",
+        true
+      ],
+      [
+        "Bree Serif",
+        false
+      ],
+      [
+        "Bricolage Grotesque",
+        true
+      ],
+      [
+        "Bungee",
+        false
+      ],
+      [
+        "Bungee Shade",
+        false
+      ],
+      [
+        "Cardo",
+        true
+      ],
+      [
+        "Caveat",
+        false
+      ],
+      [
+        "Caveat Brush",
+        false
+      ],
+      [
+        "Chakra Petch",
+        false
+      ],
+      [
+        "Changa One",
+        false
+      ],
+      [
+        "Chewy",
+        false
+      ],
+      [
+        "Cinzel",
+        false
+      ],
+      [
+        "Climate Crisis",
+        true
+      ],
+      [
+        "Codystar",
+        false
+      ],
+      [
+        "Commissioner",
+        false
+      ],
+      [
+        "Concert One",
+        false
+      ],
+      [
+        "Cookie",
+        false
+      ],
+      [
+        "Cormorant Garamond",
+        true
+      ],
+      [
+        "Courier Prime",
+        false
+      ],
+      [
+        "Cutive Mono",
+        false
+      ],
+      [
+        "Dancing Script",
+        false
+      ],
+      [
+        "DM Mono",
+        true
+      ],
+      [
+        "DM Sans",
+        false
+      ],
+      [
+        "DM Serif Display",
+        true
+      ],
+      [
+        "EB Garamond",
+        true
+      ],
+      [
+        "Eczar",
+        false
+      ],
+      [
+        "Epunda Slab",
+        true
+      ],
+      [
+        "Familjen Grotesk",
+        false
+      ],
+      [
+        "Fascinate",
+        true
+      ],
+      [
+        "Fascinate Inline",
+        true
+      ],
+      [
+        "Faster One",
+        false
+      ],
+      [
+        "Fjalla One",
+        false
+      ],
+      [
+        "Forum",
+        true
+      ],
+      [
+        "Fraunces",
+        true
+      ],
+      [
+        "Fredericka the Great",
+        false
+      ],
+      [
+        "Fredoka",
+        false
+      ],
+      [
+        "Frijole",
+        false
+      ],
+      [
+        "Gabarito",
+        true
+      ],
+      [
+        "Geist",
+        true
+      ],
+      [
+        "Geo",
+        false
+      ],
+      [
+        "Graduate",
+        false
+      ],
+      [
+        "Great Vibes",
+        false
+      ],
+      [
+        "Henny Penny",
+        false
+      ],
+      [
+        "IBM Plex Mono",
+        false
+      ],
+      [
+        "IBM Plex Sans",
+        false
+      ],
+      [
+        "IM Fell English",
+        false
+      ],
+      [
+        "Inconsolata",
+        false
+      ],
+      [
+        "Instrument Sans",
+        true
+      ],
+      [
+        "Instrument Serif",
+        true
+      ],
+      [
+        "Jacques Francois Shadow",
+        false
+      ],
+      [
+        "Josefin Sans",
+        false
+      ],
+      [
+        "Jura",
+        false
+      ],
+      [
+        "Kanit",
+        false
+      ],
+      [
+        "Kaushan Script",
+        false
+      ],
+      [
+        "Khand",
+        true
+      ],
+      [
+        "Lexend",
+        true
+      ],
+      [
+        "Libre Baskerville",
+        true
+      ],
+      [
+        "Limelight",
+        true
+      ],
+      [
+        "Literata",
+        true
+      ],
+      [
+        "Lobster",
+        false
+      ],
+      [
+        "Lora",
+        true
+      ],
+      [
+        "Major Mono Display",
+        false
+      ],
+      [
+        "MedievalSharp",
+        false
+      ],
+      [
+        "Merriweather",
+        true
+      ],
+      [
+        "Michroma",
+        false
+      ],
+      [
+        "Modak",
+        true
+      ],
+      [
+        "Monoton",
+        false
+      ],
+      [
+        "Montserrat",
+        false
+      ],
+      [
+        "Newsreader",
+        true
+      ],
+      [
+        "Nunito Sans",
+        false
+      ],
+      [
+        "Old Standard TT",
+        true
+      ],
+      [
+        "Oleo Script",
+        false
+      ],
+      [
+        "Onest",
+        true
+      ],
+      [
+        "Oswald",
+        false
+      ],
+      [
+        "Outfit",
+        false
+      ],
+      [
+        "Oxanium",
+        false
+      ],
+      [
+        "Pacifico",
+        false
+      ],
+      [
+        "Passion One",
+        false
+      ],
+      [
+        "Patua One",
+        false
+      ],
+      [
+        "Permanent Marker",
+        false
+      ],
+      [
+        "Pirata One",
+        false
+      ],
+      [
+        "Pixelify Sans",
+        false
+      ],
+      [
+        "Playfair Display",
+        true
+      ],
+      [
+        "Playwrite AU SA",
+        true
+      ],
+      [
+        "Plus Jakarta Sans",
+        false
+      ],
+      [
+        "Poppins",
+        false
+      ],
+      [
+        "Prata",
+        true
+      ],
+      [
+        "Quantico",
+        false
+      ],
+      [
+        "Racing Sans One",
+        false
+      ],
+      [
+        "Raleway",
+        false
+      ],
+      [
+        "Recursive",
+        true
+      ],
+      [
+        "Red Hat Display",
+        true
+      ],
+      [
+        "Righteous",
+        true
+      ],
+      [
+        "Risque",
+        true
+      ],
+      [
+        "Roboto",
+        false
+      ],
+      [
+        "Roboto Condensed",
+        false
+      ],
+      [
+        "Roboto Mono",
+        false
+      ],
+      [
+        "Rock Salt",
+        false
+      ],
+      [
+        "Rubik Glitch",
+        false
+      ],
+      [
+        "Rubik Mono One",
+        false
+      ],
+      [
+        "Rye",
+        false
+      ],
+      [
+        "Sacramento",
+        false
+      ],
+      [
+        "Saira Condensed",
+        false
+      ],
+      [
+        "Satisfy",
+        false
+      ],
+      [
+        "Schibsted Grotesk",
+        true
+      ],
+      [
+        "Shrikhand",
+        true
+      ],
+      [
+        "Silkscreen",
+        false
+      ],
+      [
+        "Sometype Mono",
+        true
+      ],
+      [
+        "Sora",
+        true
+      ],
+      [
+        "Space Grotesk",
+        false
+      ],
+      [
+        "Space Mono",
+        false
+      ],
+      [
+        "Special Elite",
+        false
+      ],
+      [
+        "Spectral",
+        true
+      ],
+      [
+        "Stardos Stencil",
+        false
+      ],
+      [
+        "Syncopate",
+        false
+      ],
+      [
+        "Syne",
+        false
+      ],
+      [
+        "Tangerine",
+        false
+      ],
+      [
+        "Teko",
+        false
+      ],
+      [
+        "Tilt Warp",
+        false
+      ],
+      [
+        "Titillium Web",
+        false
+      ],
+      [
+        "Tomorrow",
+        false
+      ],
+      [
+        "Tourney",
+        false
+      ],
+      [
+        "Ultra",
+        true
+      ],
+      [
+        "Unbounded",
+        false
+      ],
+      [
+        "UnifrakturCook",
+        false
+      ],
+      [
+        "UnifrakturMaguntia",
+        false
+      ],
+      [
+        "Urbanist",
+        false
+      ],
+      [
+        "Vast Shadow",
+        false
+      ],
+      [
+        "Vidaloka",
+        true
+      ],
+      [
+        "VT323",
+        false
+      ],
+      [
+        "Work Sans",
+        false
+      ],
+      [
+        "Yanone Kaffeesatz",
+        false
+      ],
+      [
+        "Yellowtail",
+        false
+      ],
+      [
+        "Yeseva One",
+        true
+      ],
+      [
+        "Zen Dots",
+        false
+      ]
+    ],
+    "added": []
+  },
+  "presets": {}
+}

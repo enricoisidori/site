@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="300" height="275" viewBox="0 0 300 275" xmlns="http://www.w3.org/2000/svg">
+  <title>Tennis trajectories in a five pointed star</title>
+  <!-- All paths have the same 5px weight as the supplied star. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="5">
+    <!-- Outer trajectory / star outline -->
+    <path stroke="#173B4A" d="M150 25L179 111H269L197 165L223 251L150 200L77 251L103 165L31 111H121Z"/>
+
+    <!-- Each inner trajectory is a smaller star, centred on the original one. -->
+    <path stroke="#679CB9" stroke-dasharray="10 11"
+      d="M150 54L172 119H240L186 160L205 226L150 187L95 226L114 160L60 119H128Z"/>
+    <path stroke="#3B7185" stroke-dasharray="10 11"
+      d="M150 83L165 127H212L174 155L189 199L150 174L111 199L126 155L88 127H135Z"/>
+    <path stroke="#173B4A" stroke-dasharray="10 11"
+      d="M150 111L158 135H183L163 151L170 174L150 160L130 174L137 151L117 135H142Z"/>
+  </g>
+
+  <!-- Direction marks: each route travels around the star's contour. -->
+  <g fill="none" stroke="#173B4A" stroke-linecap="round" stroke-linejoin="round" stroke-width="5">
+    <path d="M238 119l-16-5m16 5l-10 14"/>
+    <path d="M205 226l-4-16m4 16l-16-2"/>
+    <path d="M88 127l12 10m-12-10l14-7"/>
+  </g>
+</svg>
