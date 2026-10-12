@@ -1,0 +1,428 @@
+const video = document.querySelector("video"),
+  loading = document.querySelector("#loading"),
+  words = document.querySelector("#words"),
+  info = document.querySelector("#info");
+const LIMIT = 18 * 1024 * 1024,
+  TARGET = 60;
+// Storage may be unavailable for file:// or private browser sessions.
+function readSeen() {
+  try { const value = JSON.parse(sessionStorage.getItem("observation.seen") || "[]"); return Array.isArray(value) ? value : []; }
+  catch { return []; }
+}
+const seen = new Set(readSeen()), rejected = new Set();
+function saveSeen() { try { sessionStorage.setItem("observation.seen", JSON.stringify([...seen])); } catch {} }
+const state = {
+  status: "avvio",
+  transitions: 0,
+  history: [],
+  measurements: [],
+  mode: "download completo · massimo 18 MiB",
+  model: "ViT–GPT2 q8 · WASM locale",
+};
+let current,
+  next,
+  preparing = false,
+  switching = false,
+  caption = "",
+  terms = [],
+  query = "",
+  match = null,
+  worker;
+const escape = (s) =>
+  String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
+function render() {
+  words.textContent = terms.join(" ");
+  const highlight = (s) => {
+    const at = terms.length
+      ? String(s).search(new RegExp("\\b(" + terms.join("|") + ")\\b", "i"))
+      : 0;
+    const excerpt = String(s).slice(
+      Math.max(0, at - 180),
+      Math.max(0, at - 180) + 700,
+    );
+    return escape(excerpt).replace(
+      new RegExp("\\b(" + terms.join("|") + ")\\b", "gi"),
+      "<mark>$1</mark>",
+    );
+  };
+  info.innerHTML = `observation\n${escape(state.status)}\n\nparole → ${escape(caption)}\nquery → ${escape(query)}\nmetadato → ${match ? `${escape(match.field)}: ${highlight(match.text)}` : "—"}\nvideo → ${current ? `<a href="https://archive.org/details/${encodeURIComponent(current.id)}" target="_blank" rel="noopener">${escape(current.title)}</a>` : "—"}\nsuccessore → ${escape(next?.title || "—")}\n\n${escape(JSON.stringify(state, null, 2))}`;
+}
+function status(s) {
+  state.status = s;
+  loading.textContent = /sospeso|sospesa|bloccata/.test(s) ? s + " · I: dettagli · clic: riprova" : "·";
+  render();
+}
+async function measured(label, fn) {
+  const t = performance.now();
+  try {
+    return await fn();
+  } finally {
+    state.measurements.push({ label, ms: Math.round(performance.now() - t) });
+    state.measurements = state.measurements.slice(-30);
+    render();
+  }
+}
+async function request(url, timeout = 25000) {
+  let last;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const r = await fetch(url, { signal: AbortSignal.timeout(timeout) });
+      if (!r.ok) throw Error(`HTTP ${r.status}`);
+      return r;
+    } catch (e) {
+      last = e;
+      state.retry = { attempt: attempt + 1, error: e.message };
+      render();
+    }
+  }
+  throw last;
+}
+async function json(url) {
+  const r = await request(url);
+  const j = await r.json();
+  if (j.error) throw Error(j.error);
+  return j;
+}
+const base = "mediatype:movies AND -access-restricted-item:true";
+async function search(q, rows = 30, page = 1) {
+  query = q;
+  render();
+  const u = new URL("https://archive.org/advancedsearch.php");
+  u.search = new URLSearchParams({
+    q,
+    output: "json",
+    rows,
+    page,
+    "fl[]": "identifier",
+  });
+  return measured("ricerca", () => json(u));
+}
+function text(v) {
+  return Array.isArray(v)
+    ? v.join(" ")
+    : String(v || "").replace(/<[^>]*>/g, " ");
+}
+function score(m) {
+  let best = null,
+    total = 0;
+  for (const [field, weight] of [
+    ["title", 100],
+    ["subject", 10],
+    ["description", 1],
+  ]) {
+    const value = text(m[field]);
+    const hits = terms.filter((t) => new RegExp(`\\b${t}\\b`, "i").test(value));
+    total += hits.length * weight;
+    if (hits.length && (!best || hits.length * weight > best.score))
+      best = { field, text: value, score: hits.length * weight, hits };
+  }
+  const combined = ["title", "subject", "description"]
+    .map((k) => text(m[k]))
+    .join(" ");
+  const coverage = terms.filter((t) =>
+    new RegExp(`\\b${t}\\b`, "i").test(combined),
+  ).length;
+  return { total: coverage * 1000 + total, best };
+}
+async function candidate(id, related) {
+  if (seen.has(id) || rejected.has(id)) return null;
+  const m = await measured("metadati", () =>
+    json("https://archive.org/metadata/" + encodeURIComponent(id)),
+  );
+  if (
+    m.is_dark ||
+    !m.metadata ||
+    m.metadata["access-restricted-item"] === "true"
+  )
+    return null;
+  const scored = score(m.metadata);
+  if (related && !scored.total) return null;
+  const files = m.files
+    .filter(
+      (f) => /\.mp4$/i.test(f.name) && +f.size > 100000 && +f.size <= LIMIT,
+    )
+    .sort((a, b) => {
+      const rank = (f) =>
+        (+f.length >= 40 && +f.length <= 90 ? 0 : 1) * LIMIT + +f.size;
+      return rank(a) - rank(b);
+    });
+  if (!files.length) return null;
+  const f = files[0];
+  return {
+    id,
+    title: text(m.metadata.title),
+    file: f.name,
+    size: +f.size,
+    duration: +f.length || null,
+    score: scored.total,
+    match: scored.best,
+    url: `https://archive.org/cors/${encodeURIComponent(id)}/${f.name.split("/").map(encodeURIComponent).join("/")}`,
+  };
+}
+async function pick(related) {
+  status(
+    related
+      ? "ricerca correlata e verifica metadati"
+      : "ricerca casuale e verifica metadati",
+  );
+  const clauses = terms
+    .slice(0, 4)
+    .map((t) => `(title:${t} OR description:${t} OR subject:${t})`);
+  const queries = related
+    ? [
+        ...new Set([
+          `${base} AND (${clauses.join(" AND ")})`,
+          `${base} AND (${clauses.join(" OR ")})`,
+        ]),
+      ]
+    : [
+        `${base} AND (runtime:"00:01:00" OR runtime:"00:01:01" OR runtime:"00:00:59")`,
+        base,
+      ];
+  for (const q of queries) {
+    let j = await search(q, related ? 20 : 1);
+    const count = j.response.numFound;
+    if (!count) continue;
+    if (!related)
+      j = await search(
+        q,
+        30,
+        1 +
+          Math.floor(
+            Math.random() * Math.max(1, Math.min(300, Math.floor(count / 30))),
+          ),
+      );
+    let best = null;
+    for (const d of j.response.docs) {
+      try {
+        const c = await candidate(d.identifier, related);
+        if (c && (!best || c.score > best.score)) best = c;
+        if (!related && best) break;
+      } catch (e) {
+        state.lastCandidateError = String(e);
+      }
+    }
+    if (best) return best;
+  }
+  return null;
+}
+async function download(c) {
+  status(current ? "download successore" : "download primo video");
+  const t = performance.now();
+  const r = await request(c.url, 90000);
+  if (!r.ok) throw Error(`download HTTP ${r.status}`);
+  const reader = r.body.getReader();
+  const chunks = [];
+  let bytes = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.length;
+      if (bytes > LIMIT) throw Error("file oltre limite");
+      chunks.push(value);
+      state.download = {
+        id: c.id,
+        bytes,
+        total: c.size,
+        ms: Math.round(performance.now() - t),
+      };
+      render();
+    }
+  } catch (e) {
+    await reader.cancel();
+    throw e;
+  }
+  c.blob = URL.createObjectURL(new Blob(chunks, { type: "video/mp4" }));
+  state.download.ms = Math.round(performance.now() - t);
+  c.download = { ...state.download };
+  const check = document.createElement("video");
+  check.muted = true;
+  check.preload = "auto";
+  check.src = c.blob;
+  try {
+    await new Promise((ok, no) => {
+      const timer = setTimeout(
+        () => no(Error("verifica video scaduta")),
+        15000,
+      );
+      check.onloadeddata = () => {
+        clearTimeout(timer);
+        ok();
+      };
+      check.onerror = () => {
+        clearTimeout(timer);
+        no(Error(check.error?.message || "MP4 non decodificabile"));
+      };
+    });
+  } catch (e) {
+    URL.revokeObjectURL(c.blob);
+    throw e;
+  } finally {
+    check.removeAttribute("src");
+    check.load();
+  }
+  return c;
+}
+function infer() {
+  return new Promise((resolve, reject) => {
+    if (!worker) {
+      const source = JSON.parse(document.querySelector("#vision-source").textContent);
+      const url = URL.createObjectURL(new Blob([source], {type: "text/javascript"}));
+      worker = new Worker(url, {type: "module"});
+      URL.revokeObjectURL(url);
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = 384;
+    canvas.height = Math.max(
+      1,
+      Math.round((384 * video.videoHeight) / video.videoWidth),
+    );
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    worker.onmessage = ({ data }) => {
+      if (data.progress) {
+        state.modelDownload = data.progress;
+        render();
+        return;
+      }
+      if (data.error) reject(Error(data.error));
+      else resolve(data);
+    };
+    worker.onerror = (e) => reject(Error(e.message));
+    worker.postMessage(
+      { pixels: pixels.buffer, width: canvas.width, height: canvas.height },
+      [pixels.buffer],
+    );
+  });
+}
+const stop = new Set(
+  "a an the is are of in on at to with and it there this that some his her its for from by as near next standing sitting walking image picture photo view looking wearing has have seen front back background foreground behind beside above below outside inside black white red blue green yellow small large big old young".split(
+    " ",
+  ),
+);
+async function prepare() {
+  if (preparing || next) return;
+  preparing = true;
+  try {
+    status("descrizione locale del fotogramma");
+    const result = await measured("modello: caricamento + inferenza", infer);
+    caption = result.caption;
+    terms = [...new Set(caption.toLowerCase().match(/[a-z]{3,}/g) || [])]
+      .filter((t) => !stop.has(t))
+      .slice(0, 6);
+    const specific = terms.filter(
+      (t) => !["man", "woman", "people", "person"].includes(t),
+    );
+    if (specific.length) terms = specific;
+    state.inferenceMs = Math.round(result.ms);
+    render();
+    let c = terms.length ? await pick(true) : null;
+    if (!c) {
+      state.fallback = "ricerca correlata senza candidato verificato";
+      c = await pick(false);
+    } else {
+      state.fallback = null;
+    }
+    if (!c) throw Error("nessun video nuovo disponibile");
+    match = c.match;
+    next = await download(c);
+    status("successore pronto");
+    maybeSwitch();
+  } catch (e) {
+    status("catena sospesa: " + e.message);
+    state.error = e.message;
+    render();
+  } finally {
+    preparing = false;
+  }
+}
+async function activate(c) {
+  switching = true;
+  const old = current;
+  current = c;
+  next = null;
+  seen.add(c.id);
+  saveSeen();
+  video.src = c.blob;
+  try {
+    await video.play();
+    if (old) {
+      URL.revokeObjectURL(old.blob);
+      state.transitions++;
+    }
+    state.history.push({
+      id: c.id,
+      title: c.title,
+      caption,
+      terms: [...terms],
+      query,
+      match: c.match,
+      download: c.download,
+      at: new Date().toISOString(),
+    });
+    status("riproduzione");
+    loading.hidden = true;
+  } catch (e) {
+    state.error = e.message;
+    rejected.add(c.id);
+    status("riproduzione bloccata: " + e.message);
+    loading.hidden = false;
+  } finally {
+    switching = false;
+  }
+}
+function maybeSwitch() {
+  if (!switching && next && (video.currentTime >= TARGET || video.ended))
+    activate(next);
+}
+video.addEventListener("timeupdate", () => {
+  if (video.currentTime >= 4 && !preparing && !next && !state.error) prepare();
+  maybeSwitch();
+});
+video.addEventListener("ended", () => {
+  if (next) maybeSwitch();
+  else {
+    loading.hidden = false;
+    status(
+      state.error ? "catena sospesa: " + state.error : "attesa successore",
+    );
+  }
+});
+video.addEventListener("error", () => {
+  state.error = video.error?.message || "video non decodificabile";
+  status(state.error);
+  loading.hidden = false;
+});
+document.addEventListener("keydown", (e) => {
+  if (e.repeat) return;
+  if (e.key.toLowerCase() === "i") {
+    info.hidden = !info.hidden;
+    render();
+  }
+  if (e.key.toLowerCase() === "w") {
+    words.hidden = !words.hidden;
+    render();
+  }
+});
+document.addEventListener("pointerdown", () => {
+  if (state.error) { location.reload(); return; }
+  if (video.paused && !video.ended) video.play().catch(() => {});
+});
+try {
+  status("ricerca casuale");
+  const first = await pick(false);
+  if (!first) throw Error("nessun primo video leggero");
+  await activate(await download(first));
+} catch (e) {
+  status("avvio sospeso: " + e.message);
+  state.error = e.message;
+  render();
+}
