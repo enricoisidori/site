@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Avocado",
+    "path": "Avocado/glTF/Avocado.gltf",
+    "bytes": 23580,
+    "triangles": 682,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Avocado"
+  },
+  {
+    "name": "Barramundi Fish",
+    "path": "BarramundiFish/glTF/BarramundiFish.gltf",
+    "bytes": 128208,
+    "triangles": 3864,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/BarramundiFish"
+  },
+  {
+    "name": "Corset",
+    "path": "Corset/glTF/Corset.gltf",
+    "bytes": 662184,
+    "triangles": 18324,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Corset"
+  },
+  {
+    "name": "Glass Vase with Flowers",
+    "path": "GlassVaseFlowers/glTF/GlassVaseFlowers.gltf",
+    "bytes": 178908,
+    "triangles": 10218,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/GlassVaseFlowers"
+  },
+  {
+    "name": "Lantern",
+    "path": "Lantern/glTF/Lantern.gltf",
+    "bytes": 231324,
+    "triangles": 5394,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Lantern"
+  },
+  {
+    "name": "Suzanne",
+    "path": "Suzanne/glTF/Suzanne.gltf",
+    "bytes": 590400,
+    "triangles": 3936,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Suzanne"
+  },
+  {
+    "name": "Water Bottle",
+    "path": "WaterBottle/glTF/WaterBottle.gltf",
+    "bytes": 149412,
+    "triangles": 4510,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/WaterBottle"
+  },
+  {
+    "name": "Iridescence Suzanne",
+    "path": "IridescenceSuzanne/glTF/IridescenceSuzanne.gltf",
+    "bytes": 129888,
+    "triangles": 11808,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/IridescenceSuzanne"
+  },
+  {
+    "name": "Sheen Chair",
+    "path": "SheenChair/glTF/SheenChair.gltf",
+    "bytes": 1137976,
+    "triangles": 39936,
+    "license": "CC0-1.0",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/SheenChair"
+  }
+]

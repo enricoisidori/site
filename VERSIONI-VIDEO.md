@@ -30,3 +30,7 @@ Il 12 ottobre 2026, controllo in Chrome delle quattro versioni: riproduzione, wo
 Esecuzione del controllo: tools/check-video-versions.mjs richiede Playwright e Chrome nell'ambiente di sviluppo. Non è una dipendenza di chi usa il player.
 
 Revisione successiva: eliminata l'estensione; il limite è assolutamente 30 s. Il controllo del fallback verifica ora permanenza prima del limite e sostituzione al suo raggiungimento.
+
+## Flusso di sole immagini
+
+image.html è autonomo, utilizzabile via HTTP o apertura diretta file:// con Internet. Mostra anteprime leggere casuali da Archive, senza interfaccia, testi o dissolvenze. Coda FIFO senza ripetizioni nella sessione, quattro immagini in preparazione e fino a dieci pronte/in caricamento; cambio circa ogni 120 ms se disponibile. Ricerca per prefissi casuali di identificatore, ordinamenti variabili e pagine casuali fino a 10.000 risultati per prefisso; non è un campionamento uniforme di tutta Archive. tools/build-image.mjs rigenera il file da tools/image-flow.js e dal trasporto Archive condiviso. Le immagini iniziali dei lettori video ora vengono decodificate prima della visualizzazione e scambiate come elementi già pronti.

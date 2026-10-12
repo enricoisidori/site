@@ -1,0 +1,165 @@
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+const BASE = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/';
+const MAX_OBJECTS = 8, MAX_BYTES = 2500000, MAX_TEXTURE_BYTES = 80000;
+const panel = document.querySelector('#info');
+const active = [], modelsReady = [], texturesReady = [], textureURLs = [], seenTextures = new Set();
+const failures = [], archive = [], deck = [];
+let modelLoading = 0, textureLoading = 0, fetchingTextures = false, nextTextureSearch = 0;
+let lastSpawn = -Infinity, count = 0, exporting = false;
+const random = (a,b) => a + Math.random() * (b-a);
+const shuffle = list => { for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]];}return list; };
+const clean = text => String(text || '').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xffffff);
+const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, .1, 50); camera.position.set(0,.3,6.3);
+const renderer = new THREE.WebGLRenderer({antialias:false,alpha:false,powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.25)); renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.domElement.setAttribute('aria-label','flusso di oggetti 3d');document.body.prepend(renderer.domElement);
+const controls = new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=3;controls.maxDistance=14;controls.enablePan=false;
+scene.add(new THREE.HemisphereLight(0xffffff,0x777777,2));
+const light = new THREE.DirectionalLight(0xffffff,2);light.position.set(3,5,4);scene.add(light);
+const loader = new GLTFLoader();
+function report(error) { failures.push(clean(error.message || error)); if(failures.length>8)failures.shift(); renderInfo(); }
+async function bytes(url,limit,signal) {
+ const response=await fetch(url,{signal});if(!response.ok)throw Error('HTTP '+response.status);
+ if(Number(response.headers.get('content-length'))>limit)throw Error('file oltre limite');
+ const reader=response.body.getReader(),chunks=[];let length=0;
+ try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;if(length>limit)throw Error('file oltre limite');chunks.push(value);}}
+ catch(error){await reader.cancel();throw error;}
+ const result=new Uint8Array(length);let offset=0;for(const chunk of chunks){result.set(chunk,offset);offset+=chunk.byteLength;}return result;
+}
+function dispose(root,texture) {
+ const geometries=new Set(),materials=new Set();
+ root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);for(const m of [].concat(o.material || []))materials.add(m);});
+ geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());
+ if(texture){texture.image?.close?.();texture.dispose();}
+}
+async function loadModel(asset) {
+ const url=BASE+asset.path,base=url.slice(0,url.lastIndexOf('/')+1),signal=AbortSignal.timeout(18000);
+ const json=JSON.parse(new TextDecoder().decode(await bytes(url,500000,signal)));
+ if((json.buffers || []).reduce((n,b)=>n+b.byteLength,0)>MAX_BYTES)throw Error('geometria troppo pesante');
+ const triangles=(json.meshes || []).reduce((sum,m)=>sum+m.primitives.reduce((n,p)=>n+(json.accessors[p.indices ?? p.attributes.POSITION]?.count || 0)/3,0),0);
+ if(triangles>60000)throw Error('troppi triangoli');
+ // Do not fetch original textures: replace all materials before GLTFLoader.
+ json.materials=[];json.images=[];json.textures=[];json.samplers=[];json.animations=[];
+ json.extensionsUsed=(json.extensionsUsed || []).filter(x=>x==='KHR_mesh_quantization');
+ json.extensionsRequired=(json.extensionsRequired || []).filter(x=>x==='KHR_mesh_quantization');
+ delete json.extensions;
+ for(const node of json.nodes || [])delete node.extensions;
+ if((json.bufferViews || []).some(view=>view.extensions?.EXT_meshopt_compression))throw Error('compressione non supportata');
+ for(const mesh of json.meshes || [])for(const p of mesh.primitives){delete p.material;if(p.extensions?.KHR_draco_mesh_compression)throw Error('compressione non supportata');}
+ const blobs=[];
+ try{
+  for(const buffer of json.buffers || []){
+   const data=await bytes(new URL(buffer.uri,base).href,MAX_BYTES,signal);
+   const blob=URL.createObjectURL(new Blob([data]));blobs.push(blob);buffer.uri=blob;
+  }
+  const gltf=await new Promise((resolve,reject)=>loader.parse(JSON.stringify(json),base,resolve,reject));
+  const root=gltf.scene,box=new THREE.Box3().setFromObject(root),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
+  const extent=Math.max(size.x,size.y,size.z);if(!Number.isFinite(extent)||extent<=0){dispose(root);throw Error('geometria vuota');}
+  root.position.sub(center);
+  const group=new THREE.Group();group.add(root);group.scale.setScalar(random(1.5,2.5)/extent);
+  group.userData.asset=asset;
+  return {group,asset};
+ }finally{blobs.forEach(url=>URL.revokeObjectURL(url));}
+}
+function pumpModels() {
+ if(document.hidden)return;
+ while(modelLoading<2 && modelsReady.length+modelLoading<3){
+  if(!deck.length)deck.push(...shuffle([...MODEL_CATALOG]));
+  const asset=deck.shift();modelLoading++;
+  loadModel(asset).then(model=>{modelsReady.push(model);spawn();}).catch(report).finally(()=>{modelLoading--;setTimeout(pumpModels,200);});
+ }
+}
+async function fetchTextureURLs() {
+ if(fetchingTextures || document.hidden || Date.now()<nextTextureSearch)return;
+ fetchingTextures=true;
+ try{
+  const params=new URLSearchParams({action:'query',generator:'random',grnnamespace:'6',grnlimit:'8',prop:'imageinfo',iiprop:'url|mime|extmetadata',iiurlwidth:'128',iiextmetadatafilter:'Artist|LicenseShortName|LicenseUrl|Credit|AttributionRequired',format:'json',origin:'*'});
+  const response=await fetch('https://commons.wikimedia.org/w/api.php?'+params,{signal:AbortSignal.timeout(9000)});
+  if(!response.ok)throw Error('Commons HTTP '+response.status);
+  const data=await response.json();
+  for(const page of Object.values(data.query?.pages || {})){
+   const info=page.imageinfo?.[0];if(!info?.thumburl || !/^image\/(jpeg|png|webp)$/.test(info.mime || '') || info.thumbwidth>192 || info.thumbheight>384 || seenTextures.has(page.pageid))continue;
+   const meta=info.extmetadata || {},license=clean(meta.LicenseShortName?.value);
+   if(!/^(CC0|Public domain|CC BY(?:-SA)?(?: [\d.]+)?)$/i.test(license))continue;
+   seenTextures.add(page.pageid);
+   textureURLs.push({id:page.pageid,title:page.title,url:info.thumburl,source:info.descriptionurl || 'https://commons.wikimedia.org/?curid='+page.pageid,author:clean(meta.Artist?.value),license,licenseURL:meta.LicenseUrl?.value || '',credit:clean(meta.Credit?.value)});
+  }
+  nextTextureSearch=Date.now()+500;
+ }catch(error){report(error);nextTextureSearch=Date.now()+2500;}
+ finally{fetchingTextures=false;pumpTextures();}
+}
+function pumpTextures() {
+ if(document.hidden)return;
+ while(textureLoading<2 && texturesReady.length+textureLoading<6 && textureURLs.length){
+  const item=textureURLs.shift();textureLoading++;
+  bytes(item.url,MAX_TEXTURE_BYTES,AbortSignal.timeout(7000)).then(async data=>{
+   const source=await createImageBitmap(new Blob([data]));
+   const scale=Math.min(1,128/Math.max(source.width,source.height));
+   const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(source.width*scale));canvas.height=Math.max(1,Math.round(source.height*scale));canvas.getContext('2d').drawImage(source,0,0,canvas.width,canvas.height);source.close();
+   const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.flipY=false;texture.generateMipmaps=false;texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;
+   texturesReady.push({texture,item});spawn();
+  }).catch(report).finally(()=>{textureLoading--;pumpTextures();});
+ }
+ if(textureURLs.length<6 && texturesReady.length<6)fetchTextureURLs();
+}
+function planarUV(geometry) {
+ if(geometry.getAttribute('uv'))return;
+ geometry.computeBoundingBox();const box=geometry.boundingBox,size=box.getSize(new THREE.Vector3()),position=geometry.getAttribute('position'),uv=new Float32Array(position.count*2);
+ const axes=['x','y','z'].sort((a,b)=>size[b]-size[a]),v=new THREE.Vector3();
+ for(let i=0;i<position.count;i++){v.fromBufferAttribute(position,i);uv[2*i]=(v[axes[0]]-box.min[axes[0]])/(size[axes[0]] || 1);uv[2*i+1]=(v[axes[1]]-box.min[axes[1]])/(size[axes[1]] || 1);}
+ geometry.setAttribute('uv',new THREE.BufferAttribute(uv,2));
+}
+function spawn() {
+ if(document.hidden || !modelsReady.length || !texturesReady.length || performance.now()-lastSpawn<900)return;
+ const model=modelsReady.shift(),image=texturesReady.shift();
+ const material=new THREE.MeshStandardMaterial({map:image.texture,roughness:1,metalness:0,side:THREE.DoubleSide});
+ const originals=new Set();model.group.traverse(o=>{if(!o.isMesh)return;for(const m of [].concat(o.material || []))originals.add(m);planarUV(o.geometry);o.material=material;});originals.forEach(m=>m.dispose());
+ const group=model.group;group.position.set(random(-.45,.45),random(-.45,.45),random(-.45,.45));group.rotation.set(random(0,6.28),random(0,6.28),random(0,6.28));
+ group.userData.textureSource=image.item;group.userData.textureModified='Image mapped onto unrelated 3D geometry, resized to <=128px';
+ const entry={...model,...image,velocity:new THREE.Vector3(random(-.6,.6),random(-.6,.6),random(-.6,.6)),phase:random(0,20),base:group.position.clone()};
+ scene.add(group);active.push(entry);count++;lastSpawn=performance.now();
+ archive.push({model:model.asset,image:image.item});if(archive.length>200)archive.shift();
+ if(active.length>MAX_OBJECTS){const old=active.shift();scene.remove(old.group);dispose(old.group,old.texture);}
+ renderInfo();pumpModels();pumpTextures();
+}
+function renderInfo() {
+ if(panel.hidden)return;
+ panel.replaceChildren();
+ const text=document.createElement('p');text.textContent=`${active.length} / ${MAX_OBJECTS} oggetti · ${count} arrivi · ${modelsReady.length} modelli pronti · ${texturesReady.length} texture pronte\ni info · f fullscreen · s esporta glb · o esporta obj (solo geometria) · a fonti json\ntrascina: ruota · rotella: zoom`;panel.append(text);
+ for(const entry of active){const p=document.createElement('p');const model=document.createElement('a');model.href=entry.asset.source;model.textContent=entry.asset.name+' · CC0';model.target='_blank';model.rel='noopener';const image=document.createElement('a');image.href=entry.item.source;image.textContent=entry.item.title+' · '+entry.item.author+' · '+entry.item.license;image.target='_blank';image.rel='noopener';p.append(model,document.createElement('br'),image,document.createElement('br'),'immagine ridimensionata e applicata come texture');if(entry.item.licenseURL){const a=document.createElement('a');a.href=entry.item.licenseURL;a.textContent=' · licenza';a.target='_blank';a.rel='noopener';p.append(a);}panel.append(p);}
+ if(failures.length){const p=document.createElement('p');p.textContent='ultimi tentativi: '+failures.join(' · ');panel.append(p);}
+}
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
+async function exportScene(format) {
+ if(exporting || !active.length)return;exporting=true;
+ const group=new THREE.Group();for(const entry of active)group.add(entry.group.clone(true));
+ try{
+  if(format==='obj'){const {OBJExporter}=await import('three/addons/exporters/OBJExporter.js');download(new Blob([new OBJExporter().parse(group)],{type:'text/plain'}),'objects.obj');}
+  else{const {GLTFExporter}=await import('three/addons/exporters/GLTFExporter.js');const result=await new GLTFExporter().parseAsync(group,{binary:true,maxTextureSize:128});download(new Blob([result],{type:'model/gltf-binary'}),'objects.glb');}
+ }catch(error){report(error);}finally{exporting=false;}
+}
+document.addEventListener('keydown',event=>{
+ if(event.repeat || event.ctrlKey || event.metaKey || event.altKey)return;
+ const key=event.key.toLowerCase();if(['i','f','s','o','a'].includes(key))event.preventDefault();
+ if(key==='i'){panel.hidden=!panel.hidden;renderInfo();}
+ if(key==='f'){(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen({navigationUI:'hide'})).catch(report);}
+ if(key==='s')exportScene('glb');if(key==='o')exportScene('obj');
+ if(key==='a')download(new Blob([JSON.stringify({models:'CC0-1.0',textureModifications:'resized and mapped onto unrelated geometry',entries:archive},null,2)],{type:'application/json'}),'objects-sources.json');
+});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();report('contesto WebGL perso: ricaricare la pagina');panel.hidden=false;renderInfo();});
+let lastFrame=performance.now();
+renderer.setAnimationLoop(now=>{
+ const dt=Math.min(.05,(now-lastFrame)/1000);lastFrame=now;if(document.hidden)return;
+ const t=now/1000;
+ for(const entry of active){entry.group.rotation.x+=entry.velocity.x*dt;entry.group.rotation.y+=entry.velocity.y*dt;entry.group.rotation.z+=entry.velocity.z*dt;entry.group.position.set(entry.base.x+Math.sin(t*.8+entry.phase)*.18,entry.base.y+Math.cos(t*.6+entry.phase)*.18,entry.base.z+Math.sin(t*.7+entry.phase)*.18);}
+ controls.update();renderer.render(scene,camera);
+});
+function pump(){if(!document.hidden){spawn();pumpModels();pumpTextures();}}
+setInterval(pump,200);document.addEventListener('visibilitychange',pump);pump();
+// Exposes read-only counters for inexpensive browser verification.
+Object.defineProperty(window,'objectFlowStatus',{get:()=>({active:active.length,arrivals:count,modelsReady:modelsReady.length,texturesReady:texturesReady.length,triangles:renderer.info.render.triangles,errors:[...failures]})});
