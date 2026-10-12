@@ -14,7 +14,7 @@ Durante la riproduzione ViT–GPT2 q8 analizza un JPEG di scena già estratto da
 
 Le parole producono una ricerca prima in titolo e soggetti; senza risultati si include la descrizione. I metadati vengono verificati e la corrispondenza evidenziata. Un solo successore viene preparato: cambia dopo circa 60 secondi, alla fine del video o in caso di arresto prolungato della riproduzione. Nessun video già visto viene riproposto e nessun loop viene attivato. Senza un successore pronto la continuità non è garantita.
 
-I mostra anche il buffer disponibile e il fotogramma Archive con il secondo effettivo. W mostra parole. Entrambi sono spenti di default. Il riferimento e le differenze sono documentati in ../spiral/STUDIO-PLAYPLAYPLAYPLAY.md.
+I mostra anche il buffer disponibile e il fotogramma Archive con il secondo effettivo. W mostra parole. Entrambi sono spenti di default.
 
 Il riscaldamento del modello non blocca il successore indefinitamente: dopo 12 secondi, se ancora non pronto, la pagina prepara un nuovo casuale mentre il caricamento del modello continua.
 

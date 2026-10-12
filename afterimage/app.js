@@ -1,9 +1,10 @@
 import { resolveItem, queryFor } from './archive.js';
 import { CandidatePool, Semaphore } from './pool.js';
 import { captionTerms } from './terms.js';
-import { prepare, startPlaying, release, captureItemFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS, MAX_EXTENDED_PLAY_SECONDS } from './media.js';
+import { prepare, startPlaying, release, captureItemFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS } from './media.js';
 import { renderInfo, toggleInfo } from './info.js';
-import { setWaiting } from './loading.js';
+import { setWaiting, addLoadingImages, finishLoading } from './loading.js';
+import { beginChain, describeChain, queryChain, finishChain, exportChain } from './history.js';
 
 const stage = document.querySelector('#stage');
 const skipArea = document.querySelector('#skipArea');
@@ -26,9 +27,14 @@ const pending = new Map(), recent = new Set(), failed = new Map();
 const lifetime = new AbortController();
 const network = new Semaphore(3);
 const generalPool = new CandidatePool([], lifetime.signal, result => {
+  addLoadingImages(result.items);
   if (!active) update({ query: result.query, total: result.total, message: 'cerco derivati video leggeri…' });
 });
-const update = changes => { Object.assign(state, changes); renderInfo(state, active); };
+const update = changes => {
+  Object.assign(state, changes);
+  if (!active && /archive.*(?:http|disponibile)|backend_error|timeout|failed to fetch/i.test(changes.message || '')) document.querySelector('#info').hidden = false;
+  renderInfo(state, active);
+};
 const delay = (ms, signal) => new Promise((resolve, reject) => {
   if (signal.aborted) return reject(signal.reason);
   const done = () => { signal.removeEventListener('abort', abort); resolve(); };
@@ -122,11 +128,12 @@ async function fill(slot, kind, cycle = context) {
         slot.role = 'buffering';
         if (kind === 'semantic' || !active) update({ step: 'precaricamento', message: `preparo ${candidate.title}` });
         const began = performance.now();
-        slot.media = await network.run(() => prepare(slot.video, candidate.streamURL, signal, { startup: !active }), signal, kind === 'semantic' ? 1 : 0);
+        slot.media = await network.run(() => prepare(slot.video, candidate.streamURL, signal, { startup: !active, middle: candidate.collections.includes('prelinger') }), signal, kind === 'semantic' ? 1 : 0);
         if (signal.aborted || kind === 'semantic' && cycle !== context) return;
         slot.item = { ...candidate, incoming: kind === 'semantic' ? {
           parentID: cycle.parent.id, parentTitle: cycle.parent.title, terms: [...pool.terms],
-          caption: cycle.caption, query: entry.result.query, kind: 'query',
+          caption: cycle.caption, keywords: cycle.allKeywords, frameTime: cycle.frameTime,
+          query: entry.result.query, kind: 'query',
         } : null };
         slot.role = 'ready';
         update({ prepareMs: performance.now() - began });
@@ -162,7 +169,7 @@ function pump() {
   state.queueGeneral = readySlots('general').length;
   state.queueSemantic = readySlots('semantic').length;
   state.loading = slots.filter(slot => ['resolving', 'buffering'].includes(slot.role)).length;
-  skipArea.disabled = switching || !active || !readySlots().length;
+  skipArea.disabled = false;
 }
 async function analyze(cycle) {
   const signal = cycle.controller.signal;
@@ -174,12 +181,13 @@ async function analyze(cycle) {
       await waitFor(() => !active.video.seeking && active.video.readyState >= 2, signal);
       const frame = await captureItemFrame(active, signal);
       if (cycle !== context || signal.aborted) return;
-      favicon.href = frame.preview;
+      favicon.href = frame.preview; cycle.frameTime = frame.time;
       update({ step: 'modello', preview: frame.preview, frameTime: frame.time, frameSource: frame.source, modelStatus: 'descrizione del fotogramma…' });
       const result = await abortable(rpc({ type: 'caption', pixels: frame.pixels, width: frame.width, height: frame.height }, [frame.pixels], 45000), signal);
       if (cycle !== context || signal.aborted) return;
       const terms = captionTerms(result.caption);
-      cycle.caption = result.caption; cycle.keywords = [...terms];
+      cycle.caption = result.caption; cycle.keywords = [...terms]; cycle.allKeywords = [...terms];
+      describeChain(result.caption, terms, { time: frame.time, source: frame.source });
       update({ step: 'keyword', caption: result.caption, terms, inferenceMs: result.inferenceMs, modelStatus: 'pronto · inferenza locale' });
       if (!terms.length) { await delay(4000, signal); continue; }
       nextKeyword(cycle); return;
@@ -193,6 +201,7 @@ function nextKeyword(cycle) {
   const term = cycle.keywords.shift(); if (!term) return;
   cycle.pool = new CandidatePool([term], cycle.controller.signal, result => {
     if (cycle !== context) return;
+    queryChain(term, result.query, result.total);
     update({ step: 'query', query: result.query, total: result.total, selectedTerm: term });
     // An empty query can move to another literal keyword without re-running vision.
     if (!result.total && cycle.keywords.length) setTimeout(() => {
@@ -202,20 +211,26 @@ function nextKeyword(cycle) {
       }
     }, 1000);
   });
+  queryChain(term, queryFor([term]));
   update({ step: 'query', query: queryFor([term]), selectedTerm: term, total: null }); pump();
 }
 async function promote(next, reason) {
   if (switching || next.role !== 'ready') return;
-  switching = true; skipArea.disabled = true;
+  switching = true;
   const old = active;
   try {
     // Ready streams already have decoded data. Keep the old frame visible
     // until the new decoder renders; never open a tab or start a search here.
+    if (!old) await finishLoading();
     next.video.muted = true; await startPlaying(next.video);
     next.video.muted = state.muted;
     if (next.kind !== 'semantic' && old) next.item.incoming = {
-      parentID: old.item.id, parentTitle: old.item.title, terms: [], query: queryFor([]), kind: reason === 'click' ? 'click' : 'random',
+      parentID: old.item.id, parentTitle: old.item.title, caption: context?.caption || '',
+      keywords: context?.allKeywords || [], terms: [], query: '', kind: reason === 'click' ? 'click' : 'random',
     };
+    if (old) finishChain(next.item, reason);
+    beginChain(next.item, reason);
+    next.video.classList.toggle('fill', state.fitMode === 'fill');
     next.video.classList.add('on'); old?.video.classList.remove('on');
     active = next; active.role = 'active'; active.startedAt = performance.now();
     active.lastTime = next.video.currentTime; active.lastProgress = performance.now();
@@ -225,12 +240,14 @@ async function promote(next, reason) {
       step: 'modello', caption: '', terms: [], selectedTerm: '', query: '', total: null, next: null, preview: '', frameTime: null, inferenceMs: null, message: 'analisi del video corrente…' });
     if (old) { release(old); old.claim = null; }
     context = { id: ++generation, parent: next.item, controller: new AbortController(), pool: null, keywords: [] };
-    setWaiting(false); analyze(context);
+    const reveal = setWaiting(false); analyze(context); await reveal;
   } catch (error) {
     release(next); next.claim = null; update({ message: error.message });
   } finally { switching = false; pump(); }
 }
 function tick() {
+  // Enforce the cap even while the next decoder is starting asynchronously.
+  if (active && !document.hidden && performance.now() - active.startedAt >= MAX_PLAY_SECONDS * 1000) active.video.pause();
   if (active && !switching && !document.hidden) {
     const video = active.video, now = performance.now();
     const elapsed = (now - active.startedAt) / 1000;
@@ -240,9 +257,7 @@ function tick() {
     }
     const stalled = !video.paused && now - active.lastProgress > 2200;
     const ended = video.ended || video.currentTime >= active.media.start + active.media.seconds - .15;
-    const mayExtend = !semantic && active.media.seconds > MAX_PLAY_SECONDS + .25
-      && elapsed < Math.min(MAX_EXTENDED_PLAY_SECONDS, active.media.seconds);
-    const deadline = mayExtend ? Math.min(MAX_EXTENDED_PLAY_SECONDS, active.media.seconds) : MAX_PLAY_SECONDS;
+    const deadline = MAX_PLAY_SECONDS;
     if (semantic) promote(semantic, 'query');
     else if (general && (elapsed >= deadline || ended || stalled)) promote(general, 'fallback');
     else if (elapsed >= deadline || ended || stalled) {
@@ -253,23 +268,44 @@ function tick() {
   }
   requestAnimationFrame(tick);
 }
-skipArea.addEventListener('click', () => {
+let firstClick = true;
+function skipReady() {
+  if (!active || switching) return;
   const next = readySlots('semantic')[0] || readySlots('general')[0];
   if (next) promote(next, 'click');
+}
+document.addEventListener('click', event => {
+  if (firstClick) {
+    firstClick = false;
+    state.muted = false;
+    // Unlock audio inside the first user gesture, even during loading.
+    for (const { video } of slots) video.muted = false;
+    if (active && !active.video.ended && state.elapsed < MAX_PLAY_SECONDS) active.video.play().catch(() => {});
+    renderInfo(state, active);
+    return;
+  }
+  if (event.target.closest('#info')) return;
+  skipReady();
 });
 document.addEventListener('keydown', event => {
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
+  if (['i', 'm', 'f', 'c', 's', 'arrowright'].includes(key)) {
+    event.preventDefault();
+    if (document.activeElement === skipArea) skipArea.blur();
+  }
+  if (key === 'arrowright') { event.preventDefault(); skipReady(); }
   if (key === 'i') { toggleInfo(); renderInfo(state, active); }
   if (key === 'm') { state.muted = !state.muted; if (active) active.video.muted = state.muted; renderInfo(state, active); }
   if (key === 'f') {
-    const action = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    const action = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen({ navigationUI: 'hide' });
     action.catch(error => update({ message: error.message }));
   }
   if (key === 'c' && active) {
     const fill = active.video.classList.toggle('fill');
     update({ fitMode: fill ? 'fill' : 'fit' });
   }
+  if (key === 's') exportChain();
 });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { active?.video.pause(); if (active) active.hiddenAt = performance.now(); }
@@ -280,5 +316,6 @@ document.addEventListener('visibilitychange', () => {
 });
 setInterval(() => { pump(); renderInfo(state, active); }, 300);
 requestAnimationFrame(tick);
-ensureModel().catch(error => update({ modelStatus: error.message }));
+// The first stream gets the connection first; analyze() starts the model once
+// a video is playing, independently from future random/semantic reserves.
 pump();

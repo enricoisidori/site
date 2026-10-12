@@ -3,7 +3,7 @@ import { catalogRecord } from './catalog.js?v=runtime-51';
 import { MAX_VIDEO_BYTES, MIN_VIDEO_SECONDS, LIMITED_ARCHIVE, DARKROOM } from './config.js?v=runtime-51';
 // A bounded archive, not YouTube's ranked recommendations.
 export const COLLECTIONS = '(collection:prelinger OR collection:home_movies OR collection:prelingerhomemovies)';
-const BASE = `mediatype:movies AND ${COLLECTIONS} AND NOT access-restricted-item:true`;
+const BASE = `mediatype:movies AND ${COLLECTIONS} AND NOT "call of duty" AND NOT access-restricted-item:true`;
 export const randomInt = max => Math.floor(Math.random() * max);
 export const shuffle = values => {
   const result = [...values];
@@ -71,7 +71,7 @@ async function json(url, signal) {
   return response.json();
 }
 export async function candidates(term = '', field = '', whole = false, signal) {
-  const params = new URLSearchParams({ q: whole ? `mediatype:movies AND NOT access-restricted-item:true AND identifier:${'abcdefghijklmnopqrstuvwxyz0123456789'[randomInt(36)]}* AND item_size:[10000 TO 12000000] AND (format:"MPEG4" OR format:"512Kb MPEG4" OR format:"h.264")` : `${searchQuery(term, field)}${!term ? ' AND item_size:[10000 TO 60000000] AND (format:"MPEG4" OR format:"512Kb MPEG4" OR format:"h.264")' : ''}`, rows: '1', page: '1' });
+  const params = new URLSearchParams({ q: whole ? `mediatype:movies AND NOT "call of duty" AND NOT access-restricted-item:true AND identifier:${'abcdefghijklmnopqrstuvwxyz0123456789'[randomInt(36)]}* AND item_size:[10000 TO 12000000] AND (format:"MPEG4" OR format:"512Kb MPEG4" OR format:"h.264")` : `${searchQuery(term, field)}${!term ? ' AND item_size:[10000 TO 60000000] AND (format:"MPEG4" OR format:"512Kb MPEG4" OR format:"h.264")' : ''}`, rows: '1', page: '1' });
   const first = await json(archiveSearchURL(params), signal);
   const total = first.response?.numFound || 0;
   if (!total) return [];
@@ -92,6 +92,7 @@ export function playableFiles(files) {
 export async function resolveItem(item, signal) {
   const metadata = catalogRecord(item.identifier) || await json(`https://archive.org/metadata/${encodeURIComponent(item.identifier)}`, signal);
   if (metadata.is_dark || metadata.metadata?.['access-restricted-item'] === 'true') return null;
+  if (/\bcall[\s_-]+of[\s_-]+duty\b/i.test(['title', 'subject', 'description'].map(key => String(metadata.metadata?.[key] || '')).join(' ').replace(/<[^>]+>/g, ' '))) return null;
   const files = playableFiles(metadata.files || []);
   if (!files.length) return null;
   return {
@@ -123,7 +124,7 @@ export function videoTerms(predictions) {
 export function videoQuery(term, primary=false) {
   const terms=(Array.isArray(term)?term:[term]).map(value=>value.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim().slice(0,70)).filter(Boolean).slice(0,6);
   const clauses=terms.flatMap(value=>(primary ? ['title','subject'] : ['title','description','subject']).map(field=>`${field}:"${value}"`));
-  return `${LIMITED_ARCHIVE ? BASE : "mediatype:movies AND NOT access-restricted-item:true"} AND item_size:[10000 TO 80000000]${DARKROOM ? ' AND (title:"black screen" OR title:"black video" OR title:"blank screen")' : ''}${clauses.length ? ` AND (${clauses.join(' OR ')})` : ''}`;
+  return `${LIMITED_ARCHIVE ? BASE : "mediatype:movies AND NOT "call of duty" AND NOT access-restricted-item:true"} AND item_size:[10000 TO 80000000]${DARKROOM ? ' AND (title:"black screen" OR title:"black video" OR title:"blank screen")' : ''}${clauses.length ? ` AND (${clauses.join(' OR ')})` : ''}`;
 }
 export async function videoCandidates(term, signal, page = 1, primary=false) {
   const params = new URLSearchParams({ q: videoQuery(term,primary), rows: '6', page: String(page), sort: 'relevance' });

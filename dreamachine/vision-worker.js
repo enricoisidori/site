@@ -3,10 +3,11 @@ let captioner, RawImage;
 let loading;
 async function warmup() {
   if (!loading) loading = (async () => {
-    const lib = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1');
+    const lib = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/transformers.min.js');
     RawImage = lib.RawImage;
     lib.env.allowLocalModels = false;
     lib.env.backends.onnx.wasm.numThreads = 1;
+    lib.env.backends.onnx.wasm.proxy = false;
     captioner = await lib.pipeline('image-to-text', 'Xenova/vit-gpt2-image-captioning', {
       revision: '215b4edcb7ec1fad5905a18a03f7b2007f6fabd0', dtype: 'q8', device: 'wasm',
       progress_callback: data => self.postMessage({ type: 'progress', file: data.file, progress: data.progress, status: data.status }),

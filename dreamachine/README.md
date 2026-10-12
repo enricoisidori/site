@@ -1,29 +1,22 @@
 # dreamachine
 
-Versione gemella di afterimage: usa soltanto Prelinger, Open Source Movies e Community Video, con esclusioni aggiuntive per materiali industriali, educativi e aziendali. Gli uploader personali sono configurabili nell'array `individualUploaders` di `scope.js` solo dopo averne verificato l'identificativo Archive.
+Cerca filmati domestici/amatoriali del 1920–2015 con indicazioni esplicite di riprese grezze o non montate. Prelinger ha priorità (tre ricerche su quattro) e non richiede etichette amatoriali/non montate; restano le esclusioni e il match della query nel titolo. Il resto di Archive mantiene i criteri amatoriali stretti.
 
-La v2 richiesta dall'utente è conservata in `../relay-backups/relay-v2-20261012-190105.zip`, con manifest SHA-256 affiancato. Contiene anche ricerca limitata al titolo e noise disattivato, così come erano prima delle modifiche successive.
+Questa cartella è la versione per GitHub Pages e Live Server. Per l'apertura diretta senza server usare ../dreamachine-local/index.html. Le copie locali sono generate dagli stessi sorgenti e non hanno pulsanti di avvio.
 
-## comportamento attuale
+Descrizione locale del fotogramma → keyword → ricerca nel titolo → video. Limite assoluto 30 s; il successore della query parte appena pronto, anche prima. Nessun loop. Streaming nativo con riserve precaricate.
 
-- Solo Internet Archive, streaming nativo. La sorgente è limitata a Prelinger, Open Source Movies e Community Video; il filtro esclude inoltre trailer, spot, videogame, news, podcast, commerciali, pubblicità, TikTok, compilation, tutorial, materiale industriale, educativo, sponsorizzato, didattico e aziendale. Finestra fino a 10.000 risultati per query, senza ordinamento per popolarità.
-- Il modello locale ViT–GPT2 q8 produce una descrizione. Prima le keyword venivano estratte escludendo molte parole generiche (anche `man`, `woman`, `people`, `person`) e la scelta era casuale: questo favoriva gli oggetti.
-- Ora le parole relative alle persone sono ammesse. Le keyword sono ordinate da una piccola euristica locale: penalità per parole molto generiche/comuni, preferenza per espressioni composte e parole più specifiche. Professioni e ruoli non vengono penalizzati in quanto persone. Non è una misura reale della frequenza linguistica: non si aggiungono modelli, richieste di rete o inferenze.
-- Si cerca prima la keyword con punteggio maggiore, poi le altre se una query non dà risultati. La keyword deve comparire nel **titolo come parola intera**; viene evidenziata nel pannello.
-- Nessuna durata minima del video sorgente, salvo durata nulla/non riproducibile. Il successore della query viene promosso appena pronto. A 30 s il video passa normalmente alla riserva; l'unica estensione possibile è fino a 60 s, solo se lo stream attivo ne dispone e nessun successore della query è pronto. Poi usa una riserva casuale; senza riserve resta il noise. Nessun loop.
-- I candidati della query hanno priorità sia nell'assegnazione dei lettori liberi sia nella coda dei preparatori media. Le due riserve generali restano disponibili come fallback. Anche il clic preferisce un candidato della query già pronto, poi un casuale.
-- Noise iniziale più fine (fino a 960 px di larghezza), aggiornato a 30 fps e senza testo. Alla partenza, la luminanza del noise congelato determina l'alpha: i pixel scuri diventano trasparenti prima di quelli chiari, rivelando il video in circa 2,6 s. È una maschera luma sul noise, non una lettura del video tramite canvas; funziona anche con stream protetti da CORS. Il favicon diventa il fotogramma usato dal modello. Helvetica minuscola e rispetto del movimento ridotto.
+I informazioni e cronologia; M audio; F fullscreen; C fit/fill; S esporta la catena JSON. La cronologia viene salvata automaticamente nel browser, fino a 2.000 video. Sono incluse tutte le esclusioni aggiuntive per trailer/game advertising e contenuti sportivi.
 
-## avvio e controlli
+Caricamento su fondo bianco e SVG nero: anteprime leggere di Archive in coda FIFO, senza ripetizioni. La prima appare appena arriva; le successive vengono consumate ogni 120 ms quando disponibili, con tre caricamenti paralleli e rifornimento continuo. Quando il primo video è pronto: 3 secondi di SVG su bianco, poi 1 secondo di solo bianco, quindi dissolvenza di 3 secondi al video. Primo clic: solo audio; clic successivi / →: prossimo pronto; M: audio, F/Esc: fullscreen. Il modello ViT–GPT2 q8 viene eseguito sul dispositivo; circa 247 MB al primo caricamento. Serve Internet.
 
-Da `site/dreamachine`: `python3 -m http.server 8091 --bind 127.0.0.1`, poi http://127.0.0.1:8091/. Compatibile con hosting statico HTTPS. Nessuna chiave API.
+Istruzioni complete e limiti della verifica in [VERSIONI-VIDEO.md](../VERSIONI-VIDEO.md). Controllo integrato HTTP e file:// superato con risposte remote simulate; verificate separatamente query reali e importazione reale della libreria. Le vecchie verifiche in VERIFICA.md sono cronologia di sviluppo, non una certificazione di questa revisione.
 
-`i` informazioni e fonte; `m` audio; `f` fullscreen; `c` alterna fit/fill; clic per un altro lettore già pronto. Il clic non avvia download o nuove schede e resta inattivo se la coda è vuota.
+Backup v2 storico: ../relay-backups/relay-v2-20261012-190105.zip.
 
-Il modello richiede circa 247 MB al primo download, poi può usare la cache del browser. Le inferenze avvengono sul dispositivo. Per gli stream non leggibili da canvas si cerca una scena `.thumbs` dello stesso file e del tempo più vicino; il pannello dichiara questa approssimazione. La disponibilità della rete resta necessaria per Archive.
+Selezione stretta: ogni ricerca richiede filmati domestici/amatoriali e indicazioni esplicite di riprese grezze/non montate; controllo aggiuntivo dei metadati. Prelinger bypassa soltanto le etichette positive, mai le esclusioni né la query. Le etichette Archive non garantiscono la natura del contenuto.
 
-## verifica
+L’HTML locale occupa tutto il viewport; il fullscreen reale richiede F perché il browser vieta l’attivazione automatica senza interazione.
 
-Su richiesta dell'utente, **nessuna prova eseguita dopo queste ultime modifiche**. Le verifiche documentate in VERIFICA.md si riferiscono alle versioni precedenti. I vecchi test temporali del browser descrivono ancora il comportamento v2 (minimo 30 / massimo 60) e devono essere aggiornati prima di essere usati per questa versione.
-
-La fixture locale in `tests/fixture.mp4` è usata soltanto dai test: estratto pubblico dominio di [Chevrolet Commercial](https://archive.org/details/chevrolet), mai caricato dal player normale. Cronologia tecnica in [REVERSE-ENGINEERING.md](./REVERSE-ENGINEERING.md).
+I video appartenenti a Prelinger partono a metà della durata, anche come primo video, per saltare i titoli iniziali.
+Le immagini di caricamento provengono dalle anteprime Prelinger filtrate e dai risultati della ricerca video amatoriale; non viene più usato il catalogo globale delle immagini. Cache degli identificativi separata dalla precedente.

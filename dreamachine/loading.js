@@ -1,62 +1,99 @@
+import { loadingArt } from './loading-art.js';
+import { archiveJSON } from './archive-transport.js';
+import { queryFor } from './archive.js';
 const overlay = document.querySelector('#loading');
-const canvas = document.querySelector('#noise');
-const context = canvas.getContext('2d', { alpha: true });
+let picture = document.querySelector('.loading-picture');
+document.querySelector('.loading-art').innerHTML = loadingArt;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-let pixels, words, luma, mode = 'hidden', frame = 0, lastDraw = 0, revealAt = 0;
-let seed = (Math.random() * 0xffffffff) >>> 0 || 123456789;
-function resize() {
-  canvas.width = Math.min(960, Math.max(320, innerWidth));
-  canvas.height = Math.max(180, Math.round(canvas.width * innerHeight / innerWidth));
-  pixels = context.createImageData(canvas.width, canvas.height);
-  words = new Uint32Array(pixels.data.buffer);
-  luma = new Uint8Array(words.length);
-}
-function noise() {
-  for (let i = 0; i < words.length; i++) {
-    seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5;
-    const value = seed & 255;
-    luma[i] = value; words[i] = (255 << 24) | value * 0x010101;
+const cacheKey = document.title + ':loading-images:prelinger-v2';
+const identifiers = [], known = new Set(), ready = [];
+let mode = 'hidden', timer, inFlight = 0, lastShown = -Infinity, searching = false, retryAt = 0;
+let searchController, reveal, imageTotal = 0;
+export function addLoadingImages(items) {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; }
+  for (const item of shuffled) {
+    const id = typeof item === 'string' ? item : item.identifier;
+    if (!id || known.has(id)) continue;
+    known.add(id); identifiers.push(id);
   }
-  context.putImageData(pixels, 0, 0);
+  try { localStorage.setItem(cacheKey, JSON.stringify([...known].slice(-100))); } catch {}
+  preload();
 }
-function key(progress) {
-  // The frozen noise luminance is the matte: dark pixels key out first.
-  // Only alpha changes; the playing video underneath is never read into canvas.
-  // Smoothstep keeps the luma-key transition gradual at its ends.
-  const eased = progress * progress * (3 - 2 * progress);
-  const threshold = -24 + eased * 304;
-  for (let i = 0; i < words.length; i++) {
-    const value = luma[i];
-    const alpha = Math.max(0, Math.min(255, (value - threshold) * 10 + 128));
-    words[i] = (alpha << 24) | value * 0x010101;
+async function refill() {
+  if (searching || mode !== 'waiting' || Date.now() < retryAt) return;
+  searching = true; searchController = new AbortController();
+  try {
+    const params = new URLSearchParams({ q: queryFor([], 'collection:prelinger'), rows: '50', page: String(imageTotal ? 1 + Math.floor(Math.random() * Math.ceil(Math.min(imageTotal, 10000) / 50)) : 1), output: 'json', 'fl[]': 'identifier', 'sort[]': Math.random() < .5 ? 'identifier asc' : 'identifier desc' });
+    const data = await archiveJSON('https://archive.org/advancedsearch.php?' + params, searchController.signal);
+    if (mode === 'waiting') {
+      imageTotal = Number(data.response?.numFound) || 0;
+      addLoadingImages(data.response?.docs || []);
+    }
+  } catch {} finally { searching = false; retryAt = Date.now() + 1000; }
+}
+function preload() {
+  while (mode === 'waiting' && inFlight < 3 && ready.length < 6 && identifiers.length) {
+    const image = new Image(), id = identifiers.shift();
+    inFlight++; image.decoding = 'async'; image.fetchPriority = picture.getAttribute('src') ? 'low' : 'high';
+    let settled = false;
+    const finish = success => {
+      if (settled) return; settled = true; clearTimeout(timeout); inFlight--;
+      image.onload = image.onerror = null;
+      if (success && mode === 'waiting' && image.naturalWidth) {
+        ready.push(image); showNext();
+      }
+      preload();
+    };
+    const timeout = setTimeout(() => finish(false), 5000);
+    image.onload = () => image.decode().then(() => finish(true), () => finish(false)); image.onerror = () => finish(false);
+    image.src = 'https://archive.org/services/img/' + encodeURIComponent(id);
   }
-  context.putImageData(pixels, 0, 0);
+  if (mode === 'waiting' && identifiers.length < 8) refill();
 }
-function animate(now) {
-  frame = 0;
-  if (mode === 'waiting') {
-    if (now - lastDraw >= 1000 / 30) { noise(); lastDraw = now; }
-  } else if (mode === 'reveal') {
-    const progress = Math.min(1, (now - revealAt) / 2600);
-    key(progress);
-    if (progress === 1) { mode = 'hidden'; overlay.hidden = true; return; }
-  } else return;
-  frame = requestAnimationFrame(animate);
+function showNext() {
+  if (!ready.length || performance.now() - lastShown < (reduced ? 1500 : 120)) return;
+  // FIFO, exactly like aleph: consume each frame, never cycle the loaded pool.
+  const image = ready.shift();
+  image.className = 'loading-picture'; image.alt = ''; image.setAttribute('aria-hidden', 'true');
+  picture.replaceWith(image); picture = image; lastShown = performance.now();
+}
+function cycle() {
+  showNext(); preload(); timer = setTimeout(cycle, reduced ? 1500 : 60);
+}
+function stopImages() {
+  clearTimeout(timer); searchController?.abort(); ready.length = 0;
+}
+export async function finishLoading() {
+  mode = 'white'; stopImages();
+  overlay.hidden = false; overlay.classList.add('white');
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  overlay.classList.add('blank');
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Keep white until the caller has actually rendered the first video frame.
 }
 export function setWaiting(value) {
-  if (value && mode === 'waiting' || !value && mode !== 'waiting') return;
-  if (frame) cancelAnimationFrame(frame);
+  if (mode === 'white') {
+    if (!value) {
+      mode = 'reveal';
+      reveal = overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 3000, easing: 'linear', fill: 'forwards' });
+      return reveal.finished.catch(() => {}).then(() => {
+        if (mode === 'reveal') { mode = 'hidden'; overlay.hidden = true; }
+        reveal.cancel(); reveal = null;
+      });
+    }
+    return;
+  }
+  if (value && mode === 'waiting' || !value && (mode === 'hidden' || mode === 'reveal')) return;
+  clearTimeout(timer);
   if (value) {
+    reveal?.cancel();
     mode = 'waiting'; overlay.hidden = false;
-    overlay.classList.remove('revealed'); overlay.setAttribute('aria-hidden', 'false');
-    noise(); lastDraw = performance.now();
-    if (!reduced) frame = requestAnimationFrame(animate);
+    overlay.classList.remove('white', 'blank'); overlay.setAttribute('aria-hidden', 'false');
+    cycle();
   } else {
-    overlay.classList.add('revealed'); overlay.setAttribute('aria-hidden', 'true');
-    if (reduced) { mode = 'hidden'; overlay.hidden = true; }
-    else { mode = 'reveal'; revealAt = performance.now(); frame = requestAnimationFrame(animate); }
+    mode = 'hidden'; stopImages(); overlay.hidden = true; overlay.setAttribute('aria-hidden', 'true');
   }
 }
-resize();
-addEventListener('resize', () => { resize(); if (mode === 'waiting') noise(); });
+try { addLoadingImages(JSON.parse(localStorage.getItem(cacheKey) || '[]')); } catch {}
 setWaiting(true);
