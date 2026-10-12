@@ -291,7 +291,7 @@ async function pick(related) {
 async function download(c) {
   status(current ? "download successore" : "download primo video");
   const t = performance.now();
-  const r = await request(c.url, 90000);
+  const r = await request(c.url, 180000);
   if (!r.ok) throw Error(`download HTTP ${r.status}`);
   const reader = r.body.getReader();
   const chunks = [];
@@ -345,6 +345,21 @@ async function download(c) {
     check.load();
   }
   return c;
+}
+// A failed transfer is discarded before selecting another candidate.
+// There is never more than one successor download in flight.
+async function loadCandidate(related) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const c = await pick(related);
+    if (!c) return null;
+    try { return await download(c); }
+    catch (e) {
+      rejected.add(c.id);
+      state.lastDownloadError = {id:c.id, error:e.message};
+      render();
+    }
+  }
+  return null;
 }
 function infer() {
   return new Promise((resolve, reject) => {
@@ -400,16 +415,13 @@ async function prepare() {
     if (specific.length) terms = specific;
     state.inferenceMs = Math.round(result.ms);
     render();
-    let c = terms.length ? await pick(true) : null;
-    if (!c) {
-      state.fallback = "ricerca correlata senza candidato verificato";
-      c = await pick(false);
-    } else {
-      state.fallback = null;
-    }
-    if (!c) throw Error("nessun video nuovo disponibile");
-    match = c.match;
-    next = await download(c);
+    next = terms.length ? await loadCandidate(true) : null;
+    if (!next) {
+      state.fallback = "ricerca correlata senza candidato utilizzabile";
+      next = await loadCandidate(false);
+    } else { state.fallback = null; }
+    if (!next) throw Error("nessun video nuovo disponibile");
+    match = next.match;
     status("successore pronto");
     maybeSwitch();
   } catch (e) {
@@ -494,9 +506,9 @@ document.addEventListener("pointerdown", () => {
 });
 try {
   status("ricerca casuale");
-  const first = await pick(false);
+  const first = await loadCandidate(false);
   if (!first) throw Error("nessun primo video leggero");
-  await activate(await download(first));
+  await activate(first);
 } catch (e) {
   status("avvio sospeso: " + e.message);
   state.error = e.message;

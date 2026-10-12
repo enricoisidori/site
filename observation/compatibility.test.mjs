@@ -27,3 +27,11 @@ test('metadata validation matches whole words and excludes unrelated text',()=>{
  const c=context({getItem:()=>null});
  new Script(init+'\nterms=["boat"];if(!score({title:"A boat on a lake"}).total)throw Error("missing match");if(score({title:"boathouse"}).total)throw Error("false match");').runInContext(c);
 });
+test('failed downloads are discarded and retried sequentially',async()=>{
+ const c=context({getItem:()=>null});
+ new Script(init+`\nlet active=0,attempt=0;
+ pick=async()=>({id:'candidate-'+attempt});
+ download=async c=>{active++;if(active!==1)throw Error('parallel download');await Promise.resolve();active--;attempt++;if(attempt<3)throw Error('timeout');return c;};
+ globalThis.result=loadCandidate(true).then(c=>{if(c.id!=='candidate-2'||rejected.size!==2||active!==0)throw Error('bad recovery');});`).runInContext(c);
+ await c.result;
+});
