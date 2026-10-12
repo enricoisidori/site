@@ -1,41 +1,31 @@
 # observation
 
-Pagina statica autonoma: `index.html` contiene codice applicativo e sorgente del worker. Non richiede chiavi, account o backend.
+Pagina statica autonoma: aprire `index.html`, usare Live Server / `serve`, oppure il link GitHub Pages. Non richiede build per l’uso, chiavi, account o backend. Lo stesso HTML contiene applicazione e worker; non usa percorsi assoluti verso file locali. La modalità `file://` è predisposta ma non verificata dal browser automatico, che permette solo HTTP/HTTPS. Serve Internet per Archive, libreria e primo download dei pesi del modello.
 
-- Senza server: aprire `index.html` direttamente nel browser (doppio click).
-- Con server locale: dalla radice del repository eseguire `python3 -m http.server 8765`, poi aprire http://localhost:8765/observation/. È compatibile anche con `serve` e altri server statici.
-- GitHub Pages: pubblicare `observation/index.html`; funziona anche sotto un prefisso come `/site/observation/`. Nel repository attuale il workflow Pages pubblica i file tracciati su `main`.
+`I` mostra video → descrizione → keyword → query → nuovo video, con parole riscontrate evidenziate nel titolo, nei soggetti o nella descrizione. Ogni tempo specifica quale operazione e quale candidato misura; 1000 ms = 1 secondo. La dimensione in MiB è il totale dichiarato nei metadati, non i byte già trasferiti. `W` mostra solo parole bianche centrate. Entrambi spenti di default. Audio muto per autoplay; un click riprende se il browser lo sospende.
 
-Serve comunque una connessione Internet per video, ricerca e primo download del modello. “Senza server” non significa offline. I browser possono applicare restrizioni diverse alle pagine `file://`; l’apertura diretta non è verificabile dal browser automatico di Codex, che consente solo HTTP/HTTPS.
+## Catena e caricamento
 
-Per modificare: editare `app.js`, `vision-worker.js` o `index.template.html`, poi eseguire `python3 observation/build.py` dalla radice. Il file generato `index.html` è già pronto: non serve eseguire build per usarlo o pubblicarlo. Verifica di regressione: `node --test observation/compatibility.test.mjs`.
+- Primo item casuale da una ricerca live, preferibilmente runtime di un minuto. Nessun catalogo, video introduttivo o lista precostituita. La casualità campiona i primi 24 risultati e non è uniforme su tutto Archive.
+- MP4 massimo **6 MiB**, preferendo bitrate inferiore. Streaming `/cors/`: il primo video parte appena decodificabile; un solo successore viene preparato con almeno due secondi di buffer. Il browser può limitare il precaricamento: dopo 20 secondi si accetta almeno un secondo disponibile, altrimenti si scarta il file.
+- Durante la riproduzione ViT–GPT2 q8 descrive un fotogramma in un worker WASM sul dispositivo. I pesi vengono scaricati al primo uso, senza bloccare il primo video. I fotogrammi non sono inviati a un servizio.
+- Parole estratte dalla caption, ricerca AND poi OR in titolo/soggetti/descrizione. La ricerca filtra item piccoli; verifica fino a quattro schede per query e si ferma al primo candidato adatto. Priorità: copertura delle parole, titolo, soggetti, descrizione. Verifica nuovamente i metadati effettivi prima di aprire il video.
+- Cambio a circa 60 secondi di riproduzione, oppure alla fine dei video più brevi, quando il successore è pronto. Nessun loop, nessuna riserva parallela. Se il successore tarda, il caricamento resta visibile su nero. Nuovo casuale solo dopo l’esaurimento della ricerca correlata. Candidati falliti rilasciati prima di riprovare in sequenza; errori persistenti ritentati dopo 15 secondi.
+- Identificatori già riprodotti esclusi nella stessa sessione della scheda, anche dopo reload. Copie sotto identificatori diversi non riconosciute.
 
-Schermo nero, video a tutto viewport con proporzioni originali, audio muto per consentire autoplay. `I` mostra diagnostica; `W` parole bianche centrate, senza animazione. Entrambi spenti al caricamento. Un click riprende il video se il browser blocca autoplay. Gli errori di avvio ora compaiono sul nero; un click riprova ricaricando la pagina. Il fullscreen nativo del sistema richiede un gesto dell’utente; il layout riempie comunque la finestra.
+La corrispondenza nei metadati prova un legame testuale, non l’identità visiva: caption errate e legami metaforici restano possibili. Non è un filtro sui contenuti. Streaming e un solo successore non garantiscono assenza di pause su host lenti.
 
-## Catena
+## Misure e confronto con PLAYPLAYPLAYPLAY
 
-1. Ricerca casuale online di un item, preferendo runtime intorno a un minuto; nessuna lista iniziale o file video incluso nel sito.
-2. Sceglie un MP4 fino a 18 MiB dai metadati; preferisce file da 40–90 secondi e poi la dimensione minore. Scarica completamente con `/cors/`.
-3. Dopo quattro secondi di riproduzione acquisisce un fotogramma. ViT–GPT2 q8, in un worker WASM locale, genera una descrizione libera. Il primo uso scarica libreria e pesi da jsDelivr/Hugging Face e può superare un minuto. Le visite successive usano la cache del browser.
-4. Estrae parole, cerca solo nei campi titolo/descrizione/soggetti, cerca prima la compresenza delle parole (AND), poi allarga a OR solo se non trova candidati verificati. Verifica massimo venti risultati per ricerca in sequenza; privilegia il numero di parole riscontrate e poi pesa titolo 100, soggetti 10, descrizione 1. Esclude parole di posizione e colori generici. Scarica un solo successore verificato. Non scarica candidati alternativi in parallelo.
-5. Passa al successore a 60 secondi effettivi del video, oppure alla fine di un video più breve, soltanto quando pronto. Se finisce prima resta nero durante l’attesa, senza loop. Se la ricerca correlata non produce un candidato verificato tenta un nuovo casuale. Un trasferimento fallito viene scartato prima di cercare un altro candidato, con massimo tre tentativi sequenziali e 180 secondi per trasferimento. La ricerca casuale viene usata solo dopo l’esaurimento dei candidati correlati utilizzabili. Errori persistenti di rete o del modello sospendono la catena, senza inventare parole.
+Il [codice del riferimento](https://github.com/jacoponatoli/PLAYPLAYPLAYPLAY/blob/main/index.html) usa MP4 diretti, segmenti brevi e una coda di più video precaricati. Qui si mantiene lo streaming ma con un solo successore, rispettando il vincolo; non vengono copiate chiavi o servizi del riferimento.
 
-Le richieste HTTP fallite vengono riprovate fino a tre volte sullo stesso URL, in sequenza. La scelta casuale campiona entro le prime 300 pagine della ricerca, quindi non è uniforme su tutto Internet Archive.
+`measure.html` è una pagina separata di misura, non una playlist usata dall’app. Prova Chrome del 12 ottobre 2026, stessi file, streaming prima del download completo (possibili effetti cache/host):
 
-Gli item riprodotti sono esclusi tramite sessionStorage (persistente ai reload nella stessa scheda). Nessuna esclusione globale tra schede o dopo la chiusura della sessione. L’identificatore impedisce la ripetizione dello stesso item; duplicati caricati su Archive con identificatori diversi possono ancora apparire.
+| File | Totale file | Metadati | Primo frame streaming | Download completo |
+| --- | ---: | ---: | ---: | ---: |
+| Tempe Town Lake PSA | 6.260.842 byte | 2.838 ms | 2.084 ms | 6.651 ms |
+| TikTok 7605755333562158349 | 1.423.804 byte | 6.288 ms | 6.831 ms | 5.669 ms |
 
-I fotogrammi restano sul dispositivo. Solo le parole di ricerca arrivano a Internet Archive. Il modello può descrivere male fotogrammi scuri o astratti: la verifica nei metadati prova la relazione testuale, non garantisce identità visiva del contenuto. Non è un filtro sui contenuti.
+Entrambi riproducibili, fotogrammi leggibili dal canvas. Una terza richiesta metadati è scaduta dopo 15 s. Nel file da 6 MB lo streaming ha anticipato l’avvio; nel piccolo la latenza del server ha prevalso. La dimensione da sola non predice la velocità. Decisione: streaming, limite ridotto da 18 a 6 MiB e filtro anticipato degli item, evitando l’attesa obbligatoria di tutto il download. Il primo avvio reale precedente alla semplificazione della query ha richiesto 68,24 s: resta un problema di latenza Archive, non va nascosto nelle misure del solo primo frame.
 
-## Misure Chrome, 10 ottobre 2026
-
-`probe.html` ripete ricerca, metadata, avvio streaming e download completo sullo stesso file pubblico. È uno strumento di misura separato dalla pagina, non una playlist.
-
-- Ricerca: 2067 ms iniziali; 252–306 ms nelle ripetizioni.
-- Metadati: 362–377 ms.
-- File `tsunami_koh_lanta_thailand_512kb.mp4`: 61,24 secondi, 4.470.926 byte.
-- `/download/`: streaming fallito e fetch bloccata dai CORS del redirect.
-- `/cors/`: streaming in 548 ms; download completo in 2380 ms (dopo avvio streaming, quindi misura potenzialmente influenzata dalla cache); riproduzione del blob riuscita.
-
-Decisione: download completo con limite 18 MiB. Offre un confine chiaro di prontezza e fotogrammi leggibili; streaming parte più rapidamente ma non garantisce la disponibilità dell’intero minuto. Queste misure riguardano una connessione e un file, non sono una previsione per tutto Archive.
-
-Modello e pipeline: https://huggingface.co/docs/transformers.js/v2.17.2/en/api/pipelines#module_pipelines.ImageToTextPipeline
+Per modificare i sorgenti: `python3 observation/build.py`. Verifica: `node --test observation/compatibility.test.mjs`. Non serve nessun comando a chi apre la pagina già generata. Vedi `VERIFICA.md` per prove e limiti storici.

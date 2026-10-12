@@ -23,6 +23,10 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+      visibility: hidden;
+    }
+    video.active {
+      visibility: visible;
     }
     #loading {
       background: #000;
@@ -59,6 +63,23 @@
       padding: 16px;
       white-space: pre-wrap;
     }
+    #info h2 {
+      font: bold 12px monospace;
+      margin: 20px 0 8px;
+    }
+    #info p {
+      margin: 8px 0;
+    }
+    #info ol,
+    #info ul {
+      padding-left: 20px;
+    }
+    #info li {
+      margin: 8px 0;
+    }
+    #info code {
+      overflow-wrap: anywhere;
+    }
     mark {
       background: #fff;
       color: #000;
@@ -67,8 +88,8 @@
       color: inherit;
     }
   </style>
-  <video muted playsinline></video>
-  <div id="loading">·</div>
+
+  <div id="loading" role="status">ricerca primo video…</div>
   <div id="words" hidden></div>
   <div id="info" hidden></div>
   <!-- OBSERVATION_SCRIPTS -->

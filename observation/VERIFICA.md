@@ -38,3 +38,11 @@ Verificati anche: I e W nascosti al caricamento; attivazione indipendente da tas
 - Il fallback casuale è implementato, ma non si è verificato nelle tre transizioni finali. Non è stato forzato artificialmente.
 - La casualità campiona un sottoinsieme paginato di Archive; non è uniforme sull’intera collezione.
 - Layout a tutto viewport; fullscreen nativo richiede il gesto/controllo del browser. Audio muto per autoplay.
+
+## Aggiornamento streaming — 12 ottobre 2026
+
+Prova Chrome live, nessun salto temporale: contatore `cambi riusciti: 4` letto nella pagina della revisione streaming. Uno dei passaggi osservati: “Dr. Dolly King, Department of Finance Chair, on Diverse Student Backgrounds” → caption “a man in a suit and tie is on a tv” → keyword `suit`, `tie` → query AND → “The Real Devil Is The One Who Wears A Suit And Tie”, entrambe le parole evidenziate nel titolo. Nessuna playlist iniziale e un solo successore.
+
+Questa esecuzione aveva buffer richiesto di 8 s: Chrome spesso limitava il precaricamento a pochi secondi, causando attese inutili fino al timeout di 20 s. La soglia è stata ridotta a 2 s. Nella prova successiva: “Community Redevelopment Housing Commission - 06/28/2017” → caption “a blue and white sign with a picture of a man on it” → `sign` → “White Haven sign install”, riscontro nel titolo. Successore preparato in 3903 ms, primo frame 2401 ms, 3,7 s di buffer, pronto prima della fine del primo video. Primo avvio totale ancora 45,27 s (ricerche 5,20 + 9,40 s, metadati 16,86 s, apertura video 13,80 s). La query iniziale finale elimina il passaggio su una pagina casuale vuota e mescola i primi 24 risultati live; non promette un tempo massimo di avvio.
+
+Misure streaming/download complete e limiti in README; `measure.html` ripete il confronto separatamente dall’app. Sei test di regressione passati. Modalità file diretto non testabile nell’automazione; primo caricamento modello con cache completamente vuota non misurato. La continuità resta dipendente da Archive e non è garantita per video molto brevi o host lenti. Il confronto testuale non verifica visivamente il successore.
