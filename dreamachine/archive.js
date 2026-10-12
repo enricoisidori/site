@@ -1,141 +1,105 @@
-import { MAX_VIDEO_BYTES, MIN_VIDEO_SECONDS } from './config.js';
-// A bounded archive, not YouTube's ranked recommendations.
-export const COLLECTIONS = '(collection:prelinger OR collection:home_movies OR collection:prelingerhomemovies)';
-const BASE = `mediatype:movies AND ${COLLECTIONS} AND NOT access-restricted-item:true`;
-export const randomInt = max => Math.floor(Math.random() * max);
-export const shuffle = values => {
+import { sanitizeTerms } from './terms.js';
+import { sourceScope, exclusionTerms } from './scope.js';
+export const SEARCH_LIMIT = 10000;
+export const SORTS = ['identifier asc', 'identifier desc', 'addeddate asc', 'addeddate desc'];
+export const pick = values => values[Math.floor(Math.random() * values.length)];
+export function shuffle(values) {
   const result = [...values];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = randomInt(i + 1);
-    [result[i], result[j]] = [result[j], result[i]];
-  }
+  for (let i = result.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [result[i], result[j]] = [result[j], result[i]]; }
   return result;
-};
-export function searchQuery(term = '', field = '') {
-  const safe = term.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 70);
-  if (!safe) return BASE;
-  const fields = ['title', 'description', 'subject'];
-  return BASE + ` AND (${(fields.includes(field) ? [field] : fields).map(key => `${key}:"${safe}"`).join(' OR ')})`;
 }
-export function searchPlan(terms, initial = false) {
-  if (initial) return [{ term: '', field: '' }];
-  return ['title', 'description', 'subject'].flatMap(field => [...new Set(terms)].map(term => ({ term, field })));
+export function queryFor(terms = []) {
+  const clauses = sanitizeTerms(terms).map(term => `title:"${term}"`);
+  const blocked = exclusionTerms.join(' OR ');
+  return `mediatype:movies${sourceScope ? ` AND ${sourceScope}` : ''}${clauses.length ? ` AND (${clauses.join(' OR ')})` : ''} AND NOT (${blocked}) AND NOT access-restricted-item:true AND format:(MPEG4 OR "h.264" OR "512Kb MPEG4")`;
 }
-export function metadataMatches(metadata, term) {
-  const needle = term.toLowerCase().trim();
-  if (!needle) return [];
-  const names = { title: 'Titolo', description: 'Descrizione', subject: 'Soggetti' };
-  const pattern = new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+')}\\b`, 'i');
-  return Object.entries(names).flatMap(([key, field]) => {
-    const raw = metadata?.[key];
-    const text = (Array.isArray(raw) ? raw.join(' · ') : String(raw || ''))
-      .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
-    const found = pattern.exec(text);
-    if (!found) return [];
-    const index = found.index;
-    const start = Math.max(0, index - 80);
-    return [{ field, key, keyword: found[0], before: text.slice(start, index), after: text.slice(index + found[0].length, index + found[0].length + 100), excerpt: text.slice(start, index + found[0].length + 100) }];
-  });
-}
-// Official public endpoints work on static hosts, including GitHub Pages.
-export function archiveSearchURL(params) {
-  const query = new URLSearchParams(params);
-  const relevance = query.get('sort') === 'relevance';
-  query.delete('sort');
-  query.set('output', 'json');
-  query.set('fl[]', 'identifier');
-  if (!relevance) query.set('sort[]', 'identifier asc');
-  return `https://archive.org/advancedsearch.php?${query}`;
-}
-export function archiveMediaURL(identifier, filename) {
-  // /download redirects to storage nodes without CORS headers. /cors is
-  // Archive's own endpoint for fetching media from another website.
-  return `https://archive.org/cors/${encodeURIComponent(identifier)}/${filename.split('/').map(encodeURIComponent).join('/')}`;
+export function searchURL(query, rows, page, sort) {
+  const p = new URLSearchParams({ q: query, rows, page, output: 'json' });
+  p.append('fl[]', 'identifier'); p.append('fl[]', 'title');
+  if (sort) p.append('sort[]', sort);
+  return `https://archive.org/advancedsearch.php?${p}`;
 }
 async function json(url, signal) {
-  const response = await fetch(url, { signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(18000)]) : AbortSignal.timeout(18000) });
-  if (!response.ok) throw new Error(`Archive HTTP ${response.status}`);
-  return response.json();
+  const response = await fetch(url, { signal: AbortSignal.any([signal || new AbortController().signal, AbortSignal.timeout(10000)]) });
+  if (!response.ok) throw new Error(`archive http ${response.status}`);
+  const data = await response.json();
+  if (data.error) throw new Error(String(data.error));
+  return data;
 }
-export async function candidates(term = '', field = '', whole = false, signal) {
-  const params = new URLSearchParams({ q: whole ? `mediatype:movies AND NOT access-restricted-item:true AND identifier:${'abcdefghijklmnopqrstuvwxyz0123456789'[randomInt(36)]}*` : searchQuery(term, field), rows: '1', page: '1' });
-  const first = await json(archiveSearchURL(params), signal);
-  const total = first.response?.numFound || 0;
-  if (!total) return [];
-  // Random page, then shuffle within it. The incomplete last page is weighted
-  // by selecting a random item offset, rather than a uniformly random page.
-  const page = Math.floor(randomInt(whole ? Math.min(total, 10000) : total) / 20) + 1;
-  params.set('rows', '20');
-  params.set('page', String(page));
-  const result = await json(archiveSearchURL(params), signal);
-  return shuffle(result.response?.docs || []);
+const totals = new Map();
+const countRequests = new Map();
+export function randomPage(total, random = Math.random) {
+  return Math.floor(Math.floor(random() * Math.min(total, SEARCH_LIMIT)) / 50) + 1;
 }
-export function playableFiles(files) {
-  return files.filter(f => /\.mp4$/i.test(f.name) && !f.private && Number(f.size) > 10000
-    && Number(f.size) <= MAX_VIDEO_BYTES
-    && (!Number(f.length) || Number(f.length) >= MIN_VIDEO_SECONDS))
-    .sort((a, b) => {
-      const rank = f => /512kb/i.test(f.name) ? 0 : /h\.264/i.test(f.format || '') ? 1 : 2;
-      return rank(a) - rank(b) || Number(a.size) - Number(b.size);
-    });
+export async function search(terms, signal) {
+  const query = queryFor(terms);
+  // The global movie index already exceeds 10k. Its first search needs only
+  // one request. Keyword queries first obtain their true count, cached below.
+  let total = totals.get(query);
+  if (total == null && !terms.length) total = SEARCH_LIMIT;
+  if (total == null) {
+    if (!countRequests.has(query)) countRequests.set(query, json(searchURL(query, 1, 1), signal).then(d => {
+      const count = d.response?.numFound || 0; totals.set(query, count); return count;
+    }).finally(() => countRequests.delete(query)));
+    total = await countRequests.get(query);
+  }
+  if (!total) return { query, total, items: [] };
+  const page = randomPage(total), sort = pick(SORTS);
+  const d = await json(searchURL(query, 50, page, sort), signal);
+  const actualTotal = d.response?.numFound || 0;
+  totals.set(query, actualTotal);
+  if (totals.size > 128) totals.delete(totals.keys().next().value);
+  return { query, total: actualTotal, page, sort, items: shuffle(d.response?.docs || []) };
 }
-export async function resolveItem(item, signal) {
-  const metadata = await json(`https://archive.org/metadata/${encodeURIComponent(item.identifier)}`, signal);
-  if (metadata.is_dark || metadata.metadata?.['access-restricted-item'] === 'true') return null;
-  const files = playableFiles(metadata.files || []);
-  if (!files.length) return null;
+export function durationSeconds(value) {
+  if (typeof value === 'string' && value.includes(':')) return value.split(':').reduce((seconds, part) => seconds * 60 + Number(part), 0);
+  return Number(value) || 0;
+}
+export function streamableFiles(files) {
+  return files.filter(f => {
+    const duration = durationSeconds(f.length), size = Number(f.size), height = Number(f.height);
+    if (!/\.mp4$/i.test(f.name || '') || f.private || size <= 10000) return false;
+    if (height > 720) return false;
+    const bitrate = duration ? size * 8 / duration : 0;
+    return /512Kb MPEG4/i.test(f.format || '') || bitrate > 0 && bitrate <= 1000000
+      || !bitrate && height > 0 && height <= 480 && f.source === 'derivative';
+  }).sort((a, b) => {
+    const rank = f => Number(!/512Kb MPEG4/i.test(f.format || '')) * 10000000
+      + Math.abs((Number(f.height) || 240) - 240) * 10000
+      + (Number(f.size) * 8 / durationSeconds(f.length) || 1000000);
+    return rank(a) - rank(b);
+  });
+}
+const text = value => (Array.isArray(value) ? value.join(' · ') : String(value || '')).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+export function metadataMatches(metadata, terms) {
+  const words = sanitizeTerms(terms);
+  return ['title'].flatMap(field => {
+    const value = text(metadata[field]);
+    const matches = words.filter(term => new RegExp(`\\b${term}\\b`, 'i').test(value));
+    return matches.length ? [{ field, text: value, terms: matches }] : [];
+  });
+}
+export async function resolveItem(item, terms, signal) {
+  const d = await json(`https://archive.org/metadata/${encodeURIComponent(item.identifier)}`, signal);
+  const md = d.metadata || {};
+  if (d.is_dark || md['access-restricted-item'] === 'true') return null;
+  const matches = metadataMatches(md, terms);
+  if (terms.length && !matches.length) return null;
+  const f = streamableFiles(d.files || [])[0];
+  if (!f) return null;
   return {
-    id: item.identifier, title: metadata.metadata?.title || item.identifier,
-    searchMetadata: Object.fromEntries(['title', 'subject', 'description'].map(key => [key, metadata.metadata?.[key]])),
+    id: item.identifier, title: text(md.title) || item.identifier,
+    subject: text(md.subject), matches, filename: f.name, original: f.original,
+    collection: text(md.collection), creator: text(md.creator), contributor: text(md.contributor),
+    uploader: text(md.uploader), date: text(md.date || md.year), language: text(md.language),
+    description: text(md.description).slice(0, 420), identifier: item.identifier,
+    frames: (d.files || []).flatMap(file => {
+      const m = file.name?.match(/\.thumbs\/([^/]+)_(\d{6})\.jpg$/i);
+      return m ? [{ name: file.name, stem: m[1], time: Number(m[2]) }] : [];
+    }),
+    streamURL: `https://archive.org/download/${encodeURIComponent(item.identifier)}/${f.name.split('/').map(encodeURIComponent).join('/')}`,
+    bytes: Number(f.size), duration: durationSeconds(f.length) || null,
+    license: text(md.licenseurl || md.rights),
     source: `https://archive.org/details/${encodeURIComponent(item.identifier)}`,
-    license: metadata.metadata?.licenseurl || metadata.metadata?.rights || null,
-    bytes: Number(files[0].size),
-    urls: files.slice(0, 2).map(f => archiveMediaURL(item.identifier, f.name)),
   };
-}
-
-export function videoTerms(predictions) {
-  const terms = [];
-  for (const prediction of predictions.filter(p => p.score >= .06).slice(0, 3)) {
-    const labels = prediction.label.toLowerCase().split(',').map(s => s.trim());
-    terms.push(labels[0]);
-    if (/cash machine|cash dispenser|teller machine/.test(prediction.label.toLowerCase())) terms.push('atm');
-    if (/cellular|cellphone|mobile phone/.test(prediction.label.toLowerCase())) terms.push('telephone', 'phone');
-  }
-  return [...new Set(terms)].slice(0, 6);
-}
-export function videoQuery(term) {
-  const safe = term.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 70);
-  return `mediatype:movies AND NOT access-restricted-item:true AND (title:"${safe}" OR description:"${safe}" OR subject:"${safe}")`;
-}
-export async function videoCandidates(term, signal, page = 1) {
-  const params = new URLSearchParams({ q: videoQuery(term), rows: '20', page: String(page), sort: 'relevance' });
-  const result = await json(archiveSearchURL(params), signal);
-  return { items: result.response?.docs || [], total: result.response?.numFound || 0 };
-}
-
-// ImageNet's precise object names often have little overlap with archive tags.
-// Broaden known objects, retaining literal words as alternative searches.
-export function searchTerms(predictions) {
-  const families = [
-    [/car|cab|truck|bus|jeep|limousine|racer|ambulance|minivan|wagon|tractor/, 'automobile'],
-    [/ship|boat|canoe|liner|gondola|schooner|yawl/, 'boat'],
-    [/plane|airliner|wing|parachute/, 'airplane'],
-    [/train|locomotive|streetcar/, 'train'],
-    [/dog|retriever|terrier|hound|poodle|shepherd/, 'dog'],
-    [/bird|finch|eagle|owl|parrot|robin/, 'bird'],
-    [/beach|sandbar|seashore|ocean/, 'beach'],
-    [/mountain|alp|volcano|valley/, 'mountain'],
-    [/forest|tree|wood|park/, 'forest'],
-    [/building|palace|church|monastery|tower|castle/, 'architecture'],
-  ];
-  const terms = [];
-  const broad = [];
-  for (const prediction of predictions.filter(p => p.score >= .06)) {
-    const labels = prediction.label.toLowerCase().split(',').map(s => s.trim());
-    terms.push(...labels);
-    const family = families.find(([pattern]) => pattern.test(labels[0]));
-    if (family) broad.push(family[1]);
-  }
-  return [...new Set([...terms, ...broad])].slice(0, 16);
 }

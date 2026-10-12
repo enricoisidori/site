@@ -18,7 +18,7 @@ export function setupWords(state) {
     if (!enabled || !state.analysis || lastAnalysis === state.analysis) return;
     lastAnalysis = state.analysis;
     clear();
-    const labels = [...new Set(state.predictions.filter(p => p.score >= .06).slice(0, 3)
+    const labels = [...new Set(state.predictions.filter(p => (p.score == null || p.score >= .06)).slice(0, 3)
       .map(p => p.label.split(',')[0]))];
     labels.forEach((label, index) => {
       const line = document.createElement('div');

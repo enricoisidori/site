@@ -1,4 +1,4 @@
-import { shuffle, metadataMatches } from './archive.js';
+import { shuffle, metadataMatches } from './archive.js?v=runtime-51';
 const API = 'https://commons.wikimedia.org/w/api.php';
 function plain(value) {
   const text = String(value || '');

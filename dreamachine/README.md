@@ -1,117 +1,29 @@
-# Spiral
+# dreamachine
 
-Due pagine indipendenti, stessa idea: il contenuto corrente genera le keyword per
-scegliere quello successivo. Schermo pieno, nessun controllo visibile di default.
+Versione gemella di afterimage: usa soltanto Prelinger, Open Source Movies e Community Video, con esclusioni aggiuntive per materiali industriali, educativi e aziendali. Gli uploader personali sono configurabili nell'array `individualUploaders` di `scope.js` solo dopo averne verificato l'identificativo Archive.
 
-- Video Internet Archive: `index.html` (alias `idex.html`).
-- Immagini Wikimedia Commons: `commons.html`.
+La v2 richiesta dall'utente è conservata in `../relay-backups/relay-v2-20261012-190105.zip`, con manifest SHA-256 affiancato. Contiene anche ricerca limitata al titolo e noise disattivato, così come erano prima delle modifiche successive.
 
-## Avvio
+## comportamento attuale
 
-Dal repository: `python3 spiral/server.py`.
+- Solo Internet Archive, streaming nativo. La sorgente è limitata a Prelinger, Open Source Movies e Community Video; il filtro esclude inoltre trailer, spot, videogame, news, podcast, commerciali, pubblicità, TikTok, compilation, tutorial, materiale industriale, educativo, sponsorizzato, didattico e aziendale. Finestra fino a 10.000 risultati per query, senza ordinamento per popolarità.
+- Il modello locale ViT–GPT2 q8 produce una descrizione. Prima le keyword venivano estratte escludendo molte parole generiche (anche `man`, `woman`, `people`, `person`) e la scelta era casuale: questo favoriva gli oggetti.
+- Ora le parole relative alle persone sono ammesse. Le keyword sono ordinate da una piccola euristica locale: penalità per parole molto generiche/comuni, preferenza per espressioni composte e parole più specifiche. Professioni e ruoli non vengono penalizzati in quanto persone. Non è una misura reale della frequenza linguistica: non si aggiungono modelli, richieste di rete o inferenze.
+- Si cerca prima la keyword con punteggio maggiore, poi le altre se una query non dà risultati. La keyword deve comparire nel **titolo come parola intera**; viene evidenziata nel pannello.
+- Nessuna durata minima del video sorgente, salvo durata nulla/non riproducibile. Il successore della query viene promosso appena pronto. A 30 s il video passa normalmente alla riserva; l'unica estensione possibile è fino a 60 s, solo se lo stream attivo ne dispone e nessun successore della query è pronto. Poi usa una riserva casuale; senza riserve resta il noise. Nessun loop.
+- I candidati della query hanno priorità sia nell'assegnazione dei lettori liberi sia nella coda dei preparatori media. Le due riserve generali restano disponibili come fallback. Anche il clic preferisce un candidato della query già pronto, poi un casuale.
+- Noise iniziale più fine (fino a 960 px di larghezza), aggiornato a 30 fps e senza testo. Alla partenza, la luminanza del noise congelato determina l'alpha: i pixel scuri diventano trasparenti prima di quelli chiari, rivelando il video in circa 2,6 s. È una maschera luma sul noise, non una lettura del video tramite canvas; funziona anche con stream protetti da CORS. Il favicon diventa il fotogramma usato dal modello. Helvetica minuscola e rispetto del movimento ridotto.
 
-Apri http://127.0.0.1:8080/ per i video oppure
-http://127.0.0.1:8080/commons.html per le immagini.
+## avvio e controlli
 
-Mac: doppio clic su `Avvia Spiral.command`; Windows: `Avvia Spiral.bat`.
-Servono Python 3.10+ e Internet, senza pacchetti aggiuntivi o chiavi API.
-Il launcher apre la pagina video; la variante immagini è all'indirizzo sopra.
-Tieni aperto il terminale; Ctrl+C ferma il server. `--port 8090` cambia porta,
-`--open` apre il browser. Non aprire direttamente l'HTML come file://.
+Da `site/dreamachine`: `python3 -m http.server 8091 --bind 127.0.0.1`, poi http://127.0.0.1:8091/. Compatibile con hosting statico HTTPS. Nessuna chiave API.
 
-## Tastiera
+`i` informazioni e fonte; `m` audio; `f` fullscreen; `c` alterna fit/fill; clic per un altro lettore già pronto. Il clic non avvia download o nuove schede e resta inattivo se la coda è vuota.
 
-- **I**: pannello diagnostico, nascosto di default. Oggetti → query → contenuto,
-  esito del collegamento, parola evidenziata nel campo realmente corrispondente,
-  tentativi, query in corso, modello, fonte, licenza, titolo e file.
-- **W**: solo parole riconosciute, nascosto di default. Helvetica bianco 20 pt,
-  interlinea 108%, zero animazioni. Appaiono istantaneamente; scompaiono una alla
-  volta dopo circa 4,8 / 5,7 / 6,6 secondi. Nuove parole a ogni nuova analisi.
-- I e W si escludono a vicenda. Il clic sul contenuto richiede il fullscreen.
-- Video: il clic abilita anche l'audio; M alterna l'audio. Esc esce dal fullscreen.
+Il modello richiede circa 247 MB al primo download, poi può usare la cache del browser. Le inferenze avvengono sul dispositivo. Per gli stream non leggibili da canvas si cerca una scena `.thumbs` dello stesso file e del tempo più vicino; il pannello dichiara questa approssimazione. La disponibilità della rete resta necessaria per Archive.
 
-## Catena verificata
+## verifica
 
-1. Solo il primo contenuto è casuale.
-2. MobileViT Small q8, via Transformers.js/WASM in un Worker, riconosce un
-   fotogramma del video oppure l'intera immagine Commons. I pixel restano locali.
-3. Usa le etichette con score almeno 6%, i loro sinonimi e alcune famiglie più
-   ampie. Fino a 16 keyword per analisi. Non sono descrizioni certe dell'immagine.
-4. Prova tutte le keyword **nel titolo**, poi **nella descrizione**, poi **nei
-   soggetti/categorie**. Le query composte sono frasi, non OR tra parole.
-5. Prima di caricare un candidato verifica la keyword come parola/frase completa
-   nel campo richiesto. Un risultato del motore senza prova letterale è scartato.
-6. Solo un candidato con corrispondenza verificata e caricamento riuscito sostituisce
-   il corrente. Il pannello conserva la query che l'ha scelto, anche durante la
-   ricerca successiva, ed evidenzia il testo con `<mark>` senza markup remoto.
-7. Se non trova una corrispondenza, il corrente continua: nessun ripiego casuale.
-   Riprova dopo una pausa. I video analizzano nuovi fotogrammi e accumulano fino a
-   24 keyword con la loro provenienza; le immagini riutilizzano la stessa immagine.
+Su richiesta dell'utente, **nessuna prova eseguita dopo queste ultime modifiche**. Le verifiche documentate in VERIFICA.md si riferiscono alle versioni precedenti. I vecchi test temporali del browser descrivono ancora il comportamento v2 (minimo 30 / massimo 60) e devono essere aggiornati prima di essere usati per questa versione.
 
-La scelta tra i risultati della ricerca resta casuale. Si campiona una pagina per
-query, con fino a 20 candidati e ultimi 40 contenuti esclusi: non è una scansione
-esaustiva del catalogo. Un match testuale verificato non garantisce equivalenza
-semantica (washer può essere una rondella o una lavatrice). Nei video non prova
-che l'oggetto sia visibile proprio al punto casuale riprodotto. Nessun catalogo
-può garantire che ogni keyword produca una successione infinita di risultati.
-
-## Video / Internet Archive
-
-Collezioni: prelinger, home_movies, prelingerhomemovies. Advanced Search seleziona
-identificatori; Metadata API risolve MP4 e metadati. Priorità alle derivate 512 kbps.
-Scarta file privati/limitati, video sotto 4 secondi e file oltre 80 MiB: parametri in
-`config.js`. Ogni MP4 è scaricato interamente in un Blob prima del cambio. Due
-lettori: il corrente continua in loop durante inferenza e download. Il taglio
-avviene dopo almeno 12–20 secondi e un fotogramma decodificato del nuovo video.
-Solo allora libera il vecchio file. I corti partono dall'inizio; i lunghi lasciano
-almeno 30 secondi dopo il punto casuale. Il primo avvio attende un download completo.
-
-Il server Python inoltra JSON e MP4 da Archive e preserva Range/Content-Range;
-serve perché i video verificati non espongono CORS per il canvas. Ascolta soltanto
-su loopback. GitHub Pages da solo non basta per la variante video. Il server è
-un prototipo locale, non un servizio pronto all'esposizione pubblica.
-
-## Immagini / Wikimedia Commons
-
-Pagina separata: `commons.html`; logica in `commons.js` e `commons-api.js`.
-MediaWiki Action API: generator=random per il seme iniziale, generator=search nel
-namespace File con filetype:bitmap per i successivi; imageinfo/extmetadata per
-miniature, descrizioni, categorie, autore e licenza. Mostra JPEG, PNG, WebP e GIF,
-esclude video/SVG. Richieste dirette con origin=* e immagini crossOrigin=anonymous;
-CORS verificato sulle miniature pubbliche. Nessuna modifica al proxy Archive.
-
-L'immagine successiva è caricata e decodificata fuori schermo. La corrente resta
-visibile finché la nuova è pronta; almeno 8 secondi tra i cambi. Il modello può
-confondere gli oggetti e i metadati possono mancare o essere in altre lingue.
-Commons rende più pratico associare un'intera immagine ai suoi metadati; non è
-una garanzia di riconoscimento corretto. Fonte, autore e licenza nel pannello I.
-
-## Diagnostica e verifica
-
-`window.spiral` contiene stato, selezione verificata, ricerca in corso e cronologia
-(limitata a 200 contenuti, solo in memoria). Ultimo errore azzerato a ogni cambio
-riuscito. I file multimediali non vengono salvati su disco.
-
-```sh
-node --experimental-default-type=module --test spiral/archive.test.mjs spiral/commons-api.test.mjs
-python3 -m py_compile spiral/server.py
-```
-
-Diagramma: `processo.html` / `processo-spirale.svg` (schema video).
-Licenze variabili per singolo contenuto, leggibili attraverso le fonti.
-
-## Fonti
-
-- https://archive.org/developers/
-- https://huggingface.co/Xenova/mobilevit-small
-- https://github.com/huggingface/transformers.js
-- https://www.mediawiki.org/wiki/API:Imageinfo
-- https://commons.wikimedia.org/wiki/Commons:API/MediaWiki
-- https://commons.wikimedia.org/wiki/Help:Search
-
-
-## Hosting statico e video già visti
-
-Ricerca, metadati e MP4 usano gli endpoint ufficiali Archive (`advancedsearch.php`, `/metadata/`, `/cors/`): funzionano sia via HTTP in locale sia su GitHub Pages, senza relay. Pubblica l’intera cartella. In locale puoi usare il launcher o `python3 -m http.server`; l’apertura diretta `file://` richiede invece il launcher per i moduli e il worker.
-
-Gli identificatori incontrati vengono registrati in un insieme senza limite di 40/200 video, persistito in localStorage e condiviso tra Spiral e Dreamachine sullo stesso dominio. La lista informativa può restare limitata senza cancellare questa memoria. I risultati già visti vengono scartati e ricontrollati prima del taglio, comprese le riserve casuali. Anche ricaricando la pagina non vengono proposti di nuovo, finché non cancelli i dati del sito. Domini e dispositivi diversi hanno memorie separate; copie dello stesso film caricate su Archive con identificatori diversi non sono riconoscibili come duplicati da questo controllo. Se lo storage non è disponibile la memoria vale per la sessione corrente.
+La fixture locale in `tests/fixture.mp4` è usata soltanto dai test: estratto pubblico dominio di [Chevrolet Commercial](https://archive.org/details/chevrolet), mai caricato dal player normale. Cronologia tecnica in [REVERSE-ENGINEERING.md](./REVERSE-ENGINEERING.md).

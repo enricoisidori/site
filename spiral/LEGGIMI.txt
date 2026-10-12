@@ -10,8 +10,8 @@ Se Python manca, installalo da https://www.python.org/downloads/.
 Non servono pacchetti aggiuntivi, account o chiavi API.
 Questa è una cartella portatile, non un'app con Python incorporato.
 
-Il primo video deve essere scaricato prima di partire. Poi continua in loop
-finché il prossimo non è pronto. I = informazioni; M = audio; clic = fullscreen.
+All’avvio usa clip locali leggere. Poi prepara video correlati e riserve nuove
+in parallelo, senza loop. I = informazioni; W = parole; M = audio; clic = fullscreen.
 Per fermare il server: Ctrl+C nella finestra del terminale.
 
 Alternativa da terminale, dentro la cartella:

@@ -11,7 +11,7 @@ if (location.protocol === 'file:') {
   link.textContent = 'Apri Spiral se il server è già avviato →';
   status.append(command, document.createElement('br'), link);
 } else {
-  import(document.body.dataset.mode === 'commons' ? './commons.js' : './app.js').catch(error => {
+  import(document.body.dataset.mode === 'commons' ? './commons.js?v=runtime-51' : './app.js?v=runtime-51').catch(error => {
     console.error('[spiral] App loading failed', error);
     const status = document.querySelector('#status');
     status.hidden = false;

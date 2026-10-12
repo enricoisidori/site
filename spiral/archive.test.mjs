@@ -63,6 +63,7 @@ test('video query takes first relevance results and exposes the real total', asy
     assert.equal(result.items[0].identifier,'phone');
     const params = new URL(url,'http://local').searchParams;
     assert.equal(params.get('page'),'1');
+    assert.equal(params.get('rows'),'6');
     assert.equal(new URL(url).origin,'https://archive.org');
     assert.equal(new URL(url).pathname,'/advancedsearch.php');
     assert.equal(params.get('output'),'json');
@@ -123,4 +124,63 @@ test('drifting search can continue beyond the first results page', async () => {
     };
     await videoCandidates('phone', undefined, 4);
   } finally { globalThis.fetch = original; }
+});
+
+test('visual sign does not match signup boilerplate',()=>{
+ assert.deepEqual(metadataMatches({description:'You can sign up for weekly updates.'},'sign'),[]);
+ assert.equal(metadataMatches({description:'Sign up here. A road sign beside a tree.'},'sign')[0].before.endsWith('road '),true);
+});
+
+test('ignore promotional footer matches rather than imply a visual association',()=>{
+ assert.deepEqual(metadataMatches({description:'GRITtv brings participatory democracy onto your computer screen and into your living room.'},'computer screen'),[]);
+ assert.equal(metadataMatches({title:'Computer screen repair',description:'Follow us on YouTube.'},'computer screen')[0].key,'title');
+});
+
+test('one related search includes every detected keyword as alternatives',()=>{
+ const query=videoQuery(['street sign','sign','bicycle']);
+ assert.ok(query.includes('title:"street sign"'));
+ assert.ok(query.includes('description:"bicycle"'));
+ assert.ok(query.includes(' OR '));
+});
+
+test('plural objects still provide explicit keyword evidence in Archive metadata',()=>{
+ assert.equal(metadataMatches({title:'Cars on the road'},'car')[0].keyword,'Cars');
+ assert.equal(metadataMatches({title:'Three cities'},'city')[0].keyword,'cities');
+ assert.equal(metadataMatches({title:'Street signs'},'street sign')[0].keyword,'Street signs');
+ assert.equal(metadataMatches({title:'A train arriving'},'trains')[0].keyword,'train');
+ assert.deepEqual(metadataMatches({title:'Cellular biology'},'cell'),[]);
+});
+
+test('prefer long lightweight clips and reject dense or excessively short files',()=>{
+ const files=playableFiles([
+  {name:'short-hd.mp4',size:120000,length:1},
+  {name:'low.mp4',size:180000,length:60},
+  {name:'medium.mp4',size:150000,length:5},
+ ]);
+ assert.deepEqual(files.map(f=>f.name),['low.mp4','medium.mp4']);
+});
+
+
+test('scene frames use the right source file and nearest timestamp',async()=>{
+ const {archiveFrames,nearestFrame}=await import('./archive.js');
+ const frames=archiveFrames([
+  {name:'Movie.thumbs/Movie_000005.jpg'},
+  {name:'Movie.thumbs/Movie_000020.jpg'},
+  {name:'Movie.thumbs/Other_000019.jpg'},
+  {name:'__ia_thumb.jpg'},
+ ]);
+ assert.equal(frames.length,3);
+ assert.equal(nearestFrame(frames,'Movie_512kb.mp4',18).time,20);
+ assert.equal(nearestFrame(frames,'Unrelated.mp4',18),null);
+ assert.equal(nearestFrame(frames,'Movie_512kb.mp4',1).time,5);
+});
+test('primary keyword search targets titles and subjects, broad search includes descriptions',()=>{
+ assert.ok(!videoQuery('train',true).includes('description:'));
+ assert.ok(videoQuery('train').includes('description:'));
+});
+
+test('prefer scene frames of the selected derivative when explicitly available',async()=>{
+ const {archiveFrames,nearestFrame}=await import('./archive.js');
+ const frames=archiveFrames([{name:'Movie.thumbs/Movie_000020.jpg'},{name:'Movie.thumbs/Movie_512kb_000015.jpg'}]);
+ assert.equal(nearestFrame(frames,'Movie_512kb.mp4',20).time,15);
 });

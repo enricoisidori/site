@@ -23,3 +23,16 @@ test('unavailable or corrupted storage retains session exclusions', () => {
   const malformed = createSeenVideos({getItem:()=>'{bad',setItem(){}});
   malformed.add('b'); assert.equal(malformed.has('b'),true);
 });
+
+test('claim refuses a video already reserved by either player',async()=>{
+ const storage=memory(); const first=createSeenVideos(storage),second=createSeenVideos(storage);
+ assert.equal(await first.claim('clip'),true);
+ assert.equal(await second.claim('clip'),false);
+});
+
+test('identical media is rejected even under a different archive identifier',async()=>{
+ const seen=createSeenVideos(memory());
+ assert.equal(await seen.claim(['first-id','sha256:same-file']),true);
+ assert.equal(await seen.claim(['mirror-id','sha256:same-file']),false);
+ assert.equal(seen.has('mirror-id'),false);
+});

@@ -1,7 +1,7 @@
-import { commonsCandidates, commonsMatches } from './commons-api.js';
-import { searchPlan, searchTerms } from './archive.js';
-import { setupInfo } from './info.js';
-import { setupWords } from './words.js';
+import { commonsCandidates, commonsMatches } from './commons-api.js?v=runtime-51';
+import { searchPlan, searchTerms } from './archive.js?v=runtime-51';
+import { setupInfo } from './info.js?v=runtime-51';
+import { setupWords } from './words.js?v=runtime-51';
 
 const state = window.spiral = { kind: 'image', provider: 'Wikimedia Commons', phase: 'starting',
   current: null, predictions: [], history: [], vision: 'loading', query: '', lastError: null };
@@ -18,7 +18,7 @@ let worker;
 let requestId = 0;
 function report(error) { state.lastError = error.message || String(error); console.warn('[spiral commons]', state.lastError); }
 async function classify(data) {
-  worker ||= new Worker(new URL('./vision-worker.js', import.meta.url), { type: 'module' });
+  worker ||= new Worker(new URL('./vision-worker.js?v=runtime-51', import.meta.url), { type: 'module' });
   const target = worker;
   const id = ++requestId;
   return new Promise((resolve, reject) => {
@@ -31,7 +31,7 @@ async function classify(data) {
       } else { state.vision = 'ready'; resolve(value); }
     }
     const onMessage = ({ data }) => {
-      if (data.id === id) done(data.error ? new Error(data.error) : null, data.predictions);
+      if (data.id === id) { state.model = data.model; state.caption = data.caption; done(data.error ? new Error(data.error) : null, data.predictions); }
     };
     const onError = event => done(new Error(event.message || 'Vision worker error'));
     const timer = setTimeout(() => done(new Error('Vision timeout')), 120000);
@@ -110,7 +110,7 @@ async function recognize() {
   state.predictions = await classify({ pixels, width: canvas.width, height: canvas.height });
   state.analysis = analysis;
   const terms = searchTerms(state.predictions);
-  for (const term of terms) origins.set(term, { from: state.current.title, objects: state.predictions.filter(p => p.score >= .06) });
+  for (const term of terms) origins.set(term, { from: state.current.title, objects: state.predictions.filter(p => (p.score == null || p.score >= .06)) });
   return terms;
 }
 document.querySelector('main').addEventListener('click', () => document.documentElement.requestFullscreen?.().catch(report));

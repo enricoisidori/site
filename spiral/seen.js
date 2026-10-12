@@ -11,6 +11,18 @@ export function createSeenVideos(storage, key = 'spiral.archive.seen.v1') {
   sync();
   return {
     has(id) { sync(); return seen.has(id); },
+    async claim(id) {
+      const ids = Array.isArray(id) ? id : [id];
+      const claim = () => {
+        sync();
+        if (ids.some(value => seen.has(value))) return false;
+        ids.forEach(value => seen.add(value));
+        try { storage?.setItem(key, JSON.stringify([...seen])); } catch {}
+        return true;
+      };
+      // Serialize selection across tabs on HTTPS and localhost when available.
+      return globalThis.navigator?.locks ? navigator.locks.request(key, claim) : claim();
+    },
     add(id) {
       sync();
       seen.add(id);

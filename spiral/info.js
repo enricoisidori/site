@@ -1,4 +1,4 @@
-import { MAX_SHOT_SECONDS } from './config.js';
+import { MAX_SHOT_SECONDS } from './config.js?v=runtime-51';
 export function setupInfo(state, videos) {
   const panel = document.querySelector('#info');
   const fields = document.querySelector('#info-fields');
@@ -21,7 +21,7 @@ export function setupInfo(state, videos) {
     for (const attempt of list) {
       const li = document.createElement('li');
       const field = { title: 'Titolo', description: 'Descrizione', subject: 'Soggetti' }[attempt.field];
-      li.textContent = `${attempt.query === '(random)' ? 'Casuale' : `“${attempt.query}”${field ? ` nel campo ${field}` : ''}`} → ${attempt.status}${attempt.total != null ? ` · ${attempt.total} risultati totali` : attempt.count == null ? '' : ` · ${attempt.count} risultati nella pagina`}`;
+      li.textContent = `${attempt.query === '(random)' ? 'Casuale' : `“${attempt.query}”${field ? ` nel campo ${field}` : ''}`} → ${attempt.status}${attempt.total != null ? ` · ${attempt.count ?? 0} candidati ricevuti (${attempt.total} corrispondenze nell’indice)` : attempt.count == null ? '' : ` · ${attempt.count} risultati nella pagina`}`;
       element.append(li);
     }
   }
@@ -33,15 +33,15 @@ export function setupInfo(state, videos) {
     const active = videos.find(video => video.classList.contains('active'));
     const selected = state.selection;
     const imageMode = state.kind === 'image';
-    const objects = selected?.objects?.slice(0, 3).map(p => `${p.label.split(',')[0]} (${(p.score * 100).toFixed(1)}%)`).join(', ');
+    const objects = selected?.objects?.slice(0, 3).map(p => p.score == null ? p.label : `${p.label.split(',')[0]} (${(p.score * 100).toFixed(1)}%)`).join(', ');
     chain.textContent = selected
       ? `${objects || 'Nessun oggetto usato'}\n↓\n${selected.query ? `Query: “${selected.query}”` : 'Estrazione casuale'}\n↓\n${selected.to}`
       : 'In attesa del primo contenuto…';
     const reasons = {
       visual: `✓ COLLEGAMENTO RIUSCITO · “${selected?.query}” verificato nel campo ${{ title: 'Titolo', description: 'Descrizione', subject: 'Soggetti' }[selected?.field]}. Origine: ${selected?.from}. La corrispondenza testuale non garantisce l’accuratezza del riconoscimento.`,
-      initial: `${imageMode ? 'Prima immagine' : 'Primo video'}: estrazione casuale iniziale, prima di qualsiasi riconoscimento.`,
+      initial: `${imageMode ? 'Prima immagine' : 'Primo video casuale da Archive'}: punto di partenza della catena, senza collegamento dichiarato.`,
       deadline: '↪ LIMITE 120 SECONDI · Passaggio al video di riserva già caricato. Nessuna correlazione visiva trovata in tempo; non è un collegamento riuscito.',
-      fallback: 'Le query visive non hanno prodotto un candidato riproducibile tra quelli provati. Ripiego su un video casuale.',
+      fallback: 'Nuovo video casuale scaricato da Archive. La ricerca correlata continua in parallelo; nessun collegamento dichiarato.',
       'no-recognition': 'Nessuna etichetta utilizzabile o modello non disponibile: estrazione casuale.',
     };
     reason.textContent = selected ? reasons[selected.mode] : '';
@@ -60,10 +60,16 @@ export function setupInfo(state, videos) {
     attempts(selectionAttempts, selected?.attempts);
     attempts(searchAttempts, state.search?.attempts);
     const values = [
-      ...(!imageMode ? [['In scena da', state.shotStarted ? `${time((performance.now() - state.shotStarted) / 1000)}` : '—'], ['Riserva', state.reserveStatus || '—']] : []),
-      ['Modello', 'MobileViT Small · q8\nTransformers.js · WASM / CPU'],
+      ...(!imageMode ? [['In scena da', state.shotStarted ? `${time((performance.now() - state.shotStarted) / 1000)}` : '—'], ['Riserva', state.startup ? state.reserveStatus || 'Preparazione iniziale' : state.fallbackStatus || 'Ricerca di un nuovo video casuale']] : []),
+      ...(!imageMode ? [['Avvio effettivo', state.startupMs == null ? 'In corso…' : `${(state.startupMs/1000).toFixed(1)} s`], ['Peso file', state.current?.bytes ? `${Math.round(state.current.bytes/1024)} KB · ${state.current.playback || 'streaming'}` : '—']] : []),
+      ['Preparazione successore', state.fallbackDetail || '—'],
+      ['Buffer disponibile', active ? `${Math.max(0,Array.from({length:active.buffered.length},(_,i)=>active.buffered.start(i)<=active.currentTime+.1 && active.buffered.end(i)>active.currentTime ? active.buffered.end(i)-active.currentTime : 0).reduce((a,b)=>Math.max(a,b),0)).toFixed(1)} s` : '—'],
+      ['Modello', state.model || 'ViT–GPT2 · descrizione libera · q8 · CPU'],
+      ['Descrizione del fotogramma', state.caption || 'In attesa del modello…'],
+      ['Tempo analisi', state.inferenceMs == null ? '—' : `${(state.inferenceMs / 1000).toFixed(1)} s`],
       ['Visione', vision[state.vision] || state.vision],
       ['Processo', phases[state.phase] || state.phase],
+      ...(!imageMode ? [['Collegamenti verificati', String(state.relatedCount || 0)], ['Transizioni casuali', String(state.randomCount || 0)]] : []),
       ['Titolo', state.current?.title || 'Ricerca iniziale…'],
       ['File', state.current?.filename || '—'],
       [imageMode ? 'Dimensioni' : 'Tempo', imageMode ? state.current?.dimensions : active ? `${time(active.currentTime)} / ${time(active.duration)}${active.loop ? ' · loop di emergenza disponibile' : ''}` : '—'],
@@ -99,7 +105,7 @@ export function setupInfo(state, videos) {
     frame.hidden = !state.analysis;
     if (state.analysis) {
       if (image.getAttribute('src') !== state.analysis.image) image.src = state.analysis.image;
-      caption.textContent = imageMode ? `Immagine analizzata · ${state.analysis.title}` : `Fotogramma analizzato · ${state.analysis.title} · ${time(state.analysis.time)}`;
+      caption.textContent = imageMode ? `Immagine analizzata · ${state.analysis.title}` : `Fotogramma estratto da Archive · ${state.analysis.title} · ${time(state.analysis.time)}`;
     }
     predictions.replaceChildren();
     for (const prediction of state.predictions) {
@@ -107,7 +113,7 @@ export function setupInfo(state, videos) {
       const label = document.createElement('span');
       const confidence = document.createElement('span');
       label.textContent = prediction.label;
-      confidence.textContent = `${(prediction.score * 100).toFixed(1)}%`;
+      confidence.textContent = prediction.score == null ? 'keyword' : `${(prediction.score * 100).toFixed(1)}%`;
       row.append(label, confidence);
       predictions.append(row);
     }

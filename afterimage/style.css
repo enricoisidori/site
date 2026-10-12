@@ -1,0 +1,25 @@
+:root { color-scheme: dark; font-family: Helvetica, Arial, sans-serif; text-transform: lowercase; }
+* { box-sizing: border-box; }
+html, body, #stage { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #000; }
+video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; pointer-events: none; }
+video.on { opacity: 1; z-index: 1; }
+video.fill { object-fit: cover; }
+#skipArea { position: fixed; inset: 0; z-index: 2; border: 0; padding: 0; background: transparent; cursor: pointer; }
+#skipArea:disabled { cursor: default; }
+#skipArea:focus-visible { outline: 1px solid #aaa; outline-offset: -8px; }
+#loading { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 1; }
+#loading canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+#loading[hidden] { display: none; }
+#info { position: fixed; z-index: 10; left: 20px; bottom: 20px; width: min(600px, calc(100% - 40px)); max-height: calc(100% - 40px); overflow: auto; background: rgb(0 0 0 / 82%); color: #ddd; padding: 18px 20px; font-size: 13px; line-height: 1.55; border: 1px solid #333; }
+#info[hidden] { display: none; }
+#info p { margin: 0 0 8px; overflow-wrap: anywhere; }
+#info p:last-child { margin-bottom: 0; }
+#info .label { color: #858585; }
+#info .step { color: #777; }
+#info .step.active { color: #f1ff90; }
+#info mark { color: #000; background: #f1ff90; padding: 0 2px; }
+#info a { color: inherit; }
+#info .small { font-size: 11px; color: #999; }
+#info img { width: 112px; height: 72px; object-fit: contain; float: right; margin: 0 0 8px 12px; background: #111; }
+@media (prefers-reduced-motion: reduce) { #loading { transition: none; } }
+

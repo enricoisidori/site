@@ -1,0 +1,10 @@
+{
+  "name": "dreamachine",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "python3 -m http.server 8091 --bind 127.0.0.1",
+    "test:browser": "node tests/browser.mjs"
+  }
+}
