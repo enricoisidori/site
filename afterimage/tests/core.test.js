@@ -3,16 +3,20 @@ import assert from 'node:assert/strict';
 import { captionTerms, highlightParts } from '../terms.js';
 import { queryFor, metadataMatches, streamableFiles, durationSeconds, randomPage, SORTS, search } from '../archive.js';
 import { hasBuffer, nearestScene } from '../media.js';
+import { filterState, updateFilters } from '../scope.js';
+globalThis.location={protocol:'https:'};
 import { CandidatePool, Semaphore } from '../pool.js';
 
 test('keyword concrete e frasi composte dalla descrizione', () => {
-  assert.deepEqual(captionTerms('A man is standing beside a red fire truck on a city street.'), ['fire truck', 'city street']);
+  assert.deepEqual(captionTerms('A man is standing beside a red fire truck on a city street.'), ['fire truck', 'city street', 'man']);
   assert.deepEqual(captionTerms('a blurry black and white image'), []);
 });
-test('query solo titolo, nessuna collezione, peso totale o popolarità', () => {
+test('query solo titolo, esclusioni di collezioni senza restringere a una collezione', () => {
   const q = queryFor(['car', 'car', '" OR *:*']);
   assert.ok(q.includes('title:"car"'));
-  assert.ok(!/subject:|description:|collection:|item_size:|identifier:/.test(q));
+  assert.ok(!/subject:|description:|item_size:|identifier:/.test(q));
+  assert.ok(q.includes('NOT collection:'));
+  assert.ok(!q.includes(' AND collection:'));
   assert.ok(!q.includes('*:*'));
   assert.equal((q.match(/title:"car"/g) || []).length, 1);
   assert.ok(SORTS.every(s => !/downloads|views|relevance/.test(s)));
@@ -37,9 +41,9 @@ test('match ed evidenziazione non confondono car e cartoon', () => {
   assert.deepEqual(metadataMatches({ title: 'A car on the street', subject: [] }, ['car']), [{ field: 'title', text: 'A car on the street', terms: ['car'] }]);
   assert.deepEqual(highlightParts('A car and a cartoon', ['car']), [{ text: 'A ', match: false }, { text: 'car', match: true }, { text: ' and a cartoon', match: false }]);
 });
-test('filmati di almeno 30s e derivati leggeri, senza limite sul file lungo', () => {
+test('derivati leggeri, anche filmati brevi, senza limite sul file lungo', () => {
   const good = { name: 'long_512kb.mp4', size: 100000000, length: 1600, height: 240, format: '512Kb MPEG4' };
-  assert.deepEqual(streamableFiles([good, { ...good, length: 20 }, { ...good, private: true }, { ...good, height: 1080 }]), [good]);
+  assert.deepEqual(streamableFiles([good, { ...good, length: 20 }, { ...good, private: true }, { ...good, height: 1080 }]), [good, {...good,length:20}]);
   assert.equal(durationSeconds('01:02:30'), 3750);
   assert.equal(durationSeconds('00:00:29'), 29);
 });

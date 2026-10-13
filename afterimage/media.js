@@ -23,21 +23,21 @@ export function waitFor(check, signal, timeout = 12000) {
     poll = setInterval(() => { try { if (check()) finish(); } catch (error) { finish(error); } }, 60);
   });
 }
-export async function prepare(video, url, signal, { startup = false, middle = false } = {}) {
+export async function prepare(video, url, signal, { startup = false, middle = false, startAt = null } = {}) {
   try {
     video.muted = true; video.loop = false; video.src = url; video.load();
     await waitFor(() => { if (video.error) throw new Error(video.error.message); return video.readyState >= 1 && Number.isFinite(video.duration); }, signal, 9000);
     if (!(video.duration > 0)) throw new Error('video senza durata riproducibile');
     // Prelinger starts halfway through to bypass opening titles, including startup.
-    const start = middle ? video.duration / 2 : startup ? 0 : Math.random() * Math.max(0, video.duration - MAX_PLAY_SECONDS - .5);
+    const start = startAt != null ? Math.max(0,Math.min(startAt,video.duration-.1)) : middle ? video.duration / 2 : startup ? 0 : Math.random() * Math.max(0, video.duration - MAX_PLAY_SECONDS - .5);
     if (start > .05) video.currentTime = start;
     const began = performance.now();
     const available = Math.max(0, video.duration - start - .02);
-    const target = Math.min(startup ? 1.5 : 8, available);
+    const target = Math.min(startup ? .75 : 4, available);
     await waitFor(() => {
       if (video.error) throw new Error(video.error.message);
       const buffered = bufferAhead(video, start);
-      return !video.seeking && video.readyState >= 3 && (buffered >= target || !startup && performance.now() - began > 8000 && buffered >= 6);
+      return !video.seeking && video.readyState >= 3 && (buffered >= target || !startup && performance.now() - began > 5000 && buffered >= 2.5);
     }, signal, 16000);
     return { start, seconds: Math.max(.01, Math.min(MAX_PLAY_SECONDS, video.duration - start - .02)), remote: true };
   } catch (error) { video.pause(); video.removeAttribute('src'); video.load(); throw error; }

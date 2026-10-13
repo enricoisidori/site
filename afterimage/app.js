@@ -4,6 +4,8 @@ import { captionTerms } from './terms.js';
 import { prepare, startPlaying, release, captureItemFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS } from './media.js';
 import { renderInfo, toggleInfo } from './info.js';
 import { setWaiting, addLoadingImages, finishLoading } from './loading.js';
+import { exportChainPDF, exportChainExcel } from './exports.js';
+import { historyState, hydrateFrames } from './history.js';
 import { beginChain, describeChain, queryChain, finishChain, exportChain } from './history.js';
 
 const stage = document.querySelector('#stage');
@@ -11,7 +13,7 @@ const skipArea = document.querySelector('#skipArea');
 const favicon = document.querySelector('#favicon');
 const slots = Array.from({ length: 6 }, () => {
   const video = document.createElement('video');
-  video.muted = true; video.preload = 'auto'; video.playsInline = true; video.loop = false;
+  video.crossOrigin = 'anonymous'; video.muted = true; video.preload = 'auto'; video.playsInline = true; video.loop = false;
   video.setAttribute('playsinline', ''); video.setAttribute('muted', ''); stage.append(video);
   return { video, media: null, item: null, role: 'idle', kind: null, controller: null, claim: null };
 });
@@ -19,7 +21,7 @@ const state = {
   step: 'query', modelStatus: 'caricamento…', caption: '', terms: [], query: queryFor([]),
   checked: 0, total: null, next: null, message: 'ricerca del primo video…', downloadStatus: '',
   switches: 0, fallbacks: 0, muted: true, fitMode: 'fit', preview: '', frameTime: null, inferenceMs: null,
-  queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
+  reviewing:false,reviewIndex:null,queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
 };
 let active, switching = false, generation = 0, context;
 let worker, workerReady, rpcID = 0;
@@ -157,6 +159,7 @@ async function fill(slot, kind, cycle = context) {
   }
 }
 function pump() {
+  if(state.reviewing)return;
   if (active) trimGeneral();
   const generalTarget = active ? 2 : 4;
   let general = slots.filter(slot => slot !== active && slot.kind === 'general').length;
@@ -183,11 +186,12 @@ async function analyze(cycle) {
       if (cycle !== context || signal.aborted) return;
       favicon.href = frame.preview; cycle.frameTime = frame.time;
       update({ step: 'modello', preview: frame.preview, frameTime: frame.time, frameSource: frame.source, modelStatus: 'descrizione del fotogramma…' });
+      describeChain('', [], {time:frame.time,source:frame.source,preview:frame.preview,width:frame.width,height:frame.height});
       const result = await abortable(rpc({ type: 'caption', pixels: frame.pixels, width: frame.width, height: frame.height }, [frame.pixels], 45000), signal);
       if (cycle !== context || signal.aborted) return;
       const terms = captionTerms(result.caption);
       cycle.caption = result.caption; cycle.keywords = [...terms]; cycle.allKeywords = [...terms];
-      describeChain(result.caption, terms, { time: frame.time, source: frame.source });
+      describeChain(result.caption, terms, { time: frame.time, source: frame.source, preview: frame.preview, width:frame.width,height:frame.height });
       update({ step: 'keyword', caption: result.caption, terms, inferenceMs: result.inferenceMs, modelStatus: 'pronto · inferenza locale' });
       if (!terms.length) { await delay(4000, signal); continue; }
       nextKeyword(cycle); return;
@@ -229,7 +233,7 @@ async function promote(next, reason) {
       keywords: context?.allKeywords || [], terms: [], query: '', kind: reason === 'click' ? 'click' : 'random',
     };
     if (old) finishChain(next.item, reason);
-    beginChain(next.item, reason);
+    beginChain(next.item, reason, next.media.start);
     next.video.classList.toggle('fill', state.fitMode === 'fill');
     next.video.classList.add('on'); old?.video.classList.remove('on');
     active = next; active.role = 'active'; active.startedAt = performance.now();
@@ -246,6 +250,7 @@ async function promote(next, reason) {
   } finally { switching = false; pump(); }
 }
 function tick() {
+  if(state.reviewing){if(active&&performance.now()-active.startedAt>=MAX_PLAY_SECONDS*1000)active.video.pause();requestAnimationFrame(tick);return;}
   // Enforce the cap even while the next decoder is starting asynchronously.
   if (active && !document.hidden && performance.now() - active.startedAt >= MAX_PLAY_SECONDS * 1000) active.video.pause();
   if (active && !switching && !document.hidden) {
@@ -275,6 +280,7 @@ function skipReady() {
   if (next) promote(next, 'click');
 }
 document.addEventListener('click', event => {
+  if(event.target.closest('#info'))return;
   if (firstClick) {
     firstClick = false;
     state.muted = false;
@@ -288,13 +294,17 @@ document.addEventListener('click', event => {
   skipReady();
 });
 document.addEventListener('keydown', event => {
+  if(event.target.matches('input,textarea,select'))return;
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
-  if (['i', 'm', 'f', 'c', 's', 'arrowright'].includes(key)) {
+  if (['i', 'm', 'f', 'c', 's', 'p', 'e', 'arrowright', 'arrowleft'].includes(key)) {
     event.preventDefault();
     if (document.activeElement === skipArea) skipArea.blur();
   }
-  if (key === 'arrowright') { event.preventDefault(); skipReady(); }
+  if (key === 'arrowright') { event.preventDefault(); state.reviewing?navigateHistory(1):skipReady(); }
+  if(key==='arrowleft')navigateHistory(-1);
+  if(key==='p')exportChainPDF().catch(error=>update({message:error.message}));
+  if(key==='e')exportChainExcel().catch(error=>update({message:error.message}));
   if (key === 'i') { toggleInfo(); renderInfo(state, active); }
   if (key === 'm') { state.muted = !state.muted; if (active) active.video.muted = state.muted; renderInfo(state, active); }
   if (key === 'f') {
@@ -306,6 +316,28 @@ document.addEventListener('keydown', event => {
     update({ fitMode: fill ? 'fill' : 'fit' });
   }
   if (key === 's') exportChain();
+});
+async function navigateHistory(delta){
+ if(switching||!active)return;
+ const records=historyState.records,index=(state.reviewIndex??records.length-1)+delta;
+ if(index<0)return;
+ if(index>=records.length){state.reviewing=false;state.reviewIndex=null;context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...state.terms],allKeywords:[...state.terms]};if(state.caption&&state.terms.length)nextKeyword(context);else analyze(context);pump();return;}
+ switching=true;context?.controller.abort();state.reviewing=true;
+ for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}
+ const old=active;let target;
+ try{
+  const record=records[index];await hydrateFrames([record]);target=slots.find(slot=>slot!==old&&slot.role==='idle');if(!target)throw Error('attendo un posto libero per la cronologia');
+  target.role='buffering';target.item=record.video.streamURL?{...record.video,streamURL:record.video.streamURL.replace('/download/','/cors/')} : await resolveItem({identifier:record.video.id},[],new AbortController().signal);
+  if(!target.item)throw Error('video della cronologia non disponibile');
+  target.media=await prepare(target.video,target.item.streamURL,new AbortController().signal,{startup:true,startAt:record.playStart||0});await startPlaying(target.video);target.video.muted=state.muted;target.video.classList.toggle('fill',state.fitMode==='fill');target.video.classList.add('on');old.video.classList.remove('on');active=target;active.role='active';active.startedAt=performance.now();release(old);old.claim=null;
+  update({reviewIndex:index,step:'cronologia',caption:record.description,terms:record.keywords||[],preview:record.frame?.preview||'',message:'cronologia · → prosegue; dopo l’ultimo video riprende il flusso'});
+ }catch(error){if(target&&target!==active)release(target);update({message:error.message});}finally{switching=false;}
+}
+window.addEventListener('afterimage:navigate',event=>{if(event.detail<0||state.reviewing)navigateHistory(event.detail);else skipReady();});
+window.addEventListener('afterimage:export-error',event=>update({message:event.detail}));
+window.addEventListener('afterimage:filters',()=>{
+ invalidateSemantic();for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}generalPool.queue.length=0;failed.clear();
+ if(active&&!state.reviewing){context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...new Set([state.selectedTerm,...state.terms].filter(Boolean))],allKeywords:[...state.terms]};if(state.caption&&context.keywords.length)nextKeyword(context);else analyze(context);}pump();renderInfo(state,active);
 });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { active?.video.pause(); if (active) active.hiddenAt = performance.now(); }
@@ -319,3 +351,5 @@ requestAnimationFrame(tick);
 // The first stream gets the connection first; analyze() starts the model once
 // a video is playing, independently from future random/semantic reserves.
 pump();
+
+Object.defineProperty(window,'afterimageStatus',{get:()=>({...state,recordCount:historyState.records.length,activeID:active?.item?.id,switching})});

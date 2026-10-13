@@ -6,9 +6,13 @@ Questa cartella è la versione per GitHub Pages e Live Server. Per l'apertura di
 
 Descrizione locale del fotogramma → keyword → ricerca nel titolo → video. Limite assoluto 30 s; il successore della query parte appena pronto, anche prima. Nessun loop. Streaming nativo con riserve precaricate.
 
-I informazioni e cronologia; M audio; F fullscreen; C fit/fill; S esporta la catena JSON. La cronologia viene salvata automaticamente nel browser, fino a 2.000 video. Sono incluse tutte le esclusioni aggiuntive per trailer/game advertising.
+I apre informazioni e catena. ← / → navigano nella cronologia; dopo l’ultimo video → riprende il flusso. M audio, F fullscreen, C fit/fill, S JSON, E Excel, P PDF. Dal pannello si può anche copiare la catena e scegliere PDF verticale o quadrato, senza frecce e con due frame per pagina.
 
-Caricamento su fondo bianco e SVG nero: anteprime leggere di Archive in coda FIFO, senza ripetizioni. La prima appare appena arriva; le successive vengono consumate ogni 120 ms quando disponibili, con tre caricamenti paralleli e rifornimento continuo. Quando il primo video è pronto: 3 secondi di SVG su bianco, poi 1 secondo di solo bianco, quindi dissolvenza di 3 secondi al video. Primo clic: solo audio; clic successivi / →: prossimo pronto; M: audio, F/Esc: fullscreen. Il modello ViT–GPT2 q8 viene eseguito sul dispositivo; circa 247 MB al primo caricamento. Serve Internet.
+Avvio con immagini leggere di Internet Archive in sequenza, senza ripetizioni, e SVG nero. Quando il video è pronto, fondo bianco e SVG sfumano insieme direttamente sul video per 6 secondi, senza intervallo bianco. Buffer iniziale ridotto; il modello parte dopo il primo video. Serve Internet; il modello viene eseguito sul dispositivo.
+
+La catena conserva fino a 2.000 video con link, metadati, keyword e query. I frame già catturati per il modello sono salvati separatamente in IndexedDB, senza ulteriori analisi. PDF ed Excel vengono generati solo su richiesta; la libreria Excel viene scaricata solo al momento dell’esportazione. Excel include immagini incorporate e link alle fonti. I record storici senza frame restano consultabili.
+
+In informazioni si possono disattivare i filtri e selezionare collezioni da escludere. Le scelte persistono nel browser. «scarica default per il sito» produce filter-defaults.js: sostituire il file omonimo in questa cartella per applicare le scelte a tutti, poi rigenerare la copia locale con `node tools/build-local.mjs afterimage`. La pagina non può modificare autonomamente i file pubblicati su GitHub.
 
 Istruzioni complete e limiti della verifica in [VERSIONI-VIDEO.md](../VERSIONI-VIDEO.md). Controllo integrato HTTP e file:// superato con risposte remote simulate; verificate separatamente query reali e importazione reale della libreria. Le vecchie verifiche in VERIFICA.md sono cronologia di sviluppo, non una certificazione di questa revisione.
 
@@ -21,3 +25,7 @@ L’HTML locale occupa tutto il viewport; il fullscreen reale richiede F perché
 Un controllo locale di titolo, soggetti e descrizione scarta ulteriori trailer/spot e frasi promozionali prima di caricare il video, senza nuove richieste o modelli.
 
 I video appartenenti a Prelinger partono a metà della durata, anche come primo video, per saltare i titoli iniziali.
+
+Verifica revisione: 10 test unitari superati; avvio HTTP e file://, cronologia, PDF e Excel verificati nel browser con sorgenti e inferenza simulate. PDF renderizzato e controllato, immagini incorporate in XLSX verificate. Questi controlli non misurano la latenza dei server Archive reali.
+
+Gli export afterimage.pdf, afterimage.xlsx e afterimage.json includono solo video mostrati collegati da una keyword effettivamente comune fra descrizione e titolo. Nel PDF servono entrambi i frame; i testi sono selezionabili (Helvetica con caratteri occidentali), le keyword sottolineate. Tentativi di query e passaggi casuali non sono esportati come collegamenti.

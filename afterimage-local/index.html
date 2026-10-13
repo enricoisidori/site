@@ -39,6 +39,14 @@ video.fill { object-fit: cover; }
 #info img { width: 112px; height: 72px; object-fit: contain; float: right; margin: 0 0 8px 12px; background: #111; }
 @media (prefers-reduced-motion: reduce) { #loading { transition: none; } }
 
+/* One typographic size throughout the process and chain. */
+#info{background:rgba(255,255,255,.97);color:#111;border:0;padding:18px;font:12px/1.5 Helvetica,Arial,sans-serif;}
+#info p,#info button,#info select,#info summary,#info label,#info textarea{font:inherit;font-weight:400;}
+#info button{border:0;background:none;color:inherit;padding:0;margin:0 12px 0 0;cursor:pointer;text-decoration:underline;}
+#info .actions{display:flex;gap:10px;flex-wrap:wrap;}#info select{background:transparent;border:0;color:inherit;margin-bottom:16px;}
+#info .chain{padding:0;border:0;}#info article{margin:28px 0;}#info img{float:none;display:block;width:min(100%,384px);height:auto;margin:0 0 12px;background:white;}
+#info details{margin:12px 0;}#info label{display:block;margin:6px 0;}#info u{text-underline-offset:3px;}#info textarea{width:100%;height:180px;}
+.loading-label{position:absolute;left:50%;top:70%;transform:translateX(-50%);color:#111;font:12px Helvetica,Arial,sans-serif;}
 
 </style>
 </head>
@@ -152,7 +160,13 @@ async function archiveJSON(url, signal) {
 
 return {archiveJSON};
 })();
+modules["filter-defaults.js"] = (() => {
+const defaultFilters = { content: true, promotional: true, collections: ['tvnews', 'gamevideos', 'podcasts'] };
+
+return {defaultFilters};
+})();
 modules["scope.js"] = (() => {
+const { defaultFilters } = modules["filter-defaults.js"];
 // Global movie index with full content exclusions. Playable lightweight
 // derivatives are checked in metadata rather than a remote format filter.
 const sourceScopes = [''];
@@ -169,16 +183,24 @@ const exclusionTerms = [
 
 // Run against metadata already fetched, before any video is buffered.
 function promotionalMetadata(metadata) {
+  if (!filterState.promotional) return false;
   const text = ['title', 'subject', 'description'].map(field => String(metadata[field] || '')).join(' ').slice(0, 12000).replace(/<[^>]+>/g, ' ').toLowerCase();
   return /\bcall[\s_-]+of[\s_-]+duty\b|\b(trailers?|teasers?|promos?|promotional|advertisements?|advertising|adverts?|commercials?|infomercials?|werbespot|reklame)\b|\b(tv|television|radio)\s*[-:]?\s*spot\b|bande[ -]annonce|tr[aá]iler|pubblicit[àa]|anuncio publicitario|\b(in cinemas|in theaters|in theatres|coming soon|pre[ -]?order|available now|out now|release date|official video|launch campaign)\b/.test(text);
 }
 
-return {sourceScopes,exclusionTerms,promotionalMetadata};
+const filterKey='afterimage:filters:v2';
+const filterState={...defaultFilters,collections:[...defaultFilters.collections]};
+try{Object.assign(filterState,JSON.parse(localStorage.getItem(filterKey)||'{}'));}catch{}
+function updateFilters(changes){Object.assign(filterState,changes);filterState.collections=[...new Set(filterState.collections||[])];try{localStorage.setItem(filterKey,JSON.stringify(filterState));}catch{}window.dispatchEvent(new CustomEvent('afterimage:filters'));}
+function blockedCollection(metadata){return [].concat(metadata.collection||[]).some(id=>filterState.collections.includes(id));}
+function filterDefaultsCode(){return 'export const defaultFilters = '+JSON.stringify(filterState,null,2)+';\n';}
+
+return {sourceScopes,exclusionTerms,promotionalMetadata,filterState,updateFilters,blockedCollection,filterDefaultsCode};
 })();
 modules["archive.js"] = (() => {
 const { sanitizeTerms } = modules["terms.js"];
 const { archiveJSON:json } = modules["archive-transport.js"];
-const { sourceScopes, exclusionTerms, promotionalMetadata } = modules["scope.js"];
+const { sourceScopes, exclusionTerms, promotionalMetadata, filterState, blockedCollection } = modules["scope.js"];
 const SEARCH_LIMIT = 10000;
 const SORTS = ['identifier asc', 'identifier desc', 'addeddate asc', 'addeddate desc'];
 const pick = values => values[Math.floor(Math.random() * values.length)];
@@ -190,7 +212,7 @@ function shuffle(values) {
 function queryFor(terms = [], scope = sourceScopes[0]) {
   const clauses = sanitizeTerms(terms).map(term => `title:"${term}"`);
   const blocked = exclusionTerms.join(' OR ');
-  return `mediatype:movies${scope ? ` AND ${scope}` : ''}${clauses.length ? ` AND (${clauses.join(' OR ')})` : ''} AND NOT (${blocked}) AND NOT access-restricted-item:true`;
+  return `mediatype:movies${scope ? ` AND ${scope}` : ''}${clauses.length ? ` AND (${clauses.join(' OR ')})` : ''}${filterState.content ? ` AND NOT (${blocked})` : ''}${filterState.collections.map(id=>` AND NOT collection:"${id.replace(/[^a-zA-Z0-9_.-]/g,'')}"`).join('')} AND NOT access-restricted-item:true`;
 }
 function searchURL(query, rows, page, sort) {
   const p = new URLSearchParams({ q: query, rows, page, output: 'json' });
@@ -254,7 +276,7 @@ function metadataMatches(metadata, terms) {
 async function resolveItem(item, terms, signal) {
   const d = await json(`https://archive.org/metadata/${encodeURIComponent(item.identifier)}`, signal);
   const md = d.metadata || {};
-  if (d.is_dark || md['access-restricted-item'] === 'true' || promotionalMetadata(md)) return null;
+  if (d.is_dark || md['access-restricted-item'] === 'true' || promotionalMetadata(md) || blockedCollection(md)) return null;
   const matches = metadataMatches(md, terms);
   if (terms.length && !matches.length) return null;
   const f = streamableFiles(d.files || [])[0];
@@ -271,7 +293,7 @@ async function resolveItem(item, terms, signal) {
       const m = file.name?.match(/\.thumbs\/([^/]+)_(\d{6})\.jpg$/i);
       return m ? [{ name: file.name, stem: m[1], time: Number(m[2]) }] : [];
     }),
-    streamURL: `https://archive.org/download/${encodeURIComponent(item.identifier)}/${f.name.split('/').map(encodeURIComponent).join('/')}`,
+    streamURL: `https://archive.org/cors/${encodeURIComponent(item.identifier)}/${f.name.split('/').map(encodeURIComponent).join('/')}`,
     bytes: Number(f.size), duration: durationSeconds(f.length) || null,
     license: text(md.licenseurl || md.rights),
     source: `https://archive.org/details/${encodeURIComponent(item.identifier)}`,
@@ -348,21 +370,21 @@ function waitFor(check, signal, timeout = 12000) {
     poll = setInterval(() => { try { if (check()) finish(); } catch (error) { finish(error); } }, 60);
   });
 }
-async function prepare(video, url, signal, { startup = false, middle = false } = {}) {
+async function prepare(video, url, signal, { startup = false, middle = false, startAt = null } = {}) {
   try {
     video.muted = true; video.loop = false; video.src = url; video.load();
     await waitFor(() => { if (video.error) throw new Error(video.error.message); return video.readyState >= 1 && Number.isFinite(video.duration); }, signal, 9000);
     if (!(video.duration > 0)) throw new Error('video senza durata riproducibile');
     // Prelinger starts halfway through to bypass opening titles, including startup.
-    const start = middle ? video.duration / 2 : startup ? 0 : Math.random() * Math.max(0, video.duration - MAX_PLAY_SECONDS - .5);
+    const start = startAt != null ? Math.max(0,Math.min(startAt,video.duration-.1)) : middle ? video.duration / 2 : startup ? 0 : Math.random() * Math.max(0, video.duration - MAX_PLAY_SECONDS - .5);
     if (start > .05) video.currentTime = start;
     const began = performance.now();
     const available = Math.max(0, video.duration - start - .02);
-    const target = Math.min(startup ? 1.5 : 8, available);
+    const target = Math.min(startup ? .75 : 4, available);
     await waitFor(() => {
       if (video.error) throw new Error(video.error.message);
       const buffered = bufferAhead(video, start);
-      return !video.seeking && video.readyState >= 3 && (buffered >= target || !startup && performance.now() - began > 8000 && buffered >= 6);
+      return !video.seeking && video.readyState >= 3 && (buffered >= target || !startup && performance.now() - began > 5000 && buffered >= 2.5);
     }, signal, 16000);
     return { start, seconds: Math.max(.01, Math.min(MAX_PLAY_SECONDS, video.duration - start - .02)), remote: true };
   } catch (error) { video.pause(); video.removeAttribute('src'); video.load(); throw error; }
@@ -427,86 +449,164 @@ async function captureItemFrame(slot, signal) {
 return {MAX_PLAY_SECONDS,bufferAhead,hasBuffer,waitFor,prepare,startPlaying,release,capture,nearestScene,captureItemFrame};
 })();
 modules["history.js"] = (() => {
-const storageKey = document.title + ':chain:v1';
-let records = [], current;
-const historyState = { records, saved: true, error: '' };
-try {
-  const loaded = JSON.parse(localStorage.getItem(storageKey) || '[]');
-  if (Array.isArray(loaded)) records.push(...loaded.slice(-2000));
-} catch (error) { historyState.saved = false; historyState.error = error.message; }
-function persist() {
-  try { localStorage.setItem(storageKey, JSON.stringify(records)); historyState.saved = true; historyState.error = ''; }
-  catch (error) { historyState.saved = false; historyState.error = error.message; }
+const { highlightParts } = modules["terms.js"];
+const storageKey=document.title+':chain:v1';
+let records=[],current;
+const historyState={records,saved:true,error:''};
+try{const data=JSON.parse(localStorage.getItem(storageKey)||'[]');if(Array.isArray(data))records.push(...data.slice(-2000));}catch(error){historyState.saved=false;historyState.error=error.message;}
+const frameDB=new Promise(resolve=>{try{const request=indexedDB.open('afterimage-frames',1);request.onupgradeneeded=()=>request.result.createObjectStore('frames');request.onsuccess=()=>resolve(request.result);request.onerror=()=>resolve(null);}catch{resolve(null);}});
+async function frameStore(key,value){const db=await frameDB;if(!db)return null;return new Promise(resolve=>{const tx=db.transaction('frames',value?'readwrite':'readonly'),store=tx.objectStore('frames'),request=value?store.put(value,key):store.get(key);request.onsuccess=()=>resolve(request.result);request.onerror=()=>resolve(null);});}
+function persist(){try{localStorage.setItem(storageKey,JSON.stringify(records,(key,value)=>key==='preview'?undefined:value));historyState.saved=true;historyState.error='';}catch(error){historyState.saved=false;historyState.error=error.message;}}
+const videoInfo=item=>({id:item.id,title:item.title,source:item.source,collection:item.collection,collections:item.collections||[],creator:item.creator,subject:item.subject,description:item.description,date:item.date,publisher:item.publisher,license:item.license,filename:item.filename,streamURL:item.streamURL,duration:item.duration,width:item.width,height:item.height,format:item.format,bytes:item.bytes,uploader:item.uploader,contributor:item.contributor});
+function beginChain(item,reason,playStart=0){current={at:new Date().toISOString(),video:videoInfo(item),reason,playStart,shown:true,description:'',keywords:[],queries:[],successor:null};current.frameKey=current.at+':'+item.id;records.push(current);if(records.length>2000)records.splice(0,records.length-2000);persist();}
+function describeChain(caption,keywords,frame){if(!current)return;const needsFrame=frame.preview&&!current.frame?.preview;Object.assign(current,{description:caption,keywords:[...keywords],frame});if(needsFrame)frameStore(current.frameKey,frame.preview);persist();}
+function queryChain(term,query,total=null){if(!current)return;const old=current.queries.at(-1);if(old?.term===term)Object.assign(old,{query,total});else current.queries.push({at:new Date().toISOString(),term,query,total});persist();}
+function finishChain(item,reason){if(!current)return;current.successor={...videoInfo(item),reason,matchTerms:item.incoming?.terms||[],query:item.incoming?.query||''};current.finishedAt=new Date().toISOString();persist();}
+async function hydrateFrames(list=records){await Promise.all(list.map(async r=>{if(!r.frame?.preview&&r.frameKey){const preview=await frameStore(r.frameKey);if(preview)r.frame={...r.frame,preview};}}));return list;}
+function successfulLinks(){
+ const result=[];
+ for(let i=0;i<records.length-1;i++){
+  const record=records[i],next=records[i+1],link=record.successor,terms=link?.matchTerms||[];
+  if(record.shown===false||next.shown===false||!link||link.id!==next.video.id||!terms.length)continue;
+  const common=terms.filter(term=>highlightParts(record.description||'',[term]).some(p=>p.match)&&highlightParts(next.video.title||'',[term]).some(p=>p.match));
+  if(common.length)result.push({record,next,terms:common});
+ }
+ return result;
 }
-const videoInfo = item => ({ id: item.id, title: item.title, source: item.source, collection: item.collection });
-function beginChain(item, reason) {
-  current = { at: new Date().toISOString(), video: videoInfo(item), reason, description: '', keywords: [], queries: [], successor: null };
-  records.push(current);
-  if (records.length > 2000) records.splice(0, records.length - 2000);
-  persist();
+function exportRecords(){
+ const links=successfulLinks(),included=new Set(links.flatMap(link=>[link.record,link.next])),outgoing=new Map(links.map(link=>[link.record,link]));
+ return records.filter(record=>included.has(record)).map(record=>{
+  const link=outgoing.get(record);
+  return {...record,queries:link?record.queries.filter(query=>link.terms.includes(query.term)):[],successor:link?{...record.successor,matchTerms:link.terms}:null};
+ });
 }
-function describeChain(caption, keywords, frame) {
-  if (!current) return;
-  Object.assign(current, { description: caption, keywords: [...keywords], frame }); persist();
-}
-function queryChain(term, query, total = null) {
-  if (!current) return;
-  const previous = current.queries[current.queries.length - 1];
-  if (previous?.term === term) Object.assign(previous, { query, total });
-  else current.queries.push({ at: new Date().toISOString(), term, query, total });
-  persist();
-}
-function finishChain(item, reason) {
-  if (!current) return;
-  current.successor = { ...videoInfo(item), reason, matchTerms: item.incoming?.terms || [], query: item.incoming?.query || '' };
-  current.finishedAt = new Date().toISOString(); persist();
-}
-function exportChain() {
-  const url = URL.createObjectURL(new Blob([JSON.stringify({ project: document.title, exportedAt: new Date().toISOString(), records }, null, 2)], { type: 'application/json' }));
-  const link = document.createElement('a'); link.href = url;
-  link.download = document.title + '-catena-' + Date.now() + '.json'; link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+function chainText(){return exportRecords().map((r,i)=>[String(i+1)+'. '+r.video.title,r.video.source,'collezioni: '+(r.video.collections||[r.video.collection]).join(' · '),'descrizione: '+r.description,'keyword: '+(r.successor?.matchTerms?.join(' · ')||r.queries.at(-1)?.term||''),...(r.successor?['successivo: '+r.successor.title,r.successor.source,'tipo: '+r.successor.reason]:[])].join('\n')).join('\n\n');}
+function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+async function exportChain(){await hydrateFrames();download(new Blob([JSON.stringify({project:document.title,exportedAt:new Date().toISOString(),records:exportRecords()},null,2)],{type:'application/json'}),'afterimage.json');}
+hydrateFrames(records.slice(-30));
+
+return {historyState,beginChain,describeChain,queryChain,finishChain,hydrateFrames,successfulLinks,exportRecords,chainText,download,exportChain};
+})();
+modules["pdf.js"] = (() => {
+// Tiny PDF writer with native selectable Helvetica text. Called only after the user requests an export.
+async function buildAfterimagePDF(pages){
+ const encode=text=>new TextEncoder().encode(text),objects=[null,null,null],pageRefs=[];
+ const escape=text=>String(text||'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[\r\n]/g,' ');
+ const add=chunks=>{objects.push(chunks.map(c=>typeof c==='string'?encode(c):c));return objects.length-1;};
+ const font=add(['<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>']);
+ const extra='€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ';
+ const codes=[128,130,131,132,133,134,135,136,137,138,139,140,142,145,146,147,148,149,150,151,152,153,154,155,156,158,159];
+ const hex=text=>Array.from(String(text),ch=>{const code=ch.codePointAt(0),i=extra.indexOf(ch);return (code<=255?code:i>=0?codes[i]:63).toString(16).padStart(2,'0');}).join('');
+ for(const page of pages){
+  const data=new Uint8Array(await page.blob.arrayBuffer());
+  const image=add([`<< /Type /XObject /Subtype /Image /Width ${page.w} /Height ${page.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${data.length} >>\nstream\n`,data,'\nendstream']);
+  const width=960,height=+(width*page.h/page.w).toFixed(3),scale=width/page.w,commands=`q ${width} 0 0 ${height} 0 0 cm /Im0 Do Q\n`+(page.texts||[]).map(t=>`BT /F1 ${t.size*scale} Tf 0 g 1 0 0 1 ${t.x*scale} ${height-t.y*scale} Tm <${hex(t.text)}> Tj ET\n`+(t.underline?`0 G ${scale} w ${t.x*scale} ${height-(t.y+3)*scale} m ${(t.x+t.width)*scale} ${height-(t.y+3)*scale} l S\n`:'')).join('');
+  const content=add([`<< /Length ${encode(commands).length} >>\nstream\n${commands}endstream`]);
+  const links=[[page.source,height/2,height],[page.nextSource,0,height/2]].filter(([source])=>source);
+  const link=links.length?' /Annots ['+links.map(([source,low,high])=>`<< /Type /Annot /Subtype /Link /Rect [0 ${low} ${width} ${high}] /Border [0 0 0] /A << /S /URI /URI (${escape(source)}) >> >>`).join(' ')+']':'';
+  pageRefs.push(add([`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] /Resources << /Font << /F1 ${font} 0 R >> /XObject << /Im0 ${image} 0 R >> >> /Contents ${content} 0 R${link} >>`]));
+ }
+ objects[1]=[encode('<< /Type /Catalog /Pages 2 0 R >>')];objects[2]=[encode(`<< /Type /Pages /Count ${pageRefs.length} /Kids [${pageRefs.map(n=>n+' 0 R').join(' ')}] >>`)];
+ const info=add(['<< /Title (afterimage) /Author (Enrico Isidori) /Subject (Description and keyword chain) >>']);
+ const chunks=[encode('%PDF-1.4\n%afterimage\n')],offsets=[0];let offset=chunks[0].length;
+ for(let i=1;i<objects.length;i++){offsets[i]=offset;const parts=[encode(i+' 0 obj\n'),...objects[i],encode('\nendobj\n')];for(const part of parts){chunks.push(part);offset+=part.length;}}
+ const xref=offset;chunks.push(encode(`xref\n0 ${objects.length}\n0000000000 65535 f \n${offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')}trailer\n<< /Size ${objects.length} /Root 1 0 R /Info ${info} 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
+ return new Blob(chunks,{type:'application/pdf'});
 }
 
-return {historyState,beginChain,describeChain,queryChain,finishChain,exportChain};
+return {buildAfterimagePDF};
+})();
+modules["exports.js"] = (() => {
+const { historyState, hydrateFrames, chainText, download, successfulLinks, exportRecords } = modules["history.js"];
+const { highlightParts } = modules["terms.js"];
+const { buildAfterimagePDF } = modules["pdf.js"];
+const exportOptions={shape:"vertical"};
+let busy=false;
+async function copyChain(){const text=chainText();try{await navigator.clipboard.writeText(text);}catch{const field=document.querySelector('#chainCopy');field.value=text;field.hidden=false;field.focus();field.select();}}
+const termFor=record=>record.successor?.matchTerms?.[0]||record.queries?.at(-1)?.term||'';
+async function bitmap(preview){if(!preview)return null;try{return await createImageBitmap(await (await fetch(preview)).blob());}catch{return null;}}
+function textBlock(ctx,text,terms,x,y,width,texts){
+ const words=String(text||'').split(/(\s+)/);let line='',lines=[];
+ for(const word of words){if(ctx.measureText(line+word).width>width&&line){lines.push(line.trim());line=word;}else line+=word;}if(line)lines.push(line.trim());
+ for(const line of lines.slice(0,5)){let px=x;for(const part of highlightParts(line,terms)){texts.push({text:part.text,x:px,y,size:16,underline:part.match});const length=ctx.measureText(part.text).width;texts[texts.length-1].width=length;px+=length;}y+=24;}return y;
+}
+async function frame(ctx,record,y){const image=await bitmap(record?.frame?.preview);if(image){const ratio=Math.min(608/image.width,190/image.height);ctx.drawImage(image,(720-image.width*ratio)/2,y+(190-image.height*ratio)/2,image.width*ratio,image.height*ratio);image.close();}else ctx.fillText('frame non disponibile',56,y+110);}
+async function exportChainPDF(shape=exportOptions.shape){
+ if(busy)return;busy=true;
+ try{
+  await hydrateFrames();const links=successfulLinks().filter(link=>link.record.frame?.preview&&link.next.frame?.preview);if(!links.length)throw Error('nessun collegamento mostrato con entrambi i frame disponibili');const pages=[];
+  for(const {record,next,terms} of links){
+   const texts=[];
+   const c=document.createElement('canvas');c.width=720;c.height=shape==='square'?720:1000;const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle='#000';ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.font='16px Helvetica, Arial, sans-serif';
+   await frame(ctx,record,24);textBlock(ctx,record.description||'descrizione in attesa',terms,56,244,608,texts);
+   const lower=shape==='square'?350:530;await frame(ctx,next,lower);
+   textBlock(ctx,record.successor?.title||'successore in attesa',terms,56,lower+250,608,texts);
+   const blob=await new Promise(resolve=>c.toBlob(resolve,'image/jpeg',.78));pages.push({blob,texts,w:c.width,h:c.height,source:record.video.source,nextSource:record.successor?.source});c.width=c.height=0;await new Promise(resolve=>setTimeout(resolve,0));
+  }
+  const blob=await buildAfterimagePDF(pages);download(blob,'afterimage.pdf');
+ }finally{busy=false;}
+}
+let excelReady;
+function loadExcel(){if(!excelReady)excelReady=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';script.onload=()=>resolve(window.ExcelJS);script.onerror=()=>{excelReady=null;reject(Error('libreria Excel non disponibile'));};document.head.append(script);});return excelReady;}
+async function exportChainExcel(){
+ if(busy)return;busy=true;
+ try{
+  await hydrateFrames();const records=exportRecords();if(!records.length)throw Error('nessun collegamento mostrato da esportare');const ExcelJS=await loadExcel(),book=new ExcelJS.Workbook();book.creator='Enrico Isidori';const sheet=book.addWorksheet('catena');
+  const headers=['n','frame analizzato','data visione','titolo','descrizione del frame','keyword scelta','collezioni','soggetti','autore','data fonte','licenza','fonte','successore','fonte successore','tipo passaggio','query','tempo frame (s)'];
+  sheet.columns=headers.map((header,i)=>({header,key:String(i),width:i===1?25:[4,12,15].includes(i)?48:27}));sheet.views=[{state:'frozen',ySplit:1}];
+  records.forEach((r,i)=>{
+   const row=sheet.addRow([i+1,'',new Date(r.at),r.video.title,r.description,termFor(r),(r.video.collections||[r.video.collection]).join(' · '),r.video.subject||'',r.video.creator||'',r.video.date||'',r.video.license||'',{text:r.video.source,hyperlink:r.video.source},r.successor?.title||'',r.successor?{text:r.successor.source,hyperlink:r.successor.source}:'',r.successor?.reason||r.reason,r.successor?.query||r.queries.at(-1)?.query||'',r.frame?.time??null]);
+   row.height=105;row.eachCell(cell=>{cell.font={name:'Helvetica',size:11,bold:false};cell.alignment={vertical:'top',wrapText:true};});row.getCell(3).numFmt='dd/mm/yyyy hh:mm';
+   if(r.frame?.preview){const id=book.addImage({base64:r.frame.preview,extension:'jpeg'}),ratio=Math.min(166/(r.frame.width||166),90/(r.frame.height||90));sheet.addImage(id,{tl:{col:1.08,row:i+1.08},ext:{width:(r.frame.width||166)*ratio,height:(r.frame.height||90)*ratio},editAs:'oneCell'});}
+  });
+  sheet.getRow(1).eachCell(c=>{c.font={name:'Helvetica',size:11,bold:false};});sheet.autoFilter={from:'A1',to:'Q'+(records.length+1)};
+  download(new Blob([await book.xlsx.writeBuffer()],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'afterimage.xlsx');
+ }finally{busy=false;}
+}
+
+return {exportOptions,copyChain,exportChainPDF,exportChainExcel};
 })();
 modules["info.js"] = (() => {
 const { highlightParts } = modules["terms.js"];
 const { MAX_PLAY_SECONDS } = modules["media.js"];
-const { historyState } = modules["history.js"];
-const pane = document.querySelector('#info');
-const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const marked = (value, terms) => highlightParts(value || '', terms).map(p => p.match ? `<mark>${esc(p.text)}</mark>` : esc(p.text)).join('');
-function renderInfo(state, active) {
-  if (pane.hidden) return;
-  const openHistory = !!pane.querySelector('details[open]'), scroll = pane.scrollTop;
-  const incoming = active?.item?.incoming, item = active?.item;
-  const next = state.next;
-  const steps = ['video', 'modello', 'keyword', 'query', 'precaricamento', 'pronto'];
-  pane.innerHTML = `
-    ${state.preview ? `<img src="${state.preview}" alt="fotogramma analizzato">` : ''}
-    <p>${steps.map(s => `<span class="step ${state.step === s ? 'active' : ''}">${s}</span>`).join(' → ')}</p>
-    <p><span class="label">video ${state.switches + 1}</span><br>${item ? marked(item.title, incoming?.terms || []) : 'waiting'}</p>
-    ${item ? `<p class="small"><a id="sourceLink" href="${esc(item.source)}" target="_blank" rel="noopener">fonte · internet archive</a></p>` : ''}
-    ${item ? `<p class="small">collezioni: ${(item.collections || []).map(id => `<a href="https://archive.org/details/${encodeURIComponent(id)}" target="_blank" rel="noopener">${esc(id)}</a>`).join(' · ') || '—'}<br>editore: ${esc(item.publisher || '—')} · aggiunto: ${esc(item.added || '—')}<br>file: ${esc(item.filename)} · ${esc(item.format)} · ${item.width || '?'} × ${item.height || '?'} · ${(item.bytes / 1048576).toFixed(1)} mb · durata sorgente: ${item.duration ? Math.round(item.duration) + ' s' : 'non dichiarata'}<br>diritti / licenza: ${esc(item.license || 'non dichiarati')}</p>` : ''}
-    ${incoming ? `<p class="chain"><span class="label">catena in entrata</span><br>video: ${esc(incoming.parentTitle)}<br>↓ descrizione: ${esc(incoming.caption || 'non disponibile')}<br>↓ keyword: <mark>${esc(incoming.terms.join(' · ') || 'nessuna — fallback casuale')}</mark><br>↓ keyword nel titolo: ${incoming.kind === 'query' ? marked(item.title, incoming.terms) : 'nessun match richiesto per il fallback'}<br>↓ video: ${marked(item.title, incoming.terms)}</p>` : ''}
-    <p class="chain"><span class="label">catena in uscita</span><br>descrizione: ${esc(state.caption || 'in attesa del modello')}<br>↓ keyword: <mark>${esc(state.selectedTerm || 'in selezione')}</mark><br>↓ keyword nel titolo: ${next ? marked(next.title, next.incoming?.terms || []) : 'ricerca in corso'}<br>↓ video: ${next ? marked(next.title, next.incoming?.terms || []) : 'in preparazione'}</p>
-    <p class="small">catena: ${historyState.records.length} video conservati (massimo 2.000) · ${historyState.saved ? 'salvataggio automatico nel browser' : 'salvataggio nel browser non disponibile'} · s esporta json</p>
-    <details><summary>cronologia delle catene</summary>${historyState.records.slice(-20).reverse().map(record => `<p class="chain">${esc(record.video.title)}<br>↓ ${esc(record.description || 'descrizione non disponibile')}<br>↓ <mark>${esc(record.successor?.matchTerms?.join(' · ') || record.queries?.at(-1)?.term || '—')}</mark><br>↓ ${record.successor ? marked(record.successor.title, record.successor.matchTerms) : 'in corso'}${record.successor && record.successor.reason !== 'query' ? ' · fallback / cambio casuale' : ''}</p>`).join('')}</details>
-    ${item ? `<p><span class="label">archivio</span><br>${esc(item.collection || 'collezione non dichiarata')}<br><span class="small">id ${esc(item.identifier)}${item.creator ? ` · autore ${esc(item.creator)}` : ''}${item.contributor ? ` · contributore ${esc(item.contributor)}` : ''}${item.uploader ? ` · uploader ${esc(item.uploader)}` : ''}${item.date ? ` · ${esc(item.date)}` : ''}${item.language ? ` · lingua ${esc(item.language)}` : ''}</span>${item.subject ? `<br><span class="small">soggetti: ${esc(item.subject)}</span>` : ''}${item.description ? `<br><span class="small">${esc(item.description)}</span>` : ''}</p>` : ''}
-    ${incoming?.query ? `<p class="small"><span class="label">query in entrata</span><br>${esc(incoming.query)}</p>` : ''}
-    <p><span class="label">modello</span><br>vit–gpt2 · q8 · cpu locale · worker<br>${esc(state.modelStatus)}${state.inferenceMs ? ` · ${(state.inferenceMs / 1000).toFixed(2)} s` : ''}</p>
-    <p><span class="label">descrizione</span><br>${esc(state.caption || '—')}${state.frameTime != null ? ` <span class="small">(${esc(state.frameSource || 'frame')} a ${state.frameTime.toFixed(1)} s)</span>` : ''}</p>
-    <p><span class="label">keyword · priorità alla più specifica</span><br>${esc(state.terms.join(' · ') || '—')}${state.selectedTerm ? ` → <mark>${esc(state.selectedTerm)}</mark>` : ''}</p>
-    <p><span class="label">query</span><br>${esc(next?.incoming?.query || state.query || '—')}<br><span class="small">${state.total != null ? `${state.total.toLocaleString('it')} risultati · fino a 10.000 campionabili · ` : ''}${state.checked} metadati verificati</span></p>
-    <p><span class="label">successivo</span><br>${next ? marked(next.title, next.incoming?.terms || []) : esc(state.message)}</p>
-    <p><span class="label">coda</span><br>${state.queueSemantic} della query pronti · ${state.queueGeneral} casuali pronti · ${state.loading} in preparazione<br><span class="small">streaming diretto · buffer corrente ${(state.buffer || 0).toFixed(1)} s · riproduzione ${(state.elapsed || 0).toFixed(0)} / ${MAX_PLAY_SECONDS} s${state.prepareMs ? ` · ultima preparazione ${(state.prepareMs / 1000).toFixed(1)} s` : ''}</span></p>
-    <p class="small">${state.fallbacks} fallback casuali · ${state.switches} cambi · audio ${state.muted ? 'muto' : 'attivo'} · immagine ${state.fitMode === 'fill' ? 'fill' : 'fit'}<br>clic: ${state.queueGeneral + state.queueSemantic > 0 ? 'video pronto' : 'riserva in preparazione'}<br>primo clic: audio · poi clic / →: prossimo pronto<br>i informazioni · m audio · f schermo intero · esc esci · c fit/fill</p>
-  `;
-  if (openHistory) pane.querySelector('details')?.setAttribute('open', '');
-  pane.scrollTop = scroll;
+const { historyState, exportChain, download } = modules["history.js"];
+const { filterState, updateFilters, filterDefaultsCode } = modules["scope.js"];
+const { copyChain, exportChainPDF, exportChainExcel, exportOptions } = modules["exports.js"];
+const pane=document.querySelector('#info');
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const marked=(value,terms)=>highlightParts(value||'',terms).map(p=>p.match?`<u>${esc(p.text)}</u>`:esc(p.text)).join('');
+let pdfShape='vertical',lastRender=0;
+pane.addEventListener('change',event=>{const el=event.target;if(el.dataset.filter)updateFilters({[el.dataset.filter]:el.checked});if(el.dataset.collection){const set=new Set(filterState.collections);el.checked?set.add(el.dataset.collection):set.delete(el.dataset.collection);updateFilters({collections:[...set]});}if(el.id==='pdfShape')exportOptions.shape=pdfShape=el.value;});
+pane.addEventListener('click',async event=>{
+ const action=event.target.dataset.action;if(!action)return;
+ try{
+  if(action==='back'||action==='next')window.dispatchEvent(new CustomEvent('afterimage:navigate',{detail:action==='back'?-1:1}));
+  if(action==='copy')await copyChain();if(action==='json')await exportChain();if(action==='pdf')await exportChainPDF(pdfShape);if(action==='excel')await exportChainExcel();
+  if(action==='defaults')download(new Blob([filterDefaultsCode()],{type:'text/javascript'}),'filter-defaults.js');
+ }catch(error){window.dispatchEvent(new CustomEvent('afterimage:export-error',{detail:error.message}));}
+});
+function renderInfo(state,active){
+ if(pane.hidden||performance.now()-lastRender<750)return;
+ if(pane.contains(document.activeElement)&&document.activeElement.matches('textarea,input,select'))return;
+ lastRender=performance.now();
+ const open=[...pane.querySelectorAll('details[open]')].map(el=>el.dataset.section),scroll=pane.scrollTop,item=active?.item;
+ const records=historyState.records,collections=[...new Set([...filterState.collections,...(item?.collections||[]),...records.slice(-50).flatMap(r=>r.video.collections||[])])];
+ pane.innerHTML=`
+ <p>${esc(state.step)} · ${esc(state.modelStatus)}<br>${state.queueSemantic} della query pronti · ${state.queueGeneral} casuali pronti · ${state.loading} in preparazione<br>${esc(state.message)}</p>
+ <p class="actions"><button data-action="back">◀</button> <button data-action="next">▶</button> <button data-action="copy">copia catena</button> <button data-action="json">json</button> <button data-action="excel">excel</button> <button data-action="pdf">pdf · p</button></p>
+ <select id="pdfShape" aria-label="formato pdf"><option value="vertical" ${pdfShape==='vertical'?'selected':''}>pdf verticale</option><option value="square" ${pdfShape==='square'?'selected':''}>pdf quadrato</option></select>
+ <textarea id="chainCopy" hidden readonly aria-label="catena da copiare"></textarea>
+ ${item?`<p><a href="${esc(item.source)}" target="_blank" rel="noopener">${marked(item.title,item.incoming?.terms||[])}</a><br>${esc(item.collection||'')} · ${esc(item.creator||'')} · ${esc(item.date||'')}</p>`:''}
+ <details data-section="filters"><summary>selezione e filtri</summary><label><input type="checkbox" data-filter="content" ${filterState.content?'checked':''}> esclusioni di contenuto</label><label><input type="checkbox" data-filter="promotional" ${filterState.promotional?'checked':''}> trailer e promozionali</label>${collections.map(id=>`<label><input type="checkbox" data-collection="${esc(id)}" ${filterState.collections.includes(id)?'checked':''}> escludi ${esc(id)}</label>`).join('')}<button data-action="defaults">scarica default per il sito</button><p>le scelte sono conservate nel browser; il file scaricato aggiorna i default pubblicati</p></details>
+ <details data-section="current"><summary>informazioni video e ricerca</summary>${item?`<p>${esc(item.description)}<br>collezioni: ${esc(item.collection)}<br>soggetti: ${esc(item.subject)}<br>autore: ${esc(item.creator)} · editore: ${esc(item.publisher)}<br>licenza: ${esc(item.license||'non dichiarata')}<br>file: ${esc(item.filename)} · ${item.width||'?'} × ${item.height||'?'} · ${Math.round((item.bytes||0)/1048576)} mb</p>`:''}<p>${esc(state.query)}<br>${state.checked} metadati verificati · ${(state.buffer||0).toFixed(1)} s buffer · ${(state.elapsed||0).toFixed(0)} / ${MAX_PLAY_SECONDS} s</p></details>
+ <div class="chain">${records.slice(-30).map(record=>{
+  const terms=record.successor?.matchTerms||[record.queries?.at(-1)?.term].filter(Boolean),preview=record.frame?.preview||(record===records.at(-1)?state.preview:'');
+  return `<article>${preview?`<img src="${esc(preview)}" alt="frame usato dal modello">`:''}<p>${marked(record.description||'descrizione in preparazione',terms)}</p>${record.successor?`<p><a href="${esc(record.successor.source)}" target="_blank" rel="noopener">${marked(record.successor.title,terms)}</a>${record.successor.reason!=='query'?'<br>passaggio casuale, senza keyword comune':''}</p>`:''}<details data-section="record-${esc(record.at)}"><summary>contesto</summary><p><a href="${esc(record.video.source)}" target="_blank" rel="noopener">${esc(record.video.title)}</a><br>${esc(record.video.collection||'')}<br>${esc(record.video.subject||'')}<br>${esc(record.queries?.at(-1)?.query||'')}<br>frame ${record.frame?.time?.toFixed(1)||'—'} s · ${esc(record.frame?.source||'')}</p></details></article>`;
+ }).join('')}</div>
+ <p>${records.length} video registrati · ${historyState.saved?'cronologia salvata':'salvataggio: '+esc(historyState.error)}</p>`;
+ for(const id of open)pane.querySelectorAll('details').forEach(el=>{if(el.dataset.section===id)el.open=true;});pane.scrollTop=scroll;
 }
-function toggleInfo() { pane.hidden = !pane.hidden; }
+function toggleInfo(){pane.hidden=!pane.hidden;}
 
 return {renderInfo,toggleInfo};
 })();
@@ -581,16 +681,13 @@ function stopImages() {
 async function finishLoading() {
   mode = 'white'; stopImages();
   overlay.hidden = false; overlay.classList.add('white');
-  await new Promise(resolve => setTimeout(resolve, 3000));
-  overlay.classList.add('blank');
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  // Keep white until the caller has actually rendered the first video frame.
+  // Fade the white background and artwork together, over the playing video.
 }
 function setWaiting(value) {
   if (mode === 'white') {
     if (!value) {
       mode = 'reveal';
-      reveal = overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 3000, easing: 'linear', fill: 'forwards' });
+      reveal = overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 6000, easing: 'linear', fill: 'forwards' });
       return reveal.finished.catch(() => {}).then(() => {
         if (mode === 'reveal') { mode = 'hidden'; overlay.hidden = true; }
         reveal.cancel(); reveal = null;
@@ -621,13 +718,15 @@ const { captionTerms } = modules["terms.js"];
 const { prepare, startPlaying, release, captureItemFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS } = modules["media.js"];
 const { renderInfo, toggleInfo } = modules["info.js"];
 const { setWaiting, addLoadingImages, finishLoading } = modules["loading.js"];
+const { exportChainPDF, exportChainExcel } = modules["exports.js"];
+const { historyState, hydrateFrames } = modules["history.js"];
 const { beginChain, describeChain, queryChain, finishChain, exportChain } = modules["history.js"];
 const stage = document.querySelector('#stage');
 const skipArea = document.querySelector('#skipArea');
 const favicon = document.querySelector('#favicon');
 const slots = Array.from({ length: 6 }, () => {
   const video = document.createElement('video');
-  video.muted = true; video.preload = 'auto'; video.playsInline = true; video.loop = false;
+  video.crossOrigin = 'anonymous'; video.muted = true; video.preload = 'auto'; video.playsInline = true; video.loop = false;
   video.setAttribute('playsinline', ''); video.setAttribute('muted', ''); stage.append(video);
   return { video, media: null, item: null, role: 'idle', kind: null, controller: null, claim: null };
 });
@@ -635,7 +734,7 @@ const state = {
   step: 'query', modelStatus: 'caricamento…', caption: '', terms: [], query: queryFor([]),
   checked: 0, total: null, next: null, message: 'ricerca del primo video…', downloadStatus: '',
   switches: 0, fallbacks: 0, muted: true, fitMode: 'fit', preview: '', frameTime: null, inferenceMs: null,
-  queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
+  reviewing:false,reviewIndex:null,queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
 };
 let active, switching = false, generation = 0, context;
 let worker, workerReady, rpcID = 0;
@@ -775,6 +874,7 @@ async function fill(slot, kind, cycle = context) {
   }
 }
 function pump() {
+  if(state.reviewing)return;
   if (active) trimGeneral();
   const generalTarget = active ? 2 : 4;
   let general = slots.filter(slot => slot !== active && slot.kind === 'general').length;
@@ -801,11 +901,12 @@ async function analyze(cycle) {
       if (cycle !== context || signal.aborted) return;
       favicon.href = frame.preview; cycle.frameTime = frame.time;
       update({ step: 'modello', preview: frame.preview, frameTime: frame.time, frameSource: frame.source, modelStatus: 'descrizione del fotogramma…' });
+      describeChain('', [], {time:frame.time,source:frame.source,preview:frame.preview,width:frame.width,height:frame.height});
       const result = await abortable(rpc({ type: 'caption', pixels: frame.pixels, width: frame.width, height: frame.height }, [frame.pixels], 45000), signal);
       if (cycle !== context || signal.aborted) return;
       const terms = captionTerms(result.caption);
       cycle.caption = result.caption; cycle.keywords = [...terms]; cycle.allKeywords = [...terms];
-      describeChain(result.caption, terms, { time: frame.time, source: frame.source });
+      describeChain(result.caption, terms, { time: frame.time, source: frame.source, preview: frame.preview, width:frame.width,height:frame.height });
       update({ step: 'keyword', caption: result.caption, terms, inferenceMs: result.inferenceMs, modelStatus: 'pronto · inferenza locale' });
       if (!terms.length) { await delay(4000, signal); continue; }
       nextKeyword(cycle); return;
@@ -847,7 +948,7 @@ async function promote(next, reason) {
       keywords: context?.allKeywords || [], terms: [], query: '', kind: reason === 'click' ? 'click' : 'random',
     };
     if (old) finishChain(next.item, reason);
-    beginChain(next.item, reason);
+    beginChain(next.item, reason, next.media.start);
     next.video.classList.toggle('fill', state.fitMode === 'fill');
     next.video.classList.add('on'); old?.video.classList.remove('on');
     active = next; active.role = 'active'; active.startedAt = performance.now();
@@ -864,6 +965,7 @@ async function promote(next, reason) {
   } finally { switching = false; pump(); }
 }
 function tick() {
+  if(state.reviewing){if(active&&performance.now()-active.startedAt>=MAX_PLAY_SECONDS*1000)active.video.pause();requestAnimationFrame(tick);return;}
   // Enforce the cap even while the next decoder is starting asynchronously.
   if (active && !document.hidden && performance.now() - active.startedAt >= MAX_PLAY_SECONDS * 1000) active.video.pause();
   if (active && !switching && !document.hidden) {
@@ -893,6 +995,7 @@ function skipReady() {
   if (next) promote(next, 'click');
 }
 document.addEventListener('click', event => {
+  if(event.target.closest('#info'))return;
   if (firstClick) {
     firstClick = false;
     state.muted = false;
@@ -906,13 +1009,17 @@ document.addEventListener('click', event => {
   skipReady();
 });
 document.addEventListener('keydown', event => {
+  if(event.target.matches('input,textarea,select'))return;
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
-  if (['i', 'm', 'f', 'c', 's', 'arrowright'].includes(key)) {
+  if (['i', 'm', 'f', 'c', 's', 'p', 'e', 'arrowright', 'arrowleft'].includes(key)) {
     event.preventDefault();
     if (document.activeElement === skipArea) skipArea.blur();
   }
-  if (key === 'arrowright') { event.preventDefault(); skipReady(); }
+  if (key === 'arrowright') { event.preventDefault(); state.reviewing?navigateHistory(1):skipReady(); }
+  if(key==='arrowleft')navigateHistory(-1);
+  if(key==='p')exportChainPDF().catch(error=>update({message:error.message}));
+  if(key==='e')exportChainExcel().catch(error=>update({message:error.message}));
   if (key === 'i') { toggleInfo(); renderInfo(state, active); }
   if (key === 'm') { state.muted = !state.muted; if (active) active.video.muted = state.muted; renderInfo(state, active); }
   if (key === 'f') {
@@ -924,6 +1031,28 @@ document.addEventListener('keydown', event => {
     update({ fitMode: fill ? 'fill' : 'fit' });
   }
   if (key === 's') exportChain();
+});
+async function navigateHistory(delta){
+ if(switching||!active)return;
+ const records=historyState.records,index=(state.reviewIndex??records.length-1)+delta;
+ if(index<0)return;
+ if(index>=records.length){state.reviewing=false;state.reviewIndex=null;context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...state.terms],allKeywords:[...state.terms]};if(state.caption&&state.terms.length)nextKeyword(context);else analyze(context);pump();return;}
+ switching=true;context?.controller.abort();state.reviewing=true;
+ for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}
+ const old=active;let target;
+ try{
+  const record=records[index];await hydrateFrames([record]);target=slots.find(slot=>slot!==old&&slot.role==='idle');if(!target)throw Error('attendo un posto libero per la cronologia');
+  target.role='buffering';target.item=record.video.streamURL?{...record.video,streamURL:record.video.streamURL.replace('/download/','/cors/')} : await resolveItem({identifier:record.video.id},[],new AbortController().signal);
+  if(!target.item)throw Error('video della cronologia non disponibile');
+  target.media=await prepare(target.video,target.item.streamURL,new AbortController().signal,{startup:true,startAt:record.playStart||0});await startPlaying(target.video);target.video.muted=state.muted;target.video.classList.toggle('fill',state.fitMode==='fill');target.video.classList.add('on');old.video.classList.remove('on');active=target;active.role='active';active.startedAt=performance.now();release(old);old.claim=null;
+  update({reviewIndex:index,step:'cronologia',caption:record.description,terms:record.keywords||[],preview:record.frame?.preview||'',message:'cronologia · → prosegue; dopo l’ultimo video riprende il flusso'});
+ }catch(error){if(target&&target!==active)release(target);update({message:error.message});}finally{switching=false;}
+}
+window.addEventListener('afterimage:navigate',event=>{if(event.detail<0||state.reviewing)navigateHistory(event.detail);else skipReady();});
+window.addEventListener('afterimage:export-error',event=>update({message:event.detail}));
+window.addEventListener('afterimage:filters',()=>{
+ invalidateSemantic();for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}generalPool.queue.length=0;failed.clear();
+ if(active&&!state.reviewing){context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...new Set([state.selectedTerm,...state.terms].filter(Boolean))],allKeywords:[...state.terms]};if(state.caption&&context.keywords.length)nextKeyword(context);else analyze(context);}pump();renderInfo(state,active);
 });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { active?.video.pause(); if (active) active.hiddenAt = performance.now(); }
@@ -937,6 +1066,8 @@ requestAnimationFrame(tick);
 // The first stream gets the connection first; analyze() starts the model once
 // a video is playing, independently from future random/semantic reserves.
 pump();
+
+Object.defineProperty(window,'afterimageStatus',{get:()=>({...state,recordCount:historyState.records.length,activeID:active?.item?.id,switching})});
 
 return {};
 })();

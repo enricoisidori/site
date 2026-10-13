@@ -1,6 +1,6 @@
 import { sanitizeTerms } from './terms.js';
 import { archiveJSON as json } from './archive-transport.js';
-import { sourceScopes, exclusionTerms, promotionalMetadata } from './scope.js';
+import { sourceScopes, exclusionTerms, promotionalMetadata, filterState, blockedCollection } from './scope.js';
 export const SEARCH_LIMIT = 10000;
 export const SORTS = ['identifier asc', 'identifier desc', 'addeddate asc', 'addeddate desc'];
 export const pick = values => values[Math.floor(Math.random() * values.length)];
@@ -12,7 +12,7 @@ export function shuffle(values) {
 export function queryFor(terms = [], scope = sourceScopes[0]) {
   const clauses = sanitizeTerms(terms).map(term => `title:"${term}"`);
   const blocked = exclusionTerms.join(' OR ');
-  return `mediatype:movies${scope ? ` AND ${scope}` : ''}${clauses.length ? ` AND (${clauses.join(' OR ')})` : ''} AND NOT (${blocked}) AND NOT access-restricted-item:true`;
+  return `mediatype:movies${scope ? ` AND ${scope}` : ''}${clauses.length ? ` AND (${clauses.join(' OR ')})` : ''}${filterState.content ? ` AND NOT (${blocked})` : ''}${filterState.collections.map(id=>` AND NOT collection:"${id.replace(/[^a-zA-Z0-9_.-]/g,'')}"`).join('')} AND NOT access-restricted-item:true`;
 }
 export function searchURL(query, rows, page, sort) {
   const p = new URLSearchParams({ q: query, rows, page, output: 'json' });
@@ -76,7 +76,7 @@ export function metadataMatches(metadata, terms) {
 export async function resolveItem(item, terms, signal) {
   const d = await json(`https://archive.org/metadata/${encodeURIComponent(item.identifier)}`, signal);
   const md = d.metadata || {};
-  if (d.is_dark || md['access-restricted-item'] === 'true' || promotionalMetadata(md)) return null;
+  if (d.is_dark || md['access-restricted-item'] === 'true' || promotionalMetadata(md) || blockedCollection(md)) return null;
   const matches = metadataMatches(md, terms);
   if (terms.length && !matches.length) return null;
   const f = streamableFiles(d.files || [])[0];
@@ -93,7 +93,7 @@ export async function resolveItem(item, terms, signal) {
       const m = file.name?.match(/\.thumbs\/([^/]+)_(\d{6})\.jpg$/i);
       return m ? [{ name: file.name, stem: m[1], time: Number(m[2]) }] : [];
     }),
-    streamURL: `https://archive.org/download/${encodeURIComponent(item.identifier)}/${f.name.split('/').map(encodeURIComponent).join('/')}`,
+    streamURL: `https://archive.org/cors/${encodeURIComponent(item.identifier)}/${f.name.split('/').map(encodeURIComponent).join('/')}`,
     bytes: Number(f.size), duration: durationSeconds(f.length) || null,
     license: text(md.licenseurl || md.rights),
     source: `https://archive.org/details/${encodeURIComponent(item.identifier)}`,

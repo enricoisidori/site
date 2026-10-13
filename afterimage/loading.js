@@ -63,16 +63,13 @@ function stopImages() {
 export async function finishLoading() {
   mode = 'white'; stopImages();
   overlay.hidden = false; overlay.classList.add('white');
-  await new Promise(resolve => setTimeout(resolve, 3000));
-  overlay.classList.add('blank');
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  // Keep white until the caller has actually rendered the first video frame.
+  // Fade the white background and artwork together, over the playing video.
 }
 export function setWaiting(value) {
   if (mode === 'white') {
     if (!value) {
       mode = 'reveal';
-      reveal = overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 3000, easing: 'linear', fill: 'forwards' });
+      reveal = overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 6000, easing: 'linear', fill: 'forwards' });
       return reveal.finished.catch(() => {}).then(() => {
         if (mode === 'reveal') { mode = 'hidden'; overlay.hidden = true; }
         reveal.cancel(); reveal = null;

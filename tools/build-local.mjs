@@ -4,7 +4,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-for (const project of ['afterimage', 'dreamachine']) {
+for (const project of (process.argv[2] ? [process.argv[2]] : ['afterimage', 'dreamachine'])) {
   const source = resolve(root, project), modules = new Map();
   // Inline artwork also works under file://, without SVG mask CORS requests.
   const artwork = readFileSync(resolve(source, 'afterimage.svg'), 'utf8')
