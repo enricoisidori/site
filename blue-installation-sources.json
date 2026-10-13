@@ -1,0 +1,38 @@
+[
+  {
+    "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Lisbon,_Ohio.png",
+    "match": {
+      "x": 50,
+      "y": 50,
+      "w": 640,
+      "h": 376,
+      "ratio": 1,
+      "side": 100,
+      "zoom": 0.5
+    }
+  },
+  {
+    "source": "https://commons.wikimedia.org/wiki/File:Galleria_borbonica_-_Cistern_and_switches_(Naples).jpg",
+    "match": {
+      "x": 302,
+      "y": 134,
+      "w": 640,
+      "h": 427,
+      "ratio": 0.9576,
+      "side": 100,
+      "zoom": 0.5
+    }
+  },
+  {
+    "source": "https://commons.wikimedia.org/wiki/File:Girl_in_costume_of_Krishna_(3).jpg",
+    "match": {
+      "x": 28.5,
+      "y": 360.5,
+      "w": 640,
+      "h": 446,
+      "ratio": 0.9660238751147842,
+      "side": 33,
+      "zoom": 1.5151515151515151
+    }
+  }
+]

@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blueness</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27%3E%3Cpath fill=%27%230000ff%27 d=%27M0 0h16v16H0z%27/%3E%3C/svg%3E"><style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font:12px/1.5 Helvetica,Arial,sans-serif}
+#stage{display:block;width:100%;height:100%}
+#controls,#info{position:fixed;z-index:3;box-sizing:border-box;font:inherit;background:transparent;border:0;padding:0;text-shadow:0 1px 2px #000}
+#controls{top:16px;right:16px;width:min(360px,calc(100% - 32px));max-height:calc(100dvh - 32px);display:flex;flex-direction:column;overflow:hidden}
+.search-status{flex:none;margin:0 0 10px;white-space:pre-line}.control-fields{overflow:auto;scrollbar-width:none}.control-fields::-webkit-scrollbar{display:none}
+#info{bottom:16px;left:16px;max-width:min(550px,calc(100% - 32px));max-height:70vh;overflow:auto}
+button,input,select,summary,output,label,p,a{font:inherit;color:inherit;letter-spacing:0}
+button{padding:0;background:none;border:0;cursor:pointer;text-shadow:inherit}button:hover,a:hover{opacity:.65}
+.actions{display:flex;flex-direction:column;align-items:flex-start;gap:3px;margin:0 0 10px}.navigation{display:flex;justify-content:flex-start;gap:24px;margin:0}.navigation button{font:inherit}
+a{display:block;text-decoration:none;overflow-wrap:anywhere}.control-fields>a{margin-bottom:18px}
+details{margin:0 0 12px;padding:0;border:0}summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between}summary:after{content:'+';font:inherit}details[open]>summary:after{content:'−'}summary::-webkit-details-marker{display:none}details[open]>summary{margin-bottom:12px}
+label{display:grid;grid-template-columns:1fr 6ch;gap:12px;margin-bottom:8px;align-items:start}
+input[type=range]{grid-column:1/3;appearance:none;-webkit-appearance:none;display:block;width:100%;height:16px;margin:0;padding:0;background:transparent;cursor:pointer;border:0}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:#aaa;border:0}input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:1px;height:13px;margin-top:-6px;background:white;border:0;border-radius:0}
+input[type=range]::-moz-range-track{height:1px;background:#aaa;border:0}input[type=range]::-moz-range-thumb{width:1px;height:13px;background:white;border:0;border-radius:0}output{text-align:right;font-variant-numeric:tabular-nums}
+
+select{grid-column:1/3;appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-shadow:inherit}select option{background:black;color:white}
+label>button{text-align:right}.screen-button{display:block;margin:0;padding:0;text-align:left;text-decoration:underline;text-underline-offset:2px}p{white-space:pre-line;margin:0 0 12px}.swatch{display:none}
+.export-button{display:block;text-decoration:underline;text-underline-offset:2px;margin-top:14px}footer{margin-top:16px;font:inherit}footer a{display:inline;text-decoration:underline;text-underline-offset:2px}
+:focus-visible{outline:1px dotted #888;outline-offset:2px}[hidden]{display:none!important}
+
+</style></head><body data-mode="archive" data-sources="archive"><canvas id="stage"></canvas><aside id="controls" hidden></aside><aside id="info" hidden></aside><script>// Normal requests keep the original fetch path. Search can recover through
+// Archive JSONP, then the independent scrape endpoint, without a private proxy.
+let sequence = 0;
+function jsonp(url, signal) {
+  const target = new URL(url);
+  if (target.origin !== 'https://archive.org' || target.pathname !== '/advancedsearch.php') throw new Error('invalid JSONP endpoint');
+  return new Promise((resolve, reject) => {
+    const name = '__archive' + Date.now() + '_' + (++sequence);
+    const script = document.createElement('script');
+    let timer, settled = false;
+    const finish = (error, data) => {
+      if (settled) return; settled = true;
+      clearTimeout(timer); signal?.removeEventListener('abort', abort); script.remove();
+      window[name] = () => {}; setTimeout(() => { delete window[name]; }, 60000);
+      error ? reject(error) : resolve(data);
+    };
+    const abort = () => finish(signal.reason || new DOMException('aborted', 'AbortError'));
+    if (signal?.aborted) return abort();
+    window[name] = data => data.error ? finish(new Error(String(data.error))) : finish(null, data);
+    script.onerror = () => finish(new Error('ricerca Archive non disponibile'));
+    target.searchParams.set('callback', name); script.src = target.href;
+    signal?.addEventListener('abort', abort, { once: true });
+    timer = setTimeout(() => finish(new Error('timeout ricerca Archive')), 8000);
+    document.head.append(script);
+  });
+}
+async function direct(url, signal) {
+  const response = await fetch(url, { signal: AbortSignal.any([signal || new AbortController().signal, AbortSignal.timeout(10000)]) });
+  if (!response.ok) throw new Error('Archive HTTP ' + response.status);
+  const data = await response.json();
+  if (data.error) throw new Error(String(data.error));
+  return data;
+}
+async function archiveJSON(url, signal) {
+  const search = url.includes('/advancedsearch.php');
+  let error;
+  // file:// sends Origin:null; avoid the known failing fetch before JSONP.
+  if (!search || location.protocol !== 'file:') {
+    try { return await direct(url, signal); }
+    catch (failure) { if (signal?.aborted) throw failure; error = failure; }
+  }
+  if (!search) throw error;
+  try { return await jsonp(url, signal); }
+  catch (failure) { if (signal?.aborted) throw failure; error = failure; }
+  const original = new URL(url);
+  const params = new URLSearchParams({ q: original.searchParams.get('q'), fields: 'identifier,title', count: '100' });
+  const sort = original.searchParams.get('sort[]'); if (sort) params.set('sorts', sort);
+  if (original.searchParams.get('rows') === '1') params.set('total_only', 'true');
+  try {
+    const data = await direct('https://archive.org/services/search/v1/scrape?' + params, signal);
+    if (data.total == null) throw new Error('risposta Archive incompleta');
+    // Recovery still applies the full query; randomness is limited to this batch.
+    return { response: { numFound: Number(data.total), docs: data.items || [] }, recovery: true };
+  } catch (failure) {
+    if (signal?.aborted) throw failure;
+    throw new Error('ricerca Archive non disponibile: ' + (failure.message || error.message));
+  }
+}
+
+// Tiny image-only PDF writer. Called only after the user requests an export.
+async function buildBluenessPDF(pages){
+ const encode=text=>new TextEncoder().encode(text),objects=[null,null,null],pageRefs=[];
+ const escape=text=>String(text||'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[\r\n]/g,' ');
+ const add=chunks=>{objects.push(chunks.map(c=>typeof c==='string'?encode(c):c));return objects.length-1;};
+ for(const page of pages){
+  const data=new Uint8Array(await page.blob.arrayBuffer());
+  const image=add([`<< /Type /XObject /Subtype /Image /Width ${page.w} /Height ${page.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${data.length} >>\nstream\n`,data,'\nendstream']);
+  const width=960,height=+(width*page.h/page.w).toFixed(3),commands=`q ${width} 0 0 ${height} 0 0 cm /Im0 Do Q\n`;
+  const content=add([`<< /Length ${encode(commands).length} >>\nstream\n${commands}endstream`]);
+  const link=page.source?` /Annots [<< /Type /Annot /Subtype /Link /Rect [0 0 ${width} ${height}] /Border [0 0 0] /A << /S /URI /URI (${escape(page.source)}) >> >>]`:'';
+  pageRefs.push(add([`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] /Resources << /XObject << /Im0 ${image} 0 R >> >> /Contents ${content} 0 R${link} >>`]));
+ }
+ objects[1]=[encode('<< /Type /Catalog /Pages 2 0 R >>')];objects[2]=[encode(`<< /Type /Pages /Count ${pageRefs.length} /Kids [${pageRefs.map(n=>n+' 0 R').join(' ')}] >>`)];
+ const info=add(['<< /Title (Blueness) /Author (Enrico Isidori x Contento360) /Subject (Session route: one frame per video and final square mosaic) >>']);
+ const chunks=[encode('%PDF-1.4\n%Blueness\n')],offsets=[0];let offset=chunks[0].length;
+ for(let i=1;i<objects.length;i++){offsets[i]=offset;const parts=[encode(i+' 0 obj\n'),...objects[i],encode('\nendobj\n')];for(const part of parts){chunks.push(part);offset+=part.length;}}
+ const xref=offset;chunks.push(encode(`xref\n0 ${objects.length}\n0000000000 65535 f \n${offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')}trailer\n<< /Size ${objects.length} /Root 1 0 R /Info ${info} 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
+ return new Blob(chunks,{type:'application/pdf'});
+}
+
+(() => {
+'use strict';
+const mode=document.body.dataset.mode,archiveMode=mode==='archive',mixed=mode==='mixed';
+let sources=document.body.dataset.sources||'both';
+const kinds=mode==='video'?['video']:mixed?['image','video']:['image'];
+const canvas=document.querySelector('#stage'),ctx=canvas.getContext('2d',{alpha:false});
+const analysis=document.createElement('canvas'),ac=analysis.getContext('2d',{willReadFrequently:true});
+const controls=document.querySelector('#controls'),info=document.querySelector('#info');
+const defaults={size:50,hue:25,saturation:55,brightness:45,redMax:40,greenMax:65,rgbDistance:210,disturbance:20,zoom:1,minZoom:.5,maxZoom:8,fps:4,quality:640,seconds:mode==='mixed'?4:15,hz:8,dual:true,excludeGovernment:true,excludePolitics:true,showBorder:false,motionStep:18,trackingTolerance:15,cameraCooldown:1.2};
+const settings={...defaults};try{Object.assign(settings,JSON.parse(localStorage.getItem('blue-controls-v3-'+mode)||'{}'));}catch{}
+if(settings.motionStep===10)settings.motionStep=18;
+Object.defineProperties(settings,{excludeGovernment:{value:true,writable:false,enumerable:true,configurable:false},excludePolitics:{value:true,writable:false,enumerable:true,configurable:false}});
+const initialURL=new URL(location.href);settings.dual=initialURL.searchParams.get('dual')!=='0';
+function syncURL(){try{const url=new URL(location.href);if(settings.dual)url.searchParams.delete('dual');else url.searchParams.set('dual','0');window.history.replaceState(null,'',url);}catch{}}
+// window.history is used explicitly because the media history below has the same name.
+const pools=Object.fromEntries(kinds.map(kind=>[kind,{urls:[],ready:[],loading:0,fetching:false,next:0,checked:0,accepted:0,discarded:0,lastError:'',seen:new Set()}]));
+// Shared persistent history across all blue variants; never rotate or trim it.
+const playedKey='blue-played-v1',played=new Set();
+function mediaKey(item){try{return decodeURIComponent(new URL(item.source).hostname+new URL(item.source).pathname).replace(/_/g,' ').normalize('NFC');}catch{return item.source;}}
+function mergePlayed(value){try{for(const key of JSON.parse(value||'[]'))played.add(key);}catch{}}
+try{mergePlayed(localStorage.getItem(playedKey));}catch{}
+addEventListener('storage',event=>{if(event.key===playedKey)mergePlayed(event.newValue);});
+function rememberPlayed(item){
+ played.add(mediaKey(item));
+ try{mergePlayed(localStorage.getItem(playedKey));localStorage.setItem(playedKey,JSON.stringify([...played]));}
+ catch{lastError='cronologia non salvabile: anti-ripetizione attiva solo in questa sessione';}
+}
+// Keep unused, previously verified candidates as a fast starting pool, never replay shown media.
+const blueCatalog=new Map();let catalogTimer;
+try{for(const item of JSON.parse(localStorage.getItem('blue-candidates-v1')||'[]'))if(item.source&&item.kind&&item.candidatePolicy==='general-or-color-tag-v1')blueCatalog.set(mediaKey(item),item);}catch{}
+function recordCandidate(entry){
+ const item={candidatePolicy:'general-or-color-tag-v1',provider:entry.provider,id:entry.id,url:entry.media.currentSrc||entry.url,title:entry.title,source:entry.source,author:entry.author,license:entry.license,kind:entry.kind,videoVariants:entry.videoVariants,excludePolitics:settings.excludePolitics,excludeGovernment:settings.excludeGovernment};
+ blueCatalog.set(mediaKey(item),item);while(blueCatalog.size>1000)blueCatalog.delete(blueCatalog.keys().next().value);
+ clearTimeout(catalogTimer);catalogTimer=setTimeout(()=>{try{localStorage.setItem('blue-candidates-v1',JSON.stringify([...blueCatalog.values()]));}catch{}},400);
+}
+function seedCandidates(){for(const item of blueCatalog.values()){const pool=pools[item.kind];if(!pool||(settings.excludePolitics&&!item.excludePolitics)||(settings.excludeGovernment&&!item.excludeGovernment)||played.has(mediaKey(item))||pool.seen.has(item.source)||(sources!=='both'&&item.provider!==sources))continue;pool.seen.add(item.source);pool.urls.push({...item});}}
+let revision=0,current=null,history=[],historyIndex=-1,shownAt=0,lastDetect=0,lostAt=0,lastError='',checked=0,accepted=0,shown=0,infoVisible=false,squareWindow=null,muted=true,lastInfo=0,lastPaintKey='',reviewing=false,mixedNeedsImage=false;
+const clean=s=>String(s||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+const searchStatus=document.createElement('p');searchStatus.setAttribute('aria-live','polite');searchStatus.className='search-status';controls.append(searchStatus);
+const fields=document.createElement('div');fields.className='control-fields';controls.append(fields);
+const actions=document.createElement('div');actions.className='actions';fields.append(actions);
+const sourceLink=document.createElement('a');sourceLink.target='_blank';sourceLink.rel='noopener';sourceLink.textContent='fonte';fields.append(sourceLink);
+const groups={};function controlGroup(name,open=false){if(!groups[name]){const details=document.createElement('details'),title=document.createElement('summary');title.textContent=name;details.open=open;details.append(title);fields.append(details);groups[name]=details;}return groups[name];}
+const ranges=[['size','lato quadrato fisso sullo schermo · px',10,180,1],['hue','ampiezza del blu · ± gradi di tonalità',1,80,1],['saturation','saturazione minima · %',0,100,1],['brightness','luminosità minima · %',0,100,1],['redMax','rosso massimo rispetto al blu · % (meno viola)',0,100,1],['greenMax','verde massimo rispetto al blu · % (meno ciano)',0,100,1],['rgbDistance','distanza RGB da #0000ff · 0 = esatto',0,442,1],['disturbance','pixel fuori range ammessi · %',0,70,1],['minZoom','zoom automatico minimo · ×',.25,1,.25],['maxZoom','zoom automatico massimo · ×',1,12,.5],...(kinds.includes('video')?[['motionStep','spostamento minimo inquadratura · px',0,80,1],['trackingTolerance','tolleranza extra durante il tracking · %',0,40,1],['cameraCooldown','pausa minima fra correzioni · secondi',.3,3,.1]]:[]),...(kinds.includes('image')?[['fps','immagini al secondo',.5,10,.5],['quality','qualità immagini · lato richiesto in px',160,1280,160]]:[]),...(kinds.includes('video')?[['seconds','durata massima video · secondi',1,mixed?4:30,.5],['hz','analisi video · frame al secondo',2,15,1]]:[])];
+const swatch=document.createElement('div');
+function save(){try{localStorage.setItem('blue-controls-v3-'+mode,JSON.stringify(settings));}catch{}}
+function invalidate(key){
+ if(['size','hue','saturation','brightness','disturbance','quality','redMax','greenMax','rgbDistance','minZoom','maxZoom','excludeGovernment','excludePolitics','sources'].includes(key)){
+  revision++;for(const pool of Object.values(pools)){pool.ready.splice(0).forEach(release);if(['quality','sources','excludeGovernment','excludePolitics'].includes(key))pool.urls.length=0;}
+  if(current){current.match=null;current.cameraAnchor=null;current.pendingCamera=null;lastDetect=0;}
+ }
+ if(key==='dual')syncURL();if(key==='sources')seedCandidates();save();updateSwatch();lastPaintKey='';pump();
+}
+for(const [key,label,min,max,step] of ranges){
+ settings[key]=Math.max(min,Math.min(max,(Number.isFinite(Number(settings[key]))?Number(settings[key]):defaults[key])));
+ const row=document.createElement('label'),caption=document.createElement('span'),output=document.createElement('output'),input=document.createElement('input');caption.textContent=label;input.type='range';input.setAttribute('aria-label',label);Object.assign(input,{min,max,step,value:settings[key]});output.textContent=input.value;
+ input.addEventListener('input',()=>{output.textContent=input.value;});
+ input.addEventListener('change',()=>{const value=Number(input.value);if(input.value===''||!Number.isFinite(value)){input.value=settings[key];return;}const next=Math.max(min,Math.min(max,value));input.value=next;if(next===settings[key])return;settings[key]=next;output.textContent=input.value;invalidate(key);});row.append(caption,output,input);const group=['hue','saturation','brightness','redMax','greenMax','rgbDistance','disturbance'].includes(key)?'colore':['size','minZoom','maxZoom','motionStep','trackingTolerance','cameraCooldown'].includes(key)?'inquadratura':'riproduzione';controlGroup(group).append(row);
+}
+function updateSwatch(){swatch.style.background=`linear-gradient(90deg,hsl(${240-settings.hue} 100% 50%),#0000ff,hsl(${240+settings.hue} 100% 50%))`;swatch.title='intervallo di tonalità accettato';}updateSwatch();
+const sourceSelect=document.createElement('select');for(const [value,label]of [['both','commons + internet archive'],['commons','solo wikimedia commons'],['archive','solo internet archive']]){const option=document.createElement('option');option.value=value;option.textContent=label;sourceSelect.append(option);}sourceSelect.value=sources;sourceSelect.onchange=()=>{sources=sourceSelect.value;invalidate('sources');};const sourceRow=document.createElement('label');sourceRow.append(sourceSelect);controlGroup('archivi').append(sourceRow);
+for(const [key,label]of [['showBorder','mostra bordo']]){const row=document.createElement('label'),input=document.createElement('button');input.dataset.setting=key;input.textContent=settings[key]?'1':'0';input.onclick=()=>{settings[key]=!settings[key];input.textContent=settings[key]?'1':'0';invalidate(key);};row.append(label,input);controlGroup('schermi').append(row);}
+syncURL();
+const dualLabel=document.createElement('label'),dual=document.createElement('button');dual.textContent=settings.dual?'1':'0';dual.onclick=()=>{settings.dual=squareWindow&&!squareWindow.closed?false:!settings.dual;dual.textContent=settings.dual?'1':'0';invalidate('dual');};dualLabel.append('simula due schermi 16:9',dual);controlGroup('schermi').append(dualLabel);
+const second=document.createElement('button');second.textContent='apri secondo schermo';second.className='screen-button';second.onclick=()=>{
+ squareWindow=window.open('about:blank','blue-square','popup,width=960,height=540');if(!squareWindow)return;settings.dual=false;settings.showBorder=false;dual.textContent='0';const borderToggle=fields.querySelector('[data-setting=showBorder]');if(borderToggle)borderToggle.textContent='0';invalidate('dual');
+ squareWindow.document.write('<!doctype html><title>Blueness</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27%3E%3Cpath fill=%27blue%27 d=%27M0 0h16v16H0z%27/%3E%3C/svg%3E"><style>html,body{margin:0;background:black;overflow:hidden}canvas{display:block}</style><canvas></canvas>');squareWindow.document.close();lastPaintKey='';
+};
+const nav=document.createElement('div');nav.className='navigation';for(const [label,action]of [['◀',back],['▶',()=>advance(true)]]){const b=document.createElement('button');b.textContent=label;b.setAttribute('aria-label',label==='◀'?'indietro':'avanti');b.onclick=action;nav.append(b);}actions.append(nav,second);
+const route=[],routeSeen=new Set();let exportingPDF=false;
+const exportButton=document.createElement('button');exportButton.textContent='elabora e scarica PDF';exportButton.className='export-button';exportButton.onclick=exportRoute;fields.append(exportButton);
+function jpeg(canvas,quality){return new Promise((resolve,reject)=>canvas.toBlob(blob=>{canvas.width=canvas.height=0;blob?resolve(blob):reject(Error('fotogramma non disponibile'));},'image/jpeg',quality));}
+function captureRoute(entry){
+ if(entry.kind!=='video'||routeSeen.has(mediaKey(entry))||!entry.match)return;
+ routeSeen.add(mediaKey(entry));
+ const w=Math.max(1,Math.min(canvas.width/2,canvas.height*16/9)),h=w*9/16,scale=Math.min(1,1200/(w*2));
+ const scene=document.createElement('canvas');scene.width=Math.round(w*2*scale);scene.height=Math.round(h*scale);const sc=scene.getContext('2d');sc.fillStyle='#000';sc.fillRect(0,0,scene.width,scene.height);sc.scale(scale,scale);
+ drawScreen(sc,{x:0,y:0,w,h},false,entry,false,true);drawScreen(sc,{x:w,y:0,w,h},true,entry,false,true);
+ const tile=document.createElement('canvas');tile.width=tile.height=64;const tc=tile.getContext('2d');tc.fillStyle='#000';tc.fillRect(0,0,64,64);tc.scale(64/settings.size,64/settings.size);drawScreen(tc,{x:0,y:0,w:settings.size,h:settings.size},true,entry,false,true);
+ const record={source:entry.source,w:scene.width,h:scene.height,scene:jpeg(scene,.65),tile:jpeg(tile,.8)};
+ // One small compressed snapshot per video; PDF assembly and mosaic wait for P/click.
+ record.scene.catch(()=>{});record.tile.catch(()=>{});route.push(record);
+}
+async function exportRoute(){
+ if(exportingPDF)return;if(!route.length){exportButton.textContent='nessun video da esportare';return;}
+ exportingPDF=true;exportButton.textContent='elaborazione PDF';
+ try{
+  const records=route.slice(),pages=[];
+  for(const record of records)pages.push({blob:await record.scene,w:record.w,h:record.h,source:record.source});
+  const cols=Math.min(records.length,Math.ceil(Math.sqrt(records.length*16/9))),rows=Math.ceil(records.length/cols),cell=Math.max(1,Math.min(64,Math.floor(1600/cols)));
+  const mosaic=document.createElement('canvas');mosaic.width=cols*cell;mosaic.height=rows*cell;const mc=mosaic.getContext('2d');mc.fillStyle='#000';mc.fillRect(0,0,mosaic.width,mosaic.height);
+  for(let i=0;i<records.length;i++){const bitmap=await createImageBitmap(await records[i].tile);mc.drawImage(bitmap,(i%cols)*cell,Math.floor(i/cols)*cell,cell,cell);bitmap.close();}
+  const mw=mosaic.width,mh=mosaic.height;pages.push({blob:await jpeg(mosaic,.85),w:mw,h:mh});
+  const blob=await buildBluenessPDF(pages),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='blueness-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
+ }catch(error){lastError=error.message;}finally{exportingPDF=false;exportButton.textContent='elabora e scarica PDF';}
+}
+const credit=document.createElement('footer');credit.append('Blueness, 2026 ');
+for(const [label,url]of [['Enrico Isidori','https://enricoisidori.com'],['Contento360','https://contento360.it']]){if(label==='Contento360')credit.append(' x ');const link=document.createElement('a');link.textContent=label;link.href=url;link.target='_blank';link.rel='noopener';credit.append(link);}fields.append(credit);
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;lastPaintKey='';}addEventListener('resize',resize);resize();
+function release(item){if(!item)return;if(item.poster){item.poster.width=item.poster.height=0;item.poster=null;}if(item.kind==='video'){item.media.pause();item.media.removeAttribute('src');item.media.load();}else item.media.src='';}
+const roiCanvas=document.createElement('canvas'),roiContext=roiCanvas.getContext('2d',{willReadFrequently:true});
+const integralSums=new Uint32Array(641*641);
+const analysisStats={roi:0,full:0};
+function colorTest(){
+ const red=settings.redMax/100,green=settings.greenMax/100,sat=settings.saturation/100,value=settings.brightness*2.55,hue=settings.hue,limit=settings.rgbDistance*settings.rgbDistance;
+ // R/G limits already make B the largest channel; compare HSV algebraically, no divisions.
+ return (p,i)=>{const r=p[i],g=p[i+1],b=p[i+2];if(p[i+3]<=240||b<value||r>b*red||g>b*green)return false;const delta=b-Math.min(r,g),d=255-b;return delta>0&&delta>=sat*b&&60*Math.abs(r-g)<=hue*delta&&r*r+g*g+d*d<=limit;};
+}
+function detect(media,previous){
+ const sw=media.videoWidth||media.naturalWidth,sh=media.videoHeight||media.naturalHeight;if(!sw||!sh)return null;
+ const scale=Math.min(1,640/Math.max(sw,sh)),w=Math.round(sw*scale),h=Math.round(sh*scale);
+ const blue=colorTest(),required=1-settings.disturbance/100;
+ // Most video frames need only the already locked square, not a full-frame scan.
+ if(previous&&previous.w===w&&previous.h===h&&previous.side){
+  const s=previous.side,x=Math.round(previous.x-s/2),y=Math.round(previous.y-s/2);
+  if(x>=0&&y>=0&&x+s<=w&&y+s<=h){
+   if(roiCanvas.width!==s||roiCanvas.height!==s){roiCanvas.width=roiCanvas.height=s;}
+   roiContext.clearRect(0,0,s,s);roiContext.drawImage(media,x*sw/w,y*sh/h,s*sw/w,s*sh/h,0,0,s,s);
+   const pixels=roiContext.getImageData(0,0,s,s).data;let hits=0;
+   for(let i=0;i<pixels.length;i+=4)if(blue(pixels,i))hits++;
+   analysisStats.roi++;
+   if(hits/(s*s)+1e-9>=Math.max(.3,required-settings.trackingTolerance/100))return {...previous,ratio:hits/(s*s)};
+  }
+ }
+ if(analysis.width!==w||analysis.height!==h){analysis.width=w;analysis.height=h;}
+ ac.clearRect(0,0,w,h);ac.drawImage(media,0,0,w,h);
+ const pixels=ac.getImageData(0,0,w,h).data,stride=w+1,sums=integralSums;analysisStats.full++;sums.fill(0,0,stride);
+ for(let y=0;y<h;y++){let row=0;sums[(y+1)*stride]=0;for(let x=0;x<w;x++){
+  if(blue(pixels,(y*w+x)*4))row++;
+  sums[(y+1)*stride+x+1]=sums[y*stride+x+1]+row;
+ }}
+ // Reuse one integral image at multiple scales; the output aperture never changes size.
+ const zooms=[previous?.zoom,settings.minZoom,.25,.5,.75,1,1.5,2,3,4,6,8,12,settings.maxZoom].filter(z=>z>=settings.minZoom&&z<=settings.maxZoom);
+ const sides=[...new Set(zooms.map(z=>Math.max(2,Math.ceil(settings.size/settings.maxZoom),Math.min(Math.floor(settings.size/settings.minZoom),Math.round(settings.size/z)))))];
+ for(const s of sides){
+  if(s>w||s>h||sums[h*stride+w]<required*s*s)continue;
+  let best=null,bestScore=-Infinity;
+  // Dense scan at small scales; bounded grid for larger areas keeps video tracking light.
+  const step=Math.max(1,Math.floor(s/16));
+  for(let y=0;y<=h-s;y+=step)for(let x=0;x<=w-s;x+=step){
+   const hits=sums[(y+s)*stride+x+s]-sums[y*stride+x+s]-sums[(y+s)*stride+x]+sums[y*stride+x],ratio=hits/(s*s);if(ratio+1e-9<required)continue;
+   const movement=previous?Math.hypot(x+s/2-previous.x,y+s/2-previous.y)*settings.size/s:Infinity;const zoomChange=previous?.zoom?Math.abs((settings.size/s)/previous.zoom-1):0;if(previous&&movement<settings.motionStep&&zoomChange<.15)continue;
+   const distance=previous?Math.hypot(x+s/2-previous.x,y+s/2-previous.y)/Math.max(w,h):0,score=ratio-distance*.18;
+   if(score>bestScore){bestScore=score;best={x:x+s/2,y:y+s/2,w,h,ratio,side:s,zoom:settings.size/s};}
+  }
+  if(best)return best;
+ }return null;
+}
+// Hysteresis in space, color and time: never chase every sampled frame.
+function stabilizeCamera(entry,candidate,now){
+ const anchor=entry.cameraAnchor;
+ if(!anchor||entry.kind!=='video'){entry.lastGoodCamera=now;return candidate;}
+ if(candidate&&candidate.x===anchor.x&&candidate.y===anchor.y&&candidate.zoom===anchor.zoom){entry.pendingCamera=null;entry.lastGoodCamera=now;return candidate;}
+ if(candidate){
+  const pending=entry.pendingCamera;
+  const consistent=pending&&Math.hypot(candidate.x-pending.match.x,candidate.y-pending.match.y)*candidate.zoom<=8&&Math.abs(candidate.zoom/pending.match.zoom-1)<.1;
+  entry.pendingCamera={match:candidate,count:consistent?pending.count+1:1};
+  if(entry.pendingCamera.count>=3&&now-(entry.lastCameraMove||shownAt)>=settings.cameraCooldown*1000){entry.pendingCamera=null;entry.lastCameraMove=now;entry.lastGoodCamera=now;return candidate;}
+ }else entry.pendingCamera=null;
+ // Brief occlusion/color changes should not flash the loading square.
+ return now-(entry.lastGoodCamera||shownAt)<900?anchor:null;
+}
+function waitEvent(media,event,timeout=10000){return new Promise((resolve,reject)=>{let timer;const done=error=>{clearTimeout(timer);media.removeEventListener(event,ok);media.removeEventListener('error',bad);error?reject(error):resolve();};const ok=()=>done(),bad=()=>done(Error('media non disponibile'));media.addEventListener(event,ok,{once:true});media.addEventListener('error',bad,{once:true});timer=setTimeout(()=>done(Error('caricamento scaduto')),timeout);});}
+async function api(params){const response=await fetch('https://commons.wikimedia.org/w/api.php?'+new URLSearchParams({action:'query',format:'json',origin:'*',...params}),{signal:AbortSignal.timeout(12000)});if(!response.ok)throw Error('Commons HTTP '+response.status);const data=await response.json();if(data.error)throw Error(data.error.info);return Object.values(data.query?.pages||{});}
+// Strict metadata exclusions apply to all video candidates before any download.
+function governmental(data,page){
+
+ const text=clean([page.title,...(page.categories||[]).map(c=>c.title),...Object.values(data.extmetadata||{}).map(m=>m.value)].join(' ')).replace(/[_-]/g,' ');
+ return (settings.excludePolitics&&/trump|politic|political|election|electoral|republican|democrat|maga|campaign rally|parliament|congress|senate|senator|president|prime minister|biden|harris|vance|melania|gop|white house/i.test(text)) || (settings.excludeGovernment&&/government|govt|usgov|\.gov\b|governativ|governo|gouvernement|regierung|gobierno|minister|federal|united states|american|\busa\b|\bu\.?s\.?\b|nasa|noaa|usgs|usaf|usmc|usda|\bdod\b|department|white house|pentagon|military|militar|police|polizia|law enforcement|armed forces|navy|air force|army|defen[cs]e|presiden|prime minister|official|state agency|public agency|national archive|national park service|national science foundation|smithsonian|library of congress/i.test(text));
+}
+const totals=new Map(),searchTurns=new Map();
+function colorFallback(key,kind){if(kind==='video')return false;const n=searchTurns.get(key)||0;searchTurns.set(key,n+1);return n%4===3&&pools[kind].ready.length===0;}
+
+async function fetchArchive(kind){
+ const preferred=colorFallback('archive:'+kind,kind);
+ const alphabet='abcdefghijklmnopqrstuvwxyz0123456789',prefix=alphabet[Math.floor(Math.random()*alphabet.length)];
+ const base='mediatype:'+(kind==='video'?'movies':'image')+' AND NOT access-restricted-item:true';
+ const q=base+(preferred?' AND subject:blue':' AND identifier:'+prefix+'*');
+ const rows=kind==='video'?12:50,total=totals.get(q),page=total?1+Math.floor(Math.random()*Math.ceil(Math.min(total,10000)/rows)):1;
+ const params=new URLSearchParams({q,rows:String(rows),page:String(page),output:'json','fl[]':'identifier','sort[]':Math.random()<.5?'identifier asc':'identifier desc'});
+ const data=await archiveJSON('https://archive.org/advancedsearch.php?'+params,AbortSignal.timeout(14000));totals.set(q,Number(data.response?.numFound)||0);
+ return (data.response?.docs||[]).sort(()=>Math.random()-.5).map(item=>({provider:'archive',id:item.identifier,url:'https://archive.org/cors/'+encodeURIComponent(item.identifier)+'/__ia_thumb.jpg',title:item.identifier,source:'https://archive.org/details/'+encodeURIComponent(item.identifier),author:'internet archive',license:'licenza nella pagina originale'}));
+}
+function useLightVideo(){return !!pools.video&&(pools.video.accepted<2||pools.video.ready.length<=1);}
+function pickVideoVariant(variants,light){
+ const target=light?(pools.video.accepted<2?240:360):540;
+ return variants.filter(d=>Number(d.height)>0&&Number(d.height)<=720).sort((a,b)=>{const score=d=>Math.abs(Number(d.height)-target)+(light&&Number(d.height)>480?500:!light&&Number(d.height)<480?250:0);return score(a)-score(b);})[0];
+}
+async function fetchCommons(kind){
+ const entries=[];
+   const preferred=colorFallback('commons:'+kind,kind);
+   const term='(haswbstatement:P462=Q1088 OR incategory:Blue)';
+   const negatives=(settings.excludeGovernment?' -government -"United States" -USA -NASA -military':'')+(settings.excludePolitics?' -Trump -politics -political -election -Republican -Democrat -MAGA':'');
+   const generator=kind==='image'&&!preferred?{generator:'random',grnnamespace:'6',grnlimit:'50'}:{generator:'search',gsrsearch:(kind==='video'?'filetype:video ':'')+(preferred?term:'')+negatives,gsrnamespace:'6',gsrlimit:kind==='video'?'12':'50',gsroffset:String(Math.floor(Math.random()*(preferred?500:9000)))};
+   const params=kind==='video'?{...generator,prop:'videoinfo|categories',cllimit:'max',viprop:'url|mime|derivatives|extmetadata',viextmetadatafilter:'Artist|LicenseShortName|LicenseUrl|ImageDescription|Credit|UsageTerms'}:{...generator,prop:'imageinfo',iiprop:'url|mime|extmetadata',iiurlwidth:String(settings.quality),iiextmetadatafilter:'Artist|LicenseShortName|LicenseUrl|ImageDescription|Credit'};
+   let pages=await api(params);if(!pages.length&&generator.generator==='search'&&Number(generator.gsroffset)>0)pages=await api({...params,gsroffset:'0'});
+   for(const page of pages){
+    const data=(kind==='video'?page.videoinfo:page.imageinfo)?.[0];if(!data||governmental(data,page))continue;
+    let url=data.thumburl,videoVariants;
+    if(kind==='video'){
+     const test=document.createElement('video');
+     videoVariants=(data.derivatives||[]).filter(d=>d.src&&Number(d.width)>0&&Number(d.width)<=1280&&Number(d.height)<=720&&test.canPlayType(d.type||'video/webm'));
+     url=videoVariants[0]?.src;
+    }else if(!/^image\/(jpeg|png|webp)$/.test(data.mime||''))continue;
+    if(!url)continue;const meta=data.extmetadata||{};entries.push({provider:'commons',url,videoVariants,title:page.title,source:data.descriptionurl||'https://commons.wikimedia.org/?curid='+page.pageid,author:clean(meta.Artist?.value),license:clean(meta.LicenseShortName?.value)});
+   }
+ return entries;
+}
+function fetchBatch(kind){
+ const pool=pools[kind];if(pool.urls.length>(kind==='video'?15:70))return;
+ pool.requests ||= {};
+ for(const provider of (sources==='both'?['commons','archive']:[sources])){
+  const state=pool.requests[provider] ||= {fetching:false,next:0};
+  if(state.fetching||Date.now()<state.next)continue;state.fetching=true;state.failed=false;pool.fetching=true;
+  const version=revision;
+  (provider==='commons'?fetchCommons(kind):fetchArchive(kind)).then(entries=>{
+   if(version!==revision)return;
+   for(const item of entries){if(played.has(mediaKey(item))||pool.seen.has(item.source))continue;pool.seen.add(item.source);pool.urls.splice(Math.floor(Math.random()*(pool.urls.length+1)),0,{...item,kind});}
+  }).catch(error=>{state.failed=true;lastError=error.message;pool.lastError=error.message;}).finally(()=>{
+   state.fetching=false;state.next=Date.now()+(state.failed?3500:kind==='video'?600:250);pool.fetching=Object.values(pool.requests).some(s=>s.fetching);pump();
+  });
+ }
+}
+async function prepare(item){
+ const pool=pools[item.kind],version=revision,media=document.createElement(item.kind==='video'?'video':'img');media.crossOrigin='anonymous';
+ if(item.provider==='archive')pool.archiveLoading=(pool.archiveLoading||0)+1;
+ const light=item.kind==='video'&&useLightVideo();
+ const entry={...item,media,match:null,revision:version,startTime:0,qualityBand:light?'240–480p':'480–720p'};
+ try{
+  if(item.kind==='image')media.decoding='async';
+  if(item.kind==='video'&&item.videoVariants){const variant=pickVideoVariant(item.videoVariants,light);if(!variant)throw Error('nessun video nella fascia richiesta');item.url=variant.src;}
+  if(item.provider==='archive'&&(item.kind==='video'||settings.quality>320||settings.excludePolitics)){
+   try{
+    const response=await fetch('https://archive.org/metadata/'+encodeURIComponent(item.id),{signal:AbortSignal.timeout(5000)});
+    if(response.ok){
+     const metadata=await response.json();
+     if(governmental({extmetadata:{archive:{value:JSON.stringify(metadata.metadata)}}},{title:item.title}))throw Error('escluso dai filtri');
+     if(item.kind==='video'){
+      const height=f=>Number(f.height)||Number(f.name.match(/(?:^|[._ -])(240|360|480|540|720|1080)p(?:[._ -]|$)/i)?.[1])||0;
+      const files=(metadata.files||[]).filter(f=>/\.(mp4|webm)$/i.test(f.name)&&Number(f.size)>0&&Number(f.size)<150000000&&height(f)<=720).sort((a,b)=>{
+       const rank=f=>{const h=height(f),low=/512kb|low|240p|360p/i.test(f.name+' '+f.format)||(h>0&&h<480);if(light)return h>=240&&h<=480?0:low?1:3;return h>=480&&h<=720?0:low?3:1;};
+       return rank(a)-rank(b)||Number(a.size)-Number(b.size);
+      });
+      if(!files.length)throw Error('nessun video leggero');item.url='https://archive.org/cors/'+encodeURIComponent(item.id)+'/'+files[0].name.split('/').map(encodeURIComponent).join('/');
+     }else{
+      const files=(metadata.files||[]).filter(f=>/\.(jpe?g|png|webp)$/i.test(f.name)&&Number(f.size)>0&&Number(f.size)<=Math.min(1200000,settings.quality*settings.quality));
+      const file=files.filter(f=>f.source==='original').sort((a,b)=>Number(a.size)-Number(b.size))[0]||files.sort((a,b)=>Number(b.size)-Number(a.size))[0];
+      if(file)item.url='https://archive.org/cors/'+encodeURIComponent(item.id)+'/'+file.name.split('/').map(encodeURIComponent).join('/');
+     }
+     if(metadata.metadata?.title)entry.title=clean(metadata.metadata.title);
+    }else if(item.kind==='video')throw Error('metadati video non disponibili');
+   }catch(error){if(item.kind==='video'||error.message==='escluso dai filtri')throw error;}
+  }
+  const loaded=waitEvent(media,item.kind==='video'?'loadeddata':'load');
+  if(item.kind==='video'){media.muted=true;media.playsInline=true;media.preload='auto';}media.src=item.url;await loaded;
+  if(item.kind==='video'){
+   if(media.videoHeight>720)throw Error('nessun video leggero');
+   for(const at of [0,2,5]){if(at){if(!Number.isFinite(media.duration)||media.duration<=at+.5)continue;const seek=waitEvent(media,'seeked',5000);media.currentTime=at;await seek;}entry.match=detect(media);checked++;pool.checked++;if(entry.match){entry.startTime=media.currentTime;break;}}
+  }else{
+   // Archive thumbnails can have little or no choice of resolution; quality caps their decode/display bitmap.
+   if(item.provider==='archive' && typeof createImageBitmap==='function'){
+    const ratio=Math.min(1,settings.quality/Math.max(media.naturalWidth,media.naturalHeight));
+    if(ratio<1){const bitmap=await createImageBitmap(media,{resizeWidth:Math.round(media.naturalWidth*ratio),resizeHeight:Math.round(media.naturalHeight*ratio)});const c=document.createElement('canvas');c.width=bitmap.width;c.height=bitmap.height;c.getContext('2d').drawImage(bitmap,0,0);bitmap.close();const resized=waitEvent(media,'load');media.src=c.toDataURL('image/jpeg',.85);await resized;}
+   }
+   entry.match=detect(media);checked++;pool.checked++;
+  }
+  if(item.kind==='video'&&entry.match){
+   if(current&&media.readyState<3)await waitEvent(media,'canplay',7000);
+   entry.poster=document.createElement('canvas');entry.poster.width=entry.match.w;entry.poster.height=entry.match.h;
+   entry.poster.getContext('2d').drawImage(media,0,0,entry.poster.width,entry.poster.height);
+  }
+  if(version!==revision||!entry.match||played.has(mediaKey(entry))){pool.discarded++;release(entry);return;}accepted++;pool.accepted++;recordCandidate(entry);if(item.kind==='video')media.preload='metadata';pool.ready.push(entry);if(!current)advance();
+ }catch(error){if(!['escluso dai filtri','nessun video leggero','nessun video nella fascia richiesta'].includes(error.message)){lastError=error.message;pool.lastError=error.message;}pool.discarded++;release(entry);}finally{pool.loading--;if(item.provider==='archive')pool.archiveLoading--;pump();}
+}
+function pump(){
+ if(document.hidden)return;
+ for(const [kind,pool]of Object.entries(pools)){
+  if(pool.urls.length<(kind==='video'?8:45))fetchBatch(kind);
+  const concurrency=kind==='video'?(pool.ready.length<2?3:2):8,limit=kind==='video'?6:36;
+  while(pool.loading<concurrency&&pool.ready.length+pool.loading<limit&&pool.urls.length){let index=0;if(sources==='both'&&(pool.archiveLoading||0)>=1){const commons=pool.urls.findIndex(item=>item.provider==='commons');if(commons>=0)index=commons;}pool.loading++;prepare(pool.urls.splice(index,1)[0]);}
+ }
+}
+function select(entry,fromHistory=false){
+ if(!fromHistory&&played.has(mediaKey(entry))){release(entry);pump();return;}
+ if(!fromHistory)rememberPlayed(entry);
+ if(current?.kind==='video')current.media.pause();current=entry;shown++;shownAt=performance.now();lostAt=0;lastDetect=current.revision!==revision?0:shownAt;lastPaintKey='';
+ current.pendingCamera=null;current.cameraAnchor=current.match;current.lastGoodCamera=shownAt;current.lastCameraMove=shownAt;
+ if(current.kind==='image')mixedNeedsImage=false;
+ if(!fromHistory){reviewing=false;history.splice(historyIndex+1).forEach(release);history.push(entry);if(history.length>30)release(history.shift());historyIndex=history.length-1;while(history.filter(e=>e.kind==='video').length>4){const i=history.findIndex(e=>e.kind==='video'&&e!==current);if(i<0)break;release(history.splice(i,1)[0]);historyIndex=history.length-1;}}
+ if(current.kind==='video'){
+  // Fresh queue entries are already parked on the verified frame: do not seek again.
+  if(fromHistory&&Math.abs(current.media.currentTime-current.startTime)>.05)current.media.currentTime=current.startTime;
+  const entry=current;entry.firstFrameReady=false;entry.media.muted=muted;entry.media.preload='auto';const epoch=entry.frameEpoch=(entry.frameEpoch||0)+1;
+  if(entry.media.requestVideoFrameCallback){const onFrame=()=>{if(entry.frameEpoch!==epoch)return;entry.firstFrameReady=true;entry.frameSerial=(entry.frameSerial||0)+1;if(current===entry&&!entry.media.paused)entry.media.requestVideoFrameCallback(onFrame);};entry.media.requestVideoFrameCallback(onFrame);}
+  else entry.media.addEventListener('playing',()=>{entry.firstFrameReady=true;},{once:true});
+  entry.media.play().catch(error=>{lastError=error.message;});
+ }
+ if(!fromHistory)captureRoute(current);
+ sourceLink.href=current.source;sourceLink.textContent='fonte: '+clean(current.title);renderInfo();pump();
+}
+function back(){if(historyIndex>0){reviewing=true;select(history[--historyIndex],true);}}
+function advance(manual=false){
+ if(manual&&historyIndex<history.length-1){reviewing=true;select(history[++historyIndex],true);return;}if(manual)reviewing=false;
+ let kind=mode==='video'?'video':'image';
+ if(mixed && !mixedNeedsImage && current?.kind!=='video' && pools.video.ready.length)kind='video';
+ const entry=pools[kind]?.ready.shift() || (!current&&mixed?pools.image.ready.shift():null);if(entry)select(entry);else pump();
+}
+function renderInfo(){
+ const status=Object.entries(pools).map(([kind,pool])=>{
+  const label=kind==='video'?'video':'immagini',limit=kind==='video'?6:36;
+  const state=pool.ready.length>=limit?'coda pronta':pool.fetching?'ricerca negli archivi':pool.loading?'caricamento e analisi del blu':Date.now()<pool.next?'attesa della prossima ricerca':'ricerca attiva';
+  return `${label} · ${state}\n${pool.ready.length} / ${limit} pronti · ${pool.loading} in preparazione · ${pool.urls.length} candidati\n${pool.checked} analisi · ${pool.accepted} match · ${pool.discarded} scartati${pool.lastError?'\nultimo errore: '+pool.lastError:''}`;
+ }).join('\n\n');if(searchStatus.textContent!==status)searchStatus.textContent=status;
+ sourceLink.hidden=!current;
+ if(!infoVisible)return;info.replaceChildren();const p=document.createElement('p');p.textContent=`${mode} · ${checked} analisi · ${accepted} match · ${shown} mostrati\n${Object.entries(pools).map(([k,v])=>k+': '+v.ready.length+' pronti').join(' · ')}\n${current?.match?Math.round(current.match.ratio*100)+'% nel range blu · zoom '+current.match.zoom.toFixed(2)+'× · area sorgente '+current.match.side+' px':'ricerca in corso'}${lastError?'\nultimo errore: '+lastError:''}`;info.append(p);
+ if(current){const link=document.createElement('a');link.href=current.source;link.target='_blank';link.rel='noopener';link.textContent=clean(current.title)+' · '+current.author+' · '+current.license;info.append(link);}
+}
+function screens(){if(!settings.dual)return[{x:0,y:0,w:canvas.width,h:canvas.height,square:false}];const w=Math.min(canvas.width/2,canvas.height*16/9),h=w*9/16,y=(canvas.height-h)/2,x=(canvas.width-2*w)/2;return[{x,y,w,h,square:false},{x:x+w,y,w,h,square:true}];}
+function drawScreen(target,screen,squareOnly,entry=current,border=true,frozen=false){
+ const {x,y,w,h}=screen,cx=x+w/2,cy=y+h/2,size=settings.size,m=entry?.match;
+ target.save();target.beginPath();target.rect(x,y,w,h);target.clip();
+ if(m){
+  const media=frozen&&entry.poster?entry.poster:entry.kind==='video'&&(!entry.firstFrameReady||entry.media.seeking||entry.media.readyState<2)?entry.poster:entry.media;
+  if(!media){target.restore();return;}
+  if(squareOnly){const sw=media.videoWidth||media.naturalWidth||media.width,sh=media.videoHeight||media.naturalHeight||media.height;target.drawImage(media,(m.x-m.side/2)*sw/m.w,(m.y-m.side/2)*sh/m.h,m.side*sw/m.w,m.side*sh/m.h,cx-size/2,cy-size/2,size,size);}
+  else target.drawImage(media,cx-m.x*m.zoom,cy-m.y*m.zoom,m.w*m.zoom,m.h*m.zoom);
+ }else{target.fillStyle='#0000ff';target.fillRect(Math.round(cx-size/2),Math.round(cy-size/2),Math.round(size),Math.round(size));}
+ if(border&&m&&(!settings.dual&&!(squareWindow&&!squareWindow.closed)||settings.showBorder)){target.lineWidth=1;target.strokeStyle='#fff';target.strokeRect(Math.round(cx-size/2)+.5,Math.round(cy-size/2)+.5,Math.round(size),Math.round(size));}target.restore();
+}
+function frame(now){
+ requestAnimationFrame(frame);if(document.hidden)return;
+ if(current){
+  const expired=current.kind==='video'?(now-shownAt>=settings.seconds*1000||current.media.ended):now-shownAt>=1000/settings.fps;
+  if(expired&&(!reviewing||current.kind==='video')){
+   if(mixed&&current.kind==='video'){
+    current.media.pause();mixedNeedsImage=true;const image=pools.image.ready.shift();if(image)select(image);else{current=null;lastPaintKey='';pump();}
+   }else advance();
+  }
+ }
+ if(current&&(current.kind!=='video'||(current.firstFrameReady&&!current.media.seeking&&current.media.readyState>=2))&&(!lastDetect||(current.kind==='video'&&now-lastDetect>=1000/settings.hz))){
+  lastDetect=now;try{current.match=stabilizeCamera(current,detect(current.media,current.cameraAnchor||current.match),now);if(current.match)current.cameraAnchor=current.match;current.revision=revision;}catch(error){lastError=error.message;current.match=null;}
+  if(!current.match){if(!lostAt)lostAt=now;if(now-lostAt>=0){if(mixed&&current.kind==='video'){current.media.pause();mixedNeedsImage=true;current=null;lastPaintKey='';advance();}else advance();}}else lostAt=0;
+ }
+ const paintKey=[!!(squareWindow&&!squareWindow.closed),shown,revision,settings.showBorder,settings.dual,canvas.width,canvas.height,current?.kind==='video'?(current.media.requestVideoFrameCallback?current.frameSerial:current.media.currentTime):current?.match?'match':'waiting',current?.match?.x,current?.match?.y,current?.match?.zoom].join(':');
+ if(paintKey!==lastPaintKey&&(current?.match||shown===0)){
+  ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);for(const screen of screens())drawScreen(ctx,screen,screen.square);
+  if(squareWindow&&!squareWindow.closed){const c=squareWindow.document.querySelector('canvas');if(c){if(c.width!==squareWindow.innerWidth||c.height!==squareWindow.innerHeight){c.width=squareWindow.innerWidth;c.height=squareWindow.innerHeight;}const cctx=c.getContext('2d');cctx.fillStyle='#000';cctx.fillRect(0,0,c.width,c.height);drawScreen(cctx,{x:0,y:0,w:c.width,h:c.height},true);}}
+  lastPaintKey=paintKey;
+ }
+ if(now-lastInfo>1000){renderInfo();lastInfo=now;}
+}
+addEventListener('keydown',event=>{
+ if(event.target instanceof HTMLInputElement&&event.key.startsWith('Arrow'))return;
+ const key=event.key.toLowerCase();if(['c','i','f','m','p','arrowright','arrowleft'].includes(key))event.preventDefault();
+ if(key==='c'){controls.hidden=!controls.hidden;renderInfo();}if(key==='i'){infoVisible=!infoVisible;info.hidden=!infoVisible;renderInfo();}
+ if(key==='p')exportRoute();
+ if(key==='arrowright')advance(true);if(key==='arrowleft')back();
+ if(key==='m'){muted=!muted;if(current?.kind==='video')current.media.muted=muted;}
+ if(key==='f')(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>{});
+});
+canvas.addEventListener('click',()=>advance(true));
+addEventListener('visibilitychange',()=>{if(current?.kind==='video')document.hidden?current.media.pause():current.media.play().catch(()=>{});pump();});
+Object.defineProperty(window,'blueStatus',{get:()=>({routeFrames:route.length,mode,sources,analysis:{...analysisStats},checked,accepted,shown,history:history.length,historyIndex,ready:Object.fromEntries(Object.entries(pools).map(([k,p])=>[k,p.ready.length])),search:Object.fromEntries(Object.entries(pools).map(([k,p])=>[k,{fetching:p.fetching,preparing:p.loading,preparingArchive:p.archiveLoading||0,candidates:p.urls.length,checked:p.checked,accepted:p.accepted}])),current:current?.source,mediaURL:current?.media.currentSrc,kind:current?.kind,match:current?.match,settings:{...settings},error:lastError})});
+setInterval(pump,800);seedCandidates();renderInfo();pump();requestAnimationFrame(frame);
+})();
+</script></body></html>

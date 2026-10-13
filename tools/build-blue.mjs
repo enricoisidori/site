@@ -1,0 +1,36 @@
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import vm from 'node:vm';
+const transport=readFileSync(new URL('../afterimage/archive-transport.js',import.meta.url),'utf8').replace(/^export /gm,'');
+mkdirSync(new URL('../blueness/',import.meta.url),{recursive:true});
+const pdf=readFileSync(new URL('./blueness-pdf.js',import.meta.url),'utf8');
+const code=transport+'\n'+pdf+'\n'+readFileSync(new URL('./blue-flow.js',import.meta.url),'utf8');new vm.Script(code);
+for(const [name,mode,sources] of [['blue','image','both'],['blue-video','video','both'],['blue-mixed','mixed','both'],['blue-archive','archive','archive'],['blue-commons','image','commons'],['blue-video-archive','video','archive'],['blue-video-commons','video','commons']]){
+const page=`<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blueness</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27%3E%3Cpath fill=%27%230000ff%27 d=%27M0 0h16v16H0z%27/%3E%3C/svg%3E"><style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font:12px/1.5 Helvetica,Arial,sans-serif}
+#stage{display:block;width:100%;height:100%}
+#controls,#info{position:fixed;z-index:3;box-sizing:border-box;font:inherit;background:transparent;border:0;padding:0;text-shadow:0 1px 2px #000}
+#controls{top:16px;right:16px;width:min(360px,calc(100% - 32px));max-height:calc(100dvh - 32px);display:flex;flex-direction:column;overflow:hidden}
+.search-status{flex:none;margin:0 0 10px;white-space:pre-line}.control-fields{overflow:auto;scrollbar-width:none}.control-fields::-webkit-scrollbar{display:none}
+#info{bottom:16px;left:16px;max-width:min(550px,calc(100% - 32px));max-height:70vh;overflow:auto}
+button,input,select,summary,output,label,p,a{font:inherit;color:inherit;letter-spacing:0}
+button{padding:0;background:none;border:0;cursor:pointer;text-shadow:inherit}button:hover,a:hover{opacity:.65}
+.actions{display:flex;flex-direction:column;align-items:flex-start;gap:3px;margin:0 0 10px}.navigation{display:flex;justify-content:flex-start;gap:24px;margin:0}.navigation button{font:inherit}
+a{display:block;text-decoration:none;overflow-wrap:anywhere}.control-fields>a{margin-bottom:18px}
+details{margin:0 0 12px;padding:0;border:0}summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between}summary:after{content:'+';font:inherit}details[open]>summary:after{content:'−'}summary::-webkit-details-marker{display:none}details[open]>summary{margin-bottom:12px}
+label{display:grid;grid-template-columns:1fr 6ch;gap:12px;margin-bottom:8px;align-items:start}
+input[type=range]{grid-column:1/3;appearance:none;-webkit-appearance:none;display:block;width:100%;height:16px;margin:0;padding:0;background:transparent;cursor:pointer;border:0}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:#aaa;border:0}input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:1px;height:13px;margin-top:-6px;background:white;border:0;border-radius:0}
+input[type=range]::-moz-range-track{height:1px;background:#aaa;border:0}input[type=range]::-moz-range-thumb{width:1px;height:13px;background:white;border:0;border-radius:0}output{text-align:right;font-variant-numeric:tabular-nums}
+
+select{grid-column:1/3;appearance:none;border:0;padding:0;background:transparent;cursor:pointer;text-shadow:inherit}select option{background:black;color:white}
+label>button{text-align:right}.screen-button{display:block;margin:0;padding:0;text-align:left;text-decoration:underline;text-underline-offset:2px}p{white-space:pre-line;margin:0 0 12px}.swatch{display:none}
+.export-button{display:block;text-decoration:underline;text-underline-offset:2px;margin-top:14px}footer{margin-top:16px;font:inherit}footer a{display:inline;text-decoration:underline;text-underline-offset:2px}
+:focus-visible{outline:1px dotted #888;outline-offset:2px}[hidden]{display:none!important}
+
+</style></head><body data-mode="${mode}" data-sources="${sources}"><canvas id="stage"></canvas><aside id="controls" hidden></aside><aside id="info" hidden></aside><script>${code.replace(/<\/script/gi,'<\\/script')}</script></body></html>`;
+for(const output of [name,name.replace(/^blue/,'blueness')])writeFileSync(new URL('../'+output+'.html',import.meta.url),page);
+const localName=name==='blue-video'?'index':name==='blue'?'images':name.replace(/^blue-/,'');
+writeFileSync(new URL('../blueness/'+localName+'.html',import.meta.url),page);
+console.log('blueness/'+localName+'.html');
+}
