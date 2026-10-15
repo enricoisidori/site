@@ -24,7 +24,8 @@ export async function exportChainPDF(shape=exportOptions.shape){
    textBlock(ctx,record.successor?.title||'successore in attesa',terms,56,lower+250,608,texts);
    const blob=await new Promise(resolve=>c.toBlob(resolve,'image/jpeg',.78));pages.push({blob,texts,w:c.width,h:c.height,source:record.video.source,nextSource:record.successor?.source});c.width=c.height=0;await new Promise(resolve=>setTimeout(resolve,0));
   }
-  const blob=await buildAfterimagePDF(pages);download(blob,'afterimage.pdf');
+  const now=new Date(),pad=n=>String(n).padStart(2,'0'),stamp=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+  const blob=await buildAfterimagePDF(pages,{title:'afterimage '+stamp.replace('_',' ')});download(blob,`afterimage_${stamp}.pdf`);
  }finally{busy=false;}
 }
 let excelReady;

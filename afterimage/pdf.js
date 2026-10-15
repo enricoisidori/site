@@ -1,5 +1,5 @@
 // Tiny PDF writer with native selectable Helvetica text. Called only after the user requests an export.
-export async function buildAfterimagePDF(pages){
+export async function buildAfterimagePDF(pages,{title='afterimage'}={}){
  const encode=text=>new TextEncoder().encode(text),objects=[null,null,null],pageRefs=[];
  const escape=text=>String(text||'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[\r\n]/g,' ');
  const add=chunks=>{objects.push(chunks.map(c=>typeof c==='string'?encode(c):c));return objects.length-1;};
@@ -16,8 +16,8 @@ export async function buildAfterimagePDF(pages){
   const link=links.length?' /Annots ['+links.map(([source,low,high])=>`<< /Type /Annot /Subtype /Link /Rect [0 ${low} ${width} ${high}] /Border [0 0 0] /A << /S /URI /URI (${escape(source)}) >> >>`).join(' ')+']':'';
   pageRefs.push(add([`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] /Resources << /Font << /F1 ${font} 0 R >> /XObject << /Im0 ${image} 0 R >> >> /Contents ${content} 0 R${link} >>`]));
  }
- objects[1]=[encode('<< /Type /Catalog /Pages 2 0 R >>')];objects[2]=[encode(`<< /Type /Pages /Count ${pageRefs.length} /Kids [${pageRefs.map(n=>n+' 0 R').join(' ')}] >>`)];
- const info=add(['<< /Title (afterimage) /Author (Enrico Isidori) /Subject (Description and keyword chain) >>']);
+ objects[1]=[encode(`<< /Type /Catalog /Pages 2 0 R /PageLayout /OneColumn /PageMode /UseNone /ViewerPreferences << /DisplayDocTitle true >>${pageRefs.length?' /OpenAction ['+pageRefs[0]+' 0 R /FitH null]':''} >>`)];objects[2]=[encode(`<< /Type /Pages /Count ${pageRefs.length} /Kids [${pageRefs.map(n=>n+' 0 R').join(' ')}] >>`)];
+ const info=add([`<< /Title (${escape(title)}) /Author (Enrico Isidori) /Subject (Description and keyword chain) >>`]);
  const chunks=[encode('%PDF-1.4\n%afterimage\n')],offsets=[0];let offset=chunks[0].length;
  for(let i=1;i<objects.length;i++){offsets[i]=offset;const parts=[encode(i+' 0 obj\n'),...objects[i],encode('\nendobj\n')];for(const part of parts){chunks.push(part);offset+=part.length;}}
  const xref=offset;chunks.push(encode(`xref\n0 ${objects.length}\n0000000000 65535 f \n${offsets.slice(1).map(n=>String(n).padStart(10,'0')+' 00000 n \n').join('')}trailer\n<< /Size ${objects.length} /Root 1 0 R /Info ${info} 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
