@@ -14,7 +14,22 @@
     return symbol;
   };
 
+  // Project icons take precedence over the shared site fallback, including
+  // icons assigned later by the project itself.
+  const hasProjectIcon = () => [...document.querySelectorAll('link[rel~="icon"]')].some(icon => {
+    if (icon.hasAttribute("data-dynamic-favicon")) return false;
+    const href = icon.getAttribute("href");
+    if (!href) return false;
+    const path = new URL(href, document.baseURI).pathname;
+    return path !== "/favicon.ico" && !/(?:^|\/)favicon-red(?:[.-]|$)/.test(path);
+  });
+  if (hasProjectIcon()) return;
+
   const setIcon = (symbol) => {
+    if (hasProjectIcon()) {
+      document.querySelector('link[data-dynamic-favicon]')?.remove();
+      return;
+    }
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text x="32" y="43" text-anchor="middle" fill="#f00" font-family="Apple Symbols,Arial Unicode MS,Noto Sans Symbols 2,sans-serif" font-size="42">${symbol}</text></svg>`;
     const href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
     let icon = document.querySelector('link[data-dynamic-favicon]');

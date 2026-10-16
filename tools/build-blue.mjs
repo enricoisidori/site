@@ -31,6 +31,7 @@ label>button{text-align:right}.screen-button{display:block;margin:0;padding:0;te
 </style></head><body data-mode="${mode}" data-sources="${sources}"><canvas id="stage"></canvas><aside id="controls" hidden></aside><aside id="info" hidden></aside><script>${code.replace(/<\/script/gi,'<\\/script')}</script></body></html>`;
 for(const output of [name,name.replace(/^blue/,'blueness')])writeFileSync(new URL('../'+output+'.html',import.meta.url),page);
 const localName=name==='blue-video'?'index':name==='blue'?'images':name.replace(/^blue-/,'');
-writeFileSync(new URL('../blueness/'+localName+'.html',import.meta.url),page);
+const projectIcon='<link rel="shortcut icon" href="./favicon.ico?v=blue1"><link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=blue1"><link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg?v=blue1">';
+writeFileSync(new URL('../blueness/'+localName+'.html',import.meta.url),page.replace(/<link rel="icon" href="data:image\/svg\+xml,[^"]*">/,projectIcon));
 console.log('blueness/'+localName+'.html');
 }
