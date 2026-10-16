@@ -6,12 +6,12 @@ const kinds=mode==='video'?['video']:mixed?['image','video']:['image'];
 const canvas=document.querySelector('#stage'),ctx=canvas.getContext('2d',{alpha:false});
 const analysis=document.createElement('canvas'),ac=analysis.getContext('2d',{willReadFrequently:true});
 const controls=document.querySelector('#controls'),info=document.querySelector('#info');
-const defaults={size:50,hue:25,saturation:55,brightness:45,redMax:40,greenMax:65,rgbDistance:210,disturbance:20,zoom:1,minZoom:.5,maxZoom:8,fps:4,quality:640,seconds:mode==='mixed'?4:15,hz:8,dual:true,excludeGovernment:true,excludePolitics:true,showBorder:false,motionStep:18,trackingTolerance:15,cameraCooldown:1.2};
+const defaults={size:50,hue:25,saturation:55,brightness:45,redMax:40,greenMax:65,rgbDistance:210,disturbance:20,zoom:1,minZoom:.5,maxZoom:8,fps:4,quality:640,seconds:mode==='mixed'?4:15,hz:8,dual:false,excludeGovernment:true,excludePolitics:true,showBorder:false,motionStep:18,trackingTolerance:15,cameraCooldown:1.2};
 const settings={...defaults};try{Object.assign(settings,JSON.parse(localStorage.getItem('blue-controls-v3-'+mode)||'{}'));}catch{}
 if(settings.motionStep===10)settings.motionStep=18;
 Object.defineProperties(settings,{excludeGovernment:{value:true,writable:false,enumerable:true,configurable:false},excludePolitics:{value:true,writable:false,enumerable:true,configurable:false}});
-const initialURL=new URL(location.href);settings.dual=initialURL.searchParams.get('dual')!=='0';
-function syncURL(){try{const url=new URL(location.href);if(settings.dual)url.searchParams.delete('dual');else url.searchParams.set('dual','0');window.history.replaceState(null,'',url);}catch{}}
+const initialURL=new URL(location.href);settings.dual=initialURL.searchParams.get('dual')==='1';
+function syncURL(){try{const url=new URL(location.href);if(settings.dual)url.searchParams.set('dual','1');else url.searchParams.delete('dual');window.history.replaceState(null,'',url);}catch{}}
 // window.history is used explicitly because the media history below has the same name.
 const pools=Object.fromEntries(kinds.map(kind=>[kind,{urls:[],ready:[],loading:0,fetching:false,next:0,checked:0,accepted:0,discarded:0,lastError:'',seen:new Set()}]));
 // Shared persistent history across all blue variants; never rotate or trim it.
@@ -77,22 +77,46 @@ function captureRoute(entry){
  const scene=document.createElement('canvas');scene.width=Math.round(w*2*scale);scene.height=Math.round(h*scale);const sc=scene.getContext('2d');sc.fillStyle='#000';sc.fillRect(0,0,scene.width,scene.height);sc.scale(scale,scale);
  drawScreen(sc,{x:0,y:0,w,h},false,entry,false,true);drawScreen(sc,{x:w,y:0,w,h},true,entry,false,true);
  const tile=document.createElement('canvas');tile.width=tile.height=64;const tc=tile.getContext('2d');tc.fillStyle='#000';tc.fillRect(0,0,64,64);tc.scale(64/settings.size,64/settings.size);drawScreen(tc,{x:0,y:0,w:settings.size,h:settings.size},true,entry,false,true);
- const record={source:entry.source,w:scene.width,h:scene.height,scene:jpeg(scene,.65),tile:jpeg(tile,.8)};
+ const single=document.createElement('canvas'),singleScale=Math.min(1,1200/canvas.width);
+ single.width=Math.max(1,Math.round(canvas.width*singleScale));single.height=Math.max(1,Math.round(canvas.height*singleScale));
+ const singleContext=single.getContext('2d');singleContext.fillStyle='#000';singleContext.fillRect(0,0,single.width,single.height);singleContext.scale(singleScale,singleScale);
+ drawScreen(singleContext,{x:0,y:0,w:canvas.width,h:canvas.height},false,entry,false,true);
+ singleContext.lineWidth=1;singleContext.strokeStyle='#fff';singleContext.strokeRect(Math.round(canvas.width/2-settings.size/2)+.5,Math.round(canvas.height/2-settings.size/2)+.5,Math.round(settings.size),Math.round(settings.size));
+ const record={source:entry.source,w:scene.width,h:scene.height,scene:jpeg(scene,.65),singleW:single.width,singleH:single.height,single:jpeg(single,.65),tile:jpeg(tile,.8)};
  // One small compressed snapshot per video; PDF assembly and mosaic wait for P/click.
- record.scene.catch(()=>{});record.tile.catch(()=>{});route.push(record);
+ record.single.catch(()=>{});record.scene.catch(()=>{});record.tile.catch(()=>{});route.push(record);
 }
 async function exportRoute(){
  if(exportingPDF)return;if(!route.length){exportButton.textContent='nessun video da esportare';return;}
  exportingPDF=true;exportButton.textContent='elaborazione PDF';
  try{
-  const records=route.slice(),pages=[];
-  for(const record of records)pages.push({blob:await record.scene,w:record.w,h:record.h,source:record.source});
+  const records=route.slice(),pages=[],dualView=settings.dual;
+  for(const record of records)pages.push({blob:await (dualView?record.scene:record.single),w:dualView?record.w:record.singleW,h:dualView?record.h:record.singleH,source:record.source});
   const cols=Math.min(records.length,Math.ceil(Math.sqrt(records.length*16/9))),rows=Math.ceil(records.length/cols),cell=Math.max(1,Math.min(64,Math.floor(1600/cols)));
   const mosaic=document.createElement('canvas');mosaic.width=cols*cell;mosaic.height=rows*cell;const mc=mosaic.getContext('2d');mc.fillStyle='#000';mc.fillRect(0,0,mosaic.width,mosaic.height);
   for(let i=0;i<records.length;i++){const bitmap=await createImageBitmap(await records[i].tile);mc.drawImage(bitmap,(i%cols)*cell,Math.floor(i/cols)*cell,cell,cell);bitmap.close();}
   const mw=mosaic.width,mh=mosaic.height;pages.push({blob:await jpeg(mosaic,.85),w:mw,h:mh});
+  if(dualView)for(const page of pages)page.aspectRatio=16/9;
   const blob=await buildBluenessPDF(pages),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='blueness-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
  }catch(error){lastError=error.message;}finally{exportingPDF=false;exportButton.textContent='elabora e scarica PDF';}
+}
+let exportingJPEG=false;
+async function exportJPEG(){
+ if(exportingJPEG||!route.length)return;exportingJPEG=true;
+ try{
+  const records=route.slice(),dualView=settings.dual,folder='blueness-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-'),parts=[],central=[];let offset=0,centralSize=0;
+  // Store JPEGs directly in ZIP: no recompression or additional dependency.
+  const table=Uint32Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0;});
+  for(let i=0;i<records.length;i++){
+   const data=new Uint8Array(await(await(dualView?records[i].scene:records[i].single)).arrayBuffer()),name=new TextEncoder().encode(folder+'/'+String(i+1).padStart(4,'0')+'.jpg');
+   let crc=0xffffffff;for(const byte of data)crc=table[(crc^byte)&255]^(crc>>>8);crc=(crc^0xffffffff)>>>0;
+   const header=new Uint8Array(30+name.length),h=new DataView(header.buffer);h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(12,33,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,name.length,true);header.set(name,30);
+   const directory=new Uint8Array(46+name.length),d=new DataView(directory.buffer);d.setUint32(0,0x02014b50,true);d.setUint16(4,20,true);d.setUint16(6,20,true);d.setUint16(14,33,true);d.setUint32(16,crc,true);d.setUint32(20,data.length,true);d.setUint32(24,data.length,true);d.setUint16(28,name.length,true);d.setUint32(42,offset,true);directory.set(name,46);
+   parts.push(header,data);central.push(directory);offset+=header.length+data.length;centralSize+=directory.length;
+  }
+  const end=new Uint8Array(22),e=new DataView(end.buffer);e.setUint32(0,0x06054b50,true);e.setUint16(8,records.length,true);e.setUint16(10,records.length,true);e.setUint32(12,centralSize,true);e.setUint32(16,offset,true);
+  const url=URL.createObjectURL(new Blob([...parts,...central,end],{type:'application/zip'})),a=document.createElement('a');a.href=url;a.download=folder+'.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
+ }catch(error){lastError=error.message;}finally{exportingJPEG=false;}
 }
 const credit=document.createElement('footer');credit.append('Blueness, 2026 ');
 for(const [label,url]of [['Enrico Isidori','https://enricoisidori.com'],['Contento360','https://contento360.it']]){if(label==='Contento360')credit.append(' x ');const link=document.createElement('a');link.textContent=label;link.href=url;link.target='_blank';link.rel='noopener';credit.append(link);}fields.append(credit);
@@ -351,9 +375,9 @@ function frame(now){
 }
 addEventListener('keydown',event=>{
  if(event.target instanceof HTMLInputElement&&event.key.startsWith('Arrow'))return;
- const key=event.key.toLowerCase();if(['c','i','f','m','p','arrowright','arrowleft'].includes(key))event.preventDefault();
+ const key=event.key.toLowerCase();if(['c','i','f','m','p','j','arrowright','arrowleft'].includes(key))event.preventDefault();
  if(key==='c'){controls.hidden=!controls.hidden;renderInfo();}if(key==='i'){infoVisible=!infoVisible;info.hidden=!infoVisible;renderInfo();}
- if(key==='p')exportRoute();
+ if(key==='p')exportRoute();if(key==='j')exportJPEG();
  if(key==='arrowright')advance(true);if(key==='arrowleft')back();
  if(key==='m'){muted=!muted;if(current?.kind==='video')current.media.muted=muted;}
  if(key==='f')(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>{});
