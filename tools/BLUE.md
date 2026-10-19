@@ -143,3 +143,17 @@ Per ciascun video nuovo della sessione, un solo fotogramma verificato viene cons
 P oppure “elabora e scarica PDF” in C assembla il documento, senza librerie o API esterne: una pagina a pieno formato per ciascuna scena doppia (senza controlli/bordi), nell’ordine di visione, poi una pagina con i quadratini accostati senza interspazi. Le pagine della scena collegano la fonte originale. Il PDF e il mosaico vengono creati esclusivamente su richiesta; la sola cattura compressa per video avviene durante la sessione per poter conservare il percorso senza trattenere i video completi. Esportazioni successive comprendono il percorso finora e non azzerano le catture.
 
 Verifica: download reale da P dopo due video, PDF di tre pagine (~27 KB), letto da pdfinfo e renderizzato con Poppler; verificate scena doppia, mosaico e assenza di bordi. Verificato anche popup: principale dual=false, showBorder=false, URL dual=0.
+
+Registrazione selettiva video (anche dual): R inizia/termina, S conserva la clip dall’inizio della sua registrazione, X chiude il frammento selezionato lasciando continuare la visione. MP4 finale con soli frammenti selezionati in ordine, senza indicatore o pannelli. Codifica nativa H.264 a 25 fps, dimensioni configurabili in C (default 1080×1440 px); audio AAC originale, indipendente dal muto della pagina. Nessuna cattura delle immagini nella modalità mista: si selezionano solo i video. Il motore condiviso è assets/shared/recording/recorder.js; mp4-muxer 5.2.2 MIT è confezionato in locale e valutato solo al salvataggio. Nessun encoder o timer di cattura fuori dalla modalità R.
+
+C apre i controlli e le informazioni (I è un alias). La sezione registrazione MP4 permette di cambiare larghezza e altezza, memorizzate nel browser e applicate dalla prossima R. Il contatore dei video selezionati è separato dallo stato della clip e non cala durante il cambio video.
+
+La registrazione conserva sempre l’audio originale dei video, indipendentemente da M, mute o volume della pagina. La sola sorgente audio è la traccia del video: nessun accesso al microfono, alla webcam o ai suoni esterni.
+
+Durante R, D deseleziona la clip corrente ed esclude anche un frammento già tagliato con X. Il contatore scende subito; pressioni ripetute non lo diminuiscono ancora. Prima del taglio, S può selezionare nuovamente la clip.
+
+Q annulla la sessione e scarta tutte le clip, senza generare o scaricare file. La freccia destra taglia la clip selezionata nel punto corrente, come X, poi passa normalmente al video successivo.
+
+C → registrazione MP4: il riquadro sullo schermo mostra esattamente il ritaglio registrato. Altezza in vh, larghezza in vw e centro x/y sono regolabili; le proporzioni seguono la risoluzione di output. Default: 100vh, 3:4, 1080×1440 px (area ridotta solo quando la finestra è troppo stretta). Le impostazioni si conservano nel browser. Il ritaglio può cambiare durante la sessione; risoluzione e proporzioni prima di R. Pannello C, bordo e feedback non entrano nel file.
+
+Spazio mette in pausa/riprende la visione mentre ricerca e precaricamento proseguono. La coda arriva fino a 12 riserve senza aumentare i caricamenti simultanei. In Afterimage le riserve della query corrente hanno precedenza sulle casuali e vengono rinnovate quando cambia la descrizione. Il tempo in pausa non entra nella registrazione; la pausa non garantisce funzionamento offline, perché i media restano in streaming e il buffer dipende dal browser.

@@ -1,3 +1,4 @@
+import { createSelectiveRecorder } from '../assets/shared/recording/recorder.js';
 import { resolveItem, queryFor } from './archive.js';
 import { CandidatePool, Semaphore } from './pool.js';
 import { captionTerms } from './terms.js';
@@ -11,7 +12,7 @@ import { beginChain, describeChain, queryChain, finishChain, exportChain } from 
 const stage = document.querySelector('#stage');
 const skipArea = document.querySelector('#skipArea');
 const favicon = document.querySelector('#favicon');
-const slots = Array.from({ length: 6 }, () => {
+const slots = Array.from({ length: 13 }, () => {
   const video = document.createElement('video');
   video.crossOrigin = 'anonymous'; video.muted = true; video.preload = 'auto'; video.playsInline = true; video.loop = false;
   video.setAttribute('playsinline', ''); video.setAttribute('muted', ''); stage.append(video);
@@ -21,9 +22,18 @@ const state = {
   step: 'query', modelStatus: 'caricamento…', caption: '', terms: [], query: queryFor([]),
   checked: 0, total: null, next: null, message: 'ricerca del primo video…', downloadStatus: '',
   switches: 0, fallbacks: 0, muted: true, fitMode: 'fit', preview: '', frameTime: null, inferenceMs: null,
-  reviewing:false,reviewIndex:null,queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
+  paused:false,reviewing:false,reviewIndex:null,queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
 };
+let pausedAt=0;
 let active, switching = false, generation = 0, context;
+const recording=createSelectiveRecorder({name:'afterimage',getScene:()=>{
+ if(!active?.video||active.video.readyState<2)return null;
+ const video=active.video;return {key:active.recordingKey||active.startedAt,video,muted:state.muted,paused:state.paused||document.hidden||video.paused||video.readyState<3,draw:(ctx,w,h)=>{
+  ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);const ratio=state.fitMode==='fill'?Math.max(w/video.videoWidth,h/video.videoHeight):Math.min(w/video.videoWidth,h/video.videoHeight);
+  ctx.drawImage(video,(w-video.videoWidth*ratio)/2,(h-video.videoHeight*ratio)/2,video.videoWidth*ratio,video.videoHeight*ratio);
+ }};
+}});
+
 let worker, workerReady, rpcID = 0;
 const pending = new Map(), recent = new Set(), failed = new Map();
 const lifetime = new AbortController();
@@ -108,7 +118,7 @@ function invalidateSemantic() {
 function trimGeneral() {
   const general = slots.filter(slot => slot !== active && slot.kind === 'general')
     .sort((a, b) => Number(b.role === 'ready') - Number(a.role === 'ready'));
-  for (const slot of general.slice(2)) {
+  for (const slot of general.slice(9)) {
     slot.controller?.abort(); if (slot.role === 'ready') { release(slot); slot.claim = null; }
   }
 }
@@ -140,7 +150,7 @@ async function fill(slot, kind, cycle = context) {
         slot.role = 'ready';
         update({ prepareMs: performance.now() - began });
         if (kind === 'semantic') update({ step: 'pronto', next: slot.item, query: entry.result.query, message: 'successore della query pronto' });
-        if (!active && !switching) promote(slot, 'startup');
+        if (!active && !switching && !state.paused) promote(slot, 'startup');
         return;
       } catch (error) {
         if (signal.aborted) return;
@@ -161,13 +171,15 @@ async function fill(slot, kind, cycle = context) {
 function pump() {
   if(state.reviewing)return;
   if (active) trimGeneral();
-  const generalTarget = active ? 2 : 4;
+  const generalTarget = active ? 9 : 4;
+  let preparing=slots.filter(slot=>['resolving','buffering'].includes(slot.role)).length;
   let general = slots.filter(slot => slot !== active && slot.kind === 'general').length;
   let semantic = slots.filter(slot => slot !== active && slot.kind === 'semantic').length;
   for (const slot of slots) {
+    if (preparing>=3)break;
     if (slot.role !== 'idle' || (slot.retryAt || 0) > performance.now()) continue;
-    if (context?.pool && semantic < 3) { semantic++; fill(slot, 'semantic'); }
-    else if (general < generalTarget) { general++; fill(slot, 'general'); }
+    if (context?.pool && semantic < 3) { semantic++; preparing++; fill(slot, 'semantic'); }
+    else if (general < generalTarget) { general++; preparing++; fill(slot, 'general'); }
   }
   state.queueGeneral = readySlots('general').length;
   state.queueSemantic = readySlots('semantic').length;
@@ -219,7 +231,7 @@ function nextKeyword(cycle) {
   update({ step: 'query', query: queryFor([term]), selectedTerm: term, total: null }); pump();
 }
 async function promote(next, reason) {
-  if (switching || next.role !== 'ready') return;
+  if (state.paused || switching || next.role !== 'ready') return;
   switching = true;
   const old = active;
   try {
@@ -236,7 +248,7 @@ async function promote(next, reason) {
     beginChain(next.item, reason, next.media.start);
     next.video.classList.toggle('fill', state.fitMode === 'fill');
     next.video.classList.add('on'); old?.video.classList.remove('on');
-    active = next; active.role = 'active'; active.startedAt = performance.now();
+    active = next; active.role = 'active'; active.startedAt = performance.now();active.recordingKey=Symbol();if(state.paused){pausedAt=performance.now();active.video.pause();}
     active.lastTime = next.video.currentTime; active.lastProgress = performance.now();
     invalidateSemantic();
     remember(next.item.id);
@@ -250,6 +262,7 @@ async function promote(next, reason) {
   } finally { switching = false; pump(); }
 }
 function tick() {
+  if(state.paused){requestAnimationFrame(tick);return;}
   if(state.reviewing){if(active&&performance.now()-active.startedAt>=MAX_PLAY_SECONDS*1000)active.video.pause();requestAnimationFrame(tick);return;}
   // Enforce the cap even while the next decoder is starting asynchronously.
   if (active && !document.hidden && performance.now() - active.startedAt >= MAX_PLAY_SECONDS * 1000) active.video.pause();
@@ -285,15 +298,23 @@ document.addEventListener('click', event => {
     firstClick = false;
     state.muted = false;
     // Unlock audio inside the first user gesture, even during loading.
-    for (const { video } of slots) video.muted = false;
-    if (active && !active.video.ended && state.elapsed < MAX_PLAY_SECONDS) active.video.play().catch(() => {});
+    for (const { video } of slots) video.muted = false;recording.syncAudioMonitor();
+    if (!state.paused && active && !active.video.ended && state.elapsed < MAX_PLAY_SECONDS) active.video.play().catch(() => {});
     renderInfo(state, active);
     return;
   }
   if (event.target.closest('#info')) return;
   skipReady();
 });
+function togglePlaybackPause(){
+ state.paused=!state.paused;const now=performance.now();
+ if(state.paused){pausedAt=now;active?.video.pause();}
+ else if(active){active.startedAt+=now-pausedAt;active.lastProgress=now;if(!document.hidden&&!active.video.ended&&state.elapsed<MAX_PLAY_SECONDS)active.video.play().catch(()=>{});}
+ else{const next=readySlots('general')[0];if(next)promote(next,'startup');}
+ recording.sample();pump();renderInfo(state,active);
+}
 document.addEventListener('keydown', event => {
+  if(event.key===' '&&!event.target.closest('input,textarea,select,button,[contenteditable="true"]')){event.preventDefault();if(!event.repeat)togglePlaybackPause();return;}
   if(event.target.matches('input,textarea,select'))return;
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
@@ -305,18 +326,15 @@ document.addEventListener('keydown', event => {
   if(key==='arrowleft')navigateHistory(-1);
   if(key==='p')exportChainPDF().catch(error=>update({message:error.message}));
   if(key==='e')exportChainExcel().catch(error=>update({message:error.message}));
-  if (key === 'i') { toggleInfo(); renderInfo(state, active); }
-  if (key === 'm') { state.muted = !state.muted; if (active) active.video.muted = state.muted; renderInfo(state, active); }
+  if (key === 'c' || key === 'i') { toggleInfo(); renderInfo(state, active); }
+  if (key === 'm') { state.muted = !state.muted; if (active) active.video.muted = state.muted; recording.syncAudioMonitor(); renderInfo(state, active); }
   if (key === 'f') {
     const action = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen({ navigationUI: 'hide' });
     action.catch(error => update({ message: error.message }));
   }
-  if (key === 'c' && active) {
-    const fill = active.video.classList.toggle('fill');
-    update({ fitMode: fill ? 'fill' : 'fit' });
-  }
   if (key === 's') exportChain();
 });
+window.addEventListener('afterimage:fit',()=>{if(!active)return;const fill=active.video.classList.toggle('fill');update({fitMode:fill?'fill':'fit'});});
 async function navigateHistory(delta){
  if(switching||!active)return;
  const records=historyState.records,index=(state.reviewIndex??records.length-1)+delta;
@@ -329,7 +347,7 @@ async function navigateHistory(delta){
   const record=records[index];await hydrateFrames([record]);target=slots.find(slot=>slot!==old&&slot.role==='idle');if(!target)throw Error('attendo un posto libero per la cronologia');
   target.role='buffering';target.item=record.video.streamURL?{...record.video,streamURL:record.video.streamURL.replace('/download/','/cors/')} : await resolveItem({identifier:record.video.id},[],new AbortController().signal);
   if(!target.item)throw Error('video della cronologia non disponibile');
-  target.media=await prepare(target.video,target.item.streamURL,new AbortController().signal,{startup:true,startAt:record.playStart||0});await startPlaying(target.video);target.video.muted=state.muted;target.video.classList.toggle('fill',state.fitMode==='fill');target.video.classList.add('on');old.video.classList.remove('on');active=target;active.role='active';active.startedAt=performance.now();release(old);old.claim=null;
+  target.media=await prepare(target.video,target.item.streamURL,new AbortController().signal,{startup:true,startAt:record.playStart||0});await startPlaying(target.video);target.video.muted=state.muted;target.video.classList.toggle('fill',state.fitMode==='fill');target.video.classList.add('on');old.video.classList.remove('on');active=target;active.role='active';active.startedAt=performance.now();active.recordingKey=Symbol();if(state.paused){pausedAt=performance.now();active.video.pause();}release(old);old.claim=null;
   update({reviewIndex:index,step:'cronologia',caption:record.description,terms:record.keywords||[],preview:record.frame?.preview||'',message:'cronologia · → prosegue; dopo l’ultimo video riprende il flusso'});
  }catch(error){if(target&&target!==active)release(target);update({message:error.message});}finally{switching=false;}
 }
@@ -342,8 +360,8 @@ window.addEventListener('afterimage:filters',()=>{
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { active?.video.pause(); if (active) active.hiddenAt = performance.now(); }
   else if (active) {
-    active.startedAt += performance.now() - (active.hiddenAt || performance.now());
-    active.lastProgress = performance.now(); active.video.play().catch(() => {});
+    if(!state.paused)active.startedAt += performance.now() - (active.hiddenAt || performance.now());
+    active.lastProgress = performance.now(); if(!state.paused)active.video.play().catch(() => {});
   }
 });
 setInterval(() => { pump(); renderInfo(state, active); }, 300);
@@ -352,4 +370,4 @@ requestAnimationFrame(tick);
 // a video is playing, independently from future random/semantic reserves.
 pump();
 
-Object.defineProperty(window,'afterimageStatus',{get:()=>({...state,recordCount:historyState.records.length,activeID:active?.item?.id,switching})});
+Object.defineProperty(window,'afterimageStatus',{get:()=>({...state,recordCount:historyState.records.length,activeID:active?.item?.id,switching,recording:recording.status})});

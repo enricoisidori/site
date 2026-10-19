@@ -3,7 +3,8 @@ import vm from 'node:vm';
 const transport=readFileSync(new URL('../afterimage/archive-transport.js',import.meta.url),'utf8').replace(/^export /gm,'');
 mkdirSync(new URL('../blueness/',import.meta.url),{recursive:true});
 const pdf=readFileSync(new URL('./blueness-pdf.js',import.meta.url),'utf8');
-const code=transport+'\n'+pdf+'\n'+readFileSync(new URL('./blue-flow.js',import.meta.url),'utf8');new vm.Script(code);
+const recorder=readFileSync(new URL('../assets/shared/recording/mp4-muxer.js',import.meta.url),'utf8').replace(/^export /gm,'')+'\n'+readFileSync(new URL('../assets/shared/recording/recorder.js',import.meta.url),'utf8').replace(/^import .*;\s*$/gm,'').replace(/^export /gm,'');
+const code=transport+'\n'+pdf+'\n'+recorder+'\n'+readFileSync(new URL('./blue-flow.js',import.meta.url),'utf8');new vm.Script(code);
 for(const [name,mode,sources] of [['blue','image','both'],['blue-video','video','both'],['blue-mixed','mixed','both'],['blue-archive','archive','archive'],['blue-commons','image','commons'],['blue-video-archive','video','archive'],['blue-video-commons','video','commons']]){
 const page=`<!doctype html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blueness</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27%3E%3Cpath fill=%27%230000ff%27 d=%27M0 0h16v16H0z%27/%3E%3C/svg%3E"><style>

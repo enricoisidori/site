@@ -1,3 +1,4 @@
+import { recordingControlsHTML } from '../assets/shared/recording/recorder.js';
 import { highlightParts } from './terms.js';
 import { MAX_PLAY_SECONDS } from './media.js';
 import { historyState, exportChain, download } from './history.js';
@@ -12,6 +13,7 @@ pane.addEventListener('click',async event=>{
  const action=event.target.dataset.action;if(!action)return;
  try{
   if(action==='back'||action==='next')window.dispatchEvent(new CustomEvent('afterimage:navigate',{detail:action==='back'?-1:1}));
+  if(action==='fit')window.dispatchEvent(new Event('afterimage:fit'));
   if(action==='copy')await copyChain();if(action==='json')await exportChain();if(action==='pdf')await exportChainPDF(pdfShape);if(action==='excel')await exportChainExcel();
   if(action==='defaults')download(new Blob([filterDefaultsCode()],{type:'text/javascript'}),'filter-defaults.js');
  }catch(error){window.dispatchEvent(new CustomEvent('afterimage:export-error',{detail:error.message}));}
@@ -23,8 +25,10 @@ export function renderInfo(state,active){
  const open=[...pane.querySelectorAll('details[open]')].map(el=>el.dataset.section),scroll=pane.scrollTop,item=active?.item;
  const records=historyState.records,collections=[...new Set([...filterState.collections,...(item?.collections||[]),...records.slice(-50).flatMap(r=>r.video.collections||[])])];
  pane.innerHTML=`
- <p>${esc(state.step)} · ${esc(state.modelStatus)}<br>${state.queueSemantic} della query pronti · ${state.queueGeneral} casuali pronti · ${state.loading} in preparazione<br>${esc(state.message)}</p>
+ <p>${state.paused?'pausa · precaricamento attivo<br>':''}${esc(state.step)} · ${esc(state.modelStatus)}<br>${state.queueSemantic} della query pronti · ${state.queueGeneral} casuali pronti · ${state.loading} in preparazione<br>${esc(state.message)}</p>
  <p class="actions"><button data-action="back">◀</button> <button data-action="next">▶</button> <button data-action="copy">copia catena</button> <button data-action="json">json</button> <button data-action="excel">excel</button> <button data-action="pdf">pdf · p</button></p>
+ <p><button data-action="fit">immagine ${esc(state.fitMode)} · cambia fit/fill</button></p>
+ ${recordingControlsHTML('afterimage')}
  <select id="pdfShape" aria-label="formato pdf"><option value="vertical" ${pdfShape==='vertical'?'selected':''}>pdf verticale</option><option value="square" ${pdfShape==='square'?'selected':''}>pdf quadrato</option></select>
  <textarea id="chainCopy" hidden readonly aria-label="catena da copiare"></textarea>
  ${item?`<p><a href="${esc(item.source)}" target="_blank" rel="noopener">${marked(item.title,item.incoming?.terms||[])}</a><br>${esc(item.collection||'')} · ${esc(item.creator||'')} · ${esc(item.date||'')}</p>`:''}

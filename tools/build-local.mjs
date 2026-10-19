@@ -1,6 +1,6 @@
 // Generate file:// editions from online sources; users never run this script.
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -15,7 +15,8 @@ for (const project of (process.argv[2] ? [process.argv[2]] : ['afterimage', 'dre
     if (modules.has(filename)) return;
     let code = readFileSync(resolve(source, filename), 'utf8');
     const dependencies = [];
-    code = code.replace(/^import\s+\{([^}]+)\}\s+from\s+'\.\/([^']+)';\s*$/gm, (_, bindings, dependency) => {
+    code = code.replace(/^import\s+\{([^}]+)\}\s+from\s+'(\.\.?\/[^']+)';\s*$/gm, (_, bindings, request) => {
+      const dependency = relative(source, resolve(source, dirname(filename), request));
       dependencies.push(dependency);
       return `const {${bindings.replace(/\s+as\s+/g, ':')}} = modules[${JSON.stringify(dependency)}];`;
     });
