@@ -1,17 +1,31 @@
 import { createMP4Muxer } from './mp4-muxer.js';
+import { reconstructRecording, renderScreenReel, saveRecordingFile } from './render.js';
 
 const recorderPanels=new Map();
 export function recordingControlsHTML(name){return recorderPanels.get(name)?.controlsHTML()||'';}
 
 // No encoder, audio processing or animation loop exists until R is pressed.
-export function createSelectiveRecorder({name,getScene}){
+export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],suspendPlayback=()=>()=>{}}){
  let phase='idle',clip=null,clips=[],pending=[],timer=null,hudTimer=null,started=0,serial=0;
  let surface,context,videoConfig,audioConfig,audioContext;const playbackTaps=new WeakMap();
  let stopPromise=null,cancelPromise=null,notice='',saved=0,selectPending=false,selectedCount=0,sessionId=0;
+ let traces=[],lastManifest=null,traceOnly=false,renderAbort=null,exportPromise=null,exportTimer=null;
+ let exportState={stage:'idle',kind:'',message:'nessuna esportazione in corso',progress:null,completed:0,total:0,startedAt:null};
+ const escapeStatus=value=>String(value).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ function exportStatusText(){const s=exportState,elapsed=s.startedAt?Math.floor(((s.endedAt||performance.now())-s.startedAt)/1000):0;return 'mp4 · '+s.message+(s.kind?'\n'+(s.kind==='screens'?'screen':s.kind==='sources'?'sorgenti':'registrazione')+' · '+s.width+' × '+s.height+' px':'')+(s.total?' · '+s.completed+' / '+s.total+(s.kind==='screens'?' screen':' video')+' completati':'')+(s.progress==null?'':' · '+Math.floor(s.progress*100)+'%')+(s.startedAt?' · '+elapsed+' s':'');}
+ function syncExportStatus(){const text=exportStatusText();document.querySelectorAll('[data-mp4-status="'+name+'"]').forEach(el=>{if(el.textContent!==text)el.textContent=text;el.dataset.stage=exportState.stage;});}
+ function exportProgress(text,detail={}){Object.assign(exportState,detail,{message:text});if(['complete','error','cancelled','ready','empty'].includes(exportState.stage)){exportState.endedAt=performance.now();clearInterval(exportTimer);exportTimer=null;}syncExportStatus();message(text);}
+ function beginExport(kind,width,height,total=0){clearInterval(exportTimer);exportState={kind,width,height,total,completed:0,progress:null,stage:'preparation',message:'preparazione…',startedAt:performance.now()};syncExportStatus();exportTimer=setInterval(syncExportStatus,1000);}
+ const instructionDB=new Promise(resolve=>{try{const r=indexedDB.open('recording-instructions',1);r.onupgradeneeded=()=>r.result.createObjectStore('sessions');r.onsuccess=()=>resolve(r.result);r.onerror=()=>resolve(null);}catch{resolve(null);}});
+ async function storeInstructions(value){const db=await instructionDB;if(!db)return false;return new Promise(resolve=>{const tx=db.transaction('sessions','readwrite');tx.objectStore('sessions').put(value,name);tx.oncomplete=()=>resolve(true);tx.onerror=()=>resolve(false);tx.onabort=()=>resolve(false);});}
+ const instructionsLoaded=instructionDB.then(db=>db&&new Promise(resolve=>{const r=db.transaction('sessions').objectStore('sessions').get(name);r.onsuccess=()=>{lastManifest??=r.result||null;resolve();};r.onerror=resolve;}));
+ function manifest(){return {version:1,project:name,createdAt:new Date().toISOString(),width:dimensions.width,height:dimensions.height,fps:30,clips:traces.filter(t=>t.selected&&t.outTime>t.inTime&&t.keyframes.length).map(t=>JSON.parse(JSON.stringify(t)))};}
+ function importInstructions(){const file=document.createElement('input');file.type='file';file.accept='.json,application/json';file.onchange=async()=>{try{const data=JSON.parse(await file.files[0].text());if(data.version!==1||data.project!==name||!Array.isArray(data.clips)||!data.clips.length||data.width<128||data.width>4096||data.height<128||data.height>4096||data.width%2||data.height%2||data.clips.some(c=>!c.source?.url||!Number.isFinite(c.inTime)||!Number.isFinite(c.outTime)||c.outTime<=c.inTime||!c.keyframes?.length))throw Error('file di istruzioni non valido per '+name);if(phase!=='idle')throw Error('termina la registrazione prima di importare');lastManifest=data;await storeInstructions(data);message(data.clips.length+' clip · istruzioni caricate · e monta dai sorgenti');}catch(error){message(error.message);}};file.click();}
+ function downloadInstructions(){if(lastManifest?.clips.length)saveRecordingFile(new Blob([JSON.stringify(lastManifest,null,2)],{type:'application/json'}),name+'-instructions.json');else message('nessuna istruzione selezionata disponibile');}
  const sizeKey=name+':recording-size:v1';let dimensions={width:1080,height:1440},crop={heightVH:100,centerX:50,centerY:50};
  const dimension=(value,fallback)=>Number.isFinite(Number(value))?Math.max(128,Math.min(4096,Math.round(Number(value)/2)*2)):fallback;
  const percent=(value,fallback)=>Number.isFinite(Number(value))?Math.max(1,Math.min(100,Number(value))):fallback;
- try{const stored=JSON.parse(localStorage.getItem(sizeKey)||'null');if(stored){dimensions={width:dimension(stored.width,1080),height:dimension(stored.height,1440)};if(stored.crop)for(const key of Object.keys(crop))crop[key]=percent(stored.crop[key],crop[key]);}}catch{}
+ try{const stored=JSON.parse(localStorage.getItem(sizeKey)||'null');if(stored){traceOnly=!!stored.traceOnly;dimensions={width:dimension(stored.width,1080),height:dimension(stored.height,1440)};if(stored.crop)for(const key of Object.keys(crop))crop[key]=percent(stored.crop[key],crop[key]);}}catch{}
  function frameRectangle(){
   const aspect=dimensions.width/dimensions.height,h=Math.min(innerHeight*crop.heightVH/100,innerWidth/aspect),w=h*aspect;
   const cx=Math.max(w/2,Math.min(innerWidth-w/2,innerWidth*crop.centerX/100)),cy=Math.max(h/2,Math.min(innerHeight-h/2,innerHeight*crop.centerY/100));
@@ -21,29 +35,33 @@ export function createSelectiveRecorder({name,getScene}){
  function aspectValue(){return ['3:4','4:3','16:9','9:16','1:1'].find(r=>{const [w,h]=r.split(':').map(Number);return Math.abs(dimensions.width/dimensions.height-w/h)<.002;})||'custom';}
  function controlsHTML(){
   const r=frameRectangle(),values={heightVH:r.height/innerHeight*100,widthVW:r.width/innerWidth*100,centerX:(r.x+r.width/2)/innerWidth*100,centerY:(r.y+r.height/2)/innerHeight*100};
-  return `<details data-section="recording" data-recording="${name}"><summary>registrazione MP4</summary>
+  return `<p data-mp4-status="${name}" data-stage="${exportState.stage}" role="status" style="white-space:pre-line">${escapeStatus(exportStatusText())}</p><details data-section="recording" data-recording="${name}"><summary>registrazione MP4</summary>
   <label>proporzioni <select data-recording-aspect ${phase!=='idle'?'disabled':''}>${['3:4','4:3','16:9','9:16','1:1','custom'].map(a=>`<option value="${a}" ${a===aspectValue()?'selected':''}>${a==='custom'?'personalizzate':a}</option>`).join('')}</select></label>
   ${[['heightVH','altezza area · vh'],['widthVW','larghezza area · vw'],['centerX','centro x · vw'],['centerY','centro y · vh']].map(([key,label])=>`<label>${label} <input data-recording-crop="${key}" type="number" min="1" max="100" step="1" value="${Number(values[key].toFixed(2))}" style="${inputStyle}"></label>`).join('')}
   ${['width','height'].map(key=>`<label>output ${key==='width'?'larghezza':'altezza'} · px <input data-recording-dimension="${key}" type="number" min="128" max="4096" step="2" value="${dimensions[key]}" ${phase!=='idle'?'disabled':''} style="${inputStyle}"></label>`).join('')}
-  <p>il riquadro mostra l’area registrata · pannelli, bordo e feedback esclusi<br>r avvia / salva · q annulla · s seleziona · d deseleziona · x / → taglia</p></details>`;
+  <label><input type="checkbox" data-recording-trace ${traceOnly?'checked':''} ${phase!=='idle'?'disabled':''}> solo istruzioni · senza codifica live</label><p><button type="button" data-recording-action="sources">monta dai sorgenti · e</button> · <button type="button" data-recording-action="screens">screen MP4 · g</button> · <button type="button" data-recording-action="instructions">scarica istruzioni</button> · <button type="button" data-recording-action="import">carica istruzioni</button></p>
+  <p>il riquadro mostra l’area registrata · pannelli, bordo e feedback esclusi<br>r avvia / salva · e monta sorgenti · g screen MP4 · spazio pausa · q annulla · s seleziona · d deseleziona · x / → taglia</p></details>`;
  }
  function syncControls(){
   const r=frameRectangle(),values={heightVH:r.height/innerHeight*100,widthVW:r.width/innerWidth*100,centerX:(r.x+r.width/2)/innerWidth*100,centerY:(r.y+r.height/2)/innerHeight*100};
   document.querySelectorAll('[data-recording="'+name+'"] input,[data-recording="'+name+'"] select').forEach(input=>{
    const key=input.dataset.recordingDimension||input.dataset.recordingCrop;
    input.disabled=input.hasAttribute('data-recording-crop')?!['idle','recording'].includes(phase):phase!=='idle';
+   if(input.hasAttribute('data-recording-trace')){input.checked=traceOnly;return;}
    input.value=input.hasAttribute('data-recording-aspect')?aspectValue():input.dataset.recordingDimension?dimensions[key]:Number(values[key].toFixed(2));
-  });updateFrame();
+  });updateFrame();syncExportStatus();
  }
  document.addEventListener('change',event=>{
   const input=event.target;if(input.closest('[data-recording]')?.dataset.recording!==name)return;
+  if(phase==='idle'&&input.hasAttribute('data-recording-trace'))traceOnly=input.checked;
   if(phase==='idle'&&input.dataset.recordingDimension){const key=input.dataset.recordingDimension;if(['width','height'].includes(key))dimensions[key]=dimension(input.value,dimensions[key]);}
   if(phase==='idle'&&input.hasAttribute('data-recording-aspect')&&input.value!=='custom'){
    const [w,h]=input.value.split(':').map(Number);if(w&&h){const ratio=w/h;let height=dimensions.height,width=height*ratio;if(width>4096){width=4096;height=width/ratio;}dimensions={width:dimension(width,1080),height:dimension(height,1440)};}
   }
   if(['idle','recording'].includes(phase)&&input.dataset.recordingCrop){const key=input.dataset.recordingCrop,value=percent(input.value,50);if(key==='widthVW')crop.heightVH=percent(innerWidth*value/100/(dimensions.width/dimensions.height)/innerHeight*100,100);else if(key in crop)crop[key]=value;const r=frameRectangle();crop.centerX=(r.x+r.width/2)/innerWidth*100;crop.centerY=(r.y+r.height/2)/innerHeight*100;}
-  try{localStorage.setItem(sizeKey,JSON.stringify({...dimensions,crop}));}catch{}syncControls();
+  try{localStorage.setItem(sizeKey,JSON.stringify({...dimensions,crop,traceOnly}));}catch{}syncControls();
  });
+ document.addEventListener('click',event=>{const button=event.target.closest('[data-recording-action]');if(button?.closest('[data-recording]')?.dataset.recording!==name)return;if(button.dataset.recordingAction==='instructions')downloadInstructions();else if(button.dataset.recordingAction==='import')importInstructions();else void exportFromSources(button.dataset.recordingAction);});
  recorderPanels.set(name,{controlsHTML});
  const outline=document.createElement('div');outline.dataset.recordingFrame=name;outline.hidden=true;
  outline.style.cssText='position:fixed;z-index:2;pointer-events:none;box-sizing:border-box;border:1px solid white;outline:1px solid #0008';
@@ -62,7 +80,7 @@ export function createSelectiveRecorder({name,getScene}){
  function status(){
   const seconds=Math.floor((performance.now()-started)/1000),clock=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
   hud.hidden=false;dot.hidden=phase!=='recording';
-  feedback.textContent=phase==='recording'?`rec ${clock} · ${clip?.deselected?'deselezionata':clip?.cut?'tagliata':clip?.selected?'selezionata':'s seleziona · d deseleziona · x taglia'}${!audioConfig?' · senza audio':clip?.audioUnavailable?' · audio sorgente non disponibile':''}`:notice;
+  feedback.textContent=phase==='recording'?`rec ${clock} · ${clip?.deselected?'deselezionata':clip?.cut?'tagliata':clip?.selected?'selezionata':'s seleziona · d deseleziona · x taglia'}${traceOnly?' · solo istruzioni':!audioConfig?' · senza audio':clip?.audioUnavailable?' · audio sorgente non disponibile':''}`:notice;
   counter.hidden=!['recording','saving'].includes(phase);counter.textContent=' · video selezionati: '+selectedCount;
  }
  function message(text){notice=text;status();}
@@ -118,14 +136,21 @@ export function createSelectiveRecorder({name,getScene}){
    })().catch(()=>{if(!c.ended){c.audioRunning=false;c.audioUnavailable=true;}});
   }catch{c.audioUnavailable=true;}
  }
+ function rememberLayout(scene,c){
+  if(!scene.layout||!c.trace)return;const time=scene.video.currentTime;if(!Number.isFinite(time)||time<c.trace.inTime)return;
+  c.trace.outTime=time;const frame=frameRectangle(),signature=JSON.stringify({frame,layout:scene.layout});
+  if(signature!==c.trace.signature){c.trace.signature=signature;c.trace.keyframes.push({time,frame,layout:JSON.parse(JSON.stringify(scene.layout))});}
+ }
  function begin(scene){
   const c={session:sessionId,key:scene.key,order:serial++,started:performance.now(),selected:selectPending,cut:false,ended:false,video:[],audio:[],audioFrames:0,last:0,frameCount:0};clip=c;if(c.selected)selectedCount++;selectPending=false;
+  c.trace={source:{url:scene.video.currentSrc||scene.video.src,...scene.source},inTime:scene.video.currentTime,outTime:scene.video.currentTime,selected:c.selected,keyframes:[]};traces.push(c.trace);rememberLayout(scene,c);if(traceOnly)return c;
   c.ve=new VideoEncoder({output:(chunk,meta)=>c.video.push({chunk,meta}),error});c.ve.configure(videoConfig);
   if(audioConfig){c.ae=new AudioEncoder({output:(chunk,meta)=>c.audio.push({chunk,meta}),error});c.ae.configure(audioConfig);}
   connectInput(scene,c);return c;
  }
  function finish(c,cut=false){
-  if(!c||c.ended)return;c.ended=true;c.cut=cut||c.cut;disconnectInput(c);
+  if(!c||c.ended)return;if(c.trace){c.trace.selected=c.selected;delete c.trace.signature;}c.ended=true;c.cut=cut||c.cut;disconnectInput(c);
+  if(traceOnly)return;
   c.duration=Math.max(c.last+40000,Math.ceil(((c.pauseStarted||performance.now())-c.started)*1000/20000)*20000);
   const job=(async()=>{
    try{
@@ -143,7 +168,7 @@ export function createSelectiveRecorder({name,getScene}){
    const scene=getScene();
    if(!scene){if(clip){finish(clip);clip=null;}return;}
    if(!clip||clip.key!==scene.key){finish(clip);begin(scene);}
-   const c=clip;if(c.cut||c.ended)return;syncAudioMonitor();
+   const c=clip;if(c.cut||c.ended)return;rememberLayout(scene,c);if(traceOnly)return;syncAudioMonitor();
    if(scene.paused){c.pauseStarted??=performance.now();return;}
    if(c.pauseStarted){c.started+=performance.now()-c.pauseStarted;c.pauseStarted=null;c.forceKeyFrame=true;}
    if(c.ae&&!c.audioRunning){const gap=Math.floor((performance.now()-c.started)*48)-c.audioFrames;if(gap>=1024)encodeAudio(c,new Float32Array(2048),1024);}
@@ -160,28 +185,29 @@ export function createSelectiveRecorder({name,getScene}){
  async function start(){
   if(phase!=='idle')return;const token=++sessionId;phase='starting';syncControls();selectedCount=0;selectPending=false;message('preparazione registrazione…');
   try{
-   if(!globalThis.VideoEncoder||!globalThis.VideoFrame)throw Error('MP4 non supportato da questo browser: usa Chrome o Edge aggiornato');
+   if(!traceOnly&&(!globalThis.VideoEncoder||!globalThis.VideoFrame))throw Error('MP4 non supportato da questo browser: usa Chrome o Edge aggiornato');
    const {width,height}=dimensions,blocks=Math.ceil(width/16)*Math.ceil(height/16),level=blocks<=3600?'1f':blocks<=8192?'28':blocks<=8704?'2a':blocks<=22080?'32':blocks<=36864?'33':'3c';
    videoConfig={codec:'avc1.4200'+level,width,height,bitrate:Math.min(18000000,Math.round(3000000*width*height/(1280*720))),framerate:25,latencyMode:'realtime',avc:{format:'avc'}};
-   if(!(await VideoEncoder.isConfigSupported(videoConfig)).supported)throw Error('encoder MP4 H.264 non disponibile');if(token!==sessionId)return;
+   if(!traceOnly&&!(await VideoEncoder.isConfigSupported(videoConfig)).supported)throw Error('encoder MP4 H.264 non disponibile');if(token!==sessionId)return;
    audioConfig={codec:'mp4a.40.2',sampleRate:48000,numberOfChannels:2,bitrate:128000};
-   if(!globalThis.AudioEncoder||!globalThis.MediaStreamTrackProcessor||!(await AudioEncoder.isConfigSupported(audioConfig)).supported)throw Error('registrazione MP4 con audio non supportata: usa Chrome o Edge aggiornato');if(token!==sessionId)return;
-   audioContext??=new AudioContext();await audioContext.resume();if(token!==sessionId)return;
-   surface=document.createElement('canvas');surface.width=width;surface.height=height;context=surface.getContext('2d',{alpha:false});
-   clips=[];pending=[];clip=null;serial=0;saved=0;started=performance.now();phase='recording';sample();timer=setInterval(sample,40);hudTimer=setInterval(status,200);status();
+   if(!traceOnly&&(!globalThis.AudioEncoder||!globalThis.MediaStreamTrackProcessor||!(await AudioEncoder.isConfigSupported(audioConfig)).supported))throw Error('registrazione MP4 con audio non supportata: usa Chrome o Edge aggiornato');if(token!==sessionId)return;
+   if(!traceOnly){audioContext??=new AudioContext();await audioContext.resume();}if(token!==sessionId)return;
+   if(!traceOnly){surface=document.createElement('canvas');surface.width=width;surface.height=height;context=surface.getContext('2d',{alpha:false});}
+   traces=[];clips=[];pending=[];clip=null;serial=0;saved=0;started=performance.now();phase='recording';sample();timer=setInterval(sample,40);hudTimer=setInterval(status,200);status();
   }catch(e){if(token!==sessionId)return;phase='idle';syncControls();await cleanup();message(e.message);}
  }
  async function cleanup(){
   clearInterval(timer);clearInterval(hudTimer);timer=hudTimer=null;disconnectInput();
   if(surface){surface.width=surface.height=0;surface=context=null;}
  }
- async function stop(){
+ async function stop({save=true}={}){
   if(stopPromise)return stopPromise;if(phase!=='recording')return;const token=sessionId;
-  phase='saving';syncControls();finish(clip);clip=null;clearInterval(timer);clearInterval(hudTimer);message('montaggio MP4…');
+  sample();beginExport('live',dimensions.width,dimensions.height,selectedCount);phase='saving';syncControls();finish(clip);clip=null;clearInterval(timer);clearInterval(hudTimer);message('montaggio MP4…');
   stopPromise=(async()=>{
    try{
     await Promise.all(pending);if(token!==sessionId)return;await cleanup();if(token!==sessionId)return;
-    const selected=clips.filter(c=>c.selected).sort((a,b)=>a.order-b.order);if(!selected.length){message('nessuna clip selezionata');return;}
+    const instructions=manifest();lastManifest=instructions;const persisted=await storeInstructions(instructions);if(token!==sessionId)return;if(!persisted&&instructions.clips.length)downloadInstructions();if(!save||traceOnly){exportProgress(instructions.clips.length+' clip · istruzioni '+(persisted?'conservate nel browser':'scaricate come backup')+' · premi e per creare MP4',{stage:'ready',progress:null});return;}
+    const selected=clips.filter(c=>c.selected).sort((a,b)=>a.order-b.order);if(!selected.length){exportProgress('nessuna clip selezionata',{stage:'empty',progress:null});return;}
     const {Muxer,ArrayBufferTarget}=createMP4Muxer(),target=new ArrayBufferTarget();
     const muxer=new Muxer({target,video:{codec:'avc',width:videoConfig.width,height:videoConfig.height},...(audioConfig?{audio:{codec:'aac',sampleRate:48000,numberOfChannels:2}}:{}),fastStart:'in-memory',firstTimestampBehavior:'offset'});
     let offset=0;
@@ -194,32 +220,48 @@ export function createSelectiveRecorder({name,getScene}){
      if(audioConfig)for(const {chunk,meta} of c.audio){const at=Math.max(0,chunk.timestamp);if(at>=c.duration)continue;const bytes=new Uint8Array(chunk.byteLength);chunk.copyTo(bytes);muxer.addAudioChunkRaw(bytes,chunk.type,offset+at,Math.min(chunk.duration,c.duration-at),meta);}
      offset+=c.duration;
     }
-    muxer.finalize();const url=URL.createObjectURL(new Blob([target.buffer],{type:'video/mp4'})),a=document.createElement('a');a.href=url;a.download=name+'_'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.mp4';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);saved=selected.length;message(saved+' clip · MP4 salvato');
-   }catch(e){if(token===sessionId)message('export: '+e.message);}finally{if(token===sessionId){await cleanup();clips=[];pending=[];phase='idle';syncControls();stopPromise=null;setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);}}
+    muxer.finalize();const url=URL.createObjectURL(new Blob([target.buffer],{type:'video/mp4'})),a=document.createElement('a');a.href=url;a.download=name+'_'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.mp4';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);saved=selected.length;exportProgress('completato · download MP4 avviato',{stage:'complete',completed:saved,progress:1});message(saved+' clip · MP4 salvato');
+   }catch(e){if(token===sessionId)exportProgress('errore · '+e.message,{stage:'error'});}finally{if(token===sessionId){await cleanup();clips=[];pending=[];phase='idle';syncControls();stopPromise=null;setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);}}
   })();return stopPromise;
  }
  async function cancel(){
-  if(cancelPromise)return cancelPromise;if(phase==='idle')return;
+  if(renderAbort){renderAbort.abort();return exportPromise;}if(cancelPromise)return cancelPromise;if(phase==='idle')return;
   ++sessionId;phase='cancelling';clearInterval(timer);clearInterval(hudTimer);selectPending=false;
-  for(const c of clips)c.selected=false;if(clip){clip.selected=false;finish(clip);clip=null;}
+  for(const t of traces)t.selected=false;for(const c of clips)c.selected=false;if(clip){clip.selected=false;finish(clip);clip=null;}
   syncControls();message('annullamento registrazione…');
   const saving=stopPromise,jobs=[...pending];if(saving)jobs.push(saving);
-  cancelPromise=(async()=>{await Promise.allSettled(jobs);await cleanup();clips=[];pending=[];selectedCount=0;saved=0;stopPromise=null;phase='idle';syncControls();message('registrazione annullata · nessun file creato');cancelPromise=null;setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);})();
+  cancelPromise=(async()=>{await Promise.allSettled(jobs);await cleanup();traces=[];clips=[];pending=[];selectedCount=0;saved=0;stopPromise=null;phase='idle';syncControls();exportProgress('registrazione annullata · nessun file creato',{stage:'cancelled',progress:null});cancelPromise=null;setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);})();
   return cancelPromise;
  }
- function select(){if(phase!=='recording')return;sample();if(clip&&!clip.cut&&!clip.ended&&!clip.selected){clip.selected=true;clip.deselected=false;selectedCount++;}status();}
+ function select(){if(phase!=='recording')return;sample();if(clip&&!clip.cut&&!clip.ended&&!clip.selected){clip.selected=true;clip.trace.selected=true;clip.deselected=false;selectedCount++;}status();}
  function deselect(){
   if(phase==='starting'){selectPending=false;return;}
   if(phase!=='recording')return;sample();
-  if(clip?.selected){clip.selected=false;clip.deselected=true;selectedCount=Math.max(0,selectedCount-1);clips=clips.filter(c=>c!==clip);if(clip.ended){clip.video.length=0;clip.audio.length=0;}}
+  if(clip?.selected){clip.selected=false;clip.trace.selected=false;clip.deselected=true;selectedCount=Math.max(0,selectedCount-1);clips=clips.filter(c=>c!==clip);if(clip.ended){clip.video.length=0;clip.audio.length=0;}}
   status();
  }
  function cut(){if(phase!=='recording'||!clip?.selected||clip.cut)return;sample();clip.cut=true;finish(clip,true);disconnectInput();status();}
+ async function exportFromSources(kind='sources'){
+  if(exportPromise)return exportPromise;
+  exportPromise=(async()=>{
+   if(phase==='recording')await stop({save:false});else if(phase==='saving'&&stopPromise)await stopPromise;if(phase!=='idle')return;
+   await instructionsLoaded;const instructions=lastManifest?JSON.parse(JSON.stringify(lastManifest)):null;
+   if(kind==='sources'&&!instructions?.clips.length){exportProgress('nessuna clip selezionata: r avvia, s seleziona, poi e',{stage:'empty',progress:null});return;}
+   renderAbort=new AbortController();const signal=renderAbort.signal;phase='rendering';beginExport(kind,kind==='screens'?dimensions.width:instructions.width,kind==='screens'?dimensions.height:instructions.height,kind==='screens'?0:instructions.clips.length);syncControls();const resume=suspendPlayback();
+   try{
+    exportProgress(kind==='screens'?'preparazione screen MP4…':'preparazione montaggio dai sorgenti…',{stage:'preparation'});
+    let blob;if(kind==='screens'){const items=await getSnapshots();if(!items.length)throw Error('nessun video visto da esportare');blob=await renderScreenReel(items,{...dimensions,frame:frameRectangle(),signal,onProgress:exportProgress});}
+    else{blob=await reconstructRecording(instructions,{signal,onProgress:exportProgress});}
+    signal.throwIfAborted();saveRecordingFile(blob,name+(kind==='screens'?'-screens':'-sources')+'.mp4');exportProgress('completato · download MP4 avviato',{stage:'complete',completed:exportState.total,progress:1});message('MP4 salvato');
+   }catch(error){exportProgress(signal.aborted?'elaborazione annullata · nessun video creato':'errore · '+error.message,{stage:signal.aborted?'cancelled':'error'});}
+   finally{clearInterval(exportTimer);exportTimer=null;renderAbort=null;phase='idle';syncControls();resume?.();setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);}
+  })().finally(()=>{exportPromise=null;});return exportPromise;
+ }
  document.addEventListener('keydown',event=>{
-  if(event.repeat||event.metaKey||event.ctrlKey||event.altKey||event.target.closest?.('input,textarea,select,[contenteditable="true"]'))return;
-  const key=event.key.toLowerCase();if(key==='arrowright'&&phase==='recording'){cut();return;}if(key==='arrowright'&&phase==='starting'){selectPending=false;return;}if(key!=='r'&&!(phase!=='idle'&&['s','d','x','q'].includes(key)))return;
+  if(event.repeat||event.metaKey||event.ctrlKey||event.altKey||event.target.closest?.('input:not([type="checkbox"]),textarea,select,[contenteditable="true"]'))return;
+  const key=event.key.toLowerCase();if(key==='e'||key==='g'){event.preventDefault();event.stopImmediatePropagation();void exportFromSources(key==='g'?'screens':'sources');return;}if(key==='arrowright'&&phase==='recording'){cut();return;}if(key==='arrowright'&&phase==='starting'){selectPending=false;return;}if(key!=='r'&&!(phase!=='idle'&&['s','d','x','q'].includes(key)))return;
   event.preventDefault();event.stopImmediatePropagation();
   if(key==='r'){if(phase==='idle')void start();else if(phase==='recording')void stop();}else if(key==='s'){if(phase==='starting')selectPending=true;else select();}else if(key==='d')deselect();else if(key==='q')void cancel();else cut();
  },true);
- return {start,stop,cancel,select,deselect,cut,sample,controlsHTML,syncAudioMonitor,releaseMedia,get status(){return {phase,selected:selectedCount,width:dimensions.width,height:dimensions.height,frame:frameRectangle(),cut:!!clip?.cut,frames:clip?.frameCount||0,audioFrames:clip?.audioFrames||0,queued:clip?.ve.encodeQueueSize||0,saved,notice};}};
+ return {start,stop,cancel,exportFromSources,downloadInstructions,select,deselect,cut,sample,controlsHTML,syncAudioMonitor,releaseMedia,get status(){return {phase,selected:selectedCount,width:dimensions.width,height:dimensions.height,frame:frameRectangle(),cut:!!clip?.cut,frames:clip?.frameCount||0,audioFrames:clip?.audioFrames||0,queued:clip?.ve?.encodeQueueSize||0,saved,notice,traceOnly,export:{...exportState},instructionClips:lastManifest?.clips.length||0};}};
 }

@@ -3,7 +3,8 @@ import vm from 'node:vm';
 const transport=readFileSync(new URL('../afterimage/archive-transport.js',import.meta.url),'utf8').replace(/^export /gm,'');
 mkdirSync(new URL('../blueness/',import.meta.url),{recursive:true});
 const pdf=readFileSync(new URL('./blueness-pdf.js',import.meta.url),'utf8');
-const recorder=readFileSync(new URL('../assets/shared/recording/mp4-muxer.js',import.meta.url),'utf8').replace(/^export /gm,'')+'\n'+readFileSync(new URL('../assets/shared/recording/recorder.js',import.meta.url),'utf8').replace(/^import .*;\s*$/gm,'').replace(/^export /gm,'');
+const renderer=readFileSync(new URL('../assets/shared/recording/render.js',import.meta.url),'utf8').replace(/^export /gm,'');
+const recorder=renderer+'\n'+readFileSync(new URL('../assets/shared/recording/mp4-muxer.js',import.meta.url),'utf8').replace(/^export /gm,'')+'\n'+readFileSync(new URL('../assets/shared/recording/recorder.js',import.meta.url),'utf8').replace(/^import .*;\s*$/gm,'').replace(/^export /gm,'');
 const code=transport+'\n'+pdf+'\n'+recorder+'\n'+readFileSync(new URL('./blue-flow.js',import.meta.url),'utf8');new vm.Script(code);
 for(const [name,mode,sources] of [['blue','image','both'],['blue-video','video','both'],['blue-mixed','mixed','both'],['blue-archive','archive','archive'],['blue-commons','image','commons'],['blue-video-archive','video','archive'],['blue-video-commons','video','commons']]){
 const page=`<!doctype html>

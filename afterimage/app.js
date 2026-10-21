@@ -26,14 +26,15 @@ const state = {
 };
 let pausedAt=0;
 let active, switching = false, generation = 0, context;
-const recording=createSelectiveRecorder({name:'afterimage',getScene:()=>{
+const recording=createSelectiveRecorder({name:'afterimage',suspendPlayback:()=>{const was=state.paused;if(!was)togglePlaybackPause();return()=>{if(!was&&state.paused)togglePlaybackPause();};},getSnapshots:async()=>{await hydrateFrames();return historyState.records.filter(r=>r.shown!==false).map(r=>{const w=innerWidth,h=innerHeight,iw=r.frame?.width||r.video.width||4,ih=r.frame?.height||r.video.height||3,scale=state.fitMode==='fill'?Math.max(w/iw,h/ih):Math.min(w/iw,h/ih);return {preview:r.frame?.preview,source:{url:r.video.streamURL,archiveID:r.video.id,filename:r.video.filename},time:r.frame?.time??r.playStart??0,layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(w-iw*scale)/2,y:(h-ih*scale)/2,width:iw*scale,height:ih*scale}}]}};});},getScene:()=>{
  if(!active?.video||active.video.readyState<2)return null;
- const video=active.video;return {key:active.recordingKey||active.startedAt,video,muted:state.muted,paused:state.paused||document.hidden||video.paused||video.readyState<3,draw:(ctx,w,h)=>{
+ const video=active.video;return {key:active.recordingKey||active.startedAt,video,muted:state.muted,paused:state.paused||document.hidden||video.paused||video.readyState<3,source:{archiveID:active.item.id,filename:active.item.filename,title:active.item.title,page:active.item.source},layout:afterimageRecordingLayout(video),draw:(ctx,w,h)=>{
   ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);const ratio=state.fitMode==='fill'?Math.max(w/video.videoWidth,h/video.videoHeight):Math.min(w/video.videoWidth,h/video.videoHeight);
   ctx.drawImage(video,(w-video.videoWidth*ratio)/2,(h-video.videoHeight*ratio)/2,video.videoWidth*ratio,video.videoHeight*ratio);
  }};
 }});
 
+function afterimageRecordingLayout(video){const w=innerWidth,h=innerHeight,scale=state.fitMode==='fill'?Math.max(w/video.videoWidth,h/video.videoHeight):Math.min(w/video.videoWidth,h/video.videoHeight);return {layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(w-video.videoWidth*scale)/2,y:(h-video.videoHeight*scale)/2,width:video.videoWidth*scale,height:video.videoHeight*scale}}]};}
 let worker, workerReady, rpcID = 0;
 const pending = new Map(), recent = new Set(), failed = new Map();
 const lifetime = new AbortController();
@@ -244,7 +245,7 @@ async function promote(next, reason) {
       parentID: old.item.id, parentTitle: old.item.title, caption: context?.caption || '',
       keywords: context?.allKeywords || [], terms: [], query: '', kind: reason === 'click' ? 'click' : 'random',
     };
-    if (old) finishChain(next.item, reason);
+    recording.sample();if (old) finishChain(next.item, reason);
     beginChain(next.item, reason, next.media.start);
     next.video.classList.toggle('fill', state.fitMode === 'fill');
     next.video.classList.add('on'); old?.video.classList.remove('on');
@@ -325,7 +326,7 @@ document.addEventListener('keydown', event => {
   if (key === 'arrowright') { event.preventDefault(); state.reviewing?navigateHistory(1):skipReady(); }
   if(key==='arrowleft')navigateHistory(-1);
   if(key==='p')exportChainPDF().catch(error=>update({message:error.message}));
-  if(key==='e')exportChainExcel().catch(error=>update({message:error.message}));
+
   if (key === 'c' || key === 'i') { toggleInfo(); renderInfo(state, active); }
   if (key === 'm') { state.muted = !state.muted; if (active) active.video.muted = state.muted; recording.syncAudioMonitor(); renderInfo(state, active); }
   if (key === 'f') {
