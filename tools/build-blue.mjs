@@ -5,10 +5,13 @@ mkdirSync(new URL('../blueness/',import.meta.url),{recursive:true});
 const pdf=readFileSync(new URL('./blueness-pdf.js',import.meta.url),'utf8');
 const renderer=readFileSync(new URL('../assets/shared/recording/render.js',import.meta.url),'utf8').replace(/^export /gm,'');
 const recorder=renderer+'\n'+readFileSync(new URL('../assets/shared/recording/mp4-muxer.js',import.meta.url),'utf8').replace(/^export /gm,'')+'\n'+readFileSync(new URL('../assets/shared/recording/recorder.js',import.meta.url),'utf8').replace(/^import .*;\s*$/gm,'').replace(/^export /gm,'');
-const code=transport+'\n'+pdf+'\n'+recorder+'\n'+readFileSync(new URL('./blue-flow.js',import.meta.url),'utf8');new vm.Script(code);
-for(const [name,mode,sources] of [['blue','image','both'],['blue-video','video','both'],['blue-mixed','mixed','both'],['blue-archive','archive','archive'],['blue-commons','image','commons'],['blue-video-archive','video','archive'],['blue-video-commons','video','commons']]){
+const bootstrap='const BLUENESS_CATALOG='+readFileSync(new URL('./catalogs/blueness.json',import.meta.url),'utf8')+';\n';
+const code=bootstrap+transport+'\n'+pdf+'\n'+recorder+'\n'+readFileSync(new URL('./blue-flow.js',import.meta.url),'utf8');new vm.Script(code);
+for(const [name,mode,sources] of [['blue','image','both'],['blue-video','video','both'],['blue-mixed','mixed','both'],['blue-archive','archive','archive'],['blue-commons','image','commons'],['blue-video-archive','video','archive'],['blue-video-commons','video','commons'],['blueness-stills','image','archive']]){
+const stills=name==='blueness-stills';if(process.argv[2]==='stills'&&!stills)continue;
+const pageCode=stills?'const BLUENESS_CATALOG='+readFileSync(new URL('./catalogs/blueness-stills.json',import.meta.url),'utf8')+';\n'+renderer+'\n'+readFileSync(new URL('./blueness-stills-export.js',import.meta.url),'utf8')+'\n'+transport+'\nconst createSelectiveRecorder=()=>({controlsHTML:()=>"",sample(){},releaseMedia(){},syncAudioMonitor(){},status:{phase:"disabled"}});\n'+readFileSync(new URL('./blue-flow.js',import.meta.url),'utf8'):code;new vm.Script(pageCode);
 const page=`<!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blueness</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27%3E%3Cpath fill=%27%230000ff%27 d=%27M0 0h16v16H0z%27/%3E%3C/svg%3E"><style>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${stills?'Blueness stills':'Blueness'}</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27%3E%3Cpath fill=%27%230000ff%27 d=%27M0 0h16v16H0z%27/%3E%3C/svg%3E"><style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font:12px/1.5 Helvetica,Arial,sans-serif}
 #stage{display:block;width:100%;height:100%}
 #controls,#info{position:fixed;z-index:3;box-sizing:border-box;font:inherit;background:transparent;border:0;padding:0;text-shadow:0 1px 2px #000}
@@ -30,7 +33,8 @@ label>button{text-align:right}.screen-button{display:block;margin:0;padding:0;te
 .export-button{display:block;text-decoration:underline;text-underline-offset:2px;margin-top:14px}footer{margin-top:16px;font:inherit}footer a{display:inline;text-decoration:underline;text-underline-offset:2px}
 :focus-visible{outline:1px dotted #888;outline-offset:2px}[hidden]{display:none!important}
 
-</style></head><body data-mode="${mode}" data-sources="${sources}"><canvas id="stage"></canvas><aside id="controls" hidden></aside><aside id="info" hidden></aside><script>${code.replace(/<\/script/gi,'<\\/script')}</script></body></html>`;
+</style></head><body data-mode="${mode}" data-project="${stills?'stills':'blueness'}" data-sources="${sources}"><canvas id="stage"></canvas><aside id="controls" hidden></aside><aside id="info" hidden></aside><script>${pageCode.replace(/<\/script/gi,'<\\/script')}</script></body></html>`;
+if(stills){mkdirSync(new URL('../blueness-stills/',import.meta.url),{recursive:true});writeFileSync(new URL('../blueness-stills/index.html',import.meta.url),page);console.log('blueness-stills/index.html');continue;}
 for(const output of [name,name.replace(/^blue/,'blueness')])writeFileSync(new URL('../'+output+'.html',import.meta.url),page);
 const localName=name==='blue-video'?'index':name==='blue'?'images':name.replace(/^blue-/,'');
 const projectIcon='<link rel="shortcut icon" href="./favicon.ico?v=blue1"><link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=blue1"><link rel="icon" type="image/svg+xml" sizes="any" href="./favicon.svg?v=blue1">';

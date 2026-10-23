@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-23",
+  "secondsPerRun": 30,
+  "rounds": 2,
+  "settings": {
+    "quality": 320,
+    "fps": 4,
+    "hue": 25,
+    "saturation": 55,
+    "brightness": 45,
+    "size": 50,
+    "disturbance": 20,
+    "maxZoom": 8
+  },
+  "commonsRandomCacheFixed": true,
+  "chosen": "archive",
+  "notes": "Separate fresh browser contexts; paired concurrent runs; no initial image catalog. These are small live samples, not guaranteed throughput. bytes is only the sum of available content-length headers.",
+  "results": [
+    {
+      "round": 1,
+      "source": "commons",
+      "firstMs": 10245,
+      "shown": 12,
+      "checked": 195,
+      "accepted": 12,
+      "ready": 0,
+      "search": {
+        "image": {
+          "fetching": true,
+          "preparing": 8,
+          "preparingArchive": 0,
+          "candidates": 5,
+          "checked": 195,
+          "accepted": 12
+        }
+      },
+      "requests": 212,
+      "bytes": 6884683,
+      "errors": [],
+      "lastError": ""
+    },
+    {
+      "round": 1,
+      "source": "archive",
+      "firstMs": 9200,
+      "shown": 47,
+      "checked": 305,
+      "accepted": 47,
+      "ready": 0,
+      "search": {
+        "image": {
+          "fetching": false,
+          "preparing": 8,
+          "preparingArchive": 8,
+          "candidates": 76,
+          "checked": 305,
+          "accepted": 47
+        }
+      },
+      "requests": 334,
+      "bytes": 4113824,
+      "errors": [],
+      "lastError": "caricamento scaduto"
+    },
+    {
+      "round": 2,
+      "source": "commons",
+      "firstMs": 11438,
+      "shown": 7,
+      "checked": 119,
+      "accepted": 7,
+      "ready": 0,
+      "search": {
+        "image": {
+          "fetching": true,
+          "preparing": 8,
+          "preparingArchive": 0,
+          "candidates": 1,
+          "checked": 119,
+          "accepted": 7
+        }
+      },
+      "requests": 134,
+      "bytes": 4706407,
+      "errors": [],
+      "lastError": ""
+    },
+    {
+      "round": 2,
+      "source": "archive",
+      "firstMs": 2851,
+      "shown": 39,
+      "checked": 283,
+      "accepted": 39,
+      "ready": 0,
+      "search": {
+        "image": {
+          "fetching": false,
+          "preparing": 8,
+          "preparingArchive": 8,
+          "candidates": 51,
+          "checked": 283,
+          "accepted": 39
+        }
+      },
+      "requests": 307,
+      "bytes": 3619881,
+      "errors": [],
+      "lastError": "media non disponibile"
+    }
+  ]
+}

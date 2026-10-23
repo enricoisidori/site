@@ -6,6 +6,12 @@ import vm from 'node:vm';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 for (const project of (process.argv[2] ? [process.argv[2]] : ['afterimage', 'dreamachine'])) {
   const source = resolve(root, project), modules = new Map();
+  // The online folder must work as the web server's document root too.
+  // Keep these generated copies in sync with the shared recording engine.
+  if(project==='afterimage'){
+    const recording=resolve(source,'recording');mkdirSync(recording,{recursive:true});
+    for(const filename of ['recorder.js','render.js','mp4-muxer.js','LICENSE.mp4-muxer'])copyFileSync(resolve(root,'assets/shared/recording',filename),resolve(recording,filename));
+  }
   // Inline artwork also works under file://, without SVG mask CORS requests.
   const artwork = readFileSync(resolve(source, 'afterimage.svg'), 'utf8')
     .replace(/<rect[^>]+fill="white"[^>]*\/>/, '')

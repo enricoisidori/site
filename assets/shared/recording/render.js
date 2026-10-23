@@ -1,4 +1,4 @@
-// Reconstruction is dormant until E/G. No media downloads or decoders while viewing.
+// Screen export is dormant until G. No media downloads or decoders while viewing.
 const MEDIA_LIBRARY='https://cdn.jsdelivr.net/npm/mediabunny@1.61.6/dist/bundles/mediabunny.min.mjs';
 let mediaLibrary;
 function loadMediaLibrary(){return mediaLibrary??=import(MEDIA_LIBRARY).catch(error=>{mediaLibrary=null;throw error;});}
@@ -43,47 +43,12 @@ async function openSource(B,source,signal){
  }
  throw Error('sorgente non disponibile: '+(error?.message||source.url));
 }
-async function addClipAudio(job,input,start,end,offset,signal){
- const {B,sound}=job,total=Math.round((end-start)*48000),pcm=[new Float32Array(total),new Float32Array(total)],track=await input.getPrimaryAudioTrack();
- if(track){
-  if(!await track.canDecode())throw Error('audio sorgente non decodificabile');
-  for await(const {buffer,timestamp} of new B.AudioBufferSink(track).buffers(start,end)){
-   checkCancelled(signal);const first=Math.max(0,Math.ceil((timestamp-start)*48000)),last=Math.min(total,Math.ceil((timestamp+buffer.duration-start)*48000));
-   for(let ch=0;ch<2;ch++){const data=buffer.getChannelData(Math.min(ch,buffer.numberOfChannels-1));for(let i=first;i<last;i++){const at=(start+i/48000-timestamp)*buffer.sampleRate,lo=Math.max(0,Math.min(data.length-1,Math.floor(at))),hi=Math.min(data.length-1,lo+1);pcm[ch][i]=data[lo]+(data[hi]-data[lo])*(Math.max(0,at)-lo);}}
-  }
- }
- for(let i=0;i<total;i+=2048){checkCancelled(signal);const n=Math.min(2048,total-i),data=new Float32Array(n*2);data.set(pcm[0].subarray(i,i+n));data.set(pcm[1].subarray(i,i+n),n);const sample=new B.AudioSample({data,format:'f32-planar',numberOfChannels:2,sampleRate:48000,timestamp:offset+i/48000});try{await sound.add(sample);}finally{sample.close();}}
-}
-export async function reconstructRecording(manifest,{signal,onProgress=()=>{}}={}){
- let job;const activeInputs=new Set(),abort=()=>{for(const input of activeInputs)input.dispose();};signal?.addEventListener('abort',abort,{once:true});
- try{
-  const total=manifest.clips.length,totalDuration=manifest.clips.reduce((n,c)=>n+c.outTime-c.inTime,0);onProgress('caricamento motore MP4…',{stage:'preparation',total,completed:0,progress:null});job=await makeOutput(manifest.width,manifest.height,true);let offset=0,index=0;
-  for(const clip of manifest.clips){
-   checkCancelled(signal);onProgress(`lettura sorgente ${index+1} / ${total}`,{stage:'source',completed:index,total,progress:offset/totalDuration});const {input,track,url}=await openSource(job.B,clip.source,signal);activeInputs.add(input);
-   try{
-    const start=clip.inTime,end=clip.outTime,duration=end-start;if(!(duration>0)||!clip.keyframes.length)throw Error('istruzioni clip incomplete');
-    // Both media lanes are decoded independently of real-time playback.
-    onProgress(`audio originale · video ${index+1} / ${total}`,{stage:'audio'});await addClipAudio(job,input,start,end,offset,signal);onProgress(`montaggio video ${index+1} / ${total}`,{stage:'encoding'});
-    const count=Math.ceil(duration*30),times=Array.from({length:count},(_,i)=>start+i/30),sink=new job.B.CanvasSink(track,{poolSize:2});let n=0,keyIndex=0;
-    for await(const sample of sink.canvasesAtTimestamps(times)){
-     checkCancelled(signal);if(!sample)throw Error('fotogramma sorgente mancante');const time=times[n];while(keyIndex+1<clip.keyframes.length&&clip.keyframes[keyIndex+1].time<=time)keyIndex++;
-     renderRecordedLayout(job.ctx,sample.canvas,clip.keyframes[keyIndex],manifest.width,manifest.height);
-     await job.video.add(offset+n/30,Math.min(1/30,duration-n/30),{keyFrame:n%30===0});n++;
-     if(n%15===0){onProgress(`montaggio video ${index+1} / ${total} · ${n} / ${count} fotogrammi`,{stage:'encoding',completed:index,total,progress:Math.min(.99,(offset+n/count*duration)/totalDuration)});await new Promise(resolve=>setTimeout(resolve,0));}
-    }
-    clip.renderedSource=url;offset+=duration;index++;onProgress(`video ${index} / ${total} elaborati`,{stage:'encoding',completed:index,total,progress:Math.min(.99,offset/totalDuration)});
-   }finally{activeInputs.delete(input);input.dispose();}
-  }
-  checkCancelled(signal);onProgress('finalizzazione del file MP4…',{stage:'finalizing',progress:.99});await job.output.finalize();checkCancelled(signal);return new Blob([job.target.buffer],{type:'video/mp4'});
- }catch(error){if(job)await job.output.cancel().catch(()=>{});throw error;}
- finally{signal?.removeEventListener('abort',abort);if(job)job.canvas.width=job.canvas.height=0;}
-}
-export async function renderScreenReel(items,{width,height,frame,getImage,signal,onProgress=()=>{}}){
+export async function renderScreenReel(items,{width,height,frame,getImage,signal,frameSeconds=1/8,onProgress=()=>{}}){
  let job;
  try{
-  onProgress('caricamento motore MP4…',{stage:'preparation',total:items.length,completed:0,progress:null});job=await makeOutput(width,height,false,8);let index=0;const duration=1/8;
+  onProgress('caricamento motore MP4…',{stage:'preparation',total:items.length,completed:0,progress:null});const duration=Math.max(.1,Math.min(5,Number(frameSeconds)||1/8));job=await makeOutput(width,height,false,1/duration);let index=0;
   for(const item of items){checkCancelled(signal);let image;if(getImage)image=await getImage(item);else if(item.blob)image=await createImageBitmap(await item.blob);else if(item.preview)image=await createImageBitmap(await(await fetch(item.preview)).blob());else if(item.source){const opened=await openSource(job.B,item.source,signal);try{const sample=await new job.B.CanvasSink(opened.track).getCanvas(item.time||0);if(sample)image=await createImageBitmap(sample.canvas);}finally{opened.input.dispose();}}if(!image)throw Error('fotogramma della cronologia non disponibile');
-   try{const layout=item.layout||{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:0,y:0,width:innerWidth,height:innerHeight}}]};renderRecordedLayout(job.ctx,image,{frame,layout},width,height);await job.video.add(index*duration,duration,{keyFrame:true});}
+   try{const layout=item.layout||{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:0,y:0,width:innerWidth,height:innerHeight}}]};renderRecordedLayout(job.ctx,image,{frame:item.frame||frame,layout},width,height);await job.video.add(index*duration,duration,{keyFrame:true});}
    finally{image.close?.();}index++;onProgress(`screen ${index} / ${items.length}`,{stage:'encoding',completed:index,total:items.length,progress:Math.min(.99,index/items.length)});
   }
   checkCancelled(signal);onProgress('finalizzazione del file MP4…',{stage:'finalizing',progress:.99});await job.output.finalize();checkCancelled(signal);return new Blob([job.target.buffer],{type:'video/mp4'});

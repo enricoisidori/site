@@ -1,4 +1,4 @@
-import { recordingControlsHTML } from '../assets/shared/recording/recorder.js';
+import { recordingControlsHTML } from './recording/recorder.js';
 import { highlightParts } from './terms.js';
 import { MAX_PLAY_SECONDS } from './media.js';
 import { historyState, exportChain, download } from './history.js';

@@ -1,3 +1,7 @@
+# Aggiornamento · 23 ottobre 2026
+
+Rimane la registrazione selettiva R con audio, dimensioni/ritaglio e comandi S/D/X/Q, e rimangono P (PDF), J (JPEG) e G (screen MP4). Rimossi E, la modalità solo istruzioni, le timeline dei movimenti, lettura/scrittura IndexedDB e import/export JSON della registrazione. Nessuna istruzione di ricostruzione viene raccolta. Le sezioni storiche su E sono solo cronologia e non descrivono più il comportamento attuale. Il rendering R evita ridisegni duplicati prima del prossimo fotogramma da codificare.
+
 # afterimage
 
 Cerca nell’intero indice dei film Internet Archive, senza ordinamento per popolarità.
@@ -51,3 +55,7 @@ E carica Mediabunny 1.61.6 solo alla richiesta, legge le porzioni necessarie del
 G esporta tutti i video visti (anche non selezionati con S) come MP4 rapido di screen, 8 fotogrammi al secondo, senza dissolvenze e senza audio. Usa le dimensioni e il ritaglio correnti della registrazione, default 1080×1440. Riutilizza gli screen già salvati; se in Afterimage manca un frame, lo estrae dalla sorgente solo durante G. La visione si mette in pausa durante E/G e riprende alla fine. Excel in Afterimage resta nel pannello C; il tasto E è assegnato al montaggio dai sorgenti.
 
 In C lo stato MP4 resta visibile anche con la sezione registrazione chiusa: preparazione, lettura sorgenti, audio, video elaborati, percentuale di rendering, finalizzazione, download avviato o errore. L’avanzamento indica il lavoro sui fotogrammi, non la percentuale di byte scaricati; durante la lettura dalla rete mostra la fase e il tempo trascorso. Le istruzioni JSON non vengono scaricate automaticamente con E o R: sono conservate nel browser e restano scaricabili da C. Solo se il salvataggio nel browser non riesce viene scaricato un JSON di backup.
+
+Afterimage include i moduli di registrazione nella propria cartella: funziona anche quando il server HTTP ha `afterimage/` come radice, senza richiedere `../assets`. Le copie in `afterimage/recording/` sono generate da `node tools/build-local.mjs afterimage` a partire dal motore comune. Durante la visione si preparano 2 riserve casuali e fino a 3 della query; in pausa il target sale a 12. Le riserve già pronte non vengono eliminate alla ripresa e la query mantiene una corsia disponibile anche se le ricerche casuali sono lente.
+
+Ricerca Archive resiliente: il percorso principale resta singolo quando risponde normalmente. Se rallenta, JSONP e scrape possono recuperare la stessa query dopo 1,5–3 secondi; la prima risposta valida annulla gli altri tentativi. Una ricerca non resta in attesa oltre 14 secondi: l’app segnala l’indisponibilità in C e riprova. Questo riduce i tempi morti, ma non sostituisce Internet Archive quando il servizio è irraggiungibile. Afterimage riserva capacità anche al fallback casuale durante le ricerche del modello e riprova subito un candidato già pronto dopo un avvio video fallito. La dissolvenza iniziale gestisce correttamente le animazioni interrotte.

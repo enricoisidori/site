@@ -1,0 +1,126 @@
+[
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e7/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm.240p.vp9.webm",
+    "title": "File:DoD News Now, 1100 November 17, 2014 141117-A-AB123-005.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:DoD_News_Now,_1100_November_17,_2014_141117-A-AB123-005.webm",
+    "author": "",
+    "license": "Public domain",
+    "kind": "video",
+    "startTime": 0,
+    "verified": true,
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/e/e7/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+        "type": "video/webm; codecs=\"vp8, vorbis\"",
+        "width": 1280,
+        "height": 720,
+        "bandwidth": 1742479
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e7/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "transcodekey": "240p.vp9.webm",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 315936
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e7/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "transcodekey": "480p.vp9.webm",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 809688
+      }
+    ]
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3f/H%C8%A7la_20120111_Wym.webm/H%C8%A7la_20120111_Wym.webm.240p.vp9.webm",
+    "title": "File:Hȧla 20120111 Wym.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:H%C8%A7la_20120111_Wym.webm",
+    "author": "Wikitongues",
+    "license": "CC BY-SA 4.0",
+    "kind": "video",
+    "startTime": 5,
+    "verified": true,
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/3/3f/H%C8%A7la_20120111_Wym.webm?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+        "type": "video/webm; codecs=\"vp9, vorbis\"",
+        "width": 640,
+        "height": 360,
+        "bandwidth": 634952
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3f/H%C8%A7la_20120111_Wym.webm/H%C8%A7la_20120111_Wym.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "transcodekey": "240p.vp9.webm",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 311400
+      }
+    ]
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/54/SDO_20240315_1024_0335_%28AIA%29.ogv/SDO_20240315_1024_0335_%28AIA%29.ogv.240p.vp9.webm",
+    "title": "File:SDO 20240315 1024 0335 (AIA).ogv",
+    "source": "https://commons.wikimedia.org/wiki/File:SDO_20240315_1024_0335_(AIA).ogv",
+    "author": "Courtesy of NASA/SDO and the AIA, EVE, and HMI science teams.",
+    "license": "Public domain",
+    "kind": "video",
+    "startTime": 2,
+    "verified": true,
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/54/SDO_20240315_1024_0335_%28AIA%29.ogv/SDO_20240315_1024_0335_%28AIA%29.ogv.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "transcodekey": "240p.vp9.webm",
+        "width": 240,
+        "height": 240,
+        "bandwidth": 112064
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/54/SDO_20240315_1024_0335_%28AIA%29.ogv/SDO_20240315_1024_0335_%28AIA%29.ogv.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "transcodekey": "480p.vp9.webm",
+        "width": 480,
+        "height": 480,
+        "bandwidth": 611176
+      }
+    ]
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "archive",
+    "id": "CZzvtugj6N7XDxtei",
+    "url": "https://archive.org/cors/CZzvtugj6N7XDxtei/Singing_the_National_Anthem_while_storming_Congress_.mp4",
+    "title": "Singing the National Anthem while storming Congress.",
+    "source": "https://archive.org/details/CZzvtugj6N7XDxtei",
+    "author": "internet archive",
+    "license": "licenza nella pagina originale",
+    "kind": "video",
+    "filename": "Singing_the_National_Anthem_while_storming_Congress_.mp4",
+    "startTime": 0,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "archive",
+    "id": "001-dom-jest-tam-gdzie-misiowi-najlepiej_202111",
+    "url": "https://archive.org/cors/001-dom-jest-tam-gdzie-misiowi-najlepiej_202111/053%20Przeciwie%C5%84stwa.mp4",
+    "title": "Niedźwiedź w Dużym Niebieskim Domu/Bear in The Big Blue House (Season 1-4)",
+    "source": "https://archive.org/details/001-dom-jest-tam-gdzie-misiowi-najlepiej_202111",
+    "author": "internet archive",
+    "license": "licenza nella pagina originale",
+    "kind": "video",
+    "filename": "053 Przeciwieństwa.mp4",
+    "startTime": 0,
+    "verified": true
+  }
+]

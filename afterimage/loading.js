@@ -69,10 +69,12 @@ export function setWaiting(value) {
   if (mode === 'white') {
     if (!value) {
       mode = 'reveal';
-      reveal = overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 6000, easing: 'linear', fill: 'forwards' });
-      return reveal.finished.catch(() => {}).then(() => {
+      const animation = overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 6000, easing: 'linear', fill: 'forwards' });
+      reveal=animation;
+      return animation.finished.catch(() => {}).then(() => {
+        if(reveal!==animation)return;
         if (mode === 'reveal') { mode = 'hidden'; overlay.hidden = true; }
-        reveal.cancel(); reveal = null;
+        animation.cancel(); reveal = null;
       });
     }
     return;
@@ -80,7 +82,7 @@ export function setWaiting(value) {
   if (value && mode === 'waiting' || !value && (mode === 'hidden' || mode === 'reveal')) return;
   clearTimeout(timer);
   if (value) {
-    reveal?.cancel();
+    reveal?.cancel();reveal=null;
     mode = 'waiting'; overlay.hidden = false;
     overlay.classList.remove('white', 'blank'); overlay.setAttribute('aria-hidden', 'false');
     cycle();

@@ -16,10 +16,10 @@ try{
   await page.waitForFunction(n=>{const s=window[n];return n==='blueStatus'?s?.shown>0:s?.activeID&&!s.switching;},status,{timeout:30000});
   await page.keyboard.press('Space');await page.waitForFunction(n=>window[n].paused,status);
   const before=await page.evaluate(n=>{const s=window[n];return n==='blueStatus'?s.shown:s.switches;},status);
-  await page.waitForFunction(n=>{const s=window[n];return n==='blueStatus'?s.ready.video===12:s.queueGeneral+s.queueSemantic===12;},status,{timeout:30000});
+  await page.waitForFunction(n=>{const s=window[n];return n==='blueStatus'?s.ready.video===6:s.queueGeneral+s.queueSemantic===12;},status,{timeout:30000});
   assert.equal(await page.evaluate(n=>{const s=window[n];return n==='blueStatus'?s.shown:s.switches;},status),before);
   assert.equal(await page.locator(project==='blueness'?'#stage':'video.on').evaluate(el=>el.tagName==='VIDEO'?el.paused:true),true);
   await page.keyboard.press('Space');await page.waitForFunction(n=>!window[n].paused,status);
-  await page.waitForTimeout(150);assert.deepEqual(errors,[]);console.log(project+': pause holds scene, fills 12 ready videos, resumes');await page.close();
+  await page.waitForTimeout(150);assert.deepEqual(errors,[]);console.log(project+': pause holds scene, fills ready queue, resumes');await page.close();
  }
 }finally{await browser.close();}

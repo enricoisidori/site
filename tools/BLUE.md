@@ -1,3 +1,15 @@
+# Aggiornamento · 23 ottobre 2026
+
+Rimane la registrazione selettiva R con audio, dimensioni/ritaglio e comandi S/D/X/Q, e rimangono P (PDF), J (JPEG) e G (screen MP4). Rimossi E, la modalità solo istruzioni, le timeline dei movimenti, lettura/scrittura IndexedDB e import/export JSON della registrazione. Nessuna istruzione di ricostruzione viene raccolta. Le sezioni storiche su E sono solo cronologia e non descrivono più il comportamento attuale. Il rendering R evita ridisegni duplicati prima del prossimo fotogramma da codificare.
+
+# Stato attuale · 22 ottobre 2026
+
+Blueness non applica esclusioni tematiche: nessun filtro su politica, governi, USA, titoli, categorie o descrizioni. Le vecchie preferenze salvate per tali filtri vengono ignorate. Commons richiede solo i metadati necessari a riprodurre il file e attribuire autore/licenza, senza categorie o testi descrittivi. Le immagini Archive a qualità <=320 px non richiedono metadati aggiuntivi; sopra tale soglia li usano per scegliere una risoluzione adeguata.
+
+Restano il controllo del blu con i parametri del pannello, l'anti-ripetizione e i limiti tecnici per media accessibili e riproducibili (fino a 720p, file Archive sotto 150 MB). Ricerca video generale su Commons e Internet Archive; i tag colore sono solo un recupero occasionale per le immagini. La coda video si ferma a 6 riserve, anche in pausa, con 2–3 preparazioni contemporanee. Afterimage mantiene la propria selezione e coda.
+
+Le sezioni successive documentano anche le iterazioni precedenti; questa nota sostituisce le loro indicazioni su esclusioni tematiche e dimensione della coda Blueness.
+
 # blue
 
 Pagine autonome, apribili con doppio clic e su GitHub Pages. Richiedono Internet, senza server locale o chiavi API.
@@ -165,3 +177,11 @@ E carica Mediabunny 1.61.6 solo alla richiesta, legge le porzioni necessarie del
 G esporta tutti i video visti (anche non selezionati con S) come MP4 rapido di screen, 8 fotogrammi al secondo, senza dissolvenze e senza audio. Usa le dimensioni e il ritaglio correnti della registrazione, default 1080×1440. Riutilizza gli screen già salvati; se in Afterimage manca un frame, lo estrae dalla sorgente solo durante G. La visione si mette in pausa durante E/G e riprende alla fine. Excel in Afterimage resta nel pannello C; il tasto E è assegnato al montaggio dai sorgenti.
 
 In C lo stato MP4 resta visibile anche con la sezione registrazione chiusa: preparazione, lettura sorgenti, audio, video elaborati, percentuale di rendering, finalizzazione, download avviato o errore. L’avanzamento indica il lavoro sui fotogrammi, non la percentuale di byte scaricati; durante la lettura dalla rete mostra la fase e il tempo trascorso. Le istruzioni JSON non vengono scaricate automaticamente con E o R: sono conservate nel browser e restano scaricabili da C. Solo se il salvataggio nel browser non riesce viene scaricato un JSON di backup.
+
+Precaricamento Blueness: target di 6 video sia durante la visione sia in pausa. I caricamenti simultanei restano limitati a 2–3.
+
+I candidati Blueness già verificati conservano URL diretto, nome file e punto di partenza: non richiedono nuovamente metadati Archive e riprovano per primo quel fotogramma. Il blu viene comunque verificato con le impostazioni attuali, senza assumere che una cache passata sia valida per ogni tolleranza. Il tracking non ripete analisi sul medesimo tempo video durante uno stallo.
+
+Catalogo iniziale: `tools/catalogs/blueness.json` contiene 5 video verificati sul campo il 23 ottobre 2026, incorporati in `blueness/index.html` dal build (nessuna richiesta JSON iniziale). Partenza casuale fra quelli non ancora visti; le preferenze colore correnti vengono ricontrollate sui pixel. La scoperta online viene rinviata fino al primo video o all'esaurimento dei tentativi verificati, poi riprende normalmente. Il catalogo non è ancora una raccolta estesa; cresce con i candidati locali non visti. Per ampliarlo separatamente dall'installazione: `node tools/collect-blueness.mjs 120` (durata in secondi; richiede Playwright/Chrome), poi `node tools/build-blue.mjs`. Lo scanner usa tag colore soltanto per aumentare la resa della raccolta offline, non cambia le query generali della pagina. File rimossi, rete e tolleranze diverse possono rendere necessario il fallback: la lista non garantisce latenza zero.
+
+Misura reale singola dopo il catalogo: primo video mostrato in 499 ms in un browser isolato. Non è una media né una garanzia su altre connessioni. La scansione generale precedente nello stesso ambiente aveva trovato 4 match in 90 secondi, con 154 controlli di frame e diversi timeout: si tratta di fasi e campioni differenti, non di un benchmark controllato.

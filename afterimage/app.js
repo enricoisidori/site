@@ -1,4 +1,4 @@
-import { createSelectiveRecorder } from '../assets/shared/recording/recorder.js';
+import { createSelectiveRecorder } from './recording/recorder.js';
 import { resolveItem, queryFor } from './archive.js';
 import { CandidatePool, Semaphore } from './pool.js';
 import { captionTerms } from './terms.js';
@@ -22,19 +22,19 @@ const state = {
   step: 'query', modelStatus: 'caricamento…', caption: '', terms: [], query: queryFor([]),
   checked: 0, total: null, next: null, message: 'ricerca del primo video…', downloadStatus: '',
   switches: 0, fallbacks: 0, muted: true, fitMode: 'fit', preview: '', frameTime: null, inferenceMs: null,
-  paused:false,reviewing:false,reviewIndex:null,queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
+  paused:false,reviewing:false,reviewIndex:null,queueTarget:5,queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
 };
 let pausedAt=0;
 let active, switching = false, generation = 0, context;
 const recording=createSelectiveRecorder({name:'afterimage',suspendPlayback:()=>{const was=state.paused;if(!was)togglePlaybackPause();return()=>{if(!was&&state.paused)togglePlaybackPause();};},getSnapshots:async()=>{await hydrateFrames();return historyState.records.filter(r=>r.shown!==false).map(r=>{const w=innerWidth,h=innerHeight,iw=r.frame?.width||r.video.width||4,ih=r.frame?.height||r.video.height||3,scale=state.fitMode==='fill'?Math.max(w/iw,h/ih):Math.min(w/iw,h/ih);return {preview:r.frame?.preview,source:{url:r.video.streamURL,archiveID:r.video.id,filename:r.video.filename},time:r.frame?.time??r.playStart??0,layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(w-iw*scale)/2,y:(h-ih*scale)/2,width:iw*scale,height:ih*scale}}]}};});},getScene:()=>{
  if(!active?.video||active.video.readyState<2)return null;
- const video=active.video;return {key:active.recordingKey||active.startedAt,video,muted:state.muted,paused:state.paused||document.hidden||video.paused||video.readyState<3,source:{archiveID:active.item.id,filename:active.item.filename,title:active.item.title,page:active.item.source},layout:afterimageRecordingLayout(video),draw:(ctx,w,h)=>{
+ const video=active.video;return {key:active.recordingKey||active.startedAt,video,muted:state.muted,paused:state.paused||document.hidden||video.paused||video.readyState<3,draw:(ctx,w,h)=>{
   ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);const ratio=state.fitMode==='fill'?Math.max(w/video.videoWidth,h/video.videoHeight):Math.min(w/video.videoWidth,h/video.videoHeight);
   ctx.drawImage(video,(w-video.videoWidth*ratio)/2,(h-video.videoHeight*ratio)/2,video.videoWidth*ratio,video.videoHeight*ratio);
  }};
 }});
 
-function afterimageRecordingLayout(video){const w=innerWidth,h=innerHeight,scale=state.fitMode==='fill'?Math.max(w/video.videoWidth,h/video.videoHeight):Math.min(w/video.videoWidth,h/video.videoHeight);return {layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(w-video.videoWidth*scale)/2,y:(h-video.videoHeight*scale)/2,width:video.videoWidth*scale,height:video.videoHeight*scale}}]};}
+
 let worker, workerReady, rpcID = 0;
 const pending = new Map(), recent = new Set(), failed = new Map();
 const lifetime = new AbortController();
@@ -45,7 +45,7 @@ const generalPool = new CandidatePool([], lifetime.signal, result => {
 });
 const update = changes => {
   Object.assign(state, changes);
-  if (!active && /archive.*(?:http|disponibile)|backend_error|timeout|failed to fetch/i.test(changes.message || '')) document.querySelector('#info').hidden = false;
+  if (!active && /archive.*(?:http|disponibile|rispond|raggiung)|backend_error|timeout|failed to fetch/i.test(changes.message || '')) document.querySelector('#info').hidden = false;
   renderInfo(state, active);
 };
 const delay = (ms, signal) => new Promise((resolve, reject) => {
@@ -117,10 +117,11 @@ function invalidateSemantic() {
   }
 }
 function trimGeneral() {
+  if(state.paused)return;
   const general = slots.filter(slot => slot !== active && slot.kind === 'general')
     .sort((a, b) => Number(b.role === 'ready') - Number(a.role === 'ready'));
-  for (const slot of general.slice(9)) {
-    slot.controller?.abort(); if (slot.role === 'ready') { release(slot); slot.claim = null; }
+  for (const slot of general.slice(2).filter(slot=>slot.role!=='ready')) {
+    slot.controller?.abort();
   }
 }
 async function fill(slot, kind, cycle = context) {
@@ -171,17 +172,27 @@ async function fill(slot, kind, cycle = context) {
 }
 function pump() {
   if(state.reviewing)return;
+  // Retry an already buffered candidate after a failed start, without waiting
+  // for another network search or preparation to finish.
+  if(!active&&!switching&&!state.paused&&!document.hidden){const ready=readySlots('general')[0];if(ready)void promote(ready,'startup');}
   if (active) trimGeneral();
-  const generalTarget = active ? 9 : 4;
-  let preparing=slots.filter(slot=>['resolving','buffering'].includes(slot.role)).length;
-  let general = slots.filter(slot => slot !== active && slot.kind === 'general').length;
-  let semantic = slots.filter(slot => slot !== active && slot.kind === 'semantic').length;
+  const generalTarget = active ? (state.paused?9:2) : 4;
+  // A stalled random search must never occupy every preparation lane.
+  const semanticPreparing=slots.some(slot=>slot.kind==='semantic'&&['resolving','buffering'].includes(slot.role)&&!slot.controller?.signal.aborted);
+  if(context?.pool&&!readySlots('semantic').length&&!semanticPreparing){
+    const randomJobs=slots.filter(slot=>slot!==active&&slot.kind==='general'&&['resolving','buffering'].includes(slot.role)&&!slot.controller?.signal.aborted);
+    if(randomJobs.length>=3){const job=randomJobs.find(slot=>slot.role==='resolving')||randomJobs.at(-1);job.controller.abort();}
+  }
+  let preparing=slots.filter(slot=>['resolving','buffering'].includes(slot.role)&&!slot.controller?.signal.aborted).length;
+  let general = slots.filter(slot => slot !== active && slot.kind === 'general'&&!slot.controller?.signal.aborted).length;
+  let semantic = slots.filter(slot => slot !== active && slot.kind === 'semantic'&&!slot.controller?.signal.aborted).length;
   for (const slot of slots) {
     if (preparing>=3)break;
     if (slot.role !== 'idle' || (slot.retryAt || 0) > performance.now()) continue;
-    if (context?.pool && semantic < 3) { semantic++; preparing++; fill(slot, 'semantic'); }
+    if (context?.pool && semantic < 3 && (slots.filter(s=>s.kind==='semantic'&&['resolving','buffering'].includes(s.role)&&!s.controller?.signal.aborted).length<2 || readySlots('general').length)) { semantic++; preparing++; fill(slot, 'semantic'); }
     else if (general < generalTarget) { general++; preparing++; fill(slot, 'general'); }
   }
+  state.queueTarget=state.paused?12:5;
   state.queueGeneral = readySlots('general').length;
   state.queueSemantic = readySlots('semantic').length;
   state.loading = slots.filter(slot => ['resolving', 'buffering'].includes(slot.role)).length;
