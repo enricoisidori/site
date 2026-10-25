@@ -1,5 +1,17 @@
 # Blueness — passaggio alla nuova chat, 23 ottobre 2026
 
+## ULTIMO — r26 confermato dall'utente ("funziona"), 25 ottobre
+
+Online: https://blueness.blueness-pages.workers.dev (Worker + assets, `cloudflare/blueness-pages/`). `blueness/index.html` su GitHub è una cornice a tutto schermo verso quel Worker (scritta da `tools/build-blueness-pages.mjs`); la pagina vera è `blue-video.html`. Aggiornamento: `node tools/build-blue.mjs movements && node tools/build-blueness-pages.mjs && (cd cloudflare/blueness-pages && npx wrangler deploy)`.
+Regole attuali:
+- Raffica fino a 4 s (minimo 1 s). Il desktop aspetta un video live fino a 4 s prima della lista.
+- Lista (178, `tools/catalogs/blueness.json`, `tools/collect-blueness-videos.mjs`) solo come riserva pronta; un video live pronto vince sempre.
+- iPhone: solo lista per i primi 3 video e 30 s, poi live solo da Commons (240–360p, relay).
+- Durata fino a 15 s; cambio a fine video o a blu perso; il primo video dura almeno 3 s.
+- Primo clic = audio; salto dal secondo video in poi; nessun salto durante la raffica o il primo video, e lo SVG resta.
+- Lato viola fino a 252° (cursore in C); C mostra "video corrente: live/dalla lista"; `?reset=1` azzera; ricerca live casuale vera (Commons gsrsort=random, Archive con prefissi adattivi e conteggio).
+Provati e tolti: taglio dei video statici, minimo di 1 s, video successivo pre-avviato in loop, video da 2–8 s su mobile.
+
 ## ULTIMO — r9 online: fluidità prima della qualità, niente raffiche contro i 429 di Wikimedia
 
 Utente: "caricamento scaduto", a tratti scatta; priorità: che non si interrompa mai, anche perdendo qualità. Solo iOS: video corrente fermo da 1,5s con una riserva pronta → advance (iosVideo.stalledFor; non durante la cronologia); varianti Commons fino a 480p, 240p per i primi due e poi 360p, a parità si preferisce la più leggera, escluse le .mov mp4v; i provider si alternano quando sources=both. Dopo 3 fallimenti di caricamento/seek di fila si attende 2→30s (pool.coolUntil). Relay: il 429 passa con il suo Retry-After invece di diventare 502. Provato e annullato: "su iOS solo Commons", che concentrava il carico su Wikimedia → 429 a raffica (425 scartati/60s). I 429 visti nei test venivano in parte dalle prove ripetute da questo IP. E2E Worker locale UA iPhone in 60s: 7 match/14 scartati, altezze 240–360, zero pageerror. Pubblicato, versione 352c5011.
