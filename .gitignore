@@ -18,3 +18,4 @@ realities/node_modules
 # Generated Cloudflare Pages output
 cloudflare/blueness-pages/dist/
 cloudflare/**/.wrangler/
+cloudflare/afterimage/dist/

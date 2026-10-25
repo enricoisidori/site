@@ -2,7 +2,7 @@ import { createSelectiveRecorder } from './recording/recorder.js';
 import { resolveItem, queryFor } from './archive.js';
 import { CandidatePool, Semaphore } from './pool.js';
 import { captionTerms } from './terms.js';
-import { prepare, startPlaying, release, captureItemFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS } from './media.js';
+import { prepare, startPlaying, release, captureItemFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS, ios } from './media.js';
 import { renderInfo, toggleInfo } from './info.js';
 import { setWaiting, addLoadingImages, finishLoading } from './loading.js';
 import { exportChainPDF, exportChainExcel } from './exports.js';
@@ -38,7 +38,8 @@ const recording=createSelectiveRecorder({name:'afterimage',suspendPlayback:()=>{
 let worker, workerReady, rpcID = 0;
 const pending = new Map(), recent = new Set(), failed = new Map();
 const lifetime = new AbortController();
-const network = new Semaphore(3);
+// iPhone: fewer simultaneous video downloads and decoders.
+const network = new Semaphore(ios ? 2 : 3);
 const generalPool = new CandidatePool([], lifetime.signal, result => {
   addLoadingImages(result.items);
   if (!active) update({ query: result.query, total: result.total, message: 'cerco derivati video leggeri…' });

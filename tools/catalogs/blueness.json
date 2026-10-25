@@ -4812,5 +4812,460 @@
     ],
     "startTime": 1,
     "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/71/%D0%90%D0%BC%D0%B5%D0%B1%D0%B0_11.webm/%D0%90%D0%BC%D0%B5%D0%B1%D0%B0_11.webm.240p.vp9.webm",
+    "title": "File:Амеба 11.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:%D0%90%D0%BC%D0%B5%D0%B1%D0%B0_11.webm",
+    "author": "Alexander Klepnev",
+    "license": "CC BY 4.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/71/%D0%90%D0%BC%D0%B5%D0%B1%D0%B0_11.webm/%D0%90%D0%BC%D0%B5%D0%B1%D0%B0_11.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 62952
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/71/%D0%90%D0%BC%D0%B5%D0%B1%D0%B0_11.webm/%D0%90%D0%BC%D0%B5%D0%B1%D0%B0_11.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 189728
+      }
+    ],
+    "startTime": 1,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/Preparing_to_%E2%80%98Launch_America%E2%80%99_into_a_New_Era_of_Space_Exploration_on_This_Week_%40NASA_%E2%80%93_May_29%2C_2020.webm/Preparing_to_%E2%80%98Launch_America%E2%80%99_into_a_New_Era_of_Space_Exploration_on_This_Week_%40NASA_%E2%80%93_May_29%2C_2020.webm.240p.vp9.webm",
+    "title": "File:Preparing to ‘Launch America’ into a New Era of Space Exploration on This Week @NASA – May 29, 2020.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:Preparing_to_%E2%80%98Launch_America%E2%80%99_into_a_New_Era_of_Space_Exploration_on_This_Week_@NASA_%E2%80%93_May_29,_2020.webm",
+    "author": "NASA",
+    "license": "Public domain",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/Preparing_to_%E2%80%98Launch_America%E2%80%99_into_a_New_Era_of_Space_Exploration_on_This_Week_%40NASA_%E2%80%93_May_29%2C_2020.webm/Preparing_to_%E2%80%98Launch_America%E2%80%99_into_a_New_Era_of_Space_Exploration_on_This_Week_%40NASA_%E2%80%93_May_29%2C_2020.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 357608
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bc/Preparing_to_%E2%80%98Launch_America%E2%80%99_into_a_New_Era_of_Space_Exploration_on_This_Week_%40NASA_%E2%80%93_May_29%2C_2020.webm/Preparing_to_%E2%80%98Launch_America%E2%80%99_into_a_New_Era_of_Space_Exploration_on_This_Week_%40NASA_%E2%80%93_May_29%2C_2020.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 864600
+      }
+    ],
+    "startTime": 1,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/99/David_Boyd%2C_The_Green_Interview.webm/David_Boyd%2C_The_Green_Interview.webm.240p.vp9.webm",
+    "title": "File:David Boyd, The Green Interview.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:David_Boyd,_The_Green_Interview.webm",
+    "author": "The Green Interview",
+    "license": "CC BY 2.5",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/9/99/David_Boyd%2C_The_Green_Interview.webm?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+        "type": "video/webm; codecs=\"vp8, vorbis\"",
+        "width": 640,
+        "height": 360,
+        "bandwidth": 510455
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/99/David_Boyd%2C_The_Green_Interview.webm/David_Boyd%2C_The_Green_Interview.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 226656
+      }
+    ],
+    "startTime": 3,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6b/Flash_Talk-_Roman_Spacecraft_Overview_%28SVS15090_-_13%29.webm/Flash_Talk-_Roman_Spacecraft_Overview_%28SVS15090_-_13%29.webm.240p.vp9.webm",
+    "title": "File:Flash Talk- Roman Spacecraft Overview (SVS15090 - 13).webm",
+    "source": "https://commons.wikimedia.org/wiki/File:Flash_Talk-_Roman_Spacecraft_Overview_(SVS15090_-_13).webm",
+    "author": "NASA's Scientific Visualization Studio - eMITS/Scott Wiessinger, NASA/GSFC/Joshua E. Schlieder, eMITS/Sophia Roberts, Sydney Rhode, eMITS/Jonathan North",
+    "license": "Public domain",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6b/Flash_Talk-_Roman_Spacecraft_Overview_%28SVS15090_-_13%29.webm/Flash_Talk-_Roman_Spacecraft_Overview_%28SVS15090_-_13%29.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 189728
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6b/Flash_Talk-_Roman_Spacecraft_Overview_%28SVS15090_-_13%29.webm/Flash_Talk-_Roman_Spacecraft_Overview_%28SVS15090_-_13%29.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 740240
+      }
+    ],
+    "startTime": 10,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/59/%D0%9B%D1%83%D0%BA%D0%B0%D1%88%D0%B5%D0%BD%D0%BA%D0%BE_%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%81%D1%8F_%D1%81_%D1%80%D0%B0%D0%B1%D0%BE%D1%87%D0%B8%D0%BC_%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D0%BE%D0%BC_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8E.webm/%D0%9B%D1%83%D0%BA%D0%B0%D1%88%D0%B5%D0%BD%D0%BA%D0%BE_%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%81%D1%8F_%D1%81_%D1%80%D0%B0%D0%B1%D0%BE%D1%87%D0%B8%D0%BC_%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D0%BE%D0%BC_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8E.webm.240p.vp9.webm",
+    "title": "File:Лукашенко направился с рабочим визитом в Россию.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:%D0%9B%D1%83%D0%BA%D0%B0%D1%88%D0%B5%D0%BD%D0%BA%D0%BE_%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%81%D1%8F_%D1%81_%D1%80%D0%B0%D0%B1%D0%BE%D1%87%D0%B8%D0%BC_%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D0%BE%D0%BC_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8E.webm",
+    "author": "Информационное агентство БелТА",
+    "license": "CC BY 3.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/59/%D0%9B%D1%83%D0%BA%D0%B0%D1%88%D0%B5%D0%BD%D0%BA%D0%BE_%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%81%D1%8F_%D1%81_%D1%80%D0%B0%D0%B1%D0%BE%D1%87%D0%B8%D0%BC_%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D0%BE%D0%BC_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8E.webm/%D0%9B%D1%83%D0%BA%D0%B0%D1%88%D0%B5%D0%BD%D0%BA%D0%BE_%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%81%D1%8F_%D1%81_%D1%80%D0%B0%D0%B1%D0%BE%D1%87%D0%B8%D0%BC_%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D0%BE%D0%BC_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8E.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 157408
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/59/%D0%9B%D1%83%D0%BA%D0%B0%D1%88%D0%B5%D0%BD%D0%BA%D0%BE_%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%81%D1%8F_%D1%81_%D1%80%D0%B0%D0%B1%D0%BE%D1%87%D0%B8%D0%BC_%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D0%BE%D0%BC_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8E.webm/%D0%9B%D1%83%D0%BA%D0%B0%D1%88%D0%B5%D0%BD%D0%BA%D0%BE_%D0%BD%D0%B0%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%81%D1%8F_%D1%81_%D1%80%D0%B0%D0%B1%D0%BE%D1%87%D0%B8%D0%BC_%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D0%BE%D0%BC_%D0%B2_%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D1%8E.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 333776
+      }
+    ],
+    "startTime": 10,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d9/%EA%B9%80%EB%B9%9B%EB%82%98%EB%9D%BC_%EB%B9%84%ED%82%A4%EB%8B%88_56%EB%B2%88%2C%EC%A0%9C8%ED%9A%8C_%EC%9D%B8%ED%84%B0%EB%82%B4%EC%85%94%EB%84%90_%EC%8A%88%ED%8D%BC%ED%80%B8_%EB%AA%A8%EB%8D%B8.webm/%EA%B9%80%EB%B9%9B%EB%82%98%EB%9D%BC_%EB%B9%84%ED%82%A4%EB%8B%88_56%EB%B2%88%2C%EC%A0%9C8%ED%9A%8C_%EC%9D%B8%ED%84%B0%EB%82%B4%EC%85%94%EB%84%90_%EC%8A%88%ED%8D%BC%ED%80%B8_%EB%AA%A8%EB%8D%B8.webm.240p.vp9.webm",
+    "title": "File:김빛나라 비키니 56번,제8회 인터내셔널 슈퍼퀸 모델.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:%EA%B9%80%EB%B9%9B%EB%82%98%EB%9D%BC_%EB%B9%84%ED%82%A4%EB%8B%88_56%EB%B2%88,%EC%A0%9C8%ED%9A%8C_%EC%9D%B8%ED%84%B0%EB%82%B4%EC%85%94%EB%84%90_%EC%8A%88%ED%8D%BC%ED%80%B8_%EB%AA%A8%EB%8D%B8.webm",
+    "author": "뉴스패치[E1•NEWS ]",
+    "license": "CC BY 3.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d9/%EA%B9%80%EB%B9%9B%EB%82%98%EB%9D%BC_%EB%B9%84%ED%82%A4%EB%8B%88_56%EB%B2%88%2C%EC%A0%9C8%ED%9A%8C_%EC%9D%B8%ED%84%B0%EB%82%B4%EC%85%94%EB%84%90_%EC%8A%88%ED%8D%BC%ED%80%B8_%EB%AA%A8%EB%8D%B8.webm/%EA%B9%80%EB%B9%9B%EB%82%98%EB%9D%BC_%EB%B9%84%ED%82%A4%EB%8B%88_56%EB%B2%88%2C%EC%A0%9C8%ED%9A%8C_%EC%9D%B8%ED%84%B0%EB%82%B4%EC%85%94%EB%84%90_%EC%8A%88%ED%8D%BC%ED%80%B8_%EB%AA%A8%EB%8D%B8.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 122,
+        "height": 240,
+        "bandwidth": 385776
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d9/%EA%B9%80%EB%B9%9B%EB%82%98%EB%9D%BC_%EB%B9%84%ED%82%A4%EB%8B%88_56%EB%B2%88%2C%EC%A0%9C8%ED%9A%8C_%EC%9D%B8%ED%84%B0%EB%82%B4%EC%85%94%EB%84%90_%EC%8A%88%ED%8D%BC%ED%80%B8_%EB%AA%A8%EB%8D%B8.webm/%EA%B9%80%EB%B9%9B%EB%82%98%EB%9D%BC_%EB%B9%84%ED%82%A4%EB%8B%88_56%EB%B2%88%2C%EC%A0%9C8%ED%9A%8C_%EC%9D%B8%ED%84%B0%EB%82%B4%EC%85%94%EB%84%90_%EC%8A%88%ED%8D%BC%ED%80%B8_%EB%AA%A8%EB%8D%B8.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 246,
+        "height": 480,
+        "bandwidth": 1096576
+      }
+    ],
+    "startTime": 1,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/EPA_Head_Pruitt_Wants_to_Restore_Role_of_States.webm/EPA_Head_Pruitt_Wants_to_Restore_Role_of_States.webm.240p.vp9.webm",
+    "title": "File:EPA Head Pruitt Wants to Restore Role of States.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:EPA_Head_Pruitt_Wants_to_Restore_Role_of_States.webm",
+    "author": "VOA News",
+    "license": "Public domain",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/d/d2/EPA_Head_Pruitt_Wants_to_Restore_Role_of_States.webm?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+        "type": "video/webm; codecs=\"vp8, vorbis\"",
+        "width": 852,
+        "height": 480,
+        "bandwidth": 2625419
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/EPA_Head_Pruitt_Wants_to_Restore_Role_of_States.webm/EPA_Head_Pruitt_Wants_to_Restore_Role_of_States.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 235856
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/EPA_Head_Pruitt_Wants_to_Restore_Role_of_States.webm/EPA_Head_Pruitt_Wants_to_Restore_Role_of_States.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 852,
+        "height": 480,
+        "bandwidth": 572640
+      }
+    ],
+    "startTime": 1,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/29/All-dielectric-metasurface-circular-dichroism-waveplate-srep41893-s1.ogv/All-dielectric-metasurface-circular-dichroism-waveplate-srep41893-s1.ogv.240p.vp9.webm",
+    "title": "File:All-dielectric-metasurface-circular-dichroism-waveplate-srep41893-s1.ogv",
+    "source": "https://commons.wikimedia.org/wiki/File:All-dielectric-metasurface-circular-dichroism-waveplate-srep41893-s1.ogv",
+    "author": "Hu J, Zhao X, Lin Y, Zhu A, Zhu X, Guo P, Cao B, Wang C",
+    "license": "CC BY 4.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/2/29/All-dielectric-metasurface-circular-dichroism-waveplate-srep41893-s1.ogv?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+        "type": "video/ogg; codecs=\"theora\"",
+        "width": 320,
+        "height": 240,
+        "bandwidth": 368977
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/29/All-dielectric-metasurface-circular-dichroism-waveplate-srep41893-s1.ogv/All-dielectric-metasurface-circular-dichroism-waveplate-srep41893-s1.ogv.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 320,
+        "height": 240,
+        "bandwidth": 199552
+      }
+    ],
+    "startTime": 1,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/Misconceptions_about_Flu_and_the_Flu_Vaccine.webm/Misconceptions_about_Flu_and_the_Flu_Vaccine.webm.240p.vp9.webm",
+    "title": "File:Misconceptions about Flu and the Flu Vaccine.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:Misconceptions_about_Flu_and_the_Flu_Vaccine.webm",
+    "author": "Centers for Disease Control and Prevention",
+    "license": "Public domain",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/d/db/Misconceptions_about_Flu_and_the_Flu_Vaccine.webm?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+        "type": "video/webm; codecs=\"vp8, vorbis\"",
+        "width": 640,
+        "height": 360,
+        "bandwidth": 427354
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/Misconceptions_about_Flu_and_the_Flu_Vaccine.webm/Misconceptions_about_Flu_and_the_Flu_Vaccine.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 120592
+      }
+    ],
+    "startTime": 1,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/df/Minneapolis_Federal_Building_Protest_%282026-01-09%29.webm/Minneapolis_Federal_Building_Protest_%282026-01-09%29.webm.240p.vp9.webm",
+    "title": "File:Minneapolis Federal Building Protest (2026-01-09).webm",
+    "source": "https://commons.wikimedia.org/wiki/File:Minneapolis_Federal_Building_Protest_(2026-01-09).webm",
+    "author": "TruthMattersMedia",
+    "license": "CC BY 4.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/df/Minneapolis_Federal_Building_Protest_%282026-01-09%29.webm/Minneapolis_Federal_Building_Protest_%282026-01-09%29.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 448376
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/df/Minneapolis_Federal_Building_Protest_%282026-01-09%29.webm/Minneapolis_Federal_Building_Protest_%282026-01-09%29.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 1301208
+      }
+    ],
+    "startTime": 3,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/81/Asif_Mohiuddin_AA_2015.webm/Asif_Mohiuddin_AA_2015.webm.240p.vp9.webm",
+    "title": "File:Asif Mohiuddin AA 2015.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:Asif_Mohiuddin_AA_2015.webm",
+    "author": "American Atheists",
+    "license": "CC BY 3.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/81/Asif_Mohiuddin_AA_2015.webm/Asif_Mohiuddin_AA_2015.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 175336
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/81/Asif_Mohiuddin_AA_2015.webm/Asif_Mohiuddin_AA_2015.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 376912
+      }
+    ],
+    "startTime": 10,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3d/Health-education-pone.0010448.s005.ogv/Health-education-pone.0010448.s005.ogv.240p.vp9.webm",
+    "title": "File:Health-education-pone.0010448.s005.ogv",
+    "source": "https://commons.wikimedia.org/wiki/File:Health-education-pone.0010448.s005.ogv",
+    "author": "Blas M, Alva I, Carcamo C, Cabello R, Goodreau S, Kimball A, Kurth A, Kissinger P",
+    "license": "CC BY 3.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Health-education-pone.0010448.s005.ogv?utm_source=commons.wikimedia.org&utm_campaign=api&utm_content=original",
+        "type": "video/ogg; codecs=\"theora, vorbis\"",
+        "width": 320,
+        "height": 240,
+        "bandwidth": 327461
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3d/Health-education-pone.0010448.s005.ogv/Health-education-pone.0010448.s005.ogv.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 320,
+        "height": 240,
+        "bandwidth": 258216
+      }
+    ],
+    "startTime": 6,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8d/KinoTV_Christmas_Edition.webm/KinoTV_Christmas_Edition.webm.240p.vp9.webm",
+    "title": "File:KinoTV Christmas Edition.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:KinoTV_Christmas_Edition.webm",
+    "author": "White Russian Studio",
+    "license": "CC BY 3.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8d/KinoTV_Christmas_Edition.webm/KinoTV_Christmas_Edition.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 373104
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8d/KinoTV_Christmas_Edition.webm/KinoTV_Christmas_Edition.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 1038712
+      }
+    ],
+    "startTime": 3,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/95/Full_Throttle4_1st%E3%82%A2%E3%83%AB%E3%83%90%E3%83%A0%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E8%A8%98%E5%BF%B5%E3%82%B9%E3%83%9A%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BB%E3%83%AB%E3%83%95%E3%82%A3%E3%83%BC%E5%8B%95%E7%94%BB%E3%80%90MEGU%E7%B7%A8%E3%80%91-Shorts.webm/Full_Throttle4_1st%E3%82%A2%E3%83%AB%E3%83%90%E3%83%A0%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E8%A8%98%E5%BF%B5%E3%82%B9%E3%83%9A%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BB%E3%83%AB%E3%83%95%E3%82%A3%E3%83%BC%E5%8B%95%E7%94%BB%E3%80%90MEGU%E7%B7%A8%E3%80%91-Shorts.webm.240p.vp9.webm",
+    "title": "File:Full Throttle4 1stアルバムリリース記念スペシャルセルフィー動画【MEGU編】-Shorts.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:Full_Throttle4_1st%E3%82%A2%E3%83%AB%E3%83%90%E3%83%A0%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E8%A8%98%E5%BF%B5%E3%82%B9%E3%83%9A%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BB%E3%83%AB%E3%83%95%E3%82%A3%E3%83%BC%E5%8B%95%E7%94%BB%E3%80%90MEGU%E7%B7%A8%E3%80%91-Shorts.webm",
+    "author": "HoneyWorks OFFICIAL",
+    "license": "CC BY 3.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/95/Full_Throttle4_1st%E3%82%A2%E3%83%AB%E3%83%90%E3%83%A0%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E8%A8%98%E5%BF%B5%E3%82%B9%E3%83%9A%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BB%E3%83%AB%E3%83%95%E3%82%A3%E3%83%BC%E5%8B%95%E7%94%BB%E3%80%90MEGU%E7%B7%A8%E3%80%91-Shorts.webm/Full_Throttle4_1st%E3%82%A2%E3%83%AB%E3%83%90%E3%83%A0%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E8%A8%98%E5%BF%B5%E3%82%B9%E3%83%9A%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BB%E3%83%AB%E3%83%95%E3%82%A3%E3%83%BC%E5%8B%95%E7%94%BB%E3%80%90MEGU%E7%B7%A8%E3%80%91-Shorts.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 136,
+        "height": 240,
+        "bandwidth": 323440
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/95/Full_Throttle4_1st%E3%82%A2%E3%83%AB%E3%83%90%E3%83%A0%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E8%A8%98%E5%BF%B5%E3%82%B9%E3%83%9A%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BB%E3%83%AB%E3%83%95%E3%82%A3%E3%83%BC%E5%8B%95%E7%94%BB%E3%80%90MEGU%E7%B7%A8%E3%80%91-Shorts.webm/Full_Throttle4_1st%E3%82%A2%E3%83%AB%E3%83%90%E3%83%A0%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9%E8%A8%98%E5%BF%B5%E3%82%B9%E3%83%9A%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BB%E3%83%AB%E3%83%95%E3%82%A3%E3%83%BC%E5%8B%95%E7%94%BB%E3%80%90MEGU%E7%B7%A8%E3%80%91-Shorts.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 270,
+        "height": 480,
+        "bandwidth": 758408
+      }
+    ],
+    "startTime": 3,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c9/LimitesyAgrupaciones.webm/LimitesyAgrupaciones.webm.240p.vp9.webm",
+    "title": "File:LimitesyAgrupaciones.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:LimitesyAgrupaciones.webm",
+    "author": "Frikson",
+    "license": "CC BY-SA 3.0",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c9/LimitesyAgrupaciones.webm/LimitesyAgrupaciones.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 384,
+        "height": 240,
+        "bandwidth": 7672
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c9/LimitesyAgrupaciones.webm/LimitesyAgrupaciones.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 768,
+        "height": 480,
+        "bandwidth": 23024
+      }
+    ],
+    "startTime": 1,
+    "verified": true
+  },
+  {
+    "candidatePolicy": "general-or-color-tag-v1",
+    "provider": "commons",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/Win8_Wikipedia_app_launch.webm/Win8_Wikipedia_app_launch.webm.240p.vp9.webm",
+    "title": "File:Win8 Wikipedia app launch.webm",
+    "source": "https://commons.wikimedia.org/wiki/File:Win8_Wikipedia_app_launch.webm",
+    "author": "",
+    "license": "GPL",
+    "kind": "video",
+    "videoVariants": [
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/Win8_Wikipedia_app_launch.webm/Win8_Wikipedia_app_launch.webm.240p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 426,
+        "height": 240,
+        "bandwidth": 85088
+      },
+      {
+        "src": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/Win8_Wikipedia_app_launch.webm/Win8_Wikipedia_app_launch.webm.480p.vp9.webm",
+        "type": "video/webm; codecs=\"vp9, opus\"",
+        "width": 854,
+        "height": 480,
+        "bandwidth": 298920
+      }
+    ],
+    "startTime": 1,
+    "verified": true
   }
 ]

@@ -27,7 +27,7 @@ test('iOS videos attach inline and muted; rejected autoplay can be retried direc
  const {context,nodes,Video,events}=environment(),media=new Video(),ios=context.iosVideo;
  ios.attach(media);assert.ok(media.connected);assert.ok(media.muted&&media.defaultMuted&&media.playsInline);assert.equal(media.autoplay,false);assert.equal(media.attrs.has('autoplay'),false);
  assert.ok(media.attrs.has('playsinline'));assert.ok(!/display:none|visibility:hidden|left:-/.test(media.style.cssText));
- media.allowed=false;await ios.start(media);const button=nodes.find(node=>node.textContent==='tocca per avviare i video');assert.ok(button);assert.equal(button.hidden,false);
+ media.allowed=false;await ios.start(media);const button=nodes.find(node=>node.textContent==='CLICK EVERYWHERE');assert.ok(button);assert.equal(button.hidden,false);
  media.allowed=true;button.onclick();assert.equal(media.plays,2,'play called synchronously in the tap');await Promise.resolve();await Promise.resolve();assert.equal(button.hidden,true);
  media.src='fixture.mp4';events.pagehide({persisted:true});assert.equal(media.src,'fixture.mp4','back-forward cache preserves the source');
  events.pagehide({persisted:false});assert.equal(media.src,'');ios.release(media);assert.equal(media.connected,false);
@@ -50,8 +50,8 @@ test('desktop catalog selection and paused preparation keep their previous behav
  assert.equal(videos[0].src,'same.webm');assert.equal(videos[0].plays,0);assert.ok(!videos[0].connected);assert.equal(context.pools.video.failures,0);assert.equal(context.pools.video.ready.length,1);
 });
 test('iOS pump prepares one video at a time and stops at two ready/preparing entries',()=>{
- const pool={urls:Array.from({length:8},()=>({provider:'commons'})),ready:[],loading:0,accepted:1};let loads=0;
- const context=vm.createContext({iosVideo:{},document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,fetchBatch(){},prepare(){loads++;},current:null,playbackPaused:false,performance,setTimeout});
+ const pool={urls:Array.from({length:8},()=>({provider:'commons'})),list:[],ready:[],loading:0,accepted:1};let loads=0;
+ const context=vm.createContext({iosVideo:{},shown:3,startedAt:-1e9,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){},prepare(){loads++;},current:null,playbackPaused:false,performance,setTimeout});
  vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();assert.equal(loads,1);assert.equal(pool.loading,1);
  pool.loading=0;pool.ready.push({},{});context.pump();assert.equal(loads,1);
 });
@@ -59,18 +59,18 @@ test('only the active iOS video is recovered after an unexpected pause, with bou
  const {context,Video,nodes}=environment();let now=100;context.performance={now:()=>now};
  const ios=context.iosVideo,current=new Video(),warming=new Video();ios.attach(current);ios.attach(warming);await ios.play(current);await ios.start(warming);
  warming.pause();ios.tick(warming);assert.equal(warming.plays,1,'a parked reserve is never resumed by the monitor');
- for(let i=0;i<2;i++){current.pause();now+=1100;ios.tick(current);await Promise.resolve();assert.equal(current.paused,false);}
- assert.equal(current.plays,3);
- current.pause();now+=1100;ios.tick(current);assert.equal(current.plays,3,'no endless play retry loop');assert.equal(ios.status.waitingForTap,true);
- assert.equal(nodes.find(node=>node.textContent==='tocca per avviare i video').hidden,false);
- context.document.hidden=true;now+=1100;ios.tick(current);assert.equal(current.plays,3);
- ios.release(current);context.document.hidden=false;ios.tick(current);assert.equal(current.plays,3,'released media is not restarted');
+ for(let i=0;i<4;i++){current.pause();now+=1100;ios.tick(current);await Promise.resolve();assert.equal(current.paused,false);}
+ assert.equal(current.plays,5);
+ current.pause();now+=1100;ios.tick(current);assert.equal(current.plays,5,'no endless play retry loop');assert.equal(ios.status.waitingForTap,false,'a pause never flashes the prompt');
+ assert.ok(!nodes.find(node=>node.textContent==='CLICK EVERYWHERE'&&!node.hidden));
+ context.document.hidden=true;now+=1100;ios.tick(current);assert.equal(current.plays,5);
+ ios.release(current);context.document.hidden=false;ios.tick(current);assert.equal(current.plays,5,'released media is not restarted');
 });
 test('actual iOS rendering keeps moving even when video frame callbacks never fire; manual pause stays paused',()=>{
  let paints=0,ticks=0,callbacks=0;
  const media={readyState:2,currentTime:0,paused:false,seeking:false,ended:false,requestVideoFrameCallback(){callbacks++;},play:async()=>{},pause(){this.paused=true;}};
  const entry={kind:'video',media,source:'fixture',revision:0,startTime:0,match:{x:20,y:20,zoom:1}};
- const context=vm.createContext({iosVideo:{play:async()=>{},park(){},restore(){},present:()=>false,tick(){ticks++;},stalledFor:()=>0},pools:{video:{ready:[]}},current:null,recording:{sample(){}},played:new Set(),mediaKey:e=>e.source,baseStills:false,introEnabled:false,shown:0,shownAt:0,playbackPaused:false,pausedAt:0,lostAt:0,lastDetect:0,revision:0,lastPaintKey:'',muted:true,sourceLink:{},clean:x=>x,renderInfo(){},pump(){},performance:{now:()=>100},document:{hidden:false},requestAnimationFrame(){},settings:{seconds:30,hz:1,showBorder:false,dual:false},reviewing:false,mixed:false,canvas:{width:390,height:844},ctx:{fillRect(){paints++;}},screens:()=>[],squareWindow:null,stillsExporter:null,lastInfo:0,drawScreen(){}});
+ const context=vm.createContext({prerolled:null,mode:'video',iosVideo:{play:async()=>{},park(){},restore(){},stage(){},present:()=>false,tick(){ticks++;},stalledFor:()=>0},pools:{video:{ready:[]}},current:null,recording:{sample(){}},played:new Set(),mediaKey:e=>e.source,baseStills:false,introEnabled:false,shown:0,shownAt:0,playbackPaused:false,pausedAt:0,lostAt:0,lastDetect:0,revision:0,lastPaintKey:'',muted:true,sourceLink:{},clean:x=>x,renderInfo(){},pump(){},performance:{now:()=>100},document:{hidden:false},requestAnimationFrame(){},settings:{seconds:30,hz:1,showBorder:false,dual:false},reviewing:false,mixed:false,canvas:{width:390,height:844},ctx:{fillRect(){paints++;}},screens:()=>[],squareWindow:null,stillsExporter:null,lastInfo:0,drawScreen(){}});
  vm.runInContext(flow.slice(flow.indexOf('function select('),flow.indexOf('function back('))+flow.slice(flow.indexOf('function frame(now){'),flow.indexOf('function togglePlaybackPause(')),context);
  context.select(entry,true);assert.equal(callbacks,0,'iOS does not depend on callbacks of the occluded decoder');assert.equal(entry.firstFrameReady,true);
  media.currentTime=.1;context.frame(150);media.currentTime=.2;context.frame(250);assert.equal(paints,2,'both media times repaint despite zero callbacks');assert.equal(ticks,2);
@@ -80,14 +80,15 @@ test('actual iOS rendering keeps moving even when video frame callbacks never fi
 test('native presentation uses the canvas camera geometry and preserves first-video border rules',async()=>{
  const {context,Video,nodes}=environment(),ios=context.iosVideo,first=new Video(),second=new Video();ios.attach(first);ios.attach(second);await ios.play(first);
  const screen={x:0,y:0,w:390,h:844},match={w:320,h:180,x:130,y:80,zoom:2},entry={media:first,match,hideIntroBorder:true};
+ first.readyState=2;
  assert.equal(ios.present(entry,screen,50,true),true);assert.ok(first.style.cssText.includes('left:-65px'));assert.ok(first.style.cssText.includes('top:262px'));assert.ok(first.style.cssText.includes('width:640px'));assert.ok(first.style.cssText.includes('height:360px'));assert.ok(first.style.cssText.includes('z-index:2'));
  const border=nodes.find(node=>node!==first&&node!==second);assert.equal(border.hidden,true);assert.equal(ios.status.renderer,'native');
- await ios.play(second);assert.ok(first.style.cssText.includes('width:2px'));assert.equal(ios.present({media:second,match,hideIntroBorder:false},screen,50,true),true);assert.equal(border.hidden,false);assert.equal(border.style.left,'170px');assert.equal(border.style.top,'397px');
+ await ios.play(second);second.readyState=2;assert.ok(first.style.cssText.includes('width:2px'));assert.equal(ios.present({media:second,match,hideIntroBorder:false},screen,50,true),true);assert.equal(border.hidden,false);assert.equal(border.style.left,'170px');assert.equal(border.style.top,'397px');
  assert.equal(ios.present({media:second,match},screen,50,false),false,'dual-screen layout falls back to its original canvas renderer');assert.equal(border.hidden,true);assert.equal(ios.status.renderer,'canvas');
 });
-test('an advancing play promise without advancing frames exposes a gesture recovery instead of freezing silently',async()=>{
+test('a frozen clock never flashes the prompt: buffering is not a gesture problem',async()=>{
  const {context,Video}=environment();let now=100;context.performance={now:()=>now};const media=new Video(),ios=context.iosVideo;ios.attach(media);await ios.play(media);
- assert.equal(media.paused,false);now=4200;ios.tick(media);assert.equal(ios.status.waitingForTap,true);assert.equal(media.plays,1,'a frozen clock does not trigger endless automatic reloads');
+ assert.equal(media.paused,false);now=4200;ios.tick(media);assert.equal(ios.status.waitingForTap,false,'buffering never asks for a tap');media.readyState=4;ios.tick(media);assert.equal(ios.status.waitingForTap,false);assert.equal(media.plays,1,'a frozen clock does not trigger endless automatic reloads');
 });
 test('a SecurityError in a candidate resets shared analysis before preparing a valid video',async()=>{
  const {context}=environment();let tainted=false,resets=0;
@@ -102,13 +103,13 @@ test('a SecurityError in a candidate resets shared analysis before preparing a v
 });
 test('a tracking SecurityError removes the failed current video so the next candidate can start',()=>{
  let released=0,resets=0,advances=0;const media={currentTime:1,readyState:2,ended:false},entry={kind:'video',media,firstFrameReady:true,match:{},revision:0};
- const context=vm.createContext({requestAnimationFrame(){},document:{hidden:false},playbackPaused:false,iosVideo:{tick(){},stalledFor:()=>0},pools:{video:{ready:[]}},current:entry,baseStills:false,performance,shownAt:0,settings:{seconds:30,hz:8},reviewing:false,mixed:false,lastDetect:0,lostAt:0,revision:0,lastError:'',lastPaintKey:'old',history:[entry],historyIndex:0,stabilizeCamera:(_,match)=>match,detect(){throw Object.assign(Error('The operation is insecure.'),{name:'SecurityError'});},resetBlueAnalysis(){resets++;},release(item){assert.equal(item,entry);released++;},advance(){advances++;}});
+ const context=vm.createContext({requestAnimationFrame(){},document:{hidden:false},playbackPaused:false,mode:'video',iosVideo:{tick(){},stalledFor:()=>0},pools:{video:{ready:[]}},current:entry,baseStills:false,performance,shownAt:0,settings:{seconds:30,hz:8},reviewing:false,mixed:false,lastDetect:0,lostAt:0,revision:0,lastError:'',lastPaintKey:'old',history:[entry],historyIndex:0,stabilizeCamera:(_,match)=>match,detect(){throw Object.assign(Error('The operation is insecure.'),{name:'SecurityError'});},resetBlueAnalysis(){resets++;},release(item){assert.equal(item,entry);released++;},advance(){advances++;}});
  vm.runInContext(flow.slice(flow.indexOf('function frame(now){'),flow.indexOf('function togglePlaybackPause(')),context);context.frame(100);
  assert.equal(context.current,null);assert.equal(context.history.length,0);assert.equal(released,1);assert.equal(resets,1);assert.equal(advances,1);assert.ok(context.lastError.startsWith('tracking blu · SecurityError:'));
 });
 test('an optional export capture failure cannot destroy the video selected for playback',()=>{
  const media={readyState:2,currentTime:0,play:async()=>{},pause(){}},entry={kind:'video',source:'fixture',media,match:{},revision:0,startTime:0};let plays=0;
- const context=vm.createContext({iosVideo:{play:async()=>{plays++;}},current:null,played:new Set(),mediaKey:e=>e.source,baseStills:false,rememberPlayed(){},introEnabled:false,recording:{sample(){}},shown:0,shownAt:0,performance:{now:()=>100},playbackPaused:false,pausedAt:0,lostAt:0,lastDetect:0,revision:0,lastPaintKey:'',history:[],historyIndex:-1,reviewing:false,muted:true,captureRoute(){throw Object.assign(Error('The operation is insecure.'),{name:'SecurityError'});},release(){throw Error('must not release selected media');},sourceLink:{},clean:x=>x,renderInfo(){},pump(){},lastError:''});
+ const context=vm.createContext({prerolled:null,iosVideo:{play:async()=>{plays++;}},current:null,played:new Set(),mediaKey:e=>e.source,baseStills:false,rememberPlayed(){},introEnabled:false,recording:{sample(){}},shown:0,shownAt:0,performance:{now:()=>100},playbackPaused:false,pausedAt:0,lostAt:0,lastDetect:0,revision:0,lastPaintKey:'',history:[],historyIndex:-1,reviewing:false,muted:true,captureRoute(){throw Object.assign(Error('The operation is insecure.'),{name:'SecurityError'});},release(){throw Error('must not release selected media');},sourceLink:{},clean:x=>x,renderInfo(){},pump(){},lastError:''});
  vm.runInContext(flow.slice(flow.indexOf('function select('),flow.indexOf('function back(')),context);assert.doesNotThrow(()=>context.select(entry));assert.equal(context.current,entry);assert.equal(plays,1);assert.ok(context.lastError.startsWith('cattura export · SecurityError:'));
 });
 test('iOS video URLs use the page origin and capability discovery runs once without fetching video bytes',async()=>{
@@ -168,8 +169,51 @@ test('stalledFor reports buffering time only for the playing selected video',asy
  media.currentTime=1;ios.tick(media);assert.equal(ios.stalledFor(media),0);
  media.pause();now=5000;assert.equal(ios.stalledFor(media),0,'a manual pause is not buffering');
 });
-test('iOS prepares pre-verified catalog entries before live candidates',()=>{
- const pool={urls:[{provider:'commons'},{provider:'archive'},{provider:'commons',verified:true,id:'v'}],ready:[],loading:0,accepted:0,lastProvider:'archive'};let picked;
- const context=vm.createContext({iosVideo:{},document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,fetchBatch(){},prepare(item){picked=item;},current:null,playbackPaused:false,performance,setTimeout});
- vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();assert.equal(picked.id,'v');
+test('one list video is kept ready as fallback while live candidates keep preparing',()=>{
+ const pool={urls:[{provider:'commons',id:'live1'},{provider:'archive',id:'live2'}],list:[{id:'L1',fromList:true},{id:'L2',fromList:true}],listLoading:0,ready:[],loading:0,accepted:0};const picked=[];
+ const context=vm.createContext({iosVideo:null,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:6,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){},prepare(item){picked.push(item.id);},current:null,playbackPaused:false,performance,setTimeout});
+ vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();
+ assert.deepEqual(picked,['L1','live1','live2'],'one standby, the rest is live');
+ pool.loading=0;pool.listLoading=0;pool.ready.push({fromList:true});picked.length=0;pool.urls.push({provider:'commons',id:'live3'});context.pump();
+ assert.deepEqual(picked,['live3'],'no second list video while one is ready');
+});
+test('a refused sound playback continues muted; the tap starts playback and turns sound on',async()=>{
+ const {context,Video,nodes}=environment(),ios=context.iosVideo,media=new Video();ios.attach(media);
+ let gestures=0;ios.onGesture=m=>{gestures++;m.muted=false;};
+ media.muted=false;const original=media.play.bind(media);media.play=()=>media.muted?original():Promise.reject(Object.assign(Error('sound'),{name:'NotAllowedError'}));
+ await ios.play(media);assert.equal(media.muted,true);assert.equal(media.paused,false);assert.ok(!nodes.find(n=>n.textContent==='CLICK EVERYWHERE'&&!n.hidden),'no prompt when muted playback works');
+ media.play=original;media.allowed=false;media.muted=true;await ios.play(media);const prompt=nodes.find(n=>n.textContent==='CLICK EVERYWHERE');assert.equal(prompt.hidden,false);
+ media.allowed=true;prompt.onclick();await Promise.resolve();assert.equal(gestures,1);assert.equal(media.muted,false);
+});
+test('any tap turns the sound on for the current video',async()=>{
+ const {context,Video,events}=environment(),ios=context.iosVideo,media=new Video();ios.attach(media);await ios.play(media);
+ let gestures=0;ios.onGesture=m=>{gestures++;m.muted=false;};assert.equal(media.muted,true);
+ events.click();assert.equal(gestures,1);assert.equal(media.muted,false);events.click();assert.equal(gestures,1,'already audible: nothing to do');
+});
+test('the next ready video waits at its final geometry, invisible, and switching only reveals it',async()=>{
+ const {context,Video}=environment(),ios=context.iosVideo,current=new Video(),next=new Video();ios.attach(current);ios.attach(next);await ios.play(current);
+ const screen={x:0,y:0,w:390,h:844},match={w:320,h:180,x:130,y:80,zoom:2};
+ ios.stage({media:next,match},screen,true);assert.ok(next.style.cssText.includes('width:640px;height:360px'),'already full size');assert.ok(next.style.cssText.includes('opacity:0'));
+ const css=next.style.cssText;await ios.play(next);
+ next.readyState=2;assert.equal(ios.present({media:next,match},screen,50,true),true,'visible at once after the switch');assert.equal(next.style.opacity,'1');assert.ok(next.style.cssText.includes('width:640px;height:360px'));
+});
+test('a ready live video always wins; otherwise the list video goes in at once, with no waiting',()=>{
+ const code=flow.slice(flow.indexOf('function advance(manual=false){'),flow.indexOf('function renderInfo('));
+ const run=(ios,ready,{now=20000,current={media:{ended:false},match:{}}}={})=>{let chosen=null;const context=vm.createContext({iosVideo:ios?{}:null,mode:'video',mixed:false,shown:2,introEndsAt:4000,pools:{video:{ready}},current,historyIndex:0,history:[],shownAt:0,settings:{seconds:15},burstMinAt:1000,performance:{now:()=>now},select(e){chosen=e;},pump(){}});vm.runInContext(code,context);context.advance();return chosen;};
+ const list={id:'L',fromList:true},live={id:'V'};
+ for(const ios of [true,false]){assert.equal(run(ios,[list,live]).id,'V');assert.equal(run(ios,[list],{now:15100}).id,'L');}
+ assert.equal(run(false,[live],{now:500,current:null}),null,'the burst lasts at least one second');
+});
+test('durations as before (15 s, end or lost blue), first video 3 s; skip from the second video everywhere, list first on iPhone until settled',()=>{
+ assert.doesNotMatch(flow,/stillSample|prerolled|liveReady/);
+ assert.match(flow,/if\(current&&!manual&&shown===1&&now-shownAt<3000\)return;/);
+ assert.match(flow,/ if\(clicks<2\|\|shown<2\)return;/);
+ assert.match(flow,/const liveAllowed=kind!=='video'\|\|!iosVideo\|\|shown>=3&&performance\.now\(\)-startedAt>=30000;/);
+});
+test('iPhone settling phase: only list videos are prepared (up to the queue), no live search',()=>{
+ const pool={urls:[{provider:'commons',id:'live'}],list:[{id:'L1'},{id:'L2'},{id:'L3'}],listLoading:0,ready:[],loading:0,accepted:0};const picked=[];let searches=0;
+ const context=vm.createContext({iosVideo:{},shown:1,startedAt:0,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){searches++;},prepare(item){picked.push(item.id);},current:null,playbackPaused:false,performance:{now:()=>5000},setTimeout});
+ vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();
+ assert.deepEqual(picked,['L1']);assert.equal(searches,0);
+ pool.loading=0;pool.listLoading=0;pool.ready.push({fromList:true});context.pump();assert.deepEqual(picked,['L1','L2'],'second list reserve while settling');
 });

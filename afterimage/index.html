@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#000000">
   <title>afterimage</title>
+  <script>
+  // iPhone/iPad: Archive video needs byte ranges and same-origin pixels, served
+  // with a relay on Cloudflare. Desktop stays on this page unchanged.
+  if ((/iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) && !/\.workers\.dev$/.test(location.hostname) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) location.replace('https://afterimage.blueness-pages.workers.dev/' + location.search);
+  </script>
   <link id="favicon" rel="icon" href="data:,">
   <link rel="stylesheet" href="./style.css?v=33">
 </head>

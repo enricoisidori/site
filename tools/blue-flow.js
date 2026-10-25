@@ -1,6 +1,9 @@
 (() => {
 'use strict';
 const stills=document.body.dataset.project==='stills',wiki=stills&&document.body.dataset.wiki==='1';
+// ?reset (any value): forget everything this browser saved for Blueness, i.e.
+// shown videos, C settings, candidates, recording size; then drop the parameter.
+try{const url=new URL(location.href);if(url.searchParams.has('reset')){for(const store of [localStorage,sessionStorage])for(const key of Object.keys(store))if(/^blue|recording/i.test(key))store.removeItem(key);url.searchParams.delete('reset');window.history.replaceState(null,'',url);}}catch{}
 const baseStills=stills&&!wiki;
 const mode=document.body.dataset.mode,archiveMode=mode==='archive',mixed=mode==='mixed';
 const iosVideo=!stills&&typeof createBluenessIOSVideo==='function'?createBluenessIOSVideo():null;
@@ -13,7 +16,9 @@ const canvas=document.querySelector('#stage'),ctx=canvas.getContext('2d',{alpha:
 const analysis=document.createElement('canvas'),ac=analysis.getContext('2d',{willReadFrequently:true});
 const controls=document.querySelector('#controls'),info=document.querySelector('#info');
 if(iosVideo){controls.style.zIndex='26';info.style.zIndex='26';}
-const defaults={size:50,hue:25,saturation:55,brightness:45,redMax:40,greenMax:65,rgbDistance:210,disturbance:20,zoom:1,minZoom:.5,maxZoom:8,fps:4,quality:stills?(wiki?120:160):640,seconds:mode==='mixed'?4:15,hz:8,dual:false,showBorder:false,motionStep:18,trackingTolerance:15,cameraCooldown:1.2};
+// The CLICK EVERYWHERE tap also turns the sound on (same gesture as play()).
+if(iosVideo)iosVideo.onGesture=media=>{muted=false;media.muted=false;};
+const defaults={size:50,hue:25,violet:12,saturation:55,brightness:45,redMax:40,greenMax:65,rgbDistance:210,disturbance:20,zoom:1,minZoom:.5,maxZoom:8,fps:4,quality:stills?(wiki?120:160):640,seconds:mode==='mixed'?4:15,hz:8,dual:false,showBorder:false,motionStep:18,trackingTolerance:15,cameraCooldown:1.2};
 const settings={...defaults};try{Object.assign(settings,JSON.parse(localStorage.getItem(preferencesKey)||'{}'));}catch{}
 if(settings.motionStep===10)settings.motionStep=18;
 // Old saved thematic preferences must not restore removed content filters.
@@ -21,14 +26,14 @@ delete settings.excludeGovernment;delete settings.excludePolitics;
 const initialURL=new URL(location.href);settings.dual=initialURL.searchParams.get('dual')==='1';
 function syncURL(){try{const url=new URL(location.href);if(settings.dual)url.searchParams.set('dual','1');else url.searchParams.delete('dual');if(stills){if(sources!==document.body.dataset.sources)url.searchParams.set('source',sources);else url.searchParams.delete('source');}window.history.replaceState(null,'',url);}catch{}}
 // window.history is used explicitly because the media history below has the same name.
-const pools=Object.fromEntries(kinds.map(kind=>[kind,{urls:[],ready:[],loading:0,fetching:false,next:0,checked:0,accepted:0,discarded:0,lastError:'',loaded:0,loadMs:0,analysisMs:0,timeouts:0,failures:0,seen:new Set()}]));
+const pools=Object.fromEntries(kinds.map(kind=>[kind,{urls:[],list:[],listLoading:0,ready:[],loading:0,fetching:false,next:0,checked:0,accepted:0,discarded:0,lastError:'',loaded:0,loadMs:0,analysisMs:0,timeouts:0,failures:0,seen:new Set()}]));
 // Define search inputs before constructing controls or decoding the intro.
 const imageExcludedWords=['trump','maga','campaign','campaigns','campaigning','campign','politic','politics','political','republican','republicans','democrat','democrats','election','elections','electoral','president','presidents','presidential','"white house"','biden','harris','gop',...(baseStills?['"capitol attack"','"capitol hill"']:[])];
 const imageGeographyWords=['usa','"united states"','"u.s."','"u.s.a."','"US"'];
 const archiveImageExclusions=' AND NOT ('+imageExcludedWords.join(' OR ')+' OR '+imageGeographyWords.flatMap(term=>['title','subject','creator'].map(field=>field+':'+term)).join(' OR ')+' OR identifier:usgov*)'+(baseStills?' AND NOT subject:"January 6 Capitol Attack"':'');
 const commonsImageExclusions=imageExcludedWords.map(word=>'-'+word).concat(imageGeographyWords.map(word=>'-intitle:'+word),['-incategory:"Politics of the United States"','-incategory:"United States"']).join(' ');
 const totals=new Map(),searchTurns=new Map();
-const VIDEO_QUEUE_LIMIT=iosVideo?2:6,IMAGE_QUEUE_LIMIT=stills?12:36,introEndsAt=performance.now()+5000;let playbackPaused=false,pausedAt=0;
+const VIDEO_QUEUE_LIMIT=iosVideo?2:6,IMAGE_QUEUE_LIMIT=stills?12:36,introEndsAt=performance.now()+4000,startedAt=performance.now(),burstMinAt=performance.now()+1000;let playbackPaused=false,pausedAt=0;
 let revision=0,current=null,history=[],historyIndex=-1,shownAt=0,lastDetect=0,lostAt=0,lastError='',checked=0,accepted=0,shown=0,infoVisible=false,squareWindow=null,muted=true,lastInfo=0,lastPaintKey='',reviewing=false,mixedNeedsImage=false;
 const startupTiming={searchAt:null,resultsAt:null,loadedAt:null,readyAt:null,paintedAt:null};
 // Launch discovery even before reading the accumulated playback history.
@@ -64,7 +69,9 @@ function recordCandidate(entry){
  clearTimeout(catalogTimer);catalogTimer=setTimeout(()=>{try{localStorage.setItem('blue-candidates-v1',JSON.stringify([...blueCatalog.values()]));}catch{}},400);
 }
 function seedCandidates(limit=20,priority=false){
- let added=0;if(stills)return;const shuffled=[...blueCatalog.values()];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}for(const item of shuffled){const pool=pools[item.kind];if(!pool||played.has(mediaKey(item))||pool.seen.has(item.source)||(sources!=='both'&&item.provider!==sources))continue;pool.seen.add(item.source);if(priority)pool.urls.unshift({...item});else pool.urls.push({...item});}}
+ // The pre-verified list is a standby, not the queue: live search always runs
+ // and a ready live video always wins (see pump/advance).
+ let added=0;if(stills)return;const shuffled=[...blueCatalog.values()];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}for(const item of shuffled){const pool=pools[item.kind];if(!pool||played.has(mediaKey(item))||pool.seen.has(item.source)||(sources!=='both'&&item.provider!==sources))continue;pool.seen.add(item.source);pool.list.push({...item,fromList:true});}}
 const recording=createSelectiveRecorder({name:'bluenessmovements',getScreenIntro:!stills&&introEnabled?async({signal,frame})=>({items:await buildBluenessIntroRecords({startup:BLUENESS_STARTUP,svg:BLUENESS_INTRO_SVG,sequence:introSequence.slice(),endAt:firstLiveAt||performance.now(),scene:{width:canvas.width,height:canvas.height,size:settings.size,screens:screens()}},{signal}),render:(items,options)=>renderBluenessIntroReel(items.map(item=>({...item,frame:item.frame||frame})),{...options,frameSeconds:1/8,svgText:BLUENESS_INTRO_SVG})}):null,suspendPlayback:()=>{const was=playbackPaused;if(!was)togglePlaybackPause();return()=>{if(!was&&playbackPaused)togglePlaybackPause();};},getSnapshots:async()=>route.slice().map(r=>{const dualView=settings.dual,w=dualView?r.w:r.singleW,h=dualView?r.h:r.singleH,scale=Math.min(innerWidth/w,innerHeight/h);return {blob:dualView?r.scene:r.single,layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(innerWidth-w*scale)/2,y:(innerHeight-h*scale)/2,width:w*scale,height:h*scale}}]}};}),getScene:()=>{
  if(!current||current.kind!=='video'||!current.match)return null;
  return {key:shown,video:current.media,muted,paused:playbackPaused||document.hidden||current.media.paused||current.media.readyState<3,draw:(target,w,h)=>{
@@ -80,11 +87,11 @@ if(baseStills){const button=document.createElement('button');button.textContent=
 const actions=document.createElement('div');actions.className='actions';fields.append(actions);
 const sourceLink=document.createElement('a');sourceLink.target='_blank';sourceLink.rel='noopener';sourceLink.textContent='fonte';fields.append(sourceLink);
 const groups={};function controlGroup(name,open=false){if(!groups[name]){const details=document.createElement('details'),title=document.createElement('summary');title.textContent=name;details.open=open;details.append(title);fields.append(details);groups[name]=details;}return groups[name];}
-const ranges=[['size','lato quadrato fisso sullo schermo · px',10,180,1],['hue','ampiezza del blu · ± gradi di tonalità',1,80,1],['saturation','saturazione minima · %',0,100,1],['brightness','luminosità minima · %',0,100,1],['redMax','rosso massimo rispetto al blu · % (meno viola)',0,100,1],['greenMax','verde massimo rispetto al blu · % (meno ciano)',0,100,1],['rgbDistance','distanza RGB da #0000ff · 0 = esatto',0,442,1],['disturbance','pixel fuori range ammessi · %',0,70,1],['minZoom','zoom automatico minimo · ×',.25,1,.25],['maxZoom','zoom automatico massimo · ×',1,12,.5],...(kinds.includes('video')?[['motionStep','spostamento minimo inquadratura · px',0,80,1],['trackingTolerance','tolleranza extra durante il tracking · %',0,40,1],['cameraCooldown','pausa minima fra correzioni · secondi',.3,3,.1]]:[]),...(kinds.includes('image')?[['fps','immagini al secondo',.5,10,.5],['quality','qualità immagini · lato richiesto in px',wiki?120:160,1280,wiki?10:160]]:[]),...(kinds.includes('video')?[['seconds','tempo massimo fra cambi video · secondi',.1,mixed?4:30,.1],['hz','analisi video · frame al secondo',2,15,1]]:[])];
+const ranges=[['size','lato quadrato fisso sullo schermo · px',10,180,1],['hue','ampiezza del blu · ± gradi di tonalità',1,80,1],['violet','lato viola · massimo gradi oltre il blu',0,80,1],['saturation','saturazione minima · %',0,100,1],['brightness','luminosità minima · %',0,100,1],['redMax','rosso massimo rispetto al blu · % (meno viola)',0,100,1],['greenMax','verde massimo rispetto al blu · % (meno ciano)',0,100,1],['rgbDistance','distanza RGB da #0000ff · 0 = esatto',0,442,1],['disturbance','pixel fuori range ammessi · %',0,70,1],['minZoom','zoom automatico minimo · ×',.25,1,.25],['maxZoom','zoom automatico massimo · ×',1,12,.5],...(kinds.includes('video')?[['motionStep','spostamento minimo inquadratura · px',0,80,1],['trackingTolerance','tolleranza extra durante il tracking · %',0,40,1],['cameraCooldown','pausa minima fra correzioni · secondi',.3,3,.1]]:[]),...(kinds.includes('image')?[['fps','immagini al secondo',.5,10,.5],['quality','qualità immagini · lato richiesto in px',wiki?120:160,1280,wiki?10:160]]:[]),...(kinds.includes('video')?[['seconds','tempo massimo fra cambi video · secondi',.1,mixed?4:30,.1],['hz','analisi video · frame al secondo',2,15,1]]:[])];
 const swatch=document.createElement('div');
 function save(){try{localStorage.setItem(preferencesKey,JSON.stringify(settings));}catch{}}
 function invalidate(key){
- if(['size','hue','saturation','brightness','disturbance','quality','redMax','greenMax','rgbDistance','minZoom','maxZoom','sources'].includes(key)){
+ if(['size','hue','violet','saturation','brightness','disturbance','quality','redMax','greenMax','rgbDistance','minZoom','maxZoom','sources'].includes(key)){
   revision++;for(const pool of Object.values(pools)){pool.ready.splice(0).forEach(release);if(['quality','sources'].includes(key))pool.urls.length=0;}
   if(current){current.match=null;current.cameraAnchor=null;current.pendingCamera=null;lastDetect=0;}
  }
@@ -96,7 +103,7 @@ for(const [key,label,min,max,step] of ranges){
  input.addEventListener('input',()=>{output.textContent=input.value;});
  input.addEventListener('change',()=>{const value=Number(input.value);if(input.value===''||!Number.isFinite(value)){input.value=settings[key];return;}const next=Math.max(min,Math.min(max,value));input.value=next;if(next===settings[key])return;settings[key]=next;output.textContent=input.value;invalidate(key);});row.append(caption,output,input);const group=['hue','saturation','brightness','redMax','greenMax','rgbDistance','disturbance'].includes(key)?'colore':['size','minZoom','maxZoom','motionStep','trackingTolerance','cameraCooldown'].includes(key)?'inquadratura':'riproduzione';controlGroup(group).append(row);
 }
-function updateSwatch(){swatch.style.background=`linear-gradient(90deg,hsl(${240-settings.hue} 100% 50%),#0000ff,hsl(${240+settings.hue} 100% 50%))`;swatch.title='intervallo di tonalità accettato';}updateSwatch();
+function updateSwatch(){swatch.style.background=`linear-gradient(90deg,hsl(${240-settings.hue} 100% 50%),#0000ff,hsl(${240+Math.min(settings.hue,settings.violet??settings.hue)} 100% 50%))`;swatch.title='intervallo di tonalità accettato';}updateSwatch();
 const sourceSelect=document.createElement('select');for(const [value,label]of [['both','commons + internet archive'],['commons','solo wikimedia commons'],['archive','solo internet archive']]){const option=document.createElement('option');option.value=value;option.textContent=label;sourceSelect.append(option);}sourceSelect.value=sources;sourceSelect.onchange=()=>{sources=sourceSelect.value;invalidate('sources');};const sourceRow=document.createElement('label');sourceRow.append(sourceSelect);controlGroup('archivi').append(sourceRow);
 for(const [key,label]of [['showBorder','mostra bordo']]){const row=document.createElement('label'),input=document.createElement('button');input.dataset.setting=key;input.textContent=settings[key]?'1':'0';input.onclick=()=>{settings[key]=!settings[key];input.textContent=settings[key]?'1':'0';invalidate(key);};row.append(label,input);controlGroup('schermi').append(row);}
 syncURL();
@@ -169,9 +176,10 @@ function resetBlueAnalysis(){
  analysis.width=analysis.width;roiCanvas.width=roiCanvas.width;
 }
 function colorTest(){
- const red=settings.redMax/100,green=settings.greenMax/100,sat=settings.saturation/100,value=settings.brightness*2.55,hue=settings.hue,limit=settings.rgbDistance*settings.rgbDistance;
+ const red=settings.redMax/100,green=settings.greenMax/100,sat=settings.saturation/100,value=settings.brightness*2.55,hue=settings.hue,violet=Math.min(hue,settings.violet??hue),limit=settings.rgbDistance*settings.rgbDistance;
  // R/G limits already make B the largest channel; compare HSV algebraically, no divisions.
- return (p,i)=>{const r=p[i],g=p[i+1],b=p[i+2];if(p[i+3]<=240||b<value||r>b*red||g>b*green)return false;const delta=b-Math.min(r,g),d=255-b;return delta>0&&delta>=sat*b&&60*Math.abs(r-g)<=hue*delta&&r*r+g*g+d*d<=limit;};
+ // Hue is 240+60(r-g)/delta: r>g leans violet, g>r leans cyan. The violet side is narrower.
+ return (p,i)=>{const r=p[i],g=p[i+1],b=p[i+2];if(p[i+3]<=240||b<value||r>b*red||g>b*green)return false;const delta=b-Math.min(r,g),d=255-b;return delta>0&&delta>=sat*b&&60*(r-g)<=violet*delta&&60*(g-r)<=hue*delta&&r*r+g*g+d*d<=limit;};
 }
 function detect(media,previous){
  const sw=media.videoWidth||media.naturalWidth,sh=media.videoHeight||media.naturalHeight;if(!sw||!sh)return null;
@@ -234,11 +242,24 @@ function colorFallback(key,kind){if(kind==='video')return !!iosVideo&&!current;c
 
 async function fetchArchive(kind){
  const preferred=colorFallback('archive:'+kind,kind);if(stills&&preferred)pools[kind].colorBatches=(pools[kind].colorBatches||0)+1;
- const alphabet='abcdefghijklmnopqrstuvwxyz0123456789',prefix=alphabet[Math.floor(Math.random()*alphabet.length)];
  if(baseStills&&startupTiming.searchAt===null)startupTiming.searchAt=performance.now();
  const base='mediatype:'+(kind==='video'?'movies':'image')+' AND NOT access-restricted-item:true'+(stills?archiveImageExclusions:'')+(kind==='video'?' AND NOT subject:"Capitol Hill" AND NOT subject:"January 6 Capitol Attack"':'');
- const q=base+(preferred?' AND subject:blue':' AND identifier:'+prefix+'*');
- const rows=kind==='video'?12:50,total=totals.get(q),page=total?1+Math.floor(Math.random()*Math.ceil(Math.min(total,10000)/rows)):1;
+ const rows=kind==='video'?12:50;let q,page=1;
+ if(kind==='video'){
+  // Archive only pages through 10,000 results of a query. A random identifier
+  // prefix, lengthened until its bucket fits, makes every item reachable, and
+  // the page is random from the very first search (count first when unknown).
+  const alphabet='abcdefghijklmnopqrstuvwxyz0123456789',letter=()=>alphabet[Math.floor(Math.random()*alphabet.length)];
+  const count=async query=>{if(!totals.has(query)){const data=await archiveJSON('https://archive.org/advancedsearch.php?'+new URLSearchParams({q:query,rows:'0',output:'json'}),AbortSignal.timeout(14000));totals.set(query,Number(data.response?.numFound)||0);}return totals.get(query);};
+  let prefix=letter()+letter();q=base+(preferred?' AND subject:blue':' AND identifier:'+prefix+'*');let total=await count(q);
+  while(!preferred&&total>10000&&prefix.length<4){prefix+=letter();q=base+' AND identifier:'+prefix+'*';total=await count(q);}
+  if(!total)return [];
+  page=1+Math.floor(Math.random()*Math.ceil(Math.min(total,10000)/rows));
+ }else{
+  const alphabet='abcdefghijklmnopqrstuvwxyz0123456789',prefix=alphabet[Math.floor(Math.random()*alphabet.length)];
+  q=base+(preferred?' AND subject:blue':' AND identifier:'+prefix+'*');const total=totals.get(q);
+  page=total?1+Math.floor(Math.random()*Math.ceil(Math.min(total,10000)/rows)):1;
+ }
  const params=new URLSearchParams({q,rows:String(rows),page:String(page),output:'json','fl[]':'identifier','sort[]':Math.random()<.5?'identifier asc':'identifier desc'});
  const data=await archiveJSON('https://archive.org/advancedsearch.php?'+params,AbortSignal.timeout(14000));totals.set(q,Number(data.response?.numFound)||0);
  if(baseStills&&startupTiming.resultsAt===null)startupTiming.resultsAt=performance.now();
@@ -254,7 +275,7 @@ async function fetchCommons(kind){
  const entries=[];
    const preferred=colorFallback('commons:'+kind,kind);if(stills&&preferred)pools[kind].colorBatches=(pools[kind].colorBatches||0)+1;
    const term='(haswbstatement:P462=Q1088 OR incategory:Blue)';
-   const generator=stills&&kind==='image'?{generator:'search',gsrsearch:'filetype:bitmap '+(preferred?(Math.random()<.5?'haswbstatement:P462=Q1088 ':'incategory:Blue '):'')+commonsImageExclusions,gsrsort:'random',gsrnamespace:'6',gsrlimit:'50',requestid:String(Math.random())}:kind==='image'&&!preferred?{generator:'random',grnnamespace:'6',grnlimit:'50',...(stills?{requestid:String(Math.random())}:{})}:{generator:'search',gsrsearch:(kind==='video'?'filetype:video ':'')+(preferred?term:''),gsrnamespace:'6',gsrlimit:kind==='video'?'12':'50',gsroffset:String(Math.floor(Math.random()*(preferred?500:9000)))};
+   const generator=stills&&kind==='image'?{generator:'search',gsrsearch:'filetype:bitmap '+(preferred?(Math.random()<.5?'haswbstatement:P462=Q1088 ':'incategory:Blue '):'')+commonsImageExclusions,gsrsort:'random',gsrnamespace:'6',gsrlimit:'50',requestid:String(Math.random())}:kind==='image'&&!preferred?{generator:'random',grnnamespace:'6',grnlimit:'50',...(stills?{requestid:String(Math.random())}:{})}:kind==='video'?{generator:'search',gsrsearch:'filetype:video '+(preferred?term:''),gsrsort:'random',gsrnamespace:'6',gsrlimit:'12',requestid:String(Math.random())}:{generator:'search',gsrsearch:(preferred?term:''),gsrnamespace:'6',gsrlimit:'50',gsroffset:String(Math.floor(Math.random()*(preferred?500:9000)))};
    const params=kind==='video'?{...generator,prop:'videoinfo',viprop:'url|mime|derivatives|extmetadata',viextmetadatafilter:'Artist|LicenseShortName|LicenseUrl'}:{...generator,prop:'imageinfo',iiprop:stills?'url|mime':'url|mime|extmetadata',iiurlwidth:String(settings.quality),iiextmetadatafilter:'Artist|LicenseShortName|LicenseUrl'};
    let pages=await api(params);if(!pages.length&&generator.generator==='search'&&Number(generator.gsroffset)>0)pages=await api({...params,gsroffset:'0'});
    for(const page of pages){
@@ -272,7 +293,9 @@ async function fetchCommons(kind){
 function fetchBatch(kind){
  const pool=pools[kind];if(pool.urls.length>(kind==='video'?15:70))return;
  pool.requests ||= {};
- for(const provider of (sources==='both'?['commons','archive']:[sources])){
+ // iPhone: light and smooth over full coverage. Live search uses Commons only
+ // (240–360p transcodes, one request); the list covers the gaps.
+ for(const provider of (sources==='both'?(iosVideo&&kind==='video'?['commons']:['commons','archive']):[sources])){
   const state=pool.requests[provider] ||= {fetching:false,next:0};
   if(state.fetching||Date.now()<state.next)continue;state.fetching=true;state.failed=false;pool.fetching=true;
   const version=revision;
@@ -341,7 +364,7 @@ async function prepare(item){
   if(version!==revision||!entry.match||played.has(mediaKey(entry))){pool.discarded++;release(entry);return;}
   if(baseStills&&startupTiming.readyAt===null)startupTiming.readyAt=performance.now();
   if(baseStills&&entry.fingerprint)contentSeen.add(entry.fingerprint);accepted++;pool.accepted++;recordCandidate(entry);if(item.kind==='video')media.preload='metadata';pool.ready.push(entry);if(!current&&!playbackPaused)advance();
- }catch(error){pool.failures++;if(iosVideo&&item.kind==='video'&&['caricamento','seek'].includes(stage)&&++pool.failStreak>=3)pool.coolUntil=performance.now()+Math.min(30000,1000*2**(pool.failStreak-2));if(error.message==='caricamento scaduto')pool.timeouts++;if(!['nessun video leggero','nessun video nella fascia richiesta'].includes(error.message)){lastError=iosVideo?stage+' · '+error.name+': '+error.message:error.message;pool.lastError=lastError;}if(iosVideo&&error.name==='SecurityError')resetBlueAnalysis();pool.discarded++;release(entry);}finally{pool.loading--;if(item.provider==='archive')pool.archiveLoading--;pump();}
+ }catch(error){pool.failures++;if(iosVideo&&item.kind==='video'&&['caricamento','seek'].includes(stage)&&++pool.failStreak>=3)pool.coolUntil=performance.now()+Math.min(30000,1000*2**(pool.failStreak-2));if(error.message==='caricamento scaduto')pool.timeouts++;if(!['nessun video leggero','nessun video nella fascia richiesta'].includes(error.message)){lastError=iosVideo?stage+' · '+error.name+': '+error.message:error.message;pool.lastError=lastError;}if(iosVideo&&error.name==='SecurityError')resetBlueAnalysis();pool.discarded++;release(entry);}finally{pool.loading--;if(item.fromList)pool.listLoading--;if(item.provider==='archive')pool.archiveLoading--;pump();}
 }
 function paintIntroFrame(image,item){
  const m=item.match,zoom=settings.size/m.side,{x,y,size}=item.tile;
@@ -373,19 +396,20 @@ async function startIntroSequence(){
 function pump(){
  if(document.hidden)return;
  for(const [kind,pool]of Object.entries(pools)){
-  // A warm catalog starts playback first; discovery resumes in the background.
-  if(pool.urls.length<(kind==='video'?8:45)&&!((kind==='video'||stills&&!baseStills)&&pool.accepted===0&&(pool.loading>0||pool.urls.some(item=>item.verified))))fetchBatch(kind);
+  // iPhone: list only for the first 3 videos and 30 s; live once playback has settled.
+  const liveAllowed=kind!=='video'||!iosVideo||shown>=3&&performance.now()-startedAt>=30000;
+  // Live discovery otherwise runs from the start; the list never holds it back.
+  if(liveAllowed&&pool.urls.length<(kind==='video'?8:45)&&!(stills&&!baseStills&&pool.accepted===0&&(pool.loading>0||pool.urls.some(item=>item.verified))))fetchBatch(kind);
   const concurrency=kind==='video'?(iosVideo?1:pool.ready.length<2?3:2):8,limit=kind==='video'?VIDEO_QUEUE_LIMIT:IMAGE_QUEUE_LIMIT;
   // iPhone: after repeated load failures (e.g. HTTP 429 from Wikimedia) wait
   // instead of burning through candidates and adding to the rate limit.
   const cooling=kind==='video'&&iosVideo&&performance.now()<(pool.coolUntil||0);
   if(cooling&&!pool.coolTimer)pool.coolTimer=setTimeout(()=>{pool.coolTimer=0;pump();},pool.coolUntil-performance.now()+50);
-  while(!cooling&&pool.loading<concurrency&&pool.ready.length+pool.loading<limit&&pool.urls.length){
+  // Exactly one list video is kept ready (or preparing) as the fallback.
+  if(kind==='video'&&pool.list.length&&!pool.listLoading&&(!liveAllowed?pool.ready.length<VIDEO_QUEUE_LIMIT:!pool.ready.some(entry=>entry.fromList))&&pool.loading<concurrency){pool.loading++;pool.listLoading++;prepare(pool.list.shift());}
+  while(liveAllowed&&!cooling&&pool.loading<concurrency&&pool.ready.length+pool.loading<limit&&pool.urls.length){
    let index=0;
-   // Pre-verified catalog entries first: one load and one check, no search.
-   const verified=iosVideo?pool.urls.findIndex(item=>item.verified):-1;
-   if(verified>=0)index=verified;
-   else if(sources==='both'&&iosVideo){const other=pool.urls.findIndex(item=>item.provider!==pool.lastProvider);if(other>=0)index=other;}
+   if(sources==='both'&&iosVideo){const other=pool.urls.findIndex(item=>item.provider!==pool.lastProvider);if(other>=0)index=other;}
    else if(sources==='both'&&(pool.archiveLoading||0)>=1){const commons=pool.urls.findIndex(item=>item.provider==='commons');if(commons>=0)index=commons;}
    pool.lastProvider=pool.urls[index].provider;
    pool.loading++;prepare(pool.urls.splice(index,1)[0]);
@@ -419,6 +443,21 @@ function advance(manual=false){
  if(manual&&historyIndex<history.length-1){reviewing=true;select(history[++historyIndex],true);return;}if(manual)reviewing=false;
  let kind=mode==='video'?'video':'image';
  if(mixed && !mixedNeedsImage && current?.kind!=='video' && pools.video.ready.length)kind='video';
+ const ready=pools[kind]?.ready;
+ if(kind==='video'&&ready?.length){
+  const now=performance.now();if(!current&&now<burstMinAt)return;
+  // The first video stays at least 3 s; a click is immediate.
+  if(current&&!manual&&shown===1&&now-shownAt<3000)return;
+  // Desktop: the burst waits up to 4 s for a real live video before the list.
+  if(!current&&!iosVideo&&now<introEndsAt&&!ready.some(entry=>!entry.fromList))return;
+  // A ready live video always wins; the list video is the fallback.
+  let index=ready.findIndex(entry=>!entry.fromList);
+  // No live video ready at the change: the list video goes in at once, no waiting.
+  if(index<0){
+   index=0;
+  }
+  select(ready.splice(index,1)[0]);return;
+ }
  const entry=pools[kind]?.ready.shift() || (!current&&mixed?pools.image.ready.shift():null);if(entry)select(entry);else pump();
 }
 function renderInfo(){
@@ -426,7 +465,7 @@ function renderInfo(){
   const label=kind==='video'?'video':'immagini',limit=kind==='video'?Math.max(VIDEO_QUEUE_LIMIT,pool.ready.length):IMAGE_QUEUE_LIMIT;
   const state=playbackPaused?'pausa · precaricamento attivo':pool.ready.length>=limit?'coda pronta':pool.fetching?'ricerca negli archivi':pool.loading?(stills?'download immagini in background':'caricamento e analisi del blu'):Date.now()<pool.next?'attesa della prossima ricerca':'ricerca attiva';
   return `${label} · ${state}\n${pool.ready.length} / ${limit} pronti · ${pool.loading} in preparazione · ${pool.urls.length} candidati\n${pool.checked} analisi · ${pool.accepted} match · ${pool.discarded} scartati${stills?'\ncaricamento '+Math.round(pool.loadMs/Math.max(1,pool.loaded))+' ms · blu '+(pool.analysisMs/Math.max(1,pool.checked)).toFixed(1)+' ms · '+pool.timeouts+' timeout · '+(pool.colorBatches||0)+' ricerche tag blu':''}${pool.lastError?'\nultimo errore: '+pool.lastError:''}`;
- }).join('\n\n');const mobile=iosVideo?.status,summary=status+(iosVideo?'\n\niOS relay · 25/10-r9':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
+ }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r26':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
  sourceLink.hidden=!current;
  if(!infoVisible)return;info.replaceChildren();const p=document.createElement('p');p.textContent=`${mode} · ${checked} analisi · ${accepted} match · ${shown} mostrati\n${Object.entries(pools).map(([k,v])=>k+': '+v.ready.length+' pronti').join(' · ')}\n${current?.match?Math.round(current.match.ratio*100)+'% nel range blu · zoom '+current.match.zoom.toFixed(2)+'× · area sorgente '+current.match.side+' px':'ricerca in corso'}${lastError?'\nultimo errore: '+lastError:''}`;info.append(p);
  if(current){const link=document.createElement('a');link.href=current.source;link.target='_blank';link.rel='noopener';link.textContent=clean(current.title)+' · '+current.author+' · '+current.license;info.append(link);}
@@ -455,8 +494,10 @@ function frame(now){
   // Never sit on a buffering video while a verified reserve is ready.
   if(!reviewing&&pools.video.ready.length&&iosVideo.stalledFor(current.media)>=1500){advance();return;}}
  if(baseStills&&!current&&pools.image.ready.length)advance();
+ if(mode==='video'&&!current&&pools.video.ready.length)advance();
  if(current){
-  const expired=current.kind==='video'?(now-shownAt>=settings.seconds*1000||current.media.ended):now-shownAt>=1000/settings.fps;
+  const maxSeconds=settings.seconds;
+  const expired=current.kind==='video'?(now-shownAt>=maxSeconds*1000||current.media.ended):now-shownAt>=1000/settings.fps;
   if(expired&&(!reviewing||current.kind==='video')){
    if(mixed&&current.kind==='video'){
     current.media.pause();mixedNeedsImage=true;const image=pools.image.ready.shift();if(image)select(image);else{current=null;lastPaintKey='';pump();}
@@ -468,7 +509,10 @@ function frame(now){
   if(current.kind!=='video'||current.detectedTime!==mediaFrame||current.revision!==revision){current.detectedTime=mediaFrame;try{current.match=stabilizeCamera(current,detect(current.media,current.cameraAnchor||current.match),now);if(current.match)current.cameraAnchor=current.match;current.revision=revision;}catch(error){lastError=(iosVideo?'tracking blu · '+error.name+': ':'')+error.message;current.match=null;if(iosVideo&&error.name==='SecurityError'){resetBlueAnalysis();const failed=current;current=null;const index=history.indexOf(failed);if(index>=0)history.splice(index,1);historyIndex=history.length-1;release(failed);lastPaintKey='';advance();return;}}
   if(!current.match){if(!lostAt)lostAt=now;if(now-lostAt>=0){if(mixed&&current.kind==='video'){current.media.pause();mixedNeedsImage=true;current=null;lastPaintKey='';advance();}else advance();}}else lostAt=0;}
  }
- const nativeVideo=iosVideo?.present(current,screens()[0],settings.size,!settings.dual&&!(squareWindow&&!squareWindow.closed))||false;
+ const nativeEnabled=!settings.dual&&!(squareWindow&&!squareWindow.closed);
+ const nativeVideo=iosVideo?.present(current,screens()[0],settings.size,nativeEnabled)||false;
+ const upcoming=mode==='video'?(pools.video.ready.find(entry=>!entry.fromList)||pools.video.ready[0]):null;
+ iosVideo?.stage(upcoming,screens()[0],nativeEnabled);
  const paintKey=[!!(squareWindow&&!squareWindow.closed),shown,revision,settings.showBorder,settings.dual,canvas.width,canvas.height,current?.kind==='video'?(nativeVideo?'native':iosVideo?Math.floor(current.media.currentTime*30):current.media.requestVideoFrameCallback?current.frameSerial:current.media.currentTime):current?.match?'match':'waiting',current?.match?.x,current?.match?.y,current?.match?.zoom].join(':');
  if(paintKey!==lastPaintKey&&(current?.match||shown===0&&!baseStills)){
   // With native iOS presentation, the key changes only on camera/scene changes:
@@ -499,14 +543,24 @@ addEventListener('keydown',event=>{
  if(key==='m'){muted=!muted;if(current?.kind==='video')current.media.muted=muted;recording.syncAudioMonitor();}
  if(key==='f')(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>{});
 });
-if(!baseStills)canvas.addEventListener('click',()=>advance(true));
+// Clicks: the first one only turns the sound on (iPhone: in its helper). During
+// the burst and the first video a click does nothing else; from the second
+// video on it advances, if a video is ready.
+let clicks=0;addEventListener('click',()=>{clicks++;if(clicks===1&&!stills&&!iosVideo){muted=false;if(current?.kind==='video')current.media.muted=false;}},true);
+if(!baseStills)canvas.addEventListener('click',()=>{
+ if(mode!=='video'){advance(true);return;}
+ if(clicks<2||shown<2)return;
+ if(historyIndex<history.length-1||pools.video.ready.length)advance(true);
+});
 if(baseStills&&matchMedia('(pointer: coarse)').matches){const button=document.createElement('button');button.textContent='c';button.setAttribute('aria-label','controlli');button.style.cssText='position:fixed;right:12px;bottom:12px;z-index:25;padding:12px;font:inherit;color:white;text-shadow:0 1px 2px black;';button.onclick=()=>{controls.hidden=!controls.hidden;infoVisible=!controls.hidden;info.hidden=!infoVisible;renderInfo();};document.body.append(button);}
 addEventListener('visibilitychange',()=>{if(current?.kind==='video')document.hidden||playbackPaused?current.media.pause():(iosVideo?iosVideo.play(current.media):current.media.play()).catch(()=>{});pump();});
 Object.defineProperty(window,'blueStartupTiming',{get:()=>({...startupTiming})});
 Object.defineProperty(window,'blueStatus',{get:()=>({phase:baseStills?(current?'live':'startup'):undefined,previewShown:baseStills?previewShown:undefined,verifiedImages:baseStills?[...blueCatalog.values()]:undefined,routeFrames:route.length,paused:playbackPaused,queueLimit:VIDEO_QUEUE_LIMIT,mode,sources,analysis:{...analysisStats},checked,accepted,shown,history:history.length,historyIndex,ready:Object.fromEntries(Object.entries(pools).map(([k,p])=>[k,p.ready.length])),search:Object.fromEntries(Object.entries(pools).map(([k,p])=>[k,{fetching:p.fetching,preparing:p.loading,preparingArchive:p.archiveLoading||0,loaded:p.loaded,loadMs:p.loadMs,analysisMs:p.analysisMs,timeouts:p.timeouts,failures:p.failures,candidates:p.urls.length,checked:p.checked,accepted:p.accepted}])),current:current?.source,mediaURL:current?.media.currentSrc,fingerprint:current?.fingerprint,kind:current?.kind,match:current?.match,settings:{...settings},recording:recording.status,error:lastError})});
 if(introEnabled&&typeof BLUENESS_INTRO_SVG==='string'&&BLUENESS_INTRO_SVG){
  const intro=document.createElement('div');intro.id='blueness-intro';intro.style.cssText='position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:transparent;';intro.innerHTML=BLUENESS_INTRO_SVG;const svg=intro.querySelector('svg');if(svg){const direct=[...svg.children].filter(node=>node.tagName?.toLowerCase()==='path');if(!svg.querySelector('[data-intro-text]')&&direct.length>=3){const text=document.createElementNS(svg.namespaceURI,'g'),arrow=document.createElementNS(svg.namespaceURI,'g');text.dataset.introText='1';arrow.dataset.introArrow='1';svg.insertBefore(text,direct[0]);text.append(direct[0]);svg.insertBefore(arrow,direct[1]);arrow.append(direct[1],direct[2]);}svg.querySelector('rect:last-of-type')?.setAttribute('data-blue-anchor','1');svg.style.cssText='display:block;max-width:90vw;max-height:90dvh;width:100%;height:100%;';}document.body.append(intro);alignIntro();
- intro.liveSources=new Set();const dismiss=()=>{if(current?.match&&lastPaintKey)intro.remove();else intro.dataset.dismiss='1';};intro.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();dismiss();},{once:true});
+ intro.liveSources=new Set();const dismiss=()=>{if(current?.match&&lastPaintKey)intro.remove();else intro.dataset.dismiss='1';};if(baseStills)intro.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();dismiss();},{once:true});
+ // Video: a click on the SVG never removes it (it leaves with the second video).
+ else intro.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();});
 }
 seedCandidates();renderInfo();pump();startIntroSequence();setInterval(pump,800);requestAnimationFrame(frame);
 })();
