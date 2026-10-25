@@ -25,3 +25,9 @@ test('client disconnect aborts the upstream request',async()=>{
   assert.equal(response.status,502);assert.equal(upstreamSignal.aborted,true);
  });
 });
+test('Wikimedia rate limiting is passed through with Retry-After',async()=>{
+ await withFetch(async()=>new Response('slow down',{status:429,headers:{'Retry-After':'11'}}),async()=>{
+  const response=await worker.fetch(new Request(site+'/video?url='+encodeURIComponent('https://upload.wikimedia.org/wikipedia/commons/a/a.webm')));
+  assert.equal(response.status,429);assert.equal(response.headers.get('retry-after'),'11');
+ });
+});

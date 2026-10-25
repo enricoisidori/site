@@ -7,7 +7,7 @@ mkdirSync(new URL('../blueness/',import.meta.url),{recursive:true});
 const pdf=readFileSync(new URL('./blueness-pdf.js',import.meta.url),'utf8');
 const renderer=readFileSync(new URL('../assets/shared/recording/render.js',import.meta.url),'utf8').replace(/^export /gm,'');
 const recorder=renderer+'\n'+readFileSync(new URL('../assets/shared/recording/mp4-muxer.js',import.meta.url),'utf8').replace(/^export /gm,'')+'\n'+readFileSync(new URL('../assets/shared/recording/recorder.js',import.meta.url),'utf8').replace(/^import .*;\s*$/gm,'').replace(/^export /gm,'');
-const bootstrap='const BLUENESS_CATALOG='+readFileSync(new URL('./catalogs/blueness.json',import.meta.url),'utf8')+';\n';
+const bootstrap='const BLUENESS_CATALOG='+JSON.stringify(JSON.parse(readFileSync(new URL('./catalogs/blueness.json',import.meta.url),'utf8')))+';\n';
 const code=bootstrap+transport+'\n'+pdf+'\n'+recorder+'\n'+readFileSync(new URL('./blueness-ios-video.js',import.meta.url),'utf8')+'\n'+readFileSync(new URL('./blue-flow.js',import.meta.url),'utf8');new vm.Script(code);
 if(process.argv[2]&&!['base','movements','stills','projects'].includes(process.argv[2]))throw Error('build sconosciuto: '+process.argv[2]);
 for(const [name,mode,sources] of [['blue','image','both'],['blue-video','video','both'],['blue-mixed','mixed','both'],['blue-archive','archive','archive'],['blue-commons','image','commons'],['blue-video-archive','video','archive'],['blue-video-commons','video','commons'],['blueness-stills','image','archive'],['blueness-wiki','image','commons']]){

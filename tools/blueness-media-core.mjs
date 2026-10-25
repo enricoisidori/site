@@ -43,6 +43,8 @@ export function createBluenessMediaHandler({fetchUpstream=(url,init)=>fetch(url,
    }
    clearTimeout(timer);
    if(!response)throw Error('troppi redirect video');
+   // Pass rate limiting through (with Retry-After) instead of masking it as 502.
+   if(response.status===429){await response.body?.cancel();const retry=response.headers.get('retry-after');return new Response(JSON.stringify({error:'origine HTTP 429'}),{status:429,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...(retry?{'Retry-After':retry}:{})}});}
    if(![200,206,416].includes(response.status)){await response.body?.cancel();throw Error('origine HTTP '+response.status);}
    if(range&&request.method==='GET'&&response.status===200){await response.body?.cancel();throw Error('origine non supporta richieste parziali');}
    if(response.status===206&&!/^bytes \d+-\d+\/\d+$/.test(response.headers.get('content-range')||'')){await response.body?.cancel();throw Error('Content-Range non valido');}

@@ -51,7 +51,7 @@ test('desktop catalog selection and paused preparation keep their previous behav
 });
 test('iOS pump prepares one video at a time and stops at two ready/preparing entries',()=>{
  const pool={urls:Array.from({length:8},()=>({provider:'commons'})),ready:[],loading:0,accepted:1};let loads=0;
- const context=vm.createContext({iosVideo:{},document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,fetchBatch(){},prepare(){loads++;},current:null,playbackPaused:false});
+ const context=vm.createContext({iosVideo:{},document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,fetchBatch(){},prepare(){loads++;},current:null,playbackPaused:false,performance,setTimeout});
  vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();assert.equal(loads,1);assert.equal(pool.loading,1);
  pool.loading=0;pool.ready.push({},{});context.pump();assert.equal(loads,1);
 });
@@ -70,7 +70,7 @@ test('actual iOS rendering keeps moving even when video frame callbacks never fi
  let paints=0,ticks=0,callbacks=0;
  const media={readyState:2,currentTime:0,paused:false,seeking:false,ended:false,requestVideoFrameCallback(){callbacks++;},play:async()=>{},pause(){this.paused=true;}};
  const entry={kind:'video',media,source:'fixture',revision:0,startTime:0,match:{x:20,y:20,zoom:1}};
- const context=vm.createContext({iosVideo:{play:async()=>{},park(){},restore(){},present:()=>false,tick(){ticks++;}},current:null,recording:{sample(){}},played:new Set(),mediaKey:e=>e.source,baseStills:false,introEnabled:false,shown:0,shownAt:0,playbackPaused:false,pausedAt:0,lostAt:0,lastDetect:0,revision:0,lastPaintKey:'',muted:true,sourceLink:{},clean:x=>x,renderInfo(){},pump(){},performance:{now:()=>100},document:{hidden:false},requestAnimationFrame(){},settings:{seconds:30,hz:1,showBorder:false,dual:false},reviewing:false,mixed:false,canvas:{width:390,height:844},ctx:{fillRect(){paints++;}},screens:()=>[],squareWindow:null,stillsExporter:null,lastInfo:0,drawScreen(){}});
+ const context=vm.createContext({iosVideo:{play:async()=>{},park(){},restore(){},present:()=>false,tick(){ticks++;},stalledFor:()=>0},pools:{video:{ready:[]}},current:null,recording:{sample(){}},played:new Set(),mediaKey:e=>e.source,baseStills:false,introEnabled:false,shown:0,shownAt:0,playbackPaused:false,pausedAt:0,lostAt:0,lastDetect:0,revision:0,lastPaintKey:'',muted:true,sourceLink:{},clean:x=>x,renderInfo(){},pump(){},performance:{now:()=>100},document:{hidden:false},requestAnimationFrame(){},settings:{seconds:30,hz:1,showBorder:false,dual:false},reviewing:false,mixed:false,canvas:{width:390,height:844},ctx:{fillRect(){paints++;}},screens:()=>[],squareWindow:null,stillsExporter:null,lastInfo:0,drawScreen(){}});
  vm.runInContext(flow.slice(flow.indexOf('function select('),flow.indexOf('function back('))+flow.slice(flow.indexOf('function frame(now){'),flow.indexOf('function togglePlaybackPause(')),context);
  context.select(entry,true);assert.equal(callbacks,0,'iOS does not depend on callbacks of the occluded decoder');assert.equal(entry.firstFrameReady,true);
  media.currentTime=.1;context.frame(150);media.currentTime=.2;context.frame(250);assert.equal(paints,2,'both media times repaint despite zero callbacks');assert.equal(ticks,2);
@@ -102,7 +102,7 @@ test('a SecurityError in a candidate resets shared analysis before preparing a v
 });
 test('a tracking SecurityError removes the failed current video so the next candidate can start',()=>{
  let released=0,resets=0,advances=0;const media={currentTime:1,readyState:2,ended:false},entry={kind:'video',media,firstFrameReady:true,match:{},revision:0};
- const context=vm.createContext({requestAnimationFrame(){},document:{hidden:false},playbackPaused:false,iosVideo:{tick(){}},current:entry,baseStills:false,performance,shownAt:0,settings:{seconds:30,hz:8},reviewing:false,mixed:false,lastDetect:0,lostAt:0,revision:0,lastError:'',lastPaintKey:'old',history:[entry],historyIndex:0,stabilizeCamera:(_,match)=>match,detect(){throw Object.assign(Error('The operation is insecure.'),{name:'SecurityError'});},resetBlueAnalysis(){resets++;},release(item){assert.equal(item,entry);released++;},advance(){advances++;}});
+ const context=vm.createContext({requestAnimationFrame(){},document:{hidden:false},playbackPaused:false,iosVideo:{tick(){},stalledFor:()=>0},pools:{video:{ready:[]}},current:entry,baseStills:false,performance,shownAt:0,settings:{seconds:30,hz:8},reviewing:false,mixed:false,lastDetect:0,lostAt:0,revision:0,lastError:'',lastPaintKey:'old',history:[entry],historyIndex:0,stabilizeCamera:(_,match)=>match,detect(){throw Object.assign(Error('The operation is insecure.'),{name:'SecurityError'});},resetBlueAnalysis(){resets++;},release(item){assert.equal(item,entry);released++;},advance(){advances++;}});
  vm.runInContext(flow.slice(flow.indexOf('function frame(now){'),flow.indexOf('function togglePlaybackPause(')),context);context.frame(100);
  assert.equal(context.current,null);assert.equal(context.history.length,0);assert.equal(released,1);assert.equal(resets,1);assert.equal(advances,1);assert.ok(context.lastError.startsWith('tracking blu · SecurityError:'));
 });
@@ -147,4 +147,29 @@ test('select parks the previous iOS video and restores a history entry before se
  const body=flow.slice(flow.indexOf('function select('),flow.indexOf('function back('));
  assert.match(body,/current\.media\.pause\(\);iosVideo\?\.park\(current\.media\);/);
  assert.ok(body.indexOf('iosVideo?.restore(current.media)')<body.indexOf('current.media.currentTime=current.startTime'));
+});
+test('iOS picks light transcodes up to 480p and never MPEG-4 Part 2 .mov',()=>{
+ const code=flow.slice(flow.indexOf('function pickVideoVariant('),flow.indexOf('async function fetchCommons('));
+ const variants=[[720,'video/webm'],[480,'video/webm'],[360,'video/quicktime; codecs="mp4v"'],[240,'video/webm']].map(([h,type])=>({height:h,src:h+'.webm',type}));
+ const ios=vm.createContext({iosVideo:{canPlay:()=>true},pools:{video:{accepted:5,ready:[1,2]}}});vm.runInContext(code,ios);
+ assert.equal(ios.pickVideoVariant(variants,false).height,240,'360 .mov skipped; nearest light webm');
+ assert.equal(ios.pickVideoVariant(variants.filter(v=>v.height>=720),false),undefined,'no heavy fallback on iPhone');
+ const desktop=vm.createContext({iosVideo:null,pools:{video:{accepted:5,ready:[1,2]}}});vm.runInContext(code,desktop);
+ assert.equal(desktop.pickVideoVariant(variants,false).height,480,'desktop quality unchanged');
+});
+test('iOS skips a stalled video when a reserve is ready, alternates providers and backs off after failures',()=>{
+ assert.match(flow,/!reviewing&&pools\.video\.ready\.length&&iosVideo\.stalledFor\(current\.media\)>=1500\)\{advance\(\);return;\}/);
+ assert.match(flow,/item\.provider!==pool\.lastProvider/);
+ assert.match(flow,/\+\+pool\.failStreak>=3\)pool\.coolUntil=/);
+});
+test('stalledFor reports buffering time only for the playing selected video',async()=>{
+ const {context,Video}=environment();let now=100;context.performance={now:()=>now};const media=new Video(),other=new Video(),ios=context.iosVideo;ios.attach(media);ios.attach(other);await ios.play(media);
+ now=1800;assert.equal(ios.stalledFor(media),1700);assert.equal(ios.stalledFor(other),0);
+ media.currentTime=1;ios.tick(media);assert.equal(ios.stalledFor(media),0);
+ media.pause();now=5000;assert.equal(ios.stalledFor(media),0,'a manual pause is not buffering');
+});
+test('iOS prepares pre-verified catalog entries before live candidates',()=>{
+ const pool={urls:[{provider:'commons'},{provider:'archive'},{provider:'commons',verified:true,id:'v'}],ready:[],loading:0,accepted:0,lastProvider:'archive'};let picked;
+ const context=vm.createContext({iosVideo:{},document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,fetchBatch(){},prepare(item){picked=item;},current:null,playbackPaused:false,performance,setTimeout});
+ vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();assert.equal(picked.id,'v');
 });
