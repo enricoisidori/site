@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const html=await readFile(new URL('../../blueness-image/index.html',import.meta.url),'utf8');
+assert.ok(Buffer.byteLength(html)<450000,'startup must remain compact');
+const browser=await chromium.launch({channel:'chrome',headless:true});
+try{
+ const page=await browser.newPage({viewport:{width:390,height:844}});const errors=[];
+ page.on('pageerror',e=>errors.push(e.message));await page.context().setOffline(true);
+ await page.addInitScript(()=>{window.tileOrder=[];const draw=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(...args){if(this.canvas.id==='stage'&&args.length===9)tileOrder.push(args[1]+':'+args[2]);return draw.apply(this,args);};window.startFrames=[];let last=0;setInterval(()=>{if(window.blueStatus&&blueStatus.previewShown!==last){last=blueStatus.previewShown;const c=document.querySelector('#stage'),x=c.width/2-25,y=c.height/2-25,p=c.getContext('2d').getImageData(x,y,50,50).data;let blue=0;for(let i=0;i<p.length;i+=4)if(p[i+2]>115&&p[i]<=p[i+2]*.4&&p[i+1]<=p[i+2]*.65)blue++;startFrames.push({at:performance.now(),n:last,blue:blue/2500});}},10);});
+ const url=new URL('../../blueness-image/index.html',import.meta.url).href;
+ await page.goto(url,{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>blueStatus.previewShown>=12,{},{timeout:2000});
+ await page.waitForFunction(()=>startFrames.length>=12);
+ const frames=await page.evaluate(()=>startFrames);
+ assert.ok(frames[0].at<500,'local sequence must start before any network result');
+ assert.ok(frames[11].at-frames[0].at<900,'12 frames must be a brief fast sequence');
+ assert.ok(frames.every(f=>f.blue>=.7),'blue region must stay beneath the exact central square on every frame');
+ assert.equal(await page.evaluate(()=>blueStatus.checked),0,'intro must not run the blue detector again');
+ assert.equal(await page.evaluate(()=>blueStatus.shown),0,'intro animation must remain separate from live playback');
+ await page.waitForTimeout(400);assert.ok(await page.evaluate(()=>blueStatus.previewShown)>12,'sequence must keep moving until live is ready');
+ const firstOrder=await page.evaluate(()=>tileOrder.slice(0,12));
+ assert.equal(new Set(firstOrder).size,12,'a startup burst must sample without replacement');
+ assert.equal(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('blueness-seen-v2:')).length),0,'intro must not write playback history');
+ await page.setViewportSize({width:844,height:390});await page.waitForTimeout(50);
+ assert.ok(await page.evaluate(()=>{const c=document.querySelector('#stage'),p=c.getContext('2d').getImageData(c.width/2-25,c.height/2-25,50,50).data;let blue=0;for(let i=0;i<p.length;i+=4)if(p[i+2]>115&&p[i]<=p[i+2]*.4&&p[i+1]<=p[i+2]*.65)blue++;return blue/2500>=.7;}),'held final frame must remain blue and aligned after resize');
+ await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>blueStatus.previewShown>=12);
+ assert.notDeepEqual(await page.evaluate(()=>tileOrder.slice(0,12)),firstOrder,'each opening must shuffle the intro pool');
+ assert.deepEqual(errors,[]);
+ console.log(JSON.stringify({pass:true,pageBytes:Buffer.byteLength(html),firstFrameMs:Math.round(frames[0].at),burstMs:Math.round(frames[11].at-frames[0].at),minimumBlueCoverage:Math.min(...frames.map(f=>f.blue)),noAnalysis:true,continuousUntilLive:true,shuffledPool:true,noHistoryWrites:true}));
+}finally{await browser.close();}

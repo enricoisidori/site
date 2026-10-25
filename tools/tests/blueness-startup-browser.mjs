@@ -13,7 +13,7 @@ try{
  await page.route('https://archive.org/cors/verified/clip.mp4',r=>r.fulfill({contentType:'video/mp4',headers:{'Access-Control-Allow-Origin':'*'},body:fixture}));
  await page.route('https://archive.org/metadata/**',r=>{metadata++;return r.abort();});
  await page.route(/https:\/\/(commons\.wikimedia\.org\/w\/api|archive\.org\/(advancedsearch|services\/search))/,async r=>{shownBeforeSearch.push(await page.evaluate(()=>window.blueStatus?.shown||0));return r.abort();});
- await page.goto(new URL('../../blueness/index.html',import.meta.url).href,{waitUntil:'domcontentloaded'});
+ await page.goto(new URL('../../bluenessmovements/index.html',import.meta.url).href,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>window.blueStatus?.shown===1);
  assert.equal(metadata,0,'verified direct URL must not request metadata again');
  assert.ok(shownBeforeSearch.every(n=>n>=1),'initial catalog must show a video before network discovery');

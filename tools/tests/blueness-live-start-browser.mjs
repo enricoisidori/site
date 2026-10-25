@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const catalog=JSON.parse(await readFile(new URL('../catalogs/blueness-images.json',import.meta.url),'utf8'));
+const ids=new Set(catalog.map(item=>item.id));
+const browser=await chromium.launch({channel:'chrome',headless:true});
+try{
+ const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const images=await page.evaluate(()=>Array.from({length:3},(_,i)=>{const c=document.createElement('canvas');c.width=160;c.height=100;const x=c.getContext('2d');x.fillStyle=`rgb(${i*25},0,255)`;x.fillRect(0,0,160,100);return c.toDataURL().split(',')[1];}));
+ await page.addInitScript(()=>{localStorage.setItem('blue-controls-v3-stills',JSON.stringify({fps:4}));window.paints=[];const draw=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(...args){const result=draw.apply(this,args);if(this.canvas.id==='stage'&&window.blueStatus?.current&&!paints.some(p=>p.source===blueStatus.current))paints.push({source:blueStatus.current,at:performance.now()});return result;};});
+ let liveAllowed=false,searches=0;const requested=[];
+ await page.route('https://archive.org/advancedsearch.php?**',r=>{searches++;const cb=new URL(r.request().url()).searchParams.get('callback'),data={response:{numFound:1,docs:(liveAllowed?[0,1,2]:[0,1]).map(n=>({identifier:'new-live-'+n}))}};return r.fulfill(cb?{contentType:'text/javascript',body:cb+'('+JSON.stringify(data)+')'}:{headers:{'Access-Control-Allow-Origin':'*'},json:data});});
+ await page.route('https://archive.org/cors/**',async r=>{const id=decodeURIComponent(new URL(r.request().url()).pathname.split('/')[2]);requested.push(id);const index=Number(id.match(/^new-live-(\d)$/)?.[1]);assert.ok(Number.isFinite(index),'only images returned by fresh search may be downloaded');if(index===1)await new Promise(resolve=>setTimeout(resolve,800));await r.fulfill({headers:{'Access-Control-Allow-Origin':'*'},contentType:'image/png',body:Buffer.from(images[index],'base64')});});
+ await page.goto(new URL('../../blueness-image/index.html',import.meta.url).href,{waitUntil:'domcontentloaded'});
+ await page.waitForFunction(()=>blueStatus.shown===1);
+ assert.equal(await page.evaluate(()=>blueStatus.ready.image),0,'first image must appear without waiting for the second download');
+ const previews=await page.evaluate(()=>blueStatus.previewShown);
+ await page.waitForTimeout(100);
+ assert.equal(await page.evaluate(()=>blueStatus.previewShown),previews,'fast sequence ends on the first ready image');
+ await page.waitForFunction(()=>blueStatus.shown===2);
+ const first=await page.evaluate(()=>paints);
+ assert.ok(first[0].at<5000,'ready images must start without a mandatory five-second delay');
+ assert.equal(requested.length,2,'only the fresh search candidates load');
+ assert.equal(new Set(requested).size,2);
+ assert.ok(first.slice(0,2).every(p=>!ids.has(p.source.split('/').at(-1))));
+ assert.ok(first[1].at-first[0].at<=1050,'second catalog image changes within one second');
+ assert.ok(searches>0,'fresh search runs while catalog downloads');
+ liveAllowed=true;await page.waitForFunction(()=>blueStatus.current?.endsWith('/new-live-2'));
+ assert.equal(await page.locator('#blueness-intro').count(),0);
+ assert.ok(requested.every(id=>!ids.has(id)),'no catalog downloads before or after live starts');
+ assert.deepEqual(errors,[]);
+ console.log('PASS: fresh search only, no catalog downloads, first image ends intro immediately, SVG gone on second image');
+}finally{await browser.close();}

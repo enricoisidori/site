@@ -17,7 +17,7 @@ try{
  await page.route('https://archive.org/advancedsearch.php?**',route=>{
   const url=new URL(route.request().url());url.searchParams.set('q','mediatype:movies AND subject:blue AND NOT access-restricted-item:true');return route.continue({url:url.href});
  });
- await page.goto(new URL('../blueness/index.html',import.meta.url).href,{waitUntil:'domcontentloaded'});
+ await page.goto(new URL('../bluenessmovements/index.html',import.meta.url).href,{waitUntil:'domcontentloaded'});
  const started=Date.now();let report=0;
  while(Date.now()-started<seconds*1000){
   await page.waitForTimeout(1200);

@@ -5,7 +5,7 @@ const recorderPanels=new Map();
 export function recordingControlsHTML(name){return recorderPanels.get(name)?.controlsHTML()||'';}
 
 // No encoder, audio processing or animation loop exists until R is pressed.
-export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],suspendPlayback=()=>()=>{}}){
+export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],getScreenIntro=null,suspendPlayback=()=>()=>{}}){
  let phase='idle',clip=null,clips=[],pending=[],timer=null,hudTimer=null,started=0,serial=0;
  let surface,context,videoConfig,audioConfig,audioContext;const playbackTaps=new WeakMap();
  let stopPromise=null,cancelPromise=null,notice='',saved=0,selectPending=false,selectedCount=0,sessionId=0;
@@ -34,6 +34,7 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
   ${[['heightVH','altezza area · vh'],['widthVW','larghezza area · vw'],['centerX','centro x · vw'],['centerY','centro y · vh']].map(([key,label])=>`<label>${label} <input data-recording-crop="${key}" type="number" min="1" max="100" step="1" value="${Number(values[key].toFixed(2))}" style="${inputStyle}"></label>`).join('')}
   ${['width','height'].map(key=>`<label>output ${key==='width'?'larghezza':'altezza'} · px <input data-recording-dimension="${key}" type="number" min="128" max="4096" step="2" value="${dimensions[key]}" ${phase!=='idle'?'disabled':''} style="${inputStyle}"></label>`).join('')}
   <p><button type="button" data-recording-action="screens">screen MP4 · g</button></p>
+  ${getScreenIntro?'<p><button type="button" data-recording-action="intro">screen MP4 con intro · v</button></p>':''}
   <p>il riquadro mostra l’area registrata · pannelli, bordo e feedback esclusi<br>r avvia / salva · g screen MP4 · spazio pausa · q annulla · s seleziona · d deseleziona · x / → taglia</p></details>`;
  }
  function syncControls(){
@@ -53,7 +54,7 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
   if(['idle','recording'].includes(phase)&&input.dataset.recordingCrop){const key=input.dataset.recordingCrop,value=percent(input.value,50);if(key==='widthVW')crop.heightVH=percent(innerWidth*value/100/(dimensions.width/dimensions.height)/innerHeight*100,100);else if(key in crop)crop[key]=value;const r=frameRectangle();crop.centerX=(r.x+r.width/2)/innerWidth*100;crop.centerY=(r.y+r.height/2)/innerHeight*100;}
   try{localStorage.setItem(sizeKey,JSON.stringify({...dimensions,crop}));}catch{}syncControls();
  });
- document.addEventListener('click',event=>{const button=event.target.closest('[data-recording-action]');if(button?.closest('[data-recording]')?.dataset.recording!==name)return;void exportScreens();});
+ document.addEventListener('click',event=>{const button=event.target.closest('[data-recording-action]');if(button?.closest('[data-recording]')?.dataset.recording!==name)return;void exportScreens(button.dataset.recordingAction==='intro');});
  recorderPanels.set(name,{controlsHTML});
  const outline=document.createElement('div');outline.dataset.recordingFrame=name;outline.hidden=true;
  outline.style.cssText='position:fixed;z-index:2;pointer-events:none;box-sizing:border-box;border:1px solid white;outline:1px solid #0008';
@@ -227,7 +228,7 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
   status();
  }
  function cut(){if(phase!=='recording'||!clip?.selected||clip.cut)return;sample();clip.cut=true;finish(clip,true);disconnectInput();status();}
- async function exportScreens(){
+ async function exportScreens(withIntro=false){
   if(exportPromise)return exportPromise;
   exportPromise=(async()=>{
    if(phase==='recording')await stop();else if(phase==='saving'&&stopPromise)await stopPromise;if(phase!=='idle')return;
@@ -235,15 +236,16 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
    try{
     exportProgress('preparazione screen MP4…',{stage:'preparation'});
     const items=await getSnapshots();if(!items.length)throw Error('nessun video visto da esportare');
-    const blob=await renderScreenReel(items,{...dimensions,frame:frameRectangle(),signal,onProgress:exportProgress});
-    signal.throwIfAborted();saveRecordingFile(blob,name+'-screens.mp4');exportProgress('completato · download MP4 avviato',{stage:'complete',completed:exportState.total,progress:1});message('MP4 salvato');
+    const options={...dimensions,frame:frameRectangle(),signal,onProgress:exportProgress},intro=withIntro&&getScreenIntro?await getScreenIntro(options):null;
+    const blob=intro?await intro.render([...intro.items,...items],options):await renderScreenReel(items,options);
+    signal.throwIfAborted();saveRecordingFile(blob,name+(intro?'-intro':'-screens')+'.mp4');exportProgress('completato · download MP4 avviato',{stage:'complete',completed:exportState.total,progress:1});message('MP4 salvato');
    }catch(error){exportProgress(signal.aborted?'elaborazione annullata · nessun video creato':'errore · '+error.message,{stage:signal.aborted?'cancelled':'error'});}
    finally{clearInterval(exportTimer);exportTimer=null;renderAbort=null;phase='idle';syncControls();resume?.();setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);}
   })().finally(()=>{exportPromise=null;});return exportPromise;
  }
  document.addEventListener('keydown',event=>{
   if(event.repeat||event.metaKey||event.ctrlKey||event.altKey||event.target.closest?.('input:not([type="checkbox"]),textarea,select,[contenteditable="true"]'))return;
-  const key=event.key.toLowerCase();if(key==='g'){event.preventDefault();event.stopImmediatePropagation();void exportScreens();return;}if(key==='arrowright'&&phase==='recording'){cut();return;}if(key==='arrowright'&&phase==='starting'){selectPending=false;return;}if(key!=='r'&&!(phase!=='idle'&&['s','d','x','q'].includes(key)))return;
+  const key=event.key.toLowerCase();if(key==='g'||key==='v'&&getScreenIntro){event.preventDefault();event.stopImmediatePropagation();void exportScreens(key==='v');return;}if(key==='arrowright'&&phase==='recording'){cut();return;}if(key==='arrowright'&&phase==='starting'){selectPending=false;return;}if(key!=='r'&&!(phase!=='idle'&&['s','d','x','q'].includes(key)))return;
   event.preventDefault();event.stopImmediatePropagation();
   if(key==='r'){if(phase==='idle')void start();else if(phase==='recording')void stop();}else if(key==='s'){if(phase==='starting')selectPending=true;else select();}else if(key==='d')deselect();else if(key==='q')void cancel();else cut();
  },true);

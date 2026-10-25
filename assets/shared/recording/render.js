@@ -46,7 +46,7 @@ async function openSource(B,source,signal){
 export async function renderScreenReel(items,{width,height,frame,getImage,signal,frameSeconds=1/8,onProgress=()=>{}}){
  let job;
  try{
-  onProgress('caricamento motore MP4…',{stage:'preparation',total:items.length,completed:0,progress:null});const duration=Math.max(.1,Math.min(5,Number(frameSeconds)||1/8));job=await makeOutput(width,height,false,1/duration);let index=0;
+  onProgress('caricamento motore MP4…',{stage:'preparation',total:items.length,completed:0,progress:null});const duration=Math.max(1/60,Math.min(5,Number(frameSeconds)||1/8));job=await makeOutput(width,height,false,1/duration);let index=0;
   for(const item of items){checkCancelled(signal);let image;if(getImage)image=await getImage(item);else if(item.blob)image=await createImageBitmap(await item.blob);else if(item.preview)image=await createImageBitmap(await(await fetch(item.preview)).blob());else if(item.source){const opened=await openSource(job.B,item.source,signal);try{const sample=await new job.B.CanvasSink(opened.track).getCanvas(item.time||0);if(sample)image=await createImageBitmap(sample.canvas);}finally{opened.input.dispose();}}if(!image)throw Error('fotogramma della cronologia non disponibile');
    try{const layout=item.layout||{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:0,y:0,width:innerWidth,height:innerHeight}}]};renderRecordedLayout(job.ctx,image,{frame:item.frame||frame,layout},width,height);await job.video.add(index*duration,duration,{keyFrame:true});}
    finally{image.close?.();}index++;onProgress(`screen ${index} / ${items.length}`,{stage:'encoding',completed:index,total:items.length,progress:Math.min(.99,index/items.length)});

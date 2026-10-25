@@ -1,3 +1,9 @@
+# Nomi e percorsi correnti
+
+`blueness/index.html` è la versione video, prima in `bluenessmovements`. `blueness-image/index.html` è la versione fotografica, prima in `blueness`. Il vecchio percorso `bluenessmovements/index.html` resta un alias video. `node tools/build-blue.mjs movements` genera video e alias; `node tools/build-blue.mjs base` genera solo fotografie. `projects` include anche Wiki. I nomi dei cataloghi e le chiavi delle preferenze restano invariati.
+
+La logica desktop conserva coda6, preparazioni2–3 e tracking. C permette intervalli fra cambi video da0,1 a30secondi (default15); un cambio richiede un video pronto. V esporta gli stessi screen di G preceduti dall’intro vista, senza varianti A/L. SVG VIDEOS attivo; SVG IMAGES conservato commentato. Solo iPhone/iPad usano `tools/blueness-ios-video.js`: media inline/muted nel DOM, play prima di attendere loadeddata, codec ricontrollati anche sui candidati salvati, un caricamento per volta e coda2, preload dei video precedenti ridotto a metadata; cronologia conservata. Un pulsante permette di ritentare dal gesto se l’autoplay viene negato. Xcode/simulatore iOS non installati: i test automatici non sono una verifica su Safari iPhone reale.
+
 # Aggiornamento · 23 ottobre 2026
 
 Rimane la registrazione selettiva R con audio, dimensioni/ritaglio e comandi S/D/X/Q, e rimangono P (PDF), J (JPEG) e G (screen MP4). Rimossi E, la modalità solo istruzioni, le timeline dei movimenti, lettura/scrittura IndexedDB e import/export JSON della registrazione. Nessuna istruzione di ricostruzione viene raccolta. Le sezioni storiche su E sono solo cronologia e non descrivono più il comportamento attuale. Il rendering R evita ridisegni duplicati prima del prossimo fotogramma da codificare.
