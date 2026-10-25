@@ -207,7 +207,7 @@ test('a ready live video always wins; otherwise the list video goes in at once, 
 test('durations as before (15 s, end or lost blue), first video 3 s; skip from the second video everywhere, list first on iPhone until settled',()=>{
  assert.doesNotMatch(flow,/stillSample|prerolled|liveReady/);
  assert.match(flow,/if\(current&&!manual&&shown===1&&now-shownAt<3000\)return;/);
- assert.match(flow,/ if\(clicks<2\|\|shown<1\)return;/);assert.match(flow,/stopPropagation\(\);skipClick\(\);/);
+ assert.match(flow,/ if\(clicks<2&&!audioByKey\|\|shown<1\)return;/);assert.match(flow,/stopPropagation\(\);skipClick\(\);/);
  assert.match(flow,/const liveAllowed=kind!=='video'\|\|!iosVideo\|\|shown>=3&&performance\.now\(\)-startedAt>=30000;/);
 });
 test('iPhone settling phase: only list videos are prepared (up to the queue), no live search',()=>{
