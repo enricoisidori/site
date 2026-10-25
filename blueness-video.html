@@ -2974,7 +2974,7 @@ function renderInfo(){
   const label=kind==='video'?'video':'immagini',limit=kind==='video'?Math.max(VIDEO_QUEUE_LIMIT,pool.ready.length):IMAGE_QUEUE_LIMIT;
   const state=playbackPaused?'pausa · precaricamento attivo':pool.ready.length>=limit?'coda pronta':pool.fetching?'ricerca negli archivi':pool.loading?(stills?'download immagini in background':'caricamento e analisi del blu'):Date.now()<pool.next?'attesa della prossima ricerca':'ricerca attiva';
   return `${label} · ${state}\n${pool.ready.length} / ${limit} pronti · ${pool.loading} in preparazione · ${pool.urls.length} candidati\n${pool.checked} analisi · ${pool.accepted} match · ${pool.discarded} scartati${stills?'\ncaricamento '+Math.round(pool.loadMs/Math.max(1,pool.loaded))+' ms · blu '+(pool.analysisMs/Math.max(1,pool.checked)).toFixed(1)+' ms · '+pool.timeouts+' timeout · '+(pool.colorBatches||0)+' ricerche tag blu':''}${pool.lastError?'\nultimo errore: '+pool.lastError:''}`;
- }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r26':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
+ }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r27':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
  sourceLink.hidden=!current;
  if(!infoVisible)return;info.replaceChildren();const p=document.createElement('p');p.textContent=`${mode} · ${checked} analisi · ${accepted} match · ${shown} mostrati\n${Object.entries(pools).map(([k,v])=>k+': '+v.ready.length+' pronti').join(' · ')}\n${current?.match?Math.round(current.match.ratio*100)+'% nel range blu · zoom '+current.match.zoom.toFixed(2)+'× · area sorgente '+current.match.side+' px':'ricerca in corso'}${lastError?'\nultimo errore: '+lastError:''}`;info.append(p);
  if(current){const link=document.createElement('a');link.href=current.source;link.target='_blank';link.rel='noopener';link.textContent=clean(current.title)+' · '+current.author+' · '+current.license;info.append(link);}
@@ -3052,15 +3052,16 @@ addEventListener('keydown',event=>{
  if(key==='m'){muted=!muted;if(current?.kind==='video')current.media.muted=muted;recording.syncAudioMonitor();}
  if(key==='f')(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>{});
 });
-// Clicks: the first one only turns the sound on (iPhone: in its helper). During
-// the burst and the first video a click does nothing else; from the second
-// video on it advances, if a video is ready.
+// Clicks: the first one only turns the sound on (iPhone: in its helper).
 let clicks=0;addEventListener('click',()=>{clicks++;if(clicks===1&&!stills&&!iosVideo){muted=false;if(current?.kind==='video')current.media.muted=false;}},true);
-if(!baseStills)canvas.addEventListener('click',()=>{
+// The first click only turns the sound on; any later click skips (also the
+// first video, through the SVG), never during the burst.
+function skipClick(){
  if(mode!=='video'){advance(true);return;}
- if(clicks<2||shown<2)return;
+ if(clicks<2||shown<1)return;
  if(historyIndex<history.length-1||pools.video.ready.length)advance(true);
-});
+}
+if(!baseStills)canvas.addEventListener('click',skipClick);
 if(baseStills&&matchMedia('(pointer: coarse)').matches){const button=document.createElement('button');button.textContent='c';button.setAttribute('aria-label','controlli');button.style.cssText='position:fixed;right:12px;bottom:12px;z-index:25;padding:12px;font:inherit;color:white;text-shadow:0 1px 2px black;';button.onclick=()=>{controls.hidden=!controls.hidden;infoVisible=!controls.hidden;info.hidden=!infoVisible;renderInfo();};document.body.append(button);}
 addEventListener('visibilitychange',()=>{if(current?.kind==='video')document.hidden||playbackPaused?current.media.pause():(iosVideo?iosVideo.play(current.media):current.media.play()).catch(()=>{});pump();});
 Object.defineProperty(window,'blueStartupTiming',{get:()=>({...startupTiming})});
@@ -3068,8 +3069,8 @@ Object.defineProperty(window,'blueStatus',{get:()=>({phase:baseStills?(current?'
 if(introEnabled&&typeof BLUENESS_INTRO_SVG==='string'&&BLUENESS_INTRO_SVG){
  const intro=document.createElement('div');intro.id='blueness-intro';intro.style.cssText='position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:transparent;';intro.innerHTML=BLUENESS_INTRO_SVG;const svg=intro.querySelector('svg');if(svg){const direct=[...svg.children].filter(node=>node.tagName?.toLowerCase()==='path');if(!svg.querySelector('[data-intro-text]')&&direct.length>=3){const text=document.createElementNS(svg.namespaceURI,'g'),arrow=document.createElementNS(svg.namespaceURI,'g');text.dataset.introText='1';arrow.dataset.introArrow='1';svg.insertBefore(text,direct[0]);text.append(direct[0]);svg.insertBefore(arrow,direct[1]);arrow.append(direct[1],direct[2]);}svg.querySelector('rect:last-of-type')?.setAttribute('data-blue-anchor','1');svg.style.cssText='display:block;max-width:90vw;max-height:90dvh;width:100%;height:100%;';}document.body.append(intro);alignIntro();
  intro.liveSources=new Set();const dismiss=()=>{if(current?.match&&lastPaintKey)intro.remove();else intro.dataset.dismiss='1';};if(baseStills)intro.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();dismiss();},{once:true});
- // Video: a click on the SVG never removes it (it leaves with the second video).
- else intro.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();});
+ // Video: a click on the SVG skips like the canvas; the SVG itself leaves with the second video.
+ else intro.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();skipClick();});
 }
 seedCandidates();renderInfo();pump();startIntroSequence();setInterval(pump,800);requestAnimationFrame(frame);
 })();
