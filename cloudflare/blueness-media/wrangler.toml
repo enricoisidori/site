@@ -1,0 +1,10 @@
+# Deploy: cd cloudflare/blueness-media && npx wrangler deploy
+# Requires enricoisidori.com on Cloudflare DNS with the apex record proxied.
+name = "blueness-media"
+main = "../../tools/blueness-media-worker.mjs"
+compatibility_date = "2025-09-01"
+workers_dev = false
+routes = [
+  { pattern = "enricoisidori.com/__blueness_media/*", zone_name = "enricoisidori.com" },
+  { pattern = "www.enricoisidori.com/__blueness_media/*", zone_name = "enricoisidori.com" }
+]

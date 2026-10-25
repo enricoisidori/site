@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blueness · test iPhone</title>
+<style>
+body{margin:20px auto;padding:0 16px;max-width:640px;background:#111;color:white;font:16px/1.45 system-ui,sans-serif}h1{font-size:22px}button{font:inherit;padding:10px 14px;margin:0 8px 12px 0}video{display:block;width:100%;max-height:260px;background:black;margin:12px 0}pre,textarea{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.5 ui-monospace,monospace}textarea{box-sizing:border-box;width:100%;min-height:240px;background:#222;color:white;border:1px solid #777}a{color:#9bf}#status{white-space:pre-line}
+</style>
+<h1>Test video su questo iPhone</h1>
+<p>Prova il percorso corretto: video e lettura pixel attraverso lo stesso dominio. Puoi anche confrontarlo con i tre test originali. Ogni prova termina entro 12 secondi.</p>
+<button id="relay">Prova streaming corretto</button><button id="start">Confronta i tre test originali</button><button id="copy">Copia risultato</button>
+<p id="status">Pronto · diagnostica D2</p>
+<div id="player"></div>
+<pre id="summary"></pre>
+<details><summary>Dettagli tecnici</summary><textarea id="report" readonly aria-label="rapporto diagnostico"></textarea></details>
+<p><a href="./?v=ios8">Torna a Blueness</a></p>
+<script>
+(()=>{
+'use strict';
+const start=document.querySelector('#start'),relay=document.querySelector('#relay'),copy=document.querySelector('#copy'),status=document.querySelector('#status'),summary=document.querySelector('#summary'),report=document.querySelector('#report'),player=document.querySelector('#player');
+const cases=[
+ {name:'1 · MP4 locale + pixel',url:new URL('diagnostic.mp4',location.href).href,pixels:true},
+ {name:'2 · Commons + pixel',url:'https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e7/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm/DoD_News_Now%2C_1100_November_17%2C_2014_141117-A-AB123-005.webm.240p.vp9.webm',pixels:true},
+ {name:'3 · MP4 Archive nativo',url:'https://archive.org/download/CZzvtugj6N7XDxtei/Singing_the_National_Anthem_while_storming_Congress_.mp4',pixels:false}
+];
+const relayCases=cases.slice(1).map((spec,index)=>{const url=new URL('/__blueness_media/video',location.href);url.searchParams.set('url',spec.url);return {name:(index+1)+' · '+(index?'MP4 Archive':'Commons')+' stesso dominio + pixel',url:url.href,pixels:true,timeout:12000};});
+let active=null,running=false,rows=[],results=[];
+function log(text){rows.push(text);report.value=rows.join('\n');}
+function stop(){if(active){active.pause();active.removeAttribute('src');active.load();active.remove();active=null;}}
+function runCase(spec){
+ stop();const video=document.createElement('video');active=video;
+ video.muted=video.defaultMuted=true;video.playsInline=true;video.controls=true;video.preload='auto';video.setAttribute('playsinline','');video.setAttribute('muted','');if(spec.pixels)video.crossOrigin='anonymous';player.append(video);
+ const began=performance.now(),events=[],result={name:spec.name,readPixels:spec.pixels?'non eseguito':'non richiesto'};
+ return new Promise(resolve=>{
+  let done=false,firstTime=null,firstFrameAt=null,timer,interval;
+  const finish=(ok,reason)=>{if(done)return;done=true;clearTimeout(timer);clearInterval(interval);Object.assign(result,{ok,reason,ms:Math.round(performance.now()-began),time:video.currentTime,paused:video.paused,readyState:video.readyState,networkState:video.networkState,mediaError:video.error?{code:video.error.code,message:video.error.message}:null,events});log(JSON.stringify(result));stop();resolve(result);};
+  for(const name of ['loadstart','loadedmetadata','loadeddata','canplay','playing','pause','waiting','stalled','suspend','seeking','seeked','ended'])video.addEventListener(name,()=>events.push([name,Math.round(performance.now()-began),video.currentTime]));
+  video.addEventListener('error',()=>finish(false,'errore media '+video.error?.code+': '+video.error?.message));
+  timer=setTimeout(()=>finish(false,'timeout: il video non ha avanzato'),spec.timeout||7000);
+  interval=setInterval(()=>{
+   if(video.readyState<2)return;
+   if(firstTime===null){firstTime=video.currentTime;firstFrameAt=performance.now();
+    if(spec.pixels){try{const c=document.createElement('canvas');c.width=c.height=8;const context=c.getContext('2d');context.drawImage(video,0,0,8,8);context.getImageData(0,0,8,8);result.readPixels='OK';}catch(error){result.readPixels=error.name+': '+error.message;finish(false,'lettura pixel: '+result.readPixels);return;}}
+   }
+   if(video.currentTime-firstTime>=.3&&performance.now()-firstFrameAt>=350)finish(true,'riproduzione avanza');
+  },100);
+  video.src=spec.url;
+  // Synchronous play in the button handler for the first test; no fetch first.
+  try{Promise.resolve(video.play()).catch(error=>finish(false,'play(): '+error.name+': '+error.message));}catch(error){finish(false,'play(): '+error.name+': '+error.message);}
+ });
+}
+async function run(list,mode){
+ if(running)return;running=true;start.disabled=relay.disabled=true;rows=[];results=[];summary.textContent='';
+ log('Blueness diagnostic D2 · '+mode);log('pagina: '+location.origin+location.pathname);log('secureContext: '+isSecureContext);log('userAgent: '+navigator.userAgent);log('platform: '+navigator.platform+' · touch: '+navigator.maxTouchPoints);
+ const test=document.createElement('video');log('codec: '+JSON.stringify({h264:test.canPlayType('video/mp4; codecs="avc1.42E01E"'),vp9:test.canPlayType('video/webm; codecs="vp9, opus"')}));
+ try{for(const spec of list){status.textContent=spec.name+' · in corso…';const result=await runCase(spec);results.push(result);summary.textContent=results.map(r=>r.name+': '+(r.ok?'OK':'ERRORE')+' · '+r.reason).join('\n');}}
+ catch(error){log('errore diagnostica: '+error.name+': '+error.message);status.textContent='Errore diagnostica';}
+ finally{stop();running=false;start.disabled=relay.disabled=false;status.textContent='Diagnostica D2 terminata · premi “Copia risultato”';window.bluenessDiagnostic={version:'D2',mode,results};}
+}
+start.onclick=()=>run(cases,'originale');relay.onclick=()=>run(relayCases,'stesso dominio');
+copy.onclick=async()=>{try{await navigator.clipboard.writeText(report.value||'Nessun test eseguito');copy.textContent='Copiato';}catch{document.querySelector('details').open=true;report.focus();report.select();copy.textContent='Tieni premuto sul testo e copia';}};
+addEventListener('pagehide',stop);
+})();
+</script>
+</html>
