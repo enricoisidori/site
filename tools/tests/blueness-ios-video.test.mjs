@@ -135,7 +135,7 @@ test('only iOS cold video discovery uses blue metadata; live and desktop stay ge
  const context=vm.createContext({iosVideo:{},current:null});vm.runInContext(code,context);assert.equal(context.colorFallback('commons:video','video'),true);context.current={};assert.equal(context.colorFallback('commons:video','video'),false);context.current=null;context.iosVideo=null;assert.equal(context.colorFallback('commons:video','video'),false);
 });
 test('the Commons iOS route retains the local intro while real media prepares',async()=>{
- const context=vm.createContext({introEnabled:true,iosVideo:{},sources:'commons',BLUENESS_STARTUP:{frames:[{}],image:'fixture'},current:null,Image:class{async decode(){context.decoded=true;}},introFrame:null,introEnded:false,playbackPaused:true,document:{hidden:false},performance:{now:()=>6000},introEndsAt:5000,ctx:{fillRect(){}},canvas:{width:390,height:844}});
+ const context=vm.createContext({introEnabled:true,iosVideo:{},sources:'commons',BLUENESS_STARTUP:{frames:[{}],image:'fixture'},current:null,Image:class{async decode(){context.decoded=true;}},introFrame:null,introEnded:false,playbackPaused:true,document:{hidden:false},performance:{now:()=>6000},introEndsAt:5000,ctx:{fillRect(){}},canvas:{width:390,height:844},mode:'video',setTimeout(){}});
  vm.runInContext(flow.slice(flow.indexOf('async function startIntroSequence(){'),flow.indexOf('function pump(){')),context);await context.startIntroSequence();assert.equal(context.decoded,true,'switching source must not remove the intro');
 });
 test('videos already shown release their stream on iOS and reattach when navigating back',()=>{

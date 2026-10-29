@@ -2542,7 +2542,9 @@ const imageGeographyWords=['usa','"united states"','"u.s."','"u.s.a."','"US"'];
 const archiveImageExclusions=' AND NOT ('+imageExcludedWords.join(' OR ')+' OR '+imageGeographyWords.flatMap(term=>['title','subject','creator'].map(field=>field+':'+term)).join(' OR ')+' OR identifier:usgov*)'+(baseStills?' AND NOT subject:"January 6 Capitol Attack"':'');
 const commonsImageExclusions=imageExcludedWords.map(word=>'-'+word).concat(imageGeographyWords.map(word=>'-intitle:'+word),['-incategory:"Politics of the United States"','-incategory:"United States"']).join(' ');
 const totals=new Map(),searchTurns=new Map();
-const VIDEO_QUEUE_LIMIT=iosVideo?2:6,IMAGE_QUEUE_LIMIT=stills?12:36,introEndsAt=performance.now()+4000,startedAt=performance.now(),burstMinAt=performance.now()+1000;let playbackPaused=false,pausedAt=0;
+const VIDEO_QUEUE_LIMIT=iosVideo?2:6,IMAGE_QUEUE_LIMIT=stills?12:36,introEndsAt=performance.now()+4000,startedAt=performance.now();
+// The burst lasts at least 1 s from its first visible frame (fallback if it never paints).
+let burstMinAt=performance.now()+1500,playbackPaused=false,pausedAt=0;
 let revision=0,current=null,history=[],historyIndex=-1,shownAt=0,lastDetect=0,lostAt=0,lastError='',checked=0,accepted=0,shown=0,infoVisible=false,squareWindow=null,muted=true,lastInfo=0,lastPaintKey='',reviewing=false,mixedNeedsImage=false;
 const startupTiming={searchAt:null,resultsAt:null,loadedAt:null,readyAt:null,paintedAt:null};
 // Launch discovery even before reading the accumulated playback history.
@@ -2896,9 +2898,13 @@ async function startIntroSequence(){
   if(current){image.src='';return;}
   if(!playbackPaused&&!document.hidden&&document.getElementById('blueness-intro')){
    const item=frames[index];introSequence.push({item,at:performance.now(),scene:{width:canvas.width,height:canvas.height,size:settings.size,screens:screens()}});introFrame={image,item};paintIntroFrame(image,item);previewShown++;
+   // First visible frame: the burst runs at least 1 s from here, and the frame
+   // on enricoisidori.com can drop its own copy of the SVG.
+   if(previewShown===1){burstMinAt=performance.now()+1000;try{if(window.parent!==window)parent.postMessage('blueness:ready','*');}catch{}}
    if(++index===frames.length){index=0;const last=item;for(let i=frames.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[frames[i],frames[j]]=[frames[j],frames[i]];}if(frames.length>1&&frames[0]===last)[frames[0],frames[1]]=[frames[1],frames[0]];}
   }
-  if(performance.now()<introEndsAt)setTimeout(draw,50);
+  // Video: never black, the burst keeps cycling until the first video is shown.
+  if(!current&&(mode==='video'||performance.now()<introEndsAt))setTimeout(draw,50);
   else if(!current&&!introEnded){introEnded=true;introFrame=null;ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);}
  };draw();
 }
@@ -2974,7 +2980,7 @@ function renderInfo(){
   const label=kind==='video'?'video':'immagini',limit=kind==='video'?Math.max(VIDEO_QUEUE_LIMIT,pool.ready.length):IMAGE_QUEUE_LIMIT;
   const state=playbackPaused?'pausa · precaricamento attivo':pool.ready.length>=limit?'coda pronta':pool.fetching?'ricerca negli archivi':pool.loading?(stills?'download immagini in background':'caricamento e analisi del blu'):Date.now()<pool.next?'attesa della prossima ricerca':'ricerca attiva';
   return `${label} · ${state}\n${pool.ready.length} / ${limit} pronti · ${pool.loading} in preparazione · ${pool.urls.length} candidati\n${pool.checked} analisi · ${pool.accepted} match · ${pool.discarded} scartati${stills?'\ncaricamento '+Math.round(pool.loadMs/Math.max(1,pool.loaded))+' ms · blu '+(pool.analysisMs/Math.max(1,pool.checked)).toFixed(1)+' ms · '+pool.timeouts+' timeout · '+(pool.colorBatches||0)+' ricerche tag blu':''}${pool.lastError?'\nultimo errore: '+pool.lastError:''}`;
- }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r28':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
+ }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r29':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
  sourceLink.hidden=!current;
  if(!infoVisible)return;info.replaceChildren();const p=document.createElement('p');p.textContent=`${mode} · ${checked} analisi · ${accepted} match · ${shown} mostrati\n${Object.entries(pools).map(([k,v])=>k+': '+v.ready.length+' pronti').join(' · ')}\n${current?.match?Math.round(current.match.ratio*100)+'% nel range blu · zoom '+current.match.zoom.toFixed(2)+'× · area sorgente '+current.match.side+' px':'ricerca in corso'}${lastError?'\nultimo errore: '+lastError:''}`;info.append(p);
  if(current){const link=document.createElement('a');link.href=current.source;link.target='_blank';link.rel='noopener';link.textContent=clean(current.title)+' · '+current.author+' · '+current.license;info.append(link);}
