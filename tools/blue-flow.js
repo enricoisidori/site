@@ -77,7 +77,7 @@ function seedCandidates(limit=20,priority=false){
  // The pre-verified list is a standby, not the queue: live search always runs
  // and a ready live video always wins (see pump/advance).
  let added=0;if(stills)return;const shuffled=[...blueCatalog.values()];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}for(const item of shuffled){const pool=pools[item.kind];if(!pool||played.has(mediaKey(item))||pool.seen.has(item.source)||(sources!=='both'&&item.provider!==sources))continue;pool.seen.add(item.source);pool.list.push({...item,fromList:true});}}
-const recording=createSelectiveRecorder({name:'bluenessmovements',getScreenIntro:!stills&&introEnabled?async({signal,frame})=>({items:await buildBluenessIntroRecords({startup:BLUENESS_STARTUP,svg:BLUENESS_INTRO_SVG,sequence:introSequence.slice(),endAt:firstLiveAt||performance.now(),scene:{width:canvas.width,height:canvas.height,size:settings.size,screens:screens()}},{signal}),render:(items,options)=>renderBluenessIntroReel(items.map(item=>({...item,frame:item.frame||frame})),{...options,frameSeconds:1/8,svgText:BLUENESS_INTRO_SVG})}):null,suspendPlayback:()=>{const was=playbackPaused;if(!was)togglePlaybackPause();return()=>{if(!was&&playbackPaused)togglePlaybackPause();};},getSnapshots:async()=>route.slice().map(r=>{const dualView=settings.dual,w=dualView?r.w:r.singleW,h=dualView?r.h:r.singleH,scale=Math.min(innerWidth/w,innerHeight/h);return {blob:dualView?r.scene:r.single,layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(innerWidth-w*scale)/2,y:(innerHeight-h*scale)/2,width:w*scale,height:h*scale}}]}};}),getScene:()=>{
+const recording=createSelectiveRecorder({name:'bluenessmovements',getScreenIntro:!stills&&introEnabled?async({signal,frame})=>({items:await buildBluenessIntroRecords({startup:BLUENESS_STARTUP,svg:BLUENESS_INTRO_SVG,sequence:introSequence.slice(),endAt:firstLiveAt||performance.now(),scene:{width:canvas.width,height:canvas.height,size:settings.size,screens:screens()}},{signal}),render:(items,options)=>renderBluenessIntroReel(items.map(item=>({...item,frame:item.frame||frame})),{...options,frameSeconds:1/8,svgText:BLUENESS_INTRO_SVG})}):null,suspendPlayback:()=>{const was=playbackPaused;if(!was)togglePlaybackPause();return()=>{if(!was&&playbackPaused)togglePlaybackPause();};},getSnapshots:async(liveOnly=false)=>route.filter(r=>!liveOnly||!r.fromList).map(r=>{const dualView=settings.dual,w=dualView?r.w:r.singleW,h=dualView?r.h:r.singleH,scale=Math.min(innerWidth/w,innerHeight/h);return {blob:dualView?r.scene:r.single,layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(innerWidth-w*scale)/2,y:(innerHeight-h*scale)/2,width:w*scale,height:h*scale}}]}};}),getScene:()=>{
  if(!current||current.kind!=='video'||!current.match)return null;
  return {key:shown,video:current.media,muted,paused:playbackPaused||document.hidden||current.media.paused||current.media.readyState<3,draw:(target,w,h,options)=>{
   // options.border===false: the borderless copy recorded with R+C.
@@ -135,38 +135,10 @@ function captureRoute(entry){
  drawScreen(singleContext,{x:0,y:0,w:canvas.width,h:canvas.height},false,entry,false,true);
  singleContext.lineWidth=1;singleContext.strokeStyle='#fff';singleContext.strokeRect(Math.round(canvas.width/2-settings.size/2)+.5,Math.round(canvas.height/2-settings.size/2)+.5,Math.round(settings.size),Math.round(settings.size));
  const record={source:entry.source,w:scene.width,h:scene.height,scene:jpeg(scene,.65),singleW:single.width,singleH:single.height,single:jpeg(single,.65),tile:jpeg(tile,.8),
-  // For N: what is needed to redraw this exact frame from a better copy of the video.
-  fromList:!!entry.fromList,time:entry.media.currentTime,match:{...entry.match},url:entry.remoteURL||entry.url,videoVariants:entry.videoVariants,hideIntroBorder:!!entry.hideIntroBorder};
+  // N exports only live videos.
+  fromList:!!entry.fromList};
  // One small compressed snapshot per video; PDF assembly and mosaic wait for P/click.
  record.single.catch(()=>{});record.scene.catch(()=>{});record.tile.catch(()=>{});route.push(record);
-}
-// N: like V (intro + one frame per video), live videos only, each frame redrawn
-// from the best copy of the same video (≤1080p on Commons, the original on
-// Archive) at the same time and framing, at the export's full resolution.
-// Falls back to the normal capture if the better copy cannot be read.
-function bestVideoURL(record){
- const test=document.createElement('video'),best=(record.videoVariants||[]).filter(v=>v.src&&Number(v.height)<=1080&&test.canPlayType(v.type||'video/webm')).sort((a,b)=>Number(b.height)-Number(a.height))[0];
- return best?.src||record.url;
-}
-async function highQualityFrame(record,scale){
- const video=document.createElement('video');video.crossOrigin='anonymous';video.muted=true;video.preload='auto';
- try{
-  video.src=bestVideoURL(record);await waitEvent(video,'loadeddata',20000);
-  if(Math.abs(video.currentTime-record.time)>.02){const seeked=waitEvent(video,'seeked',20000);video.currentTime=record.time;await seeked;}
-  const out=document.createElement('canvas');out.width=Math.round(canvas.width*scale);out.height=Math.round(canvas.height*scale);
-  const c=out.getContext('2d');c.fillStyle='#000';c.fillRect(0,0,out.width,out.height);c.scale(scale,scale);
-  drawScreen(c,{x:0,y:0,w:canvas.width,h:canvas.height},false,{kind:'video',media:video,match:record.match,firstFrameReady:true},false);
-  if(!record.hideIntroBorder){c.lineWidth=1;c.strokeStyle='#fff';c.strokeRect(Math.round(canvas.width/2-settings.size/2)+.5,Math.round(canvas.height/2-settings.size/2)+.5,Math.round(settings.size),Math.round(settings.size));}
-  return await createImageBitmap(out);
- }finally{video.removeAttribute('src');video.load();}
-}
-function highQualitySnapshots(){
- const {width}=recording.status,frame=recording.status.frame,scale=Math.max(1,width/Math.max(1,frame.width));
- return route.filter(r=>!r.fromList).map(r=>({
-  // Lazy: each frame is fetched while the reel is rendered, with its progress.
-  blob:{then:(resolve,reject)=>highQualityFrame(r,scale).then(resolve,()=>r.single.then(blob=>createImageBitmap(blob)).then(resolve,reject))},
-  layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:0,y:0,width:innerWidth,height:innerHeight}}]}
- }));
 }
 async function exportRoute(){
  if(exportingPDF)return;if(!route.length){exportButton.textContent='nessun video da esportare';return;}
@@ -507,7 +479,7 @@ function renderInfo(){
   const label=kind==='video'?'video':'immagini',limit=kind==='video'?Math.max(videoQueueLimit(),pool.ready.length):IMAGE_QUEUE_LIMIT;
   const state=playbackPaused?'pausa · precaricamento attivo':pool.ready.length>=limit?'coda pronta':pool.fetching?'ricerca negli archivi':pool.loading?(stills?'download immagini in background':'caricamento e analisi del blu'):Date.now()<pool.next?'attesa della prossima ricerca':'ricerca attiva';
   return `${label} · ${state}\n${pool.ready.length} / ${limit} pronti · ${pool.loading} in preparazione · ${pool.urls.length} candidati\n${pool.checked} analisi · ${pool.accepted} match · ${pool.discarded} scartati${stills?'\ncaricamento '+Math.round(pool.loadMs/Math.max(1,pool.loaded))+' ms · blu '+(pool.analysisMs/Math.max(1,pool.checked)).toFixed(1)+' ms · '+pool.timeouts+' timeout · '+(pool.colorBatches||0)+' ricerche tag blu':''}${pool.lastError?'\nultimo errore: '+pool.lastError:''}`;
- }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r31':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
+ }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r32':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
  sourceLink.hidden=!current;
  if(!infoVisible)return;info.replaceChildren();const p=document.createElement('p');p.textContent=`${mode} · ${checked} analisi · ${accepted} match · ${shown} mostrati\n${Object.entries(pools).map(([k,v])=>k+': '+v.ready.length+' pronti').join(' · ')}\n${current?.match?Math.round(current.match.ratio*100)+'% nel range blu · zoom '+current.match.zoom.toFixed(2)+'× · area sorgente '+current.match.side+' px':'ricerca in corso'}${lastError?'\nultimo errore: '+lastError:''}`;info.append(p);
  if(current){const link=document.createElement('a');link.href=current.source;link.target='_blank';link.rel='noopener';link.textContent=clean(current.title)+' · '+current.author+' · '+current.license;info.append(link);}
@@ -581,8 +553,8 @@ addEventListener('keydown',event=>{
  const key=event.key.toLowerCase();if(['c','i','f','m','p','j','arrowright','arrowleft'].includes(key))event.preventDefault();
  if(key==='c'||key==='i'){controls.hidden=!controls.hidden;infoVisible=!controls.hidden;info.hidden=!infoVisible;renderInfo();}
  if(!stills){if(key==='p')exportRoute();if(key==='j')exportJPEG();}
- // N: intro + live videos only, frames redrawn in high quality (see highQualitySnapshots).
- if(!stills&&key==='n'&&!event.repeat&&!event.target.closest?.('input,textarea,select')){event.preventDefault();void recording.exportScreens(true,highQualitySnapshots,'-intro-hq-live');}
+ // N: like V (intro + one frame per video), live videos only.
+ if(!stills&&key==='n'&&!event.repeat&&!event.target.closest?.('input,textarea,select')){event.preventDefault();void recording.exportScreens(true,()=>recording.snapshots(true),'-intro-live');}
  if(key==='arrowright')advance(true);if(key==='arrowleft')back();
  if(key==='m'){muted=!muted;if(!muted)audioByKey=true;if(current?.kind==='video')current.media.muted=muted;recording.syncAudioMonitor();}
  if(key==='f')(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>{});

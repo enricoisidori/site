@@ -267,5 +267,5 @@ saved=selected.length;exportProgress('completato · download MP4 avviato',{stage
   event.preventDefault();event.stopImmediatePropagation();
   if(key==='r'){if(phase==='idle')void start(cHeld);else if(phase==='recording')void stop();}else if(key==='s'){if(phase==='starting')selectPending=true;else select();}else if(key==='d')deselect();else if(key==='q')void cancel();else cut();
  },true);
- return {start,stop,cancel,exportScreens,select,deselect,cut,sample,controlsHTML,syncAudioMonitor,releaseMedia,get status(){return {phase,selected:selectedCount,width:dimensions.width,height:dimensions.height,frame:frameRectangle(),cut:!!clip?.cut,frames:clip?.frameCount||0,audioFrames:clip?.audioFrames||0,queued:clip?.ve?.encodeQueueSize||0,saved,notice,export:{...exportState}};}};
+ return {snapshots:getSnapshots,start,stop,cancel,exportScreens,select,deselect,cut,sample,controlsHTML,syncAudioMonitor,releaseMedia,get status(){return {phase,selected:selectedCount,width:dimensions.width,height:dimensions.height,frame:frameRectangle(),cut:!!clip?.cut,frames:clip?.frameCount||0,audioFrames:clip?.audioFrames||0,queued:clip?.ve?.encodeQueueSize||0,saved,notice,export:{...exportState}};}};
 }
