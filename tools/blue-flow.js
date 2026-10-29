@@ -35,9 +35,10 @@ const commonsImageExclusions=imageExcludedWords.map(word=>'-'+word).concat(image
 const totals=new Map(),searchTurns=new Map();
 const VIDEO_QUEUE_LIMIT=iosVideo?2:6,
 // Desktop in pause: a long queue (25) is prepared, then only played on resume.
-videoQueueLimit=()=>!iosVideo&&playbackPaused?25:VIDEO_QUEUE_LIMIT,IMAGE_QUEUE_LIMIT=stills?12:36,introEndsAt=performance.now()+4000,startedAt=performance.now();
+// After resuming, the queue reached in pause becomes the new cap.
+videoQueueLimit=()=>iosVideo?VIDEO_QUEUE_LIMIT:playbackPaused?25:Math.max(VIDEO_QUEUE_LIMIT,raisedQueueLimit),IMAGE_QUEUE_LIMIT=stills?12:36,introEndsAt=performance.now()+4000,startedAt=performance.now();
 // The burst lasts at least 1 s from its first visible frame (fallback if it never paints).
-let burstMinAt=performance.now()+1500,playbackPaused=false,pausedAt=0;
+let raisedQueueLimit=0,burstMinAt=performance.now()+1500,playbackPaused=false,pausedAt=0;
 let revision=0,current=null,history=[],historyIndex=-1,shownAt=0,lastDetect=0,lostAt=0,lastError='',checked=0,accepted=0,shown=0,infoVisible=false,squareWindow=null,muted=true,lastInfo=0,lastPaintKey='',reviewing=false,mixedNeedsImage=false;
 const startupTiming={searchAt:null,resultsAt:null,loadedAt:null,readyAt:null,paintedAt:null};
 // Launch discovery even before reading the accumulated playback history.
@@ -78,8 +79,9 @@ function seedCandidates(limit=20,priority=false){
  let added=0;if(stills)return;const shuffled=[...blueCatalog.values()];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}for(const item of shuffled){const pool=pools[item.kind];if(!pool||played.has(mediaKey(item))||pool.seen.has(item.source)||(sources!=='both'&&item.provider!==sources))continue;pool.seen.add(item.source);pool.list.push({...item,fromList:true});}}
 const recording=createSelectiveRecorder({name:'bluenessmovements',getScreenIntro:!stills&&introEnabled?async({signal,frame})=>({items:await buildBluenessIntroRecords({startup:BLUENESS_STARTUP,svg:BLUENESS_INTRO_SVG,sequence:introSequence.slice(),endAt:firstLiveAt||performance.now(),scene:{width:canvas.width,height:canvas.height,size:settings.size,screens:screens()}},{signal}),render:(items,options)=>renderBluenessIntroReel(items.map(item=>({...item,frame:item.frame||frame})),{...options,frameSeconds:1/8,svgText:BLUENESS_INTRO_SVG})}):null,suspendPlayback:()=>{const was=playbackPaused;if(!was)togglePlaybackPause();return()=>{if(!was&&playbackPaused)togglePlaybackPause();};},getSnapshots:async()=>route.slice().map(r=>{const dualView=settings.dual,w=dualView?r.w:r.singleW,h=dualView?r.h:r.singleH,scale=Math.min(innerWidth/w,innerHeight/h);return {blob:dualView?r.scene:r.single,layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(innerWidth-w*scale)/2,y:(innerHeight-h*scale)/2,width:w*scale,height:h*scale}}]}};}),getScene:()=>{
  if(!current||current.kind!=='video'||!current.match)return null;
- return {key:shown,video:current.media,muted,paused:playbackPaused||document.hidden||current.media.paused||current.media.readyState<3,draw:(target,w,h)=>{
-  target.fillStyle='#000';target.fillRect(0,0,w,h);for(const screen of screens())drawScreen(target,screen,screen.square);
+ return {key:shown,video:current.media,muted,paused:playbackPaused||document.hidden||current.media.paused||current.media.readyState<3,draw:(target,w,h,options)=>{
+  // options.border===false: the borderless copy recorded with R+C.
+  target.fillStyle='#000';target.fillRect(0,0,w,h);for(const screen of screens())drawScreen(target,screen,screen.square,current,options?.border!==false);
  }};
 }});
 
@@ -438,6 +440,7 @@ function pump(){
   const liveAllowed=kind!=='video'||!iosVideo||shown>=3&&performance.now()-startedAt>=30000;
   // Live discovery otherwise runs from the start; the list never holds it back.
   if(liveAllowed&&pool.urls.length<(kind==='video'?8:45)&&!(stills&&!baseStills&&pool.accepted===0&&(pool.loading>0||pool.urls.some(item=>item.verified))))fetchBatch(kind);
+  if(kind==='video'&&playbackPaused&&!iosVideo)raisedQueueLimit=Math.max(raisedQueueLimit,pool.ready.length);
   // Desktop in pause: nothing plays, so more videos are prepared at once.
   const concurrency=kind==='video'?(iosVideo?1:playbackPaused?6:pool.ready.length<2?3:2):8,limit=kind==='video'?videoQueueLimit():IMAGE_QUEUE_LIMIT;
   // iPhone: after repeated load failures (e.g. HTTP 429 from Wikimedia) wait
@@ -504,7 +507,7 @@ function renderInfo(){
   const label=kind==='video'?'video':'immagini',limit=kind==='video'?Math.max(videoQueueLimit(),pool.ready.length):IMAGE_QUEUE_LIMIT;
   const state=playbackPaused?'pausa · precaricamento attivo':pool.ready.length>=limit?'coda pronta':pool.fetching?'ricerca negli archivi':pool.loading?(stills?'download immagini in background':'caricamento e analisi del blu'):Date.now()<pool.next?'attesa della prossima ricerca':'ricerca attiva';
   return `${label} · ${state}\n${pool.ready.length} / ${limit} pronti · ${pool.loading} in preparazione · ${pool.urls.length} candidati\n${pool.checked} analisi · ${pool.accepted} match · ${pool.discarded} scartati${stills?'\ncaricamento '+Math.round(pool.loadMs/Math.max(1,pool.loaded))+' ms · blu '+(pool.analysisMs/Math.max(1,pool.checked)).toFixed(1)+' ms · '+pool.timeouts+' timeout · '+(pool.colorBatches||0)+' ricerche tag blu':''}${pool.lastError?'\nultimo errore: '+pool.lastError:''}`;
- }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r30':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
+ }).join('\n\n');const mobile=iosVideo?.status,summary=status+(current?.kind==='video'?'\nvideo corrente: '+(current.fromList?'dalla lista':'live'):'')+(iosVideo?'\n\niOS relay · 25/10-r31':'')+(mobile?'\n'+mobile.renderer+' · '+(mobile.paused?'video in pausa':'video in riproduzione')+' · '+mobile.time.toFixed(2)+' s\nreadyState '+mobile.readyState+' · rete '+mobile.networkState+' · ultimo avanzamento '+mobile.stalledMs+' ms'+(mobile.waitingForTap?' · serve un tocco':'')+(mobile.error?'\n'+mobile.error:''):'');if(searchStatus.textContent!==summary)searchStatus.textContent=summary;
  sourceLink.hidden=!current;
  if(!infoVisible)return;info.replaceChildren();const p=document.createElement('p');p.textContent=`${mode} · ${checked} analisi · ${accepted} match · ${shown} mostrati\n${Object.entries(pools).map(([k,v])=>k+': '+v.ready.length+' pronti').join(' · ')}\n${current?.match?Math.round(current.match.ratio*100)+'% nel range blu · zoom '+current.match.zoom.toFixed(2)+'× · area sorgente '+current.match.side+' px':'ricerca in corso'}${lastError?'\nultimo errore: '+lastError:''}`;info.append(p);
  if(current){const link=document.createElement('a');link.href=current.source;link.target='_blank';link.rel='noopener';link.textContent=clean(current.title)+' · '+current.author+' · '+current.license;info.append(link);}

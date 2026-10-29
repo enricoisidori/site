@@ -7,7 +7,9 @@ export function recordingControlsHTML(name){return recorderPanels.get(name)?.con
 // No encoder, audio processing or animation loop exists until R is pressed.
 export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],getScreenIntro=null,suspendPlayback=()=>()=>{}}){
  let phase='idle',clip=null,clips=[],pending=[],timer=null,hudTimer=null,started=0,serial=0;
- let surface,context,videoConfig,audioConfig,audioContext;const playbackTaps=new WeakMap();
+ let surface,context,videoConfig,audioConfig,audioContext;
+ // R pressed while C is held: a second, borderless video is encoded alongside.
+ let plain=false,plainSurface,plainContext,cHeld=false;const playbackTaps=new WeakMap();
  let stopPromise=null,cancelPromise=null,notice='',saved=0,selectPending=false,selectedCount=0,sessionId=0;
  let renderAbort=null,exportPromise=null,exportTimer=null;
  let exportState={stage:'idle',kind:'',message:'nessuna esportazione in corso',progress:null,completed:0,total:0,startedAt:null};
@@ -133,6 +135,7 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
   const c={session:sessionId,key:scene.key,order:serial++,started:performance.now(),selected:selectPending,cut:false,ended:false,video:[],audio:[],audioFrames:0,last:0,frameCount:0};clip=c;if(c.selected)selectedCount++;selectPending=false;
 
   c.ve=new VideoEncoder({output:(chunk,meta)=>c.video.push({chunk,meta}),error});c.ve.configure(videoConfig);
+  if(plain){c.plainVideo=[];c.pe=new VideoEncoder({output:(chunk,meta)=>c.plainVideo.push({chunk,meta}),error});c.pe.configure(videoConfig);}
   if(audioConfig){c.ae=new AudioEncoder({output:(chunk,meta)=>c.audio.push({chunk,meta}),error});c.ae.configure(audioConfig);}
   connectInput(scene,c);return c;
  }
@@ -141,12 +144,12 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
   c.duration=Math.max(c.last+40000,Math.ceil(((c.pauseStarted||performance.now())-c.started)*1000/20000)*20000);
   const job=(async()=>{
    try{
-    await c.ve.flush();if(c.session!==sessionId)c.selected=false;
-    if(c.preview&&c.selected){for(const timestamp of [c.duration-40000,c.duration-20000])if(timestamp>c.last){const frame=new VideoFrame(c.preview,{timestamp,duration:20000});c.ve.encode(frame,{keyFrame:true});frame.close();c.last=timestamp;}await c.ve.flush();}
+    await c.ve.flush();await c.pe?.flush();if(c.session!==sessionId)c.selected=false;
+    if(c.preview&&c.selected){const last=c.last;for(const timestamp of [c.duration-40000,c.duration-20000])if(timestamp>last){const frame=new VideoFrame(c.preview,{timestamp,duration:20000});c.ve.encode(frame,{keyFrame:true});frame.close();if(c.pe&&c.plainPreview){const p=new VideoFrame(c.plainPreview,{timestamp,duration:20000});c.pe.encode(p,{keyFrame:true});p.close();}c.last=timestamp;}await c.ve.flush();await c.pe?.flush();}
     if(c.ae&&c.selected)while(c.audioFrames/48000*1e6<c.duration){const frames=Math.min(1024,Math.ceil((c.duration/1e6-c.audioFrames/48000)*48000));if(frames<=0)break;encodeAudio(c,new Float32Array(frames*2),frames);}
     await c.ae?.flush();
-    if(c.selected&&c.video.length)clips.push(c);else{c.video.length=0;c.audio.length=0;}}
-   finally{c.preview?.close();c.preview=null;if(c.ve.state!=='closed')c.ve.close();if(c.ae&&c.ae.state!=='closed')c.ae.close();}
+    if(c.selected&&c.video.length)clips.push(c);else{c.video.length=0;c.audio.length=0;if(c.plainVideo)c.plainVideo.length=0;}}
+   finally{c.preview?.close();c.preview=null;c.plainPreview?.close();c.plainPreview=null;if(c.ve.state!=='closed')c.ve.close();if(c.pe&&c.pe.state!=='closed')c.pe.close();if(c.ae&&c.ae.state!=='closed')c.ae.close();}
   })();pending.push(job);job.catch(error);
  }
  function sample(){
@@ -159,18 +162,21 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
    if(scene.paused){c.pauseStarted??=performance.now();return;}
    if(c.pauseStarted){c.started+=performance.now()-c.pauseStarted;c.pauseStarted=null;c.forceKeyFrame=true;}
    if(c.ae&&!c.audioRunning){const gap=Math.floor((performance.now()-c.started)*48)-c.audioFrames;if(gap>=1024)encodeAudio(c,new Float32Array(2048),1024);}
-   if(c.ve.encodeQueueSize>48)return;
+   if(c.ve.encodeQueueSize>48||c.pe&&c.pe.encodeQueueSize>48)return;
    if(c.ve.encodeQueueSize>12&&!c.draining){c.draining=true;c.ve.flush().then(()=>{c.draining=false;}).catch(error);c.forceKeyFrame=true;}
    const timestamp=c.frameCount?Math.round((performance.now()-c.started)*1000):0;
    if(c.frameCount&&timestamp-c.last<35000)return;
    const area=frameRectangle();context.save();
    try{context.fillStyle='#000';context.fillRect(0,0,surface.width,surface.height);context.scale(surface.width/area.width,surface.height/area.height);context.translate(-area.x,-area.y);scene.draw(context,innerWidth,innerHeight);}finally{context.restore();}
+   const keyFrame=c.forceKeyFrame||c.frameCount%25===0;
+   if(c.pe){plainContext.save();try{plainContext.fillStyle='#000';plainContext.fillRect(0,0,plainSurface.width,plainSurface.height);plainContext.scale(plainSurface.width/area.width,plainSurface.height/area.height);plainContext.translate(-area.x,-area.y);scene.draw(plainContext,innerWidth,innerHeight,{border:false});}finally{plainContext.restore();}
+    const p=new VideoFrame(plainSurface,{timestamp,duration:40000});try{c.pe.encode(p,{keyFrame});c.plainPreview?.close();c.plainPreview=p.clone();}finally{p.close();}}
    const frame=new VideoFrame(surface,{timestamp,duration:40000});
-   try{c.ve.encode(frame,{keyFrame:c.forceKeyFrame||c.frameCount%25===0});c.preview?.close();c.preview=frame.clone();c.forceKeyFrame=false;c.last=timestamp;c.frameCount++;}finally{frame.close();}
+   try{c.ve.encode(frame,{keyFrame});c.preview?.close();c.preview=frame.clone();c.forceKeyFrame=false;c.last=timestamp;c.frameCount++;}finally{frame.close();}
   }catch(e){error(e);}
  }
- async function start(){
-  if(phase!=='idle')return;const token=++sessionId;phase='starting';syncControls();selectedCount=0;selectPending=false;message('preparazione registrazione…');
+ async function start(withPlain=false){
+  if(phase!=='idle')return;plain=!!withPlain;const token=++sessionId;phase='starting';syncControls();selectedCount=0;selectPending=false;message('preparazione registrazione…');
   try{
    if((!globalThis.VideoEncoder||!globalThis.VideoFrame))throw Error('MP4 non supportato da questo browser: usa Chrome o Edge aggiornato');
    const {width,height}=dimensions,blocks=Math.ceil(width/16)*Math.ceil(height/16),level=blocks<=3600?'1f':blocks<=8192?'28':blocks<=8704?'2a':blocks<=22080?'32':blocks<=36864?'33':'3c';
@@ -180,12 +186,14 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
    if((!globalThis.AudioEncoder||!globalThis.MediaStreamTrackProcessor||!(await AudioEncoder.isConfigSupported(audioConfig)).supported))throw Error('registrazione MP4 con audio non supportata: usa Chrome o Edge aggiornato');if(token!==sessionId)return;
    {audioContext??=new AudioContext();await audioContext.resume();}if(token!==sessionId)return;
    {surface=document.createElement('canvas');surface.width=width;surface.height=height;context=surface.getContext('2d',{alpha:false});}
+   if(plain){plainSurface=document.createElement('canvas');plainSurface.width=width;plainSurface.height=height;plainContext=plainSurface.getContext('2d',{alpha:false});}
    clips=[];pending=[];clip=null;serial=0;saved=0;started=performance.now();phase='recording';sample();timer=setInterval(sample,40);hudTimer=setInterval(status,200);status();
   }catch(e){if(token!==sessionId)return;phase='idle';syncControls();await cleanup();message(e.message);}
  }
  async function cleanup(){
   clearInterval(timer);clearInterval(hudTimer);timer=hudTimer=null;disconnectInput();
   if(surface){surface.width=surface.height=0;surface=context=null;}
+  if(plainSurface){plainSurface.width=plainSurface.height=0;plainSurface=plainContext=null;}
  }
  async function stop(){
   if(stopPromise)return stopPromise;if(phase!=='recording')return;const token=sessionId;
@@ -195,19 +203,26 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
     await Promise.all(pending);if(token!==sessionId)return;await cleanup();if(token!==sessionId)return;
 
     const selected=clips.filter(c=>c.selected).sort((a,b)=>a.order-b.order);if(!selected.length){exportProgress('nessuna clip selezionata',{stage:'empty',progress:null});return;}
-    const {Muxer,ArrayBufferTarget}=createMP4Muxer(),target=new ArrayBufferTarget();
-    const muxer=new Muxer({target,video:{codec:'avc',width:videoConfig.width,height:videoConfig.height},...(audioConfig?{audio:{codec:'aac',sampleRate:48000,numberOfChannels:2}}:{}),fastStart:'in-memory',firstTimestampBehavior:'offset'});
-    let offset=0;
-    for(const c of selected){
-     const first=c.video[0].chunk.timestamp;
-     for(let i=0;i<c.video.length;i++){
-      const {chunk,meta}=c.video[i],at=chunk.timestamp-first,until=i+1<c.video.length?c.video[i+1].chunk.timestamp-first:c.duration;
-      const bytes=new Uint8Array(chunk.byteLength);chunk.copyTo(bytes);muxer.addVideoChunkRaw(bytes,chunk.type,offset+at,Math.max(1,until-at),meta);
+    const stamp=new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+    const mux=(track,suffix)=>{
+     const {Muxer,ArrayBufferTarget}=createMP4Muxer(),target=new ArrayBufferTarget();
+     const muxer=new Muxer({target,video:{codec:'avc',width:videoConfig.width,height:videoConfig.height},...(audioConfig?{audio:{codec:'aac',sampleRate:48000,numberOfChannels:2}}:{}),fastStart:'in-memory',firstTimestampBehavior:'offset'});
+     let offset=0;
+     for(const c of selected){
+      const video=c[track];const first=video[0].chunk.timestamp;
+      for(let i=0;i<video.length;i++){
+       const {chunk,meta}=video[i],at=chunk.timestamp-first,until=i+1<video.length?video[i+1].chunk.timestamp-first:c.duration;
+       const bytes=new Uint8Array(chunk.byteLength);chunk.copyTo(bytes);muxer.addVideoChunkRaw(bytes,chunk.type,offset+at,Math.max(1,until-at),meta);
+      }
+      if(audioConfig)for(const {chunk,meta} of c.audio){const at=Math.max(0,chunk.timestamp);if(at>=c.duration)continue;const bytes=new Uint8Array(chunk.byteLength);chunk.copyTo(bytes);muxer.addAudioChunkRaw(bytes,chunk.type,offset+at,Math.min(chunk.duration,c.duration-at),meta);}
+      offset+=c.duration;
      }
-     if(audioConfig)for(const {chunk,meta} of c.audio){const at=Math.max(0,chunk.timestamp);if(at>=c.duration)continue;const bytes=new Uint8Array(chunk.byteLength);chunk.copyTo(bytes);muxer.addAudioChunkRaw(bytes,chunk.type,offset+at,Math.min(chunk.duration,c.duration-at),meta);}
-     offset+=c.duration;
-    }
-    muxer.finalize();const url=URL.createObjectURL(new Blob([target.buffer],{type:'video/mp4'})),a=document.createElement('a');a.href=url;a.download=name+'_'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.mp4';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);saved=selected.length;exportProgress('completato · download MP4 avviato',{stage:'complete',completed:saved,progress:1});message(saved+' clip · MP4 salvato');
+     muxer.finalize();const url=URL.createObjectURL(new Blob([target.buffer],{type:'video/mp4'})),a=document.createElement('a');a.href=url;a.download=name+'_'+stamp+suffix+'.mp4';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
+    };
+    mux('video','');
+    // Started with R+C: the same clips, same audio, without the white border.
+    if(plain&&selected.every(c=>c.plainVideo?.length))setTimeout(()=>mux('plainVideo','-senza-contorno'),600);
+saved=selected.length;exportProgress('completato · download MP4 avviato',{stage:'complete',completed:saved,progress:1});message(saved+' clip · MP4 salvato');
    }catch(e){if(token===sessionId)exportProgress('errore · '+e.message,{stage:'error'});}finally{if(token===sessionId){await cleanup();clips=[];pending=[];phase='idle';syncControls();stopPromise=null;setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);}}
   })();return stopPromise;
  }
@@ -224,7 +239,7 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
  function deselect(){
   if(phase==='starting'){selectPending=false;return;}
   if(phase!=='recording')return;sample();
-  if(clip?.selected){clip.selected=false;clip.deselected=true;selectedCount=Math.max(0,selectedCount-1);clips=clips.filter(c=>c!==clip);if(clip.ended){clip.video.length=0;clip.audio.length=0;}}
+  if(clip?.selected){clip.selected=false;clip.deselected=true;selectedCount=Math.max(0,selectedCount-1);clips=clips.filter(c=>c!==clip);if(clip.ended){clip.video.length=0;clip.audio.length=0;if(clip.plainVideo)clip.plainVideo.length=0;}}
   status();
  }
  function cut(){if(phase!=='recording'||!clip?.selected||clip.cut)return;sample();clip.cut=true;finish(clip,true);disconnectInput();status();}
@@ -243,11 +258,14 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
    finally{clearInterval(exportTimer);exportTimer=null;renderAbort=null;phase='idle';syncControls();resume?.();setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);}
   })().finally(()=>{exportPromise=null;});return exportPromise;
  }
+ document.addEventListener('keydown',event=>{if(event.key.toLowerCase()==='c')cHeld=true;},true);
+ document.addEventListener('keyup',event=>{if(event.key.toLowerCase()==='c')cHeld=false;},true);
+ addEventListener('blur',()=>{cHeld=false;});
  document.addEventListener('keydown',event=>{
   if(event.repeat||event.metaKey||event.ctrlKey||event.altKey||event.target.closest?.('input:not([type="checkbox"]),textarea,select,[contenteditable="true"]'))return;
   const key=event.key.toLowerCase();if(key==='g'||key==='v'&&getScreenIntro){event.preventDefault();event.stopImmediatePropagation();void exportScreens(key==='v');return;}if(key==='arrowright'&&phase==='recording'){cut();return;}if(key==='arrowright'&&phase==='starting'){selectPending=false;return;}if(key!=='r'&&!(phase!=='idle'&&['s','d','x','q'].includes(key)))return;
   event.preventDefault();event.stopImmediatePropagation();
-  if(key==='r'){if(phase==='idle')void start();else if(phase==='recording')void stop();}else if(key==='s'){if(phase==='starting')selectPending=true;else select();}else if(key==='d')deselect();else if(key==='q')void cancel();else cut();
+  if(key==='r'){if(phase==='idle')void start(cHeld);else if(phase==='recording')void stop();}else if(key==='s'){if(phase==='starting')selectPending=true;else select();}else if(key==='d')deselect();else if(key==='q')void cancel();else cut();
  },true);
  return {start,stop,cancel,exportScreens,select,deselect,cut,sample,controlsHTML,syncAudioMonitor,releaseMedia,get status(){return {phase,selected:selectedCount,width:dimensions.width,height:dimensions.height,frame:frameRectangle(),cut:!!clip?.cut,frames:clip?.frameCount||0,audioFrames:clip?.audioFrames||0,queued:clip?.ve?.encodeQueueSize||0,saved,notice,export:{...exportState}};}};
 }

@@ -218,6 +218,6 @@ test('iPhone settling phase: only list videos are prepared (up to the queue), no
  pool.loading=0;pool.listLoading=0;pool.ready.push({fromList:true});context.pump();assert.deepEqual(picked,['L1','L2'],'second list reserve while settling');
 });
 test('desktop in pause prepares up to 25 videos; iPhone keeps its small queue',()=>{
- assert.match(flow,/videoQueueLimit=\(\)=>!iosVideo&&playbackPaused\?25:VIDEO_QUEUE_LIMIT/);
+ assert.match(flow,/videoQueueLimit=\(\)=>iosVideo\?VIDEO_QUEUE_LIMIT:playbackPaused\?25:Math\.max\(VIDEO_QUEUE_LIMIT,raisedQueueLimit\)/);assert.match(flow,/raisedQueueLimit=Math\.max\(raisedQueueLimit,pool\.ready\.length\)/);
  assert.match(flow,/limit=kind==='video'\?videoQueueLimit\(\):IMAGE_QUEUE_LIMIT;/);
 });
