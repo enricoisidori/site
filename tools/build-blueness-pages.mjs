@@ -28,15 +28,27 @@ ${layout}
 // Same SVG and geometry as the page (default 50 px square), visible at once.
 const wait=document.getElementById('wait'),svg=wait.querySelector('svg');
 const place=()=>layoutBluenessIntro(svg,innerWidth,innerHeight,50);place();addEventListener('resize',place);
-// Only if the page is not ready almost at once: a light sweeping across the
-// SVG, like a loading shimmer (3 s per pass, intensity 80, band 40: chosen in demo-attesa.html).
-const shimmer=setTimeout(()=>{
+// Last resort only: if the page is still not ready after 1.5 s, a light sweeps
+// across the SVG, like a loading shimmer (3 s per pass, intensity 80, band 40:
+// chosen in demo-attesa.html). A normal load never shows it.
+let shimmering=false;
+const shimmer=setTimeout(()=>{shimmering=true;
  const ns='http://www.w3.org/2000/svg',defs=document.createElementNS(ns,'defs');
  defs.innerHTML='<linearGradient id="blueness-wait" x1="0" x2="1" y1="0" y2="0" gradientTransform="translate(-1 0)"><stop offset="0" stop-color="#0700FF"/><stop offset=".1" stop-color="#0700FF"/><stop offset=".5" stop-color="#cdccff"/><stop offset=".9" stop-color="#0700FF"/><stop offset="1" stop-color="#0700FF"/><animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="3s" repeatCount="indefinite"/></linearGradient>';
  svg.prepend(defs);for(const shape of svg.querySelectorAll('path,rect'))shape.setAttribute('fill','url(#blueness-wait)');
-},400);
+},1500);
 // The page signals its first burst frame: it now shows the same SVG itself.
-addEventListener('message',event=>{if(event.origin===new URL('${LIVE}').origin&&event.data==='blueness:ready'){clearTimeout(shimmer);wait.remove();}});
+addEventListener('message',event=>{
+ if(event.origin!==new URL('${LIVE}').origin||event.data!=='blueness:ready')return;
+ clearTimeout(shimmer);if(!shimmering){wait.remove();return;}
+ // The shimmer does not stop abruptly: from where it is, the band runs off to the right fast.
+ const gradient=svg.querySelector('#blueness-wait'),loop=gradient.querySelector('animateTransform');
+ // The loop is timed from the SVG document start (begin=0), so its phase is time mod 3 s.
+ const at=-1+2*((svg.getCurrentTime()%3)/3);loop.remove();gradient.setAttribute('gradientTransform','translate('+at+' 0)');
+ const exit=document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+ for(const [k,v] of [['attributeName','gradientTransform'],['type','translate'],['from',at+' 0'],['to','1 0'],['dur','0.25s'],['fill','freeze'],['begin','indefinite']])exit.setAttribute(k,v);
+ gradient.append(exit);exit.beginElement();setTimeout(()=>wait.remove(),260);
+});
 </script></body></html>
 `);
 process.stdout.write('Blueness assets: '+dist.pathname+'\nGitHub Pages frame: blueness/index.html\n');
