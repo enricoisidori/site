@@ -51,7 +51,7 @@ test('desktop catalog selection and paused preparation keep their previous behav
 });
 test('iOS pump prepares one video at a time and stops at two ready/preparing entries',()=>{
  const pool={urls:Array.from({length:8},()=>({provider:'commons'})),list:[],ready:[],loading:0,accepted:1};let loads=0;
- const context=vm.createContext({iosVideo:{},shown:3,startedAt:-1e9,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){},prepare(){loads++;},current:null,playbackPaused:false,performance,setTimeout});
+ const context=vm.createContext({iosVideo:{},shown:3,startedAt:-1e9,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,videoQueueLimit:()=>2,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){},prepare(){loads++;},current:null,playbackPaused:false,performance,setTimeout});
  vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();assert.equal(loads,1);assert.equal(pool.loading,1);
  pool.loading=0;pool.ready.push({},{});context.pump();assert.equal(loads,1);
 });
@@ -171,7 +171,7 @@ test('stalledFor reports buffering time only for the playing selected video',asy
 });
 test('one list video is kept ready as fallback while live candidates keep preparing',()=>{
  const pool={urls:[{provider:'commons',id:'live1'},{provider:'archive',id:'live2'}],list:[{id:'L1',fromList:true},{id:'L2',fromList:true}],listLoading:0,ready:[],loading:0,accepted:0};const picked=[];
- const context=vm.createContext({iosVideo:null,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:6,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){},prepare(item){picked.push(item.id);},current:null,playbackPaused:false,performance,setTimeout});
+ const context=vm.createContext({iosVideo:null,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:6,videoQueueLimit:()=>6,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){},prepare(item){picked.push(item.id);},current:null,playbackPaused:false,performance,setTimeout});
  vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();
  assert.deepEqual(picked,['L1','live1','live2'],'one standby, the rest is live');
  pool.loading=0;pool.listLoading=0;pool.ready.push({fromList:true});picked.length=0;pool.urls.push({provider:'commons',id:'live3'});context.pump();
@@ -212,8 +212,12 @@ test('durations as before (15 s, end or lost blue), first video 3 s; skip from t
 });
 test('iPhone settling phase: only list videos are prepared (up to the queue), no live search',()=>{
  const pool={urls:[{provider:'commons',id:'live'}],list:[{id:'L1'},{id:'L2'},{id:'L3'}],listLoading:0,ready:[],loading:0,accepted:0};const picked=[];let searches=0;
- const context=vm.createContext({iosVideo:{},shown:1,startedAt:0,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){searches++;},prepare(item){picked.push(item.id);},current:null,playbackPaused:false,performance:{now:()=>5000},setTimeout});
+ const context=vm.createContext({iosVideo:{},shown:1,startedAt:0,document:{hidden:false},pools:{video:pool},sources:'both',VIDEO_QUEUE_LIMIT:2,videoQueueLimit:()=>2,IMAGE_QUEUE_LIMIT:12,baseStills:false,stills:false,fetchBatch(){searches++;},prepare(item){picked.push(item.id);},current:null,playbackPaused:false,performance:{now:()=>5000},setTimeout});
  vm.runInContext(flow.slice(flow.indexOf('function pump(){'),flow.indexOf('function select(')),context);context.pump();
  assert.deepEqual(picked,['L1']);assert.equal(searches,0);
  pool.loading=0;pool.listLoading=0;pool.ready.push({fromList:true});context.pump();assert.deepEqual(picked,['L1','L2'],'second list reserve while settling');
+});
+test('desktop in pause prepares up to 25 videos; iPhone keeps its small queue',()=>{
+ assert.match(flow,/videoQueueLimit=\(\)=>!iosVideo&&playbackPaused\?25:VIDEO_QUEUE_LIMIT/);
+ assert.match(flow,/limit=kind==='video'\?videoQueueLimit\(\):IMAGE_QUEUE_LIMIT;/);
 });
