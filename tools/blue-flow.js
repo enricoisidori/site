@@ -130,9 +130,39 @@ function captureRoute(entry){
  const singleContext=single.getContext('2d');singleContext.fillStyle='#000';singleContext.fillRect(0,0,single.width,single.height);singleContext.scale(singleScale,singleScale);
  drawScreen(singleContext,{x:0,y:0,w:canvas.width,h:canvas.height},false,entry,false,true);
  singleContext.lineWidth=1;singleContext.strokeStyle='#fff';singleContext.strokeRect(Math.round(canvas.width/2-settings.size/2)+.5,Math.round(canvas.height/2-settings.size/2)+.5,Math.round(settings.size),Math.round(settings.size));
- const record={source:entry.source,w:scene.width,h:scene.height,scene:jpeg(scene,.65),singleW:single.width,singleH:single.height,single:jpeg(single,.65),tile:jpeg(tile,.8)};
+ const record={source:entry.source,w:scene.width,h:scene.height,scene:jpeg(scene,.65),singleW:single.width,singleH:single.height,single:jpeg(single,.65),tile:jpeg(tile,.8),
+  // For N: what is needed to redraw this exact frame from a better copy of the video.
+  fromList:!!entry.fromList,time:entry.media.currentTime,match:{...entry.match},url:entry.remoteURL||entry.url,videoVariants:entry.videoVariants,hideIntroBorder:!!entry.hideIntroBorder};
  // One small compressed snapshot per video; PDF assembly and mosaic wait for P/click.
  record.single.catch(()=>{});record.scene.catch(()=>{});record.tile.catch(()=>{});route.push(record);
+}
+// N: like V (intro + one frame per video), live videos only, each frame redrawn
+// from the best copy of the same video (≤1080p on Commons, the original on
+// Archive) at the same time and framing, at the export's full resolution.
+// Falls back to the normal capture if the better copy cannot be read.
+function bestVideoURL(record){
+ const test=document.createElement('video'),best=(record.videoVariants||[]).filter(v=>v.src&&Number(v.height)<=1080&&test.canPlayType(v.type||'video/webm')).sort((a,b)=>Number(b.height)-Number(a.height))[0];
+ return best?.src||record.url;
+}
+async function highQualityFrame(record,scale){
+ const video=document.createElement('video');video.crossOrigin='anonymous';video.muted=true;video.preload='auto';
+ try{
+  video.src=bestVideoURL(record);await waitEvent(video,'loadeddata',20000);
+  if(Math.abs(video.currentTime-record.time)>.02){const seeked=waitEvent(video,'seeked',20000);video.currentTime=record.time;await seeked;}
+  const out=document.createElement('canvas');out.width=Math.round(canvas.width*scale);out.height=Math.round(canvas.height*scale);
+  const c=out.getContext('2d');c.fillStyle='#000';c.fillRect(0,0,out.width,out.height);c.scale(scale,scale);
+  drawScreen(c,{x:0,y:0,w:canvas.width,h:canvas.height},false,{kind:'video',media:video,match:record.match,firstFrameReady:true},false);
+  if(!record.hideIntroBorder){c.lineWidth=1;c.strokeStyle='#fff';c.strokeRect(Math.round(canvas.width/2-settings.size/2)+.5,Math.round(canvas.height/2-settings.size/2)+.5,Math.round(settings.size),Math.round(settings.size));}
+  return await createImageBitmap(out);
+ }finally{video.removeAttribute('src');video.load();}
+}
+function highQualitySnapshots(){
+ const {width}=recording.status,frame=recording.status.frame,scale=Math.max(1,width/Math.max(1,frame.width));
+ return route.filter(r=>!r.fromList).map(r=>({
+  // Lazy: each frame is fetched while the reel is rendered, with its progress.
+  blob:{then:(resolve,reject)=>highQualityFrame(r,scale).then(resolve,()=>r.single.then(blob=>createImageBitmap(blob)).then(resolve,reject))},
+  layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:0,y:0,width:innerWidth,height:innerHeight}}]}
+ }));
 }
 async function exportRoute(){
  if(exportingPDF)return;if(!route.length){exportButton.textContent='nessun video da esportare';return;}
@@ -545,6 +575,8 @@ addEventListener('keydown',event=>{
  const key=event.key.toLowerCase();if(['c','i','f','m','p','j','arrowright','arrowleft'].includes(key))event.preventDefault();
  if(key==='c'||key==='i'){controls.hidden=!controls.hidden;infoVisible=!controls.hidden;info.hidden=!infoVisible;renderInfo();}
  if(!stills){if(key==='p')exportRoute();if(key==='j')exportJPEG();}
+ // N: intro + live videos only, frames redrawn in high quality (see highQualitySnapshots).
+ if(!stills&&key==='n'&&!event.repeat&&!event.target.closest?.('input,textarea,select')){event.preventDefault();void recording.exportScreens(true,highQualitySnapshots,'-intro-hq-live');}
  if(key==='arrowright')advance(true);if(key==='arrowleft')back();
  if(key==='m'){muted=!muted;if(!muted)audioByKey=true;if(current?.kind==='video')current.media.muted=muted;recording.syncAudioMonitor();}
  if(key==='f')(document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()).catch(()=>{});

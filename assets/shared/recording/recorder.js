@@ -228,17 +228,17 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
   status();
  }
  function cut(){if(phase!=='recording'||!clip?.selected||clip.cut)return;sample();clip.cut=true;finish(clip,true);disconnectInput();status();}
- async function exportScreens(withIntro=false){
+ async function exportScreens(withIntro=false,source=getSnapshots,label=''){
   if(exportPromise)return exportPromise;
   exportPromise=(async()=>{
    if(phase==='recording')await stop();else if(phase==='saving'&&stopPromise)await stopPromise;if(phase!=='idle')return;
    renderAbort=new AbortController();const signal=renderAbort.signal;phase='rendering';beginExport('screens',dimensions.width,dimensions.height);syncControls();const resume=suspendPlayback();
    try{
     exportProgress('preparazione screen MP4…',{stage:'preparation'});
-    const items=await getSnapshots();if(!items.length)throw Error('nessun video visto da esportare');
+    const items=await source();if(!items.length)throw Error('nessun video visto da esportare');
     const options={...dimensions,frame:frameRectangle(),signal,onProgress:exportProgress},intro=withIntro&&getScreenIntro?await getScreenIntro(options):null;
     const blob=intro?await intro.render([...intro.items,...items],options):await renderScreenReel(items,options);
-    signal.throwIfAborted();saveRecordingFile(blob,name+(intro?'-intro':'-screens')+'.mp4');exportProgress('completato · download MP4 avviato',{stage:'complete',completed:exportState.total,progress:1});message('MP4 salvato');
+    signal.throwIfAborted();saveRecordingFile(blob,name+(label||(intro?'-intro':'-screens'))+'.mp4');exportProgress('completato · download MP4 avviato',{stage:'complete',completed:exportState.total,progress:1});message('MP4 salvato');
    }catch(error){exportProgress(signal.aborted?'elaborazione annullata · nessun video creato':'errore · '+error.message,{stage:signal.aborted?'cancelled':'error'});}
    finally{clearInterval(exportTimer);exportTimer=null;renderAbort=null;phase='idle';syncControls();resume?.();setTimeout(()=>{if(phase==='idle')hud.hidden=true;},5000);}
   })().finally(()=>{exportPromise=null;});return exportPromise;
