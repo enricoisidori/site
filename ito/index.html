@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#161618">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Ito</title>
+<style>
+  :root {
+    --bg: #161618;
+    --fg: #f4f3ef;
+    --muted: rgba(244, 243, 239, 0.55);
+    --faint: rgba(244, 243, 239, 0.4);
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --top: max(14px, env(safe-area-inset-top));
+    --side: max(20px, env(safe-area-inset-left), env(safe-area-inset-right));
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    overscroll-behavior: none;
+  }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+    overflow: hidden;
+  }
+  button {
+    appearance: none;
+    -webkit-appearance: none;
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* Barra in alto */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--top) var(--side) 0;
+  }
+  .title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; padding: 10px 0; }
+  .tools { display: flex; align-items: center; gap: 4px; margin-right: -12px; }
+  .tools button { font-size: 15px; padding: 10px 12px; }
+  #lang span { opacity: 0.4; transition: opacity 0.2s; }
+  #lang span.on { opacity: 1; font-weight: 600; }
+  #lang i { font-style: normal; opacity: 0.3; margin: 0 4px; }
+  #infoBtn { color: var(--muted); }
+
+  main {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--side);
+  }
+
+  /* Il pulsante sta sempre al centro: il contenuto compare sopra e sotto. */
+  .stack { position: relative; width: min(100%, 320px); }
+  .above, .below {
+    position: absolute;
+    left: 50%;
+    width: min(calc(100vw - 40px), 420px);
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .above { bottom: calc(100% + clamp(24px, 5vh, 44px)); }
+  .below { top: calc(100% + 18px); }
+
+  .view {
+    position: absolute;
+    left: 0; right: 0;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+    pointer-events: none;
+    text-wrap: balance;
+  }
+  .above .view { bottom: 0; }
+  .below .view { top: 0; }
+  .view.on { opacity: 1; transform: none; pointer-events: auto; }
+
+  .msg {
+    font-size: clamp(22px, 6.4vw, 28px);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .sub { display: block; color: var(--muted); }
+  .example { padding-left: 36px; margin-top: 4px; }
+  .example .link { font-size: 17px; padding: 6px 0; text-align: left; }
+  #theme { font-size: 26px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; margin-top: 14px; }
+  #theme:empty { display: none; }
+  #theme .sub { font-size: 17px; font-weight: 400; margin-top: 4px; line-height: 1.4; }
+  .label { font-size: 15px; color: var(--muted); margin-bottom: 6px; }
+  #num {
+    font-weight: 700;
+    font-size: min(40vw, 26vh, 260px);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: proportional-nums;
+    font-feature-settings: "pnum" 1, "tnum" 0;
+    white-space: nowrap;
+  }
+  .reveal #num { animation: pop 0.42s var(--ease) both; }
+  .newtheme #theme { animation: pop 0.36s var(--ease) both; }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.88); filter: blur(6px); }
+    to   { opacity: 1; transform: none; filter: none; }
+  }
+  .hint { font-size: 14px; line-height: 1.45; color: var(--faint); }
+  .link {
+    font-size: 14px;
+    color: var(--muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    padding: 6px 4px;
+  }
+  .link:active { opacity: 0.6; }
+
+  #go {
+    border-radius: 999px;
+    background: var(--fg);
+    color: #161618;
+    font-weight: 600;
+    font-size: clamp(18px, 5vw, 21px);
+    width: 100%;
+    min-height: 66px;
+    padding: 0 28px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    transition: transform 0.18s var(--ease), background-color 0.2s, box-shadow 0.18s;
+  }
+  #go.pressed, #go:active {
+    transform: scale(0.96);
+    background: #dcdad4;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+  #go span { display: inline-block; transition: opacity 0.16s; }
+  #go.swap span { opacity: 0; }
+
+  .bottom {
+    position: fixed;
+    left: 0; right: 0;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+  }
+  .bottom button {
+    color: var(--fg);
+    opacity: 0.45;
+    font-size: 14px;
+    padding: 12px 14px;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .bottom button:active, #reset.armed { opacity: 0.95; }
+  .showing .bottom, .info-open .bottom { opacity: 0; pointer-events: none; }
+  #mainTheme { font-size: clamp(26px, 7.4vw, 34px); font-weight: 600; }
+  #mainTheme .sub { font-size: 0.6em; font-weight: 400; margin-top: 6px; line-height: 1.3; }
+  .newtheme #mainTheme { animation: pop 0.36s var(--ease) both; }
+
+  /* Regole */
+  #info {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: var(--bg);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s var(--ease), visibility 0s 0.25s;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  .info-open #info { opacity: 1; visibility: visible; transition: opacity 0.25s var(--ease); }
+  .rules {
+    max-width: 460px;
+    margin: 0 auto;
+    padding: calc(var(--top) + 80px) var(--side) max(40px, env(safe-area-inset-bottom));
+  }
+  .rules h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .rules .lead { font-size: 18px; line-height: 1.4; color: var(--muted); margin-bottom: 28px; }
+  .rules ol { list-style: none; counter-reset: s; }
+  .rules li {
+    counter-increment: s;
+    position: relative;
+    padding-left: 36px;
+    font-size: 17px;
+    line-height: 1.45;
+    margin-bottom: 18px;
+  }
+  .rules li::before {
+    content: counter(s);
+    position: absolute;
+    left: 0; top: 0;
+    font-weight: 700;
+    color: var(--faint);
+  }
+  .rules li em { font-style: normal; color: var(--muted); }
+
+  .haptic { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; overflow: hidden; }
+</style>
+</head>
+<body>
+<header>
+  <button class="title" id="home" type="button">Ito</button>
+  <div class="tools">
+    <button id="lang" type="button" aria-label="Lingua / Language"><span data-l="it">IT</span><i>/</i><span data-l="en">EN</span></button>
+    <button id="infoBtn" type="button"></button>
+  </div>
+</header>
+
+<main>
+  <div class="stack">
+    <div class="above">
+      <div class="view" id="v-pass"><div class="msg"><span data-t="pass1"></span><span class="sub" data-t="pass2"></span></div></div>
+      <div class="view" id="v-theme"><div class="label" data-t="theme"></div><div class="msg" id="mainTheme"></div></div>
+      <div class="view" id="v-num"><div class="label" data-t="yours"></div><div id="num"></div></div>
+    </div>
+
+    <button id="go" type="button"><span></span></button>
+
+    <div class="below">
+      <div class="view hint" id="b-num" data-t="memo"></div>
+    </div>
+  </div>
+</main>
+
+<section id="info" aria-hidden="true">
+  <div class="rules">
+    <div id="rules"></div>
+    <div class="example">
+      <button id="genTheme" class="link" type="button"></button>
+      <div id="theme"></div>
+    </div>
+  </div>
+</section>
+
+<nav class="bottom">
+  <button id="themeBtn" type="button" data-t="newTheme"></button>
+  <button id="reset" type="button"></button>
+</nav>
+<label class="haptic" aria-hidden="true"><input type="checkbox" switch tabindex="-1"></label>
+
+<script>
+(() => {
+  const T = {
+    it: {
+      see: "Vedi il tuo numero",
+      done: "Memorizzato",
+      yours: "Il tuo numero",
+      memo: "Memorizzalo e non dirlo a nessuno",
+      pass1: "Passa il telefono",
+      pass2: "al giocatore alla tua destra",
+      gen: "Genera un esempio",
+      another: "Un altro esempio",
+      theme: "Tema",
+      newTheme: "Genera un tema",
+      reset: "Nuova partita",
+      confirm: "Tocca ancora per ricominciare",
+      info: "Info",
+      close: "Chiudi",
+      rulesTitle: "Come si gioca",
+      rulesLead: "Ito è collaborativo: si vince o si perde tutti insieme.",
+      rules: [
+        "Ognuno vede in segreto il suo numero, da 1 a 100. Non ci sono doppioni.",
+        "Scegliete un tema, per esempio <em>un primo appuntamento</em>.",
+        "Senza dire il numero, ognuno racconta qualcosa sul tema che corrisponda al suo numero: più è basso, peggio va; più è alto, meglio va. Nessun turno, parla chi vuole.",
+        "Mettetevi in ordine, dal numero più basso al più alto.",
+        "Rivelate i numeri: se l'ordine è giusto, avete vinto."
+      ]
+    },
+    en: {
+      see: "See your number",
+      done: "Got it",
+      yours: "Your number",
+      memo: "Memorise it and keep it secret",
+      pass1: "Pass the phone",
+      pass2: "to the player on your right",
+      gen: "Generate an example",
+      another: "Another example",
+      theme: "Theme",
+      newTheme: "Generate a theme",
+      reset: "New game",
+      confirm: "Tap again to restart",
+      info: "Info",
+      close: "Close",
+      rulesTitle: "How to play",
+      rulesLead: "Ito is cooperative: you all win or lose together.",
+      rules: [
+        "Everyone secretly sees their own number, from 1 to 100. No two are the same.",
+        "Pick a theme, for example <em>a first date</em>.",
+        "Without saying your number, describe something on the theme that matches it: the lower it is, the worse it goes; the higher, the better. No turns, anyone can speak.",
+        "Line up in order, from the lowest number to the highest.",
+        "Reveal your numbers: if the order is right, you win."
+      ]
+    }
+  };
+
+  // [tema IT, scala IT, tema EN, scala EN]
+  const THEMES = [
+    ["Animali", "dal più piccolo al più grande", "Animals", "smallest to biggest"],
+    ["Cibi", "dal più disgustoso al più buono", "Food", "most disgusting to most delicious"],
+    ["Cose che fanno paura", "dalla meno alla più spaventosa", "Scary things", "least to most frightening"],
+    ["Superpoteri", "dal più inutile al più utile", "Superpowers", "most useless to most useful"],
+    ["Mete per le vacanze", "dalla peggiore alla migliore", "Holiday destinations", "worst to best"],
+    ["Regali", "dal più deludente al più bello", "Gifts", "most disappointing to best"],
+    ["Persone famose", "dalla meno alla più famosa", "Famous people", "least to most famous"],
+    ["Oggetti", "dal più leggero al più pesante", "Objects", "lightest to heaviest"],
+    ["Lavori", "dal più noioso al più divertente", "Jobs", "most boring to most fun"],
+    ["Film", "dal più brutto al più bello", "Films", "worst to best"],
+    ["Cose in casa", "dalla più economica alla più costosa", "Things at home", "cheapest to most expensive"],
+    ["Odori", "dal peggiore al migliore", "Smells", "worst to best"],
+    ["Sport", "dal meno al più faticoso", "Sports", "least to most tiring"],
+    ["Mezzi di trasporto", "dal più lento al più veloce", "Vehicles", "slowest to fastest"],
+    ["Situazioni", "dalla meno alla più imbarazzante", "Situations", "least to most embarrassing"],
+    ["Canzoni", "dalla più triste alla più allegra", "Songs", "saddest to happiest"],
+    ["Bevande", "dalla peggiore alla migliore", "Drinks", "worst to best"],
+    ["Cose da portare su un'isola deserta", "dalla meno alla più utile", "Things to bring to a desert island", "least to most useful"],
+    ["Suoni", "dal più fastidioso al più piacevole", "Sounds", "most annoying to most pleasant"],
+    ["Scuse per il ritardo", "dalla meno alla più credibile", "Excuses for being late", "least to most believable"],
+    ["Verdure", "dalla più odiata alla più amata", "Vegetables", "most hated to most loved"],
+    ["Invenzioni", "dalla meno alla più importante", "Inventions", "least to most important"],
+    ["Abilità", "dalla più facile alla più difficile da imparare", "Skills", "easiest to hardest to learn"],
+    ["Piatti", "dal più leggero al più calorico", "Dishes", "lightest to most calorific"],
+    ["Animali domestici", "dal peggiore al migliore", "Pets", "worst to best"],
+    ["Cose", "dalla più fredda alla più calda", "Things", "coldest to hottest"],
+    ["Parole", "dalla più brutta alla più bella", "Words", "ugliest to most beautiful"],
+    ["Primi appuntamenti", "dal peggiore al migliore", "First dates", "worst to best"],
+    ["Città", "dalla meno alla più romantica", "Cities", "least to most romantic"],
+    ["Faccende di casa", "dalla più odiata alla più piacevole", "Chores", "most hated to most pleasant"],
+    ["Hobby", "dal più noioso al più appassionante", "Hobbies", "most boring to most exciting"],
+    ["Cattivi dei film", "dal meno al più cattivo", "Film villains", "least to most evil"],
+    ["Momenti della giornata", "dal peggiore al migliore", "Times of day", "worst to best"],
+    ["Dolci", "dal meno al più goloso", "Desserts", "least to most indulgent"],
+    ["Rumori di notte", "dal meno al più inquietante", "Noises at night", "least to most creepy"],
+    ["Personaggi di fantasia", "dal più debole al più forte", "Fictional characters", "weakest to strongest"],
+    ["Cose da dimenticare a casa", "dalla meno alla più grave", "Things to forget at home", "least to most serious"],
+    ["Animali", "dal meno al più pericoloso", "Animals", "least to most dangerous"],
+    ["Cose", "dalla più morbida alla più dura", "Things", "softest to hardest"],
+    ["Feste", "dalla più noiosa alla più divertente", "Parties", "most boring to most fun"],
+    ["Luoghi", "dal più tranquillo al più rumoroso", "Places", "quietest to loudest"],
+    ["Cose", "dalla più piccola alla più grande", "Things", "smallest to biggest"],
+    ["Colazioni", "dalla più triste alla più ricca", "Breakfasts", "saddest to most lavish"],
+    ["Cose che si fanno di domenica", "dalla meno alla più rilassante", "Sunday activities", "least to most relaxing"],
+    ["Professioni", "dalla meno alla più rispettata", "Professions", "least to most respected"],
+    ["Oggetti", "dal meno al più fragile", "Objects", "least to most fragile"],
+    ["Cose", "dalla più lenta alla più veloce", "Things", "slowest to fastest"],
+    ["Ricordi d'infanzia", "dal peggiore al più bello", "Childhood memories", "worst to best"]
+  ];
+
+  const KEY = "ito_state_v4";
+  const LKEY = "ito_lang";
+  const $ = (id) => document.getElementById(id);
+  const go = $("go"), goText = go.firstElementChild, num = $("num"), reset = $("reset");
+  const hapticLabel = document.querySelector(".haptic");
+
+  function tick() {
+    try { if (navigator.vibrate) navigator.vibrate(12); } catch {}
+    try { hapticLabel.click(); } catch {}
+  }
+  function rand(n) {
+    const r = new Uint32Array(1);
+    crypto.getRandomValues(r);
+    return r[0] % n;
+  }
+  function freshPool() {
+    const a = Array.from({ length: 100 }, (_, i) => i + 1);
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = rand(i + 1);
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function freshState() { return { pool: freshPool(), dealt: 0 }; }
+  function load() {
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY));
+      if (s && Array.isArray(s.pool) && typeof s.dealt === "number") return { pool: s.pool, dealt: s.dealt };
+    } catch {}
+    return freshState();
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {}
+  }
+
+  let state = load();
+  let theme = -1;          // esempio in Info
+  let mainTheme = -1;      // tema in schermata, solo su richiesta, mai salvato
+  let lang = "it";
+  try {
+    lang = localStorage.getItem(LKEY) === "en" ? "en" : "it";
+  } catch {}
+  let phase = "idle";      // idle | number | pass
+  let passTimer = 0;
+  let lockUntil = 0;
+  let infoOpen = false;
+
+  function t(k) { return T[lang][k]; }
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-t]").forEach((el) => { el.textContent = t(el.dataset.t); });
+    document.querySelectorAll("#lang span").forEach((s) => s.classList.toggle("on", s.dataset.l === lang));
+    $("rules").innerHTML =
+      "<h2>" + t("rulesTitle") + "</h2><p class='lead'>" + t("rulesLead") + "</p><ol>" +
+      t("rules").map((r) => "<li>" + r + "</li>").join("") + "</ol>";
+    if (!reset.classList.contains("armed")) reset.textContent = t("reset");
+    render(false);
+  }
+
+  function setLabel(text, animate) {
+    if (goText.textContent === text) return;
+    if (!animate) { goText.textContent = text; return; }
+    go.classList.add("swap");
+    setTimeout(() => { goText.textContent = text; go.classList.remove("swap"); }, 150);
+  }
+
+  function fillTheme(el, i) {
+    if (i < 0) { el.innerHTML = ""; return; }
+    const th = THEMES[i];
+    const [a, b] = lang === "it" ? [th[0], th[1]] : [th[2], th[3]];
+    el.innerHTML = "";
+    el.append(a, Object.assign(document.createElement("span"), { className: "sub", textContent: b }));
+  }
+
+  function render(animate) {
+    document.body.classList.toggle("showing", phase === "number");
+    document.body.classList.toggle("info-open", infoOpen);
+    $("infoBtn").textContent = infoOpen ? t("close") : t("info");
+
+    const on = new Set();
+    if (phase === "number") { on.add("v-num"); on.add("b-num"); }
+    else if (phase === "pass") { on.add("v-pass"); }
+    else if (mainTheme >= 0) { on.add("v-theme"); }
+    document.querySelectorAll(".view").forEach((v) => v.classList.toggle("on", on.has(v.id)));
+
+    fillTheme($("theme"), theme);
+    fillTheme($("mainTheme"), mainTheme);
+    $("genTheme").textContent = theme >= 0 ? t("another") : t("gen");
+    setLabel(phase === "number" ? t("done") : t("see"), animate);
+  }
+
+  go.addEventListener("pointerdown", () => go.classList.add("pressed"));
+  ["pointerup", "pointercancel", "pointerleave"].forEach((e) =>
+    go.addEventListener(e, () => go.classList.remove("pressed"))
+  );
+
+  go.addEventListener("click", () => {
+    if (performance.now() < lockUntil) return;   // il doppio tocco non salta il numero
+    lockUntil = performance.now() + 700;
+    tick();
+    clearTimeout(passTimer);
+    if (phase !== "number") {
+      if (!state.pool.length) state.pool = freshPool();
+      num.textContent = state.pool.pop();
+      state.dealt += 1;
+      mainTheme = -1;
+      save();
+      phase = "number";
+      document.body.classList.remove("reveal");
+      void num.offsetWidth;
+      document.body.classList.add("reveal");
+    } else {
+      phase = "pass";
+      setTimeout(() => { if (phase !== "number") num.textContent = ""; }, 300);
+      passTimer = setTimeout(() => { phase = "idle"; render(true); }, 2600);
+    }
+    render(true);
+  });
+
+  $("home").addEventListener("click", () => location.reload());
+
+  $("themeBtn").addEventListener("click", () => {
+    if (phase === "number" || infoOpen) return;
+    tick();
+    clearTimeout(passTimer);
+    phase = "idle";
+    let i;
+    do { i = rand(THEMES.length); } while (i === mainTheme);
+    mainTheme = i;
+    document.body.classList.remove("newtheme");
+    void $("mainTheme").offsetWidth;
+    render(false);
+    document.body.classList.add("newtheme");
+  });
+
+  $("genTheme").addEventListener("click", () => {
+    tick();
+    let i;
+    do { i = rand(THEMES.length); } while (i === theme);
+    theme = i;
+    document.body.classList.remove("newtheme");
+    render(false);
+  });
+
+  $("lang").addEventListener("click", () => {
+    lang = lang === "it" ? "en" : "it";
+    try { localStorage.setItem(LKEY, lang); } catch {}
+    tick();
+    applyLang();
+  });
+
+  $("infoBtn").addEventListener("click", () => {
+    infoOpen = !infoOpen;
+    $("info").setAttribute("aria-hidden", String(!infoOpen));
+    if (infoOpen) $("info").scrollTop = 0;
+    render(false);
+  });
+
+  // Nuova partita: secondo tocco entro 3 s per confermare.
+  let armTimer = 0;
+  reset.addEventListener("click", () => {
+    if (phase === "number" || infoOpen) return;
+    if (!reset.classList.contains("armed")) {
+      reset.classList.add("armed");
+      reset.textContent = t("confirm");
+      tick();
+      clearTimeout(armTimer);
+      armTimer = setTimeout(disarm, 3000);
+      return;
+    }
+    disarm();
+    tick();
+    clearTimeout(passTimer);
+    state = freshState();
+    mainTheme = -1;
+    save();
+    phase = "idle";
+    num.textContent = "";
+    render(true);
+  });
+  function disarm() {
+    clearTimeout(armTimer);
+    reset.classList.remove("armed");
+    reset.textContent = t("reset");
+  }
+
+  applyLang();
+})();
+</script>
+</body>
+</html>
