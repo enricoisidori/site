@@ -537,8 +537,8 @@ document.addEventListener('keydown', event => {
   }
   if (key === 'arrowright') { event.preventDefault(); state.reviewing?navigateHistory(1):skipReady(); }
   if(key==='arrowleft')navigateHistory(-1);
-  if(key==='p')exportChainPDF().catch(error=>update({message:error.message}));
-  if (key === 'b') exportChainBook().catch(error => update({ message: error.message }));
+  if(key==='p')exportChainPDF().catch(error=>notice(error.message));
+  if (key === 'b') { notice('making the book…'); exportChainBook().then(() => notice('book downloaded'), error => notice(error.message)); }
 
   // Panel C is for the author: on a touch-only device (phone) it opens only
   // with the two-finger hold below, never with a key.
@@ -576,7 +576,17 @@ function downloadReport() {
 }
 window.addEventListener('afterimage:report', downloadReport);
 window.addEventListener('afterimage:info', () => renderInfo(state, active));
-window.addEventListener('afterimage:export-error',event=>update({message:event.detail}));
+window.addEventListener('afterimage:export-error',event=>notice(event.detail));
+// A short line at the top of the screen, so an export that cannot be made
+// (or is still being made) is visible even with panel C closed.
+const noticeBox = Object.assign(document.createElement('div'), { id: 'notice' });
+document.body.append(noticeBox);
+let noticeTimer;
+function notice(text) {
+  update({ message: text });
+  noticeBox.textContent = text; noticeBox.classList.add('on');
+  clearTimeout(noticeTimer); noticeTimer = setTimeout(() => noticeBox.classList.remove('on'), 4000);
+}
 window.addEventListener('afterimage:filters',()=>{
  invalidateSemantic();for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}generalPool.queue.length=0;failed.clear();
  if(active&&!state.reviewing){context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...new Set([state.selectedTerm,...state.terms].filter(Boolean))],allKeywords:[...state.terms],misses:0};if(state.caption&&context.keywords.length)nextKeyword(context);else analyze(context);}pump();renderInfo(state,active);

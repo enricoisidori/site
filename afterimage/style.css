@@ -33,6 +33,8 @@ video.fill { object-fit: cover; transform-origin: 50% 50%; }
 #info textarea{width:100%;height:180px;}
 #info .more,#info .filters{margin-top:22px;}#info label.inline{display:inline;margin:0;}
 .loading-label{position:absolute;left:50%;top:70%;transform:translateX(-50%);color:#111;font:12px Helvetica,Arial,sans-serif;}
+#notice { position: fixed; left: 0; right: 0; top: 20px; z-index: 11; pointer-events: none; text-align: center; font: 14px/1.4 Helvetica, Arial, sans-serif; color: #fff; -webkit-text-stroke: 2px #000; paint-order: stroke fill; opacity: 0; transition: opacity .3s; }
+#notice.on { opacity: 1; }
 #subtitles { position: fixed; left: 0; right: 0; bottom: calc(7vh - 10px); z-index: 3; pointer-events: none; font: clamp(17px, 1.6vw + 10px, 25px)/1.35 Helvetica, Arial, sans-serif; color: #fff; text-transform: none; -webkit-text-stroke: 2px #000; paint-order: stroke fill; }
 /* A real outline of the letters (not shadows): a 2px stroke centred on each
    glyph edge, painted under the fill, so 1px shows outside, like the
