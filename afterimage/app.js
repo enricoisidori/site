@@ -5,7 +5,7 @@ import { captionTerms } from './terms.js';
 import { prepare, startPlaying, release, capture, captureItemFrame, pickScene, sceneFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS, ios } from './media.js';
 import { renderInfo, toggleInfo } from './info.js';
 import { setWaiting, addLoadingImages, finishLoading, FADE_MS } from './loading.js';
-import { showTitle, typeCaption, underline, anchor, revealAfter, readEnough } from './subtitles.js';
+import { showTitle, typeCaption, writeCaption, captionState, titleSeconds, underline, anchor, revealAfter, readEnough } from './subtitles.js';
 import { exportChainPDF, exportChainExcel } from './exports.js';
 import { historyState, hydrateFrames } from './history.js';
 import { beginChain, describeChain, queryChain, finishChain, exportChain, download } from './history.js';
@@ -22,8 +22,8 @@ const slots = Array.from({ length: 13 }, () => {
   return { video, media: null, item: null, role: 'idle', kind: null, controller: null, claim: null };
 });
 const state = {
-  step: 'query', modelStatus: 'caricamento…', caption: '', terms: [], query: queryFor([]),
-  checked: 0, total: null, next: null, message: 'ricerca del primo video…', downloadStatus: '',
+  step: 'query', modelStatus: 'loading…', caption: '', terms: [], query: queryFor([]),
+  checked: 0, total: null, next: null, message: 'finding the first video…', downloadStatus: '',
   switches: 0, fallbacks: 0, muted: true, fitMode: 'fill', preview: '', frameTime: null, inferenceMs: null,
   paused:false,reviewing:false,reviewIndex:null,queueTarget:5,queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
 };
@@ -45,7 +45,7 @@ const lifetime = new AbortController();
 const network = new Semaphore(ios ? 2 : 3);
 const generalPool = new UniformPool([], lifetime.signal, result => {
   addLoadingImages(result.items);
-  if (!active) update({ query: result.query, total: result.total, message: 'cerco derivati video leggeri…' });
+  if (!active) update({ query: result.query, total: result.total, message: 'looking for light video files…' });
 }, { inflight: 5, target: 8, onItem: item => addLoadingImages([item]) });
 const update = changes => {
   if (changes.message) report.message(changes.message);
@@ -88,7 +88,7 @@ function rpc(data, transfer = [], timeout = 240000) {
   const id = ++rpcID;
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      const error = new Error('Timeout modello locale');
+      const error = new Error('local model timeout');
       worker?.terminate(); worker = null; workerReady = null;
       for (const request of pending.values()) { clearTimeout(request.timer); request.reject(error); }
       pending.clear();
@@ -99,7 +99,7 @@ function rpc(data, transfer = [], timeout = 240000) {
 async function ensureModel() {
   if (!workerReady) {
     if (!worker) makeWorker();
-    workerReady = rpc({ type: 'warmup' }).then(() => update({ modelStatus: 'Pronto · nessuna API remota' })).catch(error => {
+    workerReady = rpc({ type: 'warmup' }).then(() => update({ modelStatus: 'ready · no remote API' })).catch(error => {
       workerReady = null; worker?.terminate(); worker = null;
       for (const p of pending.values()) { clearTimeout(p.timer); p.reject(error); } pending.clear();
       throw error;
@@ -119,6 +119,10 @@ const MIN_PLAY_SECONDS = 10, HOLD_MS = 10000;
 // replays its clip): a random video comes only after this long, or when the
 // description has no keyword left.
 const LONGEST_SECONDS = 120;
+// Videos too short to leave time for finding the next one (title 10 s,
+// description ~3.5 s, preparation of the successor) are skipped: they would
+// end and loop. Shortest file, and shortest stretch left after the start point.
+const MIN_VIDEO_SECONDS = 40, MIN_LEFT_SECONDS = 30;
 let fallbackCause = '';
 // A successor takes over only when it can play on without stalling: enough
 // seconds already downloaded from its start (or all of its clip), or it has
@@ -220,9 +224,9 @@ async function fill(slot, kind, cycle = context, keywordPool = cycle?.pool) {
       update({ checked: state.checked + 1 });
       try {
         const candidate = await resolveItem(entry.candidate, pool.terms, signal, fileLimits);
-        if (!candidate) { failed.set(slot.claim, performance.now() + 60000); slot.claim = null; if (kind === 'semantic') missed(cycle); continue; }
+        if (!candidate || candidate.duration && candidate.duration < MIN_VIDEO_SECONDS) { if (candidate) report.short(); failed.set(slot.claim, performance.now() + 60000); slot.claim = null; if (kind === 'semantic') missed(cycle); continue; }
         slot.role = 'buffering';
-        if (kind === 'semantic' || !active) update({ step: 'precaricamento', message: `preparo ${candidate.title}` });
+        if (kind === 'semantic' || !active) update({ step: 'preloading', message: `preparing ${candidate.title}` });
         const began = performance.now();
         const middle = candidate.collections.includes('prelinger');
         // With a scene thumbnail the video starts on that scene through byte
@@ -237,6 +241,8 @@ async function fill(slot, kind, cycle = context, keywordPool = cycle?.pool) {
         const bitrate = candidate.duration ? candidate.bytes * 8 / candidate.duration : 1000000;
         slot.media = await network.run(() => prepare(slot.video, candidate.streamURL, signal, { startup: !active, middle, startAt: scene ? scene.time : null, pixels: !scene, maxStart: 48000000 / bitrate }), signal, kind === 'semantic' ? 1 : 0);
         if (signal.aborted || kind === 'semantic' && cycle !== context) return;
+        // The real length is known only now (Archive metadata can be missing or wrong).
+        if (slot.video.duration - slot.media.start < MIN_LEFT_SECONDS) { report.short(); throw new Error('video too short'); }
         if (!scene && kind === 'semantic' && slot.media.readable) visionOf(item, async () => ({ ...capture(slot.video), source: 'fotogramma del lettore' })).catch(() => {});
         slot.item = { ...item, incoming: kind === 'semantic' ? {
           parentID: cycle.parent.id, parentTitle: cycle.parent.title, terms: [...pool.terms],
@@ -245,7 +251,7 @@ async function fill(slot, kind, cycle = context, keywordPool = cycle?.pool) {
         } : null };
         slot.role = 'ready'; slot.readyAt = performance.now();
         update({ prepareMs: performance.now() - began }); report.prepared(performance.now() - began);
-        if (kind === 'semantic') update({ step: 'pronto', next: slot.item, query: entry.result.query, message: 'successore della query pronto' });
+        if (kind === 'semantic') update({ step: 'ready', next: slot.item, query: entry.result.query, message: 'linked successor ready' });
         if (!active && !switching && !state.paused) promote(slot, 'startup');
         return;
       } catch (error) {
@@ -253,7 +259,7 @@ async function fill(slot, kind, cycle = context, keywordPool = cycle?.pool) {
         failed.set(slot.claim, performance.now() + 60000);
         release(slot); slot.kind = kind; slot.role = 'resolving'; slot.claim = null;
         if (kind === 'semantic') missed(cycle);
-        if (kind === 'semantic' || !active) update({ message: `${error.message}; provo un altro candidato…` });
+        if (kind === 'semantic' || !active) update({ message: `${error.message}; trying another candidate…` });
       }
     }
   } catch (error) {
@@ -309,7 +315,7 @@ async function analyze(cycle) {
   const signal = cycle.controller.signal, slot = active, item = active.item;
   for (let attempt = 0; attempt < 3 && cycle === context; attempt++) {
     try {
-      update({ step: 'modello', modelStatus: 'descrizione del fotogramma…' });
+      update({ step: 'model', modelStatus: 'describing the frame…' });
       // Usually already under way (or done) since the video was a candidate.
       const vision = await abortable(visionOf(item, async () => {
         if (item.scene && attempt === 0) return sceneFrame(item, item.scene, signal);
@@ -326,7 +332,7 @@ async function analyze(cycle) {
       cycle.caption = vision.caption; cycle.keywords = [...terms]; cycle.allKeywords = [...terms];
       describeChain(vision.caption, terms, { time: frame.time, source: frame.source, preview: frame.preview, width: frame.width, height: frame.height });
       typeCaption(vision.caption, terms[0]); report.caption(vision.caption, vision.inferenceMs);
-      update({ step: 'keyword', preview: frame.preview, frameTime: frame.time, frameSource: frame.source, caption: vision.caption, terms, inferenceMs: vision.inferenceMs, modelStatus: 'pronto · inferenza locale' });
+      update({ step: 'keyword', preview: frame.preview, frameTime: frame.time, frameSource: frame.source, caption: vision.caption, terms, inferenceMs: vision.inferenceMs, modelStatus: 'ready · local inference' });
       if (!terms.length) { item.vision = null; await delay(4000, signal); continue; }
       nextKeyword(cycle); return;
     } catch (error) {
@@ -419,7 +425,7 @@ async function promote(next, reason) {
     invalidateSemantic();
     remember(next.item.id);
     update({ switches: state.switches + Number(!!old), fallbacks: state.fallbacks + Number(!!old && next.kind !== 'semantic'),
-      step: 'modello', caption: '', terms: [], selectedTerm: '', query: '', total: null, next: null, preview: '', frameTime: null, inferenceMs: null, message: 'analisi del video corrente…' });
+      step: 'model', caption: '', terms: [], selectedTerm: '', query: '', total: null, next: null, preview: '', frameTime: null, inferenceMs: null, message: 'describing the current video…' });
     if (old) { release(old); old.claim = null; }
     context = { id: ++generation, parent: next.item, controller: new AbortController(), pool: null, keywords: [], misses: 0 };
     analyze(context); await reveal;
@@ -454,16 +460,23 @@ function tick() {
     else if (!stalled && active.stallAt) { report.stall(now - active.stallAt); active.stallAt = 0; }
     if (over && !active.extended) { active.extended = true; report.extended(); }
     // The successor takes over once well buffered (after MIN_PLAY_SECONDS),
-    // or at once when the current video stalls.
-    if (semantic && read && (elapsed >= MIN_PLAY_SECONDS && prontissimo(semantic) || stalled || tooLong)) promote(semantic, 'query');
-    // A random video only when the chain cannot go on: no keyword left, a
-    // stall that lasts, or the very long limit.
-    else if (general && read && (tooLong || !chainAlive && (over || ended) || stalled && now - active.heldAt > HOLD_MS)) {
-      fallbackCause = tooLong ? 'nessun successore dopo 2 minuti' : !chainAlive ? 'parole della descrizione esaurite' : 'video bloccato più di 10 s';
-      promote(general, 'fallback');
+    // or at once when the current video stalls. A random video only when the
+    // chain cannot go on: no keyword left, a stall that lasts, or the very
+    // long limit.
+    // The title counts from when it appears (after the first fade-in, not before).
+    const next = semantic && (Math.min(elapsed, titleSeconds(now)) >= MIN_PLAY_SECONDS && prontissimo(semantic) || stalled || tooLong) ? semantic
+      : general && (tooLong || !chainAlive && (over || ended) || stalled && now - active.heldAt > HOLD_MS) ? general : null;
+    if (next) {
+      // Until now only the title was on screen: the description is written
+      // now, left for 2 s, and then the video changes.
+      if (captionState() === 'waiting') writeCaption();
+      if (read) {
+        if (next === general) fallbackCause = tooLong ? 'nessun successore dopo 2 minuti' : !chainAlive ? 'parole della descrizione esaurite' : 'video bloccato più di 10 s';
+        promote(next, next === semantic ? 'query' : 'fallback');
+      }
     }
     // A short video that ends while the chain is still searching plays its clip again.
-    else if (ended && !tooLong) { report.replay(); video.currentTime = active.media.start; video.play().catch(() => {}); active.lastProgress = now; }
+    if (ended && !tooLong && !(next && read)) { report.replay(); video.currentTime = active.media.start; video.play().catch(() => {}); active.lastProgress = now; }
     state.elapsed = elapsed; state.buffer = bufferAhead(video);
   }
   requestAnimationFrame(tick);
@@ -500,7 +513,7 @@ document.addEventListener('keydown', event => {
   if(event.target.matches('input,textarea,select'))return;
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
-  if (['i', 'm', 'f', 'c', 's', 'p', 'e', '1', 'arrowright', 'arrowleft'].includes(key)) {
+  if (['i', 'm', 'f', 'c', 's', 'p', '1', 'arrowright', 'arrowleft'].includes(key)) {
     event.preventDefault();
     if (document.activeElement === skipArea) skipArea.blur();
   }
@@ -516,10 +529,7 @@ document.addEventListener('keydown', event => {
   }
   if (key === 's') exportChain();
   // 1: a plain-text report of this session (interruptions, timings, every video).
-  if (key === '1') {
-    const stamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
-    download(new Blob([report.text({ archive: archiveStats() })], { type: 'text/plain;charset=utf-8' }), `afterimage_report_${stamp}.txt`);
-  }
+  if (key === '1') downloadReport();
 });
 window.addEventListener('afterimage:fit',()=>{if(!active)return;const fill=active.video.classList.toggle('fill');update({fitMode:fill?'fill':'fit'});applyCrop(active);});
 async function navigateHistory(delta){
@@ -531,14 +541,20 @@ async function navigateHistory(delta){
  for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}
  const old=active;let target;
  try{
-  const record=records[index];await hydrateFrames([record]);target=slots.find(slot=>slot!==old&&slot.role==='idle');if(!target)throw Error('attendo un posto libero per la cronologia');
+  const record=records[index];await hydrateFrames([record]);target=slots.find(slot=>slot!==old&&slot.role==='idle');if(!target)throw Error('waiting for a free slot for the history');
   target.role='buffering';target.item=record.video.streamURL?{...record.video,streamURL:record.video.streamURL.replace('/download/','/cors/')} : await resolveItem({identifier:record.video.id},[],new AbortController().signal);
-  if(!target.item)throw Error('video della cronologia non disponibile');
+  if(!target.item)throw Error('history video unavailable');
   target.media=await prepare(target.video,target.item.streamURL,new AbortController().signal,{startup:true,startAt:record.playStart||0,pixels:needPixels()});await startPlaying(target.video);target.video.muted=state.muted;target.video.classList.toggle('fill',state.fitMode==='fill');target.video.classList.add('on');old.video.classList.remove('on');active=target;active.role='active';active.startedAt=performance.now();active.recordingKey=Symbol();if(state.paused){pausedAt=performance.now();active.video.pause();}release(old);old.claim=null;
-  showTitle(record.video.title);update({reviewIndex:index,step:'cronologia',caption:record.description,terms:record.keywords||[],preview:record.frame?.preview||'',message:'cronologia · → prosegue; dopo l’ultimo video riprende il flusso'});
+  showTitle(record.video.title);update({reviewIndex:index,step:'history',caption:record.description,terms:record.keywords||[],preview:record.frame?.preview||'',message:'history · → goes on; after the last video the flow resumes'});
  }catch(error){if(target&&target!==active)release(target);update({message:error.message});}finally{switching=false;}
 }
 window.addEventListener('afterimage:navigate',event=>{if(event.detail<0||state.reviewing)navigateHistory(event.detail);else skipReady();});
+function downloadReport() {
+  const stamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+  download(new Blob([report.text({ archive: archiveStats() })], { type: 'text/plain;charset=utf-8' }), `afterimage_report_${stamp}.txt`);
+}
+window.addEventListener('afterimage:report', downloadReport);
+window.addEventListener('afterimage:info', () => renderInfo(state, active));
 window.addEventListener('afterimage:export-error',event=>update({message:event.detail}));
 window.addEventListener('afterimage:filters',()=>{
  invalidateSemantic();for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}generalPool.queue.length=0;failed.clear();

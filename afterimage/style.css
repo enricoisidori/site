@@ -15,35 +15,35 @@ video.fill { object-fit: cover; transform-origin: 50% 50%; }
 #loading .loading-art { position: absolute; inset: 0; z-index: 1; color: black; }
 #loading .loading-art svg { width: 100%; height: 100%; }
 #loading[hidden] { display: none; }
-#info { position: fixed; z-index: 10; left: 20px; bottom: 20px; width: min(600px, calc(100% - 40px)); max-height: calc(100% - 40px); overflow: auto; background: rgb(0 0 0 / 82%); color: #ddd; padding: 18px 20px; font-size: 13px; line-height: 1.55; border: 1px solid #333; }
-#info[hidden] { display: none; }
-#info p { margin: 0 0 8px; overflow-wrap: anywhere; }
-#info p:last-child { margin-bottom: 0; }
-#info .label { color: #858585; }
-#info .step { color: #777; }
-#info .step.active { color: #f1ff90; }
-#info mark { color: #000; background: #f1ff90; padding: 0 2px; }
-#info a { color: inherit; }
-#info .small { font-size: 11px; color: #999; }
-#info .chain { padding-left: 10px; border-left: 2px solid #f1ff90; }
-#info summary { cursor: pointer; }
-#info img { width: 112px; height: 72px; object-fit: contain; float: right; margin: 0 0 8px 12px; background: #111; }
 @media (prefers-reduced-motion: reduce) { #loading { transition: none; } }
 
-/* One typographic size throughout the process and chain. */
-#info{background:rgba(255,255,255,.97);color:#111;border:0;padding:18px;font:12px/1.5 Helvetica,Arial,sans-serif;}
-#info p,#info button,#info select,#info summary,#info label,#info textarea{font:inherit;font-weight:400;}
-#info button{border:0;background:none;color:inherit;padding:0;margin:0 12px 0 0;cursor:pointer;text-decoration:underline;}
-#info .actions{display:flex;gap:10px;flex-wrap:wrap;}#info select{background:transparent;border:0;color:inherit;margin-bottom:16px;}
-#info .chain{padding:0;border:0;}#info article{margin:28px 0;}#info img{float:none;display:block;width:min(100%,384px);height:auto;margin:0 0 12px;background:white;}
-#info details{margin:12px 0;}#info label{display:block;margin:6px 0;}#info u{text-underline-offset:3px;}#info textarea{width:100%;height:180px;}
+/* Panel C: one font, one size, one colour; no boxes, rules or grey. Links are
+   never underlined (only the keyword is, once); the thumbnail is a link too. */
+#info{position:fixed;z-index:10;left:20px;bottom:20px;width:min(600px,calc(100% - 40px));max-height:calc(100% - 40px);overflow:auto;background:rgba(255,255,255,.97);color:#111;border:0;padding:18px;font:12px/1.5 Helvetica,Arial,sans-serif;}
+#info[hidden]{display:none;}
+#info *{font:inherit;color:inherit;font-weight:400;}
+#info p{margin:0;overflow-wrap:anywhere;}
+#info a{text-decoration:none;}#info a:hover,#info button:hover{opacity:.6;}
+#info button,#info select{border:0;background:none;padding:0;margin:0;cursor:pointer;text-decoration:none;}
+#info .actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:6px 0 4px;}
+#info article{margin:0;padding:22px 0 0;}
+#info .thumb{display:block;}#info .thumb:hover{opacity:1;}#info img{display:block;width:min(100%,384px);height:auto;margin:0 0 8px;}
+#info u{text-decoration:underline;text-underline-offset:3px;}
+#info details{margin:6px 0 0;}#info summary{cursor:pointer;}#info label{display:block;margin:4px 0;}
+#info textarea{width:100%;height:180px;}
+#info .more,#info .filters{margin-top:22px;}
 .loading-label{position:absolute;left:50%;top:70%;transform:translateX(-50%);color:#111;font:12px Helvetica,Arial,sans-serif;}
-#subtitles { position: fixed; left: 0; right: 0; bottom: 7vh; z-index: 3; pointer-events: none; font: 20px/1.35 Helvetica, Arial, sans-serif; color: #fff; text-transform: none; text-shadow: -.75px -.75px 0 #000, .75px -.75px 0 #000, -.75px .75px 0 #000, .75px .75px 0 #000, 0 -.75px 0 #000, 0 .75px 0 #000, -.75px 0 0 #000, .75px 0 0 #000; }
+#subtitles { position: fixed; left: 0; right: 0; bottom: calc(7vh - 10px); z-index: 3; pointer-events: none; font: clamp(17px, 1.6vw + 10px, 25px)/1.35 Helvetica, Arial, sans-serif; color: #fff; text-transform: none; -webkit-text-stroke: 2px #000; paint-order: stroke fill; }
+/* A real outline of the letters (not shadows): a 2px stroke centred on each
+   glyph edge, painted under the fill, so 1px shows outside, like the
+   border of the underline. */
 #subtitles .line { padding: 0 24px; text-align: center; overflow-wrap: break-word; }
 #subtitles .line.anchored { text-align: left; }
 #subtitles .inner { display: inline-block; max-width: 100%; }
 #subtitles .session { margin-bottom: 4px; font-style: italic; }
-/* A white line with a thin black outline all around, unbroken across spaces
-   (and across a line wrap, where each piece gets its own outline). */
-#subtitles u { text-decoration: none; padding-bottom: 4px; background-image: linear-gradient(#fff, #fff), linear-gradient(#000, #000); background-size: calc(100% - 1.5px) 2px, 100% 3.5px; background-position: .75px calc(100% - .75px), 0 100%; background-repeat: no-repeat; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+/* The underline is its own box: a white line with a real black border of the
+   same width as the text outline, on all four sides. The keyword never breaks
+   across lines, so the line stays one unbroken piece under it. */
+#subtitles u { text-decoration: none; position: relative; white-space: nowrap; }
+#subtitles u::after { content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; background: #fff; border: 1px solid #000; }
 #subtitles .ghost { visibility: hidden; }

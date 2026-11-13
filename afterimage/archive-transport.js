@@ -17,10 +17,10 @@ function jsonp(url, signal) {
     const abort = () => finish(signal.reason || new DOMException('aborted', 'AbortError'));
     if (signal?.aborted) return abort();
     window[name] = data => data.error ? finish(new Error(String(data.error))) : finish(null, data);
-    script.onerror = () => finish(new Error('ricerca Archive non disponibile'));
+    script.onerror = () => finish(new Error('Archive search unavailable'));
     target.searchParams.set('callback', name); script.src = target.href;
     signal?.addEventListener('abort', abort, { once: true });
-    timer = setTimeout(() => finish(new Error('timeout ricerca Archive')), 8000);
+    timer = setTimeout(() => finish(new Error('Archive search timeout')), 8000);
     document.head.append(script);
   });
 }
@@ -74,10 +74,10 @@ async function request(url, signal, { scrape: allowScrape = true } = {}) {
   if(original.searchParams.get('rows')==='1')params.set('total_only','true');
   const scrape=async()=>{
     const data=await direct('https://archive.org/services/search/v1/scrape?'+params,combined);
-    if(data.total==null)throw new Error('risposta Archive incompleta');
+    if(data.total==null)throw new Error('incomplete Archive answer');
     return {response:{numFound:Number(data.total),docs:data.items||[]},recovery:true};
   };
-  const validate=data=>{if(data.response?.numFound==null)throw new Error('risposta Archive incompleta');return data;};
+  const validate=data=>{if(data.response?.numFound==null)throw new Error('incomplete Archive answer');return data;};
   const preferred=(location.protocol==='file:'?jsonp(url,combined):direct(url,combined)).then(validate);
   const alternatives=[];
   const fallback=async(ms,paths,task)=>{const result=await Promise.race([later(ms,combined).then(()=>null),Promise.any(paths).catch(()=>null)]);combined.throwIfAborted();return result??task();};
@@ -85,6 +85,6 @@ async function request(url, signal, { scrape: allowScrape = true } = {}) {
   // Scrape ignores page and would break the uniform draw: opt-out per call.
   if(allowScrape&&!trouble)alternatives.push(fallback(location.protocol==='file:'?1500:3000,[preferred,...alternatives],scrape));
   try{return await Promise.any([preferred,...alternatives]);}
-  catch(error){if(signal?.aborted)throw signal.reason;throw new Error('Internet Archive non risponde alla ricerca; riprovo automaticamente');}
+  catch(error){if(signal?.aborted)throw signal.reason;throw new Error('Internet Archive is not answering the search; retrying automatically');}
   finally{controller.abort();}
 }

@@ -2,7 +2,7 @@
 // .txt when the key 1 is pressed. Kept in memory for the current page only.
 const started = new Date(), t0 = performance.now();
 const videos = [], stalls = [], events = [];
-const count = { replays: 0, extended: 0, pauses: 0, hiddenMs: 0, visionOK: 0, visionFail: 0, inferenceMs: 0, prepareMs: [], emptyKeywords: 0, keywordChanges: 0, backupUsed: 0 };
+const count = { short: 0, replays: 0, extended: 0, pauses: 0, hiddenMs: 0, visionOK: 0, visionFail: 0, inferenceMs: 0, prepareMs: [], emptyKeywords: 0, keywordChanges: 0, backupUsed: 0 };
 let firstVideoMs = null, firstPictureMs = null, hiddenAt = null, current = null;
 const terms = new Map();
 
@@ -22,21 +22,23 @@ export const report = {
     const at = now();
     if (current) current.onScreen = at - current.at;
     if (firstVideoMs == null) firstVideoMs = at;
-    current = { at, id: item.id, title: item.title || '', duration: item.duration || 0, reason, cause, keyword, caption: '', stalls: 0 };
+    current = { at, id: item.id, title: item.title || '', duration: item.duration || 0, reason, cause, keyword, caption: '', stalls: 0, replays: 0 };
     videos.push(current);
     if (keyword) terms.set(keyword, (terms.get(keyword) || 0) + 1);
   },
   caption(text, inferenceMs) { if (current) current.caption = text; count.visionOK++; count.inferenceMs += inferenceMs || 0; },
   visionFailed(message) { count.visionFail++; events.push([now(), 'descrizione non riuscita: ' + message]); },
   stall(ms) { stalls.push([now() - ms, ms, current?.title || '']); if (current) current.stalls++; },
-  replay() { count.replays++; },
+  replay() { count.replays++; if (current) current.replays++; },
+  short() { count.short++; },
   extended() { count.extended++; },
   emptyKeyword(term) { count.emptyKeywords++; events.push([now(), `nessun risultato per "${term}"`]); },
   keywordChange() { count.keywordChanges++; },
   backup() { count.backupUsed++; },
   prepared(ms) { if (ms) count.prepareMs.push(ms); },
   pause() { count.pauses++; },
-  message(text) { if (/archive|timeout|http|errore|non risponde/i.test(text || '')) events.push([now(), text]); },
+  // Problems only (video titles in "preparing …" messages may contain these words).
+  message(text) { if (!/^(preparing|describing|looking|finding|linked) /i.test(text || '') && /archive|timeout|http|error|not answering|too short|unavailable/i.test(text || '')) events.push([now(), text]); },
   visibility(hidden) {
     if (hidden) hiddenAt = now(); else if (hiddenAt != null) { count.hiddenMs += now() - hiddenAt; hiddenAt = null; }
   },
@@ -54,7 +56,21 @@ export const report = {
     for (const v of videos) if (v.reason === 'fallback') causes[v.cause || 'non indicata'] = (causes[v.cause || 'non indicata'] || 0) + 1;
     const prep = [...count.prepareMs].sort((a, b) => a - b);
     const L = [];
-    L.push('AFTERIMAGE — REPORT DELLA SESSIONE', '');
+    // Summary first: the numbers that matter, with █ on every one that is not zero.
+    const errors = events.filter(e => !/nessun risultato/.test(e[1])).length;
+    const BAR = '█'.repeat(48);
+    const mark = (label, value, bad) => `${bad ? '█' : ' '} ${label.padEnd(34)} ${value}`;
+    L.push('AFTERIMAGE — REPORT DELLA SESSIONE', '', BAR);
+    L.push(mark('Durata', dur(total), false));
+    L.push(mark('Video mostrati', String(shown), false));
+    L.push(mark('NEW SESSION (salti casuali)', `${random} su ${Math.max(0, switches)} cambi`, random > 0));
+    L.push(mark('Loop (spezzone ripetuto)', String(count.replays), count.replays > 0));
+    L.push(mark('Interruzioni (video fermo)', stalls.length ? `${stalls.length}, in tutto ${dur(stallTotal)}` : '0', stalls.length > 0));
+    L.push(mark('Errori e segnalazioni', String(errors), errors > 0));
+    L.push(mark('Richieste Archive non riuscite', extra.archive ? String(extra.archive.failures) : '–', !!extra.archive?.failures));
+    L.push(mark('Descrizioni non riuscite', String(count.visionFail), count.visionFail > 0));
+    L.push(mark('Primo video dopo', firstVideoMs == null ? 'nessuno' : dur(firstVideoMs), firstVideoMs == null || firstVideoMs > 10000));
+    L.push(BAR, '(█ = da guardare)', '');
     L.push(`Inizio:      ${started.toLocaleString('it-IT')}`);
     L.push(`Report:      ${new Date().toLocaleString('it-IT')}`);
     L.push(`Durata:      ${dur(total)}${count.hiddenMs ? ` (di cui ${dur(count.hiddenMs)} con la pagina nascosta)` : ''}`);
@@ -74,13 +90,14 @@ export const report = {
     L.push(`Tempo medio per video:     ${dur(avg)} (min ${dur(onScreen.length ? Math.min(...onScreen) : null)}, max ${dur(onScreen.length ? Math.max(...onScreen) : null)})`);
     L.push(`Video tenuti oltre 30 s in attesa del successivo: ${count.extended}`);
     L.push(`Spezzoni ripetuti (video finito prima del successivo): ${count.replays}`);
+    L.push(`Video scartati perché troppo corti: ${count.short}`);
     L.push(`Seconda parola usata come riserva: ${count.backupUsed}`);
     L.push(`Parole senza risultati: ${count.emptyKeywords}`, '');
     L.push('INTERRUZIONI (video fermo a caricare)');
     L.push(`Numero:        ${stalls.length}`);
     L.push(`Tempo totale:  ${dur(stallTotal)} (${pct(stallTotal, total)} della sessione)`);
     L.push(`Più lunga:     ${dur(stalls.length ? Math.max(...stalls.map(s => s[1])) : null)}`);
-    for (const [at, ms, title] of stalls.slice(-40)) L.push(`  ${clock(at)}  ${dur(ms).padEnd(8)}  ${title.slice(0, 70)}`);
+    for (const [at, ms, title] of stalls.slice(-40)) L.push(`█ ${clock(at)}  ${dur(ms).padEnd(8)}  ${title.slice(0, 70)}`);
     L.push(`Pause manuali: ${count.pauses}`, '');
     L.push('ARCHIVE');
     if (extra.archive) {
@@ -101,8 +118,9 @@ export const report = {
     L.push('ELENCO DEI VIDEO (ora · tempo sullo schermo · come è arrivato · titolo)');
     const how = v => v.reason === 'query' ? `parola "${v.keyword}"` : v.reason === 'fallback' ? `NEW SESSION${v.cause ? ' – ' + v.cause : ''}` : v.reason === 'click' ? 'clic' : 'avvio';
     for (const v of videos) {
-      L.push(`${clock(v.at)}  ${(dur(v.onScreen) + (v === current ? '+' : '')).padEnd(8)}  ${how(v)}${v === current ? '  (in corso)' : ''}`);
-      L.push(`          ${v.title.slice(0, 100)}${v.stalls ? `  [${v.stalls} interruzioni]` : ''}`);
+      const problems = [v.reason === 'fallback' && 'NEW SESSION', v.replays && `loop ×${v.replays}`, v.stalls && `${v.stalls} interruzioni`].filter(Boolean);
+      L.push(`${problems.length ? '█' : ' '} ${clock(v.at)}  ${(dur(v.onScreen) + (v === current ? '+' : '')).padEnd(8)}  ${how(v)}${v === current ? '  (in corso)' : ''}${problems.length ? '  █ ' + problems.join(', ') : ''}`);
+      L.push(`          ${v.title.slice(0, 100)}`);
       L.push(`          https://archive.org/details/${v.id}`);
       if (v.caption) L.push(`          descrizione: ${v.caption}`);
     }

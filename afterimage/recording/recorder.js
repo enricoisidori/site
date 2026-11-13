@@ -59,7 +59,7 @@ export function createSelectiveRecorder({name,getScene,getSnapshots=async()=>[],
  outline.style.cssText='position:fixed;z-index:2;pointer-events:none;box-sizing:border-box;border:1px solid white;outline:1px solid #0008';
  const frameLabel=document.createElement('span');frameLabel.style.cssText='position:absolute;left:5px;top:3px;color:white;text-shadow:0 1px 2px black;font:12px/1.4 Helvetica,Arial,sans-serif;white-space:nowrap';outline.append(frameLabel);document.body.append(outline);
  function updateFrame(){
-  const r=frameRectangle();outline.hidden=!(['starting','recording'].includes(phase)||document.querySelector('#controls:not([hidden]),#info:not([hidden])'));
+  const r=frameRectangle();outline.hidden=!['starting','recording'].includes(phase);
   Object.assign(outline.style,{left:r.x+'px',top:r.y+'px',width:r.width+'px',height:r.height+'px'});
   frameLabel.textContent=Number((r.width/innerWidth*100).toFixed(1))+'vw × '+Number((r.height/innerHeight*100).toFixed(1))+'vh · '+dimensions.width+' × '+dimensions.height+'px';
  }

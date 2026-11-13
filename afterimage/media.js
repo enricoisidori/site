@@ -33,7 +33,7 @@ export function waitFor(check, signal, timeout = 12000) {
     const abort = () => finish(signal.reason || new DOMException('aborted', 'AbortError'));
     if (signal?.aborted) return abort();
     signal?.addEventListener('abort', abort, { once: true });
-    timer = setTimeout(() => finish(new Error('timeout preparazione video')), timeout);
+    timer = setTimeout(() => finish(new Error('video preparation timeout')), timeout);
     poll = setInterval(() => { try { if (check()) finish(); } catch (error) { finish(error); } }, 60);
   });
 }
@@ -54,7 +54,7 @@ export async function prepare(video, url, signal, { startup = false, middle = fa
     // Safari on iPhone does not buffer from preload alone: a muted play() starts it.
     if (ios) video.play().catch(() => {});
     await waitFor(() => { if (video.error) throw new Error(video.error.message); return video.readyState >= 1 && Number.isFinite(video.duration); }, signal, 9000);
-    if (!(video.duration > 0)) throw new Error('video senza durata riproducibile');
+    if (!(video.duration > 0)) throw new Error('video without a playable duration');
     // Prelinger starts halfway through to bypass opening titles, including startup.
     const start = startAt != null ? Math.max(0,Math.min(startAt,video.duration-.1)) : middle ? video.duration / 2 : startup ? 0 : Math.random() * Math.max(0, Math.min(maxStart, video.duration - MAX_PLAY_SECONDS - .5));
     if (start > .05) video.currentTime = start;
@@ -78,7 +78,7 @@ export async function startPlaying(video, signal) {
       signal?.removeEventListener('abort', abort); error ? reject(error) : resolve();
     };
     const abort = () => done(signal.reason || new DOMException('aborted', 'AbortError'));
-    const timer = setTimeout(() => done(new Error('timeout avvio video')), 4000);
+    const timer = setTimeout(() => done(new Error('video start timeout')), 4000);
     if (signal?.aborted) return abort();
     signal?.addEventListener('abort', abort, { once: true });
     video.play().then(() => done(), done);
@@ -122,7 +122,7 @@ export function pickScene(item, { startup = false, middle = false } = {}) {
   if (middle) return scenes.sort((a, b) => Math.abs(a.time - duration / 2) - Math.abs(b.time - duration / 2))[0];
   // Leave room for a full-length play when the file allows it.
   const roomy = scenes.filter(frame => frame.time <= duration - MAX_PLAY_SECONDS);
-  if (roomy.length) scenes = roomy;
+  if (roomy.length) scenes = roomy; else if (duration) scenes = [scenes[0]];
   // The very first second is usually black or a title card.
   if (scenes.length > 1 && scenes[0].time <= 1) scenes = scenes.slice(1);
   return startup ? scenes[0] : scenes[Math.floor(Math.random() * scenes.length)];
@@ -158,7 +158,7 @@ export async function captureItemFrame(slot, signal) {
   catch (error) {
     if (error.name !== 'SecurityError') throw error;
     const frame = nearestScene(slot.item, slot.video.currentTime);
-    if (!frame) throw new Error('Questo file non ha frame di scena Archive: uso il fallback casuale');
+    if (!frame) throw new Error('this file has no Archive scene frames');
     return { ...await sceneFrame(slot.item, frame, signal), source: 'scena Archive più vicina (tempo approssimato)' };
   }
 }

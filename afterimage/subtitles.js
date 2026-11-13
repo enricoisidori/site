@@ -1,13 +1,14 @@
 import { highlightParts } from './terms.js';
-// Subtitles: the title of the video, then its description written word by
-// word, with the search keyword underlined. The next video's title appears
-// with the same word underlined at the same place on screen.
+// Subtitles: the title of the video stays on screen for most of its time; only
+// just before the change is its description written word by word, with the
+// search keyword underlined, and left for 2 s. The next video's title then
+// appears with the same word underlined at the same place on screen.
 const box = document.createElement('div');
 box.id = 'subtitles'; box.setAttribute('aria-live', 'polite');
 document.body.append(box);
-// How long a title stays before the description starts being written, and the
-// minimum reading times before the video may change.
-const TITLE_MS = 4500, TITLE_MIN_MS = 3000, CAPTION_MIN_MS = 2000;
+// Minimum reading times: the title before anything else, the finished
+// description before the video changes.
+const TITLE_MIN_MS = 3000, CAPTION_MIN_MS = 2000;
 let titleAt = 0, typing = null, caption = '', term = '', shown = 0, doneAt = null, gate = null, run = 0;
 
 // Subtitles stay hidden until `promise` settles (the first video fading in).
@@ -16,10 +17,16 @@ export function revealAfter(promise) {
   box.style.visibility = 'hidden'; titleAt = Infinity;
   current.then(() => { if (gate !== current) return; gate = null; box.style.visibility = ''; titleAt = performance.now(); });
 }
-// True once the title has been on screen 3 s and the description, if one is
-// being written, has been complete for 2 s.
+// True once the title has been on screen 3 s and the description, if there is
+// one, has been written and left complete for 2 s.
 export function readEnough(now = performance.now()) {
-  return now - titleAt >= TITLE_MIN_MS && (doneAt == null || now - doneAt >= CAPTION_MIN_MS);
+  return now - titleAt >= TITLE_MIN_MS && (!caption || doneAt != null && now - doneAt >= CAPTION_MIN_MS);
+}
+// Seconds the current title has been on screen (0 while still hidden).
+export function titleSeconds(now = performance.now()) { return Math.max(0, (now - titleAt) / 1000); }
+// 'none' (no description yet), 'waiting' (known, not written), 'typing', 'done'.
+export function captionState() {
+  return !caption ? 'none' : doneAt == null ? 'waiting' : doneAt === Infinity ? 'typing' : 'done';
 }
 
 function line(className) { const el = document.createElement('div'); el.className = 'line ' + (className || ''); box.append(el); return el; }
@@ -101,19 +108,23 @@ function render() {
   if (!row) { box.textContent = ''; row = line('caption'); }
   fill(row, caption, term, shown);
 }
-// The local model returns the whole sentence at once: it is written out as a
-// model would, quickly and at an uneven pace.
+// The description is kept until the change is near (writeCaption).
 export function typeCaption(text, keyword = '') {
-  clearTimeout(typing); caption = text; term = keyword; shown = 0; doneAt = null;
-  if (!text) return;
-  doneAt = Infinity; const mine = ++run;
-  const total = text.split(/\s+/).filter(Boolean).length;
+  clearTimeout(typing); typing = null; caption = text || ''; term = keyword; shown = 0; doneAt = null; run++;
+}
+// Written out as a model would, quickly and at an uneven pace, once the title
+// has had its minimum time.
+export function writeCaption() {
+  if (!caption || doneAt != null) return;
+  doneAt = Infinity; const mine = run;
+  const total = caption.split(/\s+/).filter(Boolean).length;
   const step = () => {
+    if (mine !== run) return;
     shown++; render();
     if (shown < total) typing = setTimeout(step, 35 + Math.random() * 110 + (Math.random() < .12 ? 180 : 0));
     else { typing = null; doneAt = performance.now(); }
   };
-  const start = () => { if (mine === run) typing = setTimeout(step, Math.max(0, titleAt + TITLE_MS - performance.now())); };
+  const start = () => { if (mine === run) typing = setTimeout(step, Math.max(0, titleAt + TITLE_MIN_MS - performance.now())); };
   if (gate) gate.then(start); else start();
 }
 // The keyword can change after the sentence (a word with no results is skipped).

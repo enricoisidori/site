@@ -38,7 +38,7 @@ function cumulative(index) {
   return index;
 }
 let globalIndex;
-const loadGlobal = () => globalIndex ||= fetch(new URL('./partition.json', import.meta.url)).then(r => { if (!r.ok) throw new Error('indice Archive mancante'); return r.json(); }).then(index => {
+const loadGlobal = () => globalIndex ||= fetch(new URL('./partition.json', import.meta.url)).then(r => { if (!r.ok) throw new Error('Archive index missing'); return r.json(); }).then(index => {
   cumulative(index);
   // Videos published after the index was built: counted live, once, without
   // delaying the first draw. They become one more drawer.
