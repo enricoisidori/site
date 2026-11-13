@@ -1,3 +1,15 @@
+# Versione principale · 13 novembre 2026
+
+Questa cartella era `afterimage-coverage/`; la versione precedente è conservata in `../afterimage-backup/`.
+
+- **Tasto 1**: scarica un report `.txt` della sessione (durata, avvio, cambi collegati e NEW SESSION con la causa, interruzioni con orario e durata, richieste ad Archive, descrizioni, elenco di tutti i video).
+
+- **Estrazione**: `partition.json` (da `node tools/build-archive-partition.mjs`) divide tutti i 12,6 M video Archive in 1.323 finestre di `publicdate` con meno di 10.000 elementi ciascuna. Un numero casuale sceglie finestra e posizione: una sola richiesta `rows=1` restituisce esattamente quel video, in modo uniforme, in 0,2–0,9 s (gli intervalli per identificativo impiegavano 8–15 s). I video pubblicati dopo l'indice vengono contati dal vivo.
+- **Parola chiave**: `title:"parola"` dopo (o prima di) un momento casuale della libreria, in una sola richiesta. Ogni corrispondenza è raggiungibile, senza conteggio preliminare. Le parole successive della stessa descrizione vengono cercate in anticipo.
+- **Descrizione**: MobileCLIP-S0 fp16 (23 MB + 6 MB di tabelle) al posto di vit-gpt2 (246 MB). La frase è composta da tipo di ripresa, soggetti e luogo; le parole sono ordinate per specificità (z-score rispetto a 400 fotogrammi Archive reali) e la catena prende la prima non ancora usata. Rigenerazione: `tools/build-afterimage-vocabulary.mjs`.
+- **Riproduzione**: il primo video parte dall'inizio via `/cors/`; i successivi partono dalla scena Archive descritta, via `/download/` con Range (salto immediato). Il modello descrive quella scena mentre il video carica. Durante la registrazione R si torna a `/cors/`, perché servono i pixel.
+- **Schermo pieno** di default; le bande nere incise nel file vengono ritagliate.
+
 # Aggiornamento · 23 ottobre 2026
 
 Rimane la registrazione selettiva R con audio, dimensioni/ritaglio e comandi S/D/X/Q, e rimangono P (PDF), J (JPEG) e G (screen MP4). Rimossi E, la modalità solo istruzioni, le timeline dei movimenti, lettura/scrittura IndexedDB e import/export JSON della registrazione. Nessuna istruzione di ricostruzione viene raccolta. Le sezioni storiche su E sono solo cronologia e non descrivono più il comportamento attuale. Il rendering R evita ridisegni duplicati prima del prossimo fotogramma da codificare.

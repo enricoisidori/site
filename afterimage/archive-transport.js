@@ -40,7 +40,33 @@ function later(ms, signal) {
     if(signal.aborted)return abort();signal.addEventListener('abort',abort,{once:true});
   });
 }
-export async function archiveJSON(url, signal) {
+// One shared budget for every JSON request to Archive (searches and metadata):
+// short bursts pass at once, sustained traffic stays under ~90 requests a
+// minute. While Archive is failing the budget shrinks, and no parallel
+// recovery paths are opened, so a struggling (or limiting) Archive is not
+// asked even more.
+const RATE = 1.5, BURST = 8;
+let tokens = BURST, refilledAt = Date.now(), trouble = 0;
+// Returns null when a request may go now, otherwise how many ms to wait.
+function budget() {
+  const now = Date.now(), rate = RATE / (1 + trouble);
+  tokens = Math.min(BURST, tokens + (now - refilledAt) / 1000 * rate); refilledAt = now;
+  if (tokens >= 1) { tokens--; return null; }
+  return Math.ceil((1 - tokens) / rate * 1000);
+}
+export const archiveHealth = () => ({ tokens, trouble });
+const stats = { requests: 0, failures: 0 };
+export const archiveStats = () => ({ ...stats });
+// Tests start each case with a full budget.
+export function resetArchiveBudget() { tokens = BURST; trouble = 0; refilledAt = Date.now(); }
+export async function archiveJSON(url, signal, options) {
+  for (let wait = budget(); wait != null; wait = budget()) await later(wait, signal || new AbortController().signal);
+  signal?.throwIfAborted();
+  stats.requests++;
+  try { const data = await request(url, signal, options); trouble = Math.max(0, trouble - 1); return data; }
+  catch (error) { if (!signal?.aborted) { trouble = Math.min(8, trouble + 1); stats.failures++; } throw error; }
+}
+async function request(url, signal, { scrape: allowScrape = true } = {}) {
   if(!url.includes('/advancedsearch.php'))return direct(url,signal);
   const controller=new AbortController(),combined=AbortSignal.any([controller.signal,AbortSignal.timeout(14000),...(signal?[signal]:[])]);
   const original=new URL(url),params=new URLSearchParams({q:original.searchParams.get('q'),fields:'identifier,title',count:'100'});
@@ -55,8 +81,9 @@ export async function archiveJSON(url, signal) {
   const preferred=(location.protocol==='file:'?jsonp(url,combined):direct(url,combined)).then(validate);
   const alternatives=[];
   const fallback=async(ms,paths,task)=>{const result=await Promise.race([later(ms,combined).then(()=>null),Promise.any(paths).catch(()=>null)]);combined.throwIfAborted();return result??task();};
-  if(location.protocol!=='file:')alternatives.push(fallback(1500,[preferred],async()=>validate(await jsonp(url,combined))));
-  alternatives.push(fallback(location.protocol==='file:'?1500:3000,[preferred,...alternatives],scrape));
+  if(location.protocol!=='file:'&&!trouble)alternatives.push(fallback(4000,[preferred],async()=>validate(await jsonp(url,combined))));
+  // Scrape ignores page and would break the uniform draw: opt-out per call.
+  if(allowScrape&&!trouble)alternatives.push(fallback(location.protocol==='file:'?1500:3000,[preferred,...alternatives],scrape));
   try{return await Promise.any([preferred,...alternatives]);}
   catch(error){if(signal?.aborted)throw signal.reason;throw new Error('Internet Archive non risponde alla ricerca; riprovo automaticamente');}
   finally{controller.abort();}

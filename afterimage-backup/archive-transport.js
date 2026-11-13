@@ -40,7 +40,7 @@ function later(ms, signal) {
     if(signal.aborted)return abort();signal.addEventListener('abort',abort,{once:true});
   });
 }
-export async function archiveJSON(url, signal, { scrape: allowScrape = true } = {}) {
+export async function archiveJSON(url, signal) {
   if(!url.includes('/advancedsearch.php'))return direct(url,signal);
   const controller=new AbortController(),combined=AbortSignal.any([controller.signal,AbortSignal.timeout(14000),...(signal?[signal]:[])]);
   const original=new URL(url),params=new URLSearchParams({q:original.searchParams.get('q'),fields:'identifier,title',count:'100'});
@@ -56,8 +56,7 @@ export async function archiveJSON(url, signal, { scrape: allowScrape = true } = 
   const alternatives=[];
   const fallback=async(ms,paths,task)=>{const result=await Promise.race([later(ms,combined).then(()=>null),Promise.any(paths).catch(()=>null)]);combined.throwIfAborted();return result??task();};
   if(location.protocol!=='file:')alternatives.push(fallback(1500,[preferred],async()=>validate(await jsonp(url,combined))));
-  // Scrape ignores page and would break the uniform draw: opt-out per call.
-  if(allowScrape)alternatives.push(fallback(location.protocol==='file:'?1500:3000,[preferred,...alternatives],scrape));
+  alternatives.push(fallback(location.protocol==='file:'?1500:3000,[preferred,...alternatives],scrape));
   try{return await Promise.any([preferred,...alternatives]);}
   catch(error){if(signal?.aborted)throw signal.reason;throw new Error('Internet Archive non risponde alla ricerca; riprovo automaticamente');}
   finally{controller.abort();}

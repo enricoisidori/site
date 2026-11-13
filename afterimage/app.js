@@ -1,13 +1,16 @@
 import { createSelectiveRecorder } from './recording/recorder.js';
-import { resolveItem, queryFor } from './archive.js';
-import { CandidatePool, Semaphore } from './pool.js';
+import { resolveItem, queryFor, prefetchKeyword } from './archive.js';
+import { UniformPool, CandidatePool, Semaphore } from './pool.js';
 import { captionTerms } from './terms.js';
-import { prepare, startPlaying, release, captureItemFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS, ios } from './media.js';
+import { prepare, startPlaying, release, capture, captureItemFrame, pickScene, sceneFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS, ios } from './media.js';
 import { renderInfo, toggleInfo } from './info.js';
-import { setWaiting, addLoadingImages, finishLoading } from './loading.js';
+import { setWaiting, addLoadingImages, finishLoading, FADE_MS } from './loading.js';
+import { showTitle, typeCaption, underline, anchor, revealAfter, readEnough } from './subtitles.js';
 import { exportChainPDF, exportChainExcel } from './exports.js';
 import { historyState, hydrateFrames } from './history.js';
-import { beginChain, describeChain, queryChain, finishChain, exportChain } from './history.js';
+import { beginChain, describeChain, queryChain, finishChain, exportChain, download } from './history.js';
+import { report } from './report.js';
+import { archiveStats } from './archive-transport.js';
 
 const stage = document.querySelector('#stage');
 const skipArea = document.querySelector('#skipArea');
@@ -21,15 +24,15 @@ const slots = Array.from({ length: 13 }, () => {
 const state = {
   step: 'query', modelStatus: 'caricamento…', caption: '', terms: [], query: queryFor([]),
   checked: 0, total: null, next: null, message: 'ricerca del primo video…', downloadStatus: '',
-  switches: 0, fallbacks: 0, muted: true, fitMode: 'fit', preview: '', frameTime: null, inferenceMs: null,
+  switches: 0, fallbacks: 0, muted: true, fitMode: 'fill', preview: '', frameTime: null, inferenceMs: null,
   paused:false,reviewing:false,reviewIndex:null,queueTarget:5,queueGeneral: 0, queueSemantic: 0, loading: 0, buffer: 0, elapsed: 0, prepareMs: null,
 };
 let pausedAt=0;
 let active, switching = false, generation = 0, context;
 const recording=createSelectiveRecorder({name:'afterimage',suspendPlayback:()=>{const was=state.paused;if(!was)togglePlaybackPause();return()=>{if(!was&&state.paused)togglePlaybackPause();};},getSnapshots:async()=>{await hydrateFrames();return historyState.records.filter(r=>r.shown!==false).map(r=>{const w=innerWidth,h=innerHeight,iw=r.frame?.width||r.video.width||4,ih=r.frame?.height||r.video.height||3,scale=state.fitMode==='fill'?Math.max(w/iw,h/ih):Math.min(w/iw,h/ih);return {preview:r.frame?.preview,source:{url:r.video.streamURL,archiveID:r.video.id,filename:r.video.filename},time:r.frame?.time??r.playStart??0,layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(w-iw*scale)/2,y:(h-ih*scale)/2,width:iw*scale,height:ih*scale}}]}};});},getScene:()=>{
- if(!active?.video||active.video.readyState<2)return null;
- const video=active.video;return {key:active.recordingKey||active.startedAt,video,muted:state.muted,paused:state.paused||document.hidden||video.paused||video.readyState<3,draw:(ctx,w,h)=>{
-  ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);const ratio=state.fitMode==='fill'?Math.max(w/video.videoWidth,h/video.videoHeight):Math.min(w/video.videoWidth,h/video.videoHeight);
+ if(!active?.video||active.video.readyState<2||active.media?.readable===false)return null;
+ const video=active.video,crop=active.crop||1;return {key:active.recordingKey||active.startedAt,video,muted:state.muted,paused:state.paused||document.hidden||video.paused||video.readyState<3,draw:(ctx,w,h)=>{
+  ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);const ratio=state.fitMode==='fill'?Math.max(w/video.videoWidth,h/video.videoHeight)*crop:Math.min(w/video.videoWidth,h/video.videoHeight);
   ctx.drawImage(video,(w-video.videoWidth*ratio)/2,(h-video.videoHeight*ratio)/2,video.videoWidth*ratio,video.videoHeight*ratio);
  }};
 }});
@@ -40,11 +43,12 @@ const pending = new Map(), recent = new Set(), failed = new Map();
 const lifetime = new AbortController();
 // iPhone: fewer simultaneous video downloads and decoders.
 const network = new Semaphore(ios ? 2 : 3);
-const generalPool = new CandidatePool([], lifetime.signal, result => {
+const generalPool = new UniformPool([], lifetime.signal, result => {
   addLoadingImages(result.items);
   if (!active) update({ query: result.query, total: result.total, message: 'cerco derivati video leggeri…' });
-});
+}, { inflight: 5, target: 8, onItem: item => addLoadingImages([item]) });
 const update = changes => {
+  if (changes.message) report.message(changes.message);
   Object.assign(state, changes);
   if (!active && /archive.*(?:http|disponibile|rispond|raggiung)|backend_error|timeout|failed to fetch/i.test(changes.message || '')) document.querySelector('#info').hidden = false;
   renderInfo(state, active);
@@ -104,12 +108,83 @@ async function ensureModel() {
   return workerReady;
 }
 
+// The recorder reads video pixels and audio, which only /cors/ streams allow.
+const needPixels = () => ['starting', 'recording'].includes(recording.status.phase);
+// Heavier files are acceptable where byte ranges avoid downloading from the start.
+const fileLimits = ios ? { maxBitrate: 1500000, maxHeight: 720 } : { maxBitrate: 3000000, maxHeight: 1080 };
+// Shortest time on screen before a ready successor takes over, and how long a
+// video that ended early keeps its last frame while its successor is prepared.
+const MIN_PLAY_SECONDS = 10, HOLD_MS = 10000;
+// While its successor is still being found a video simply keeps playing (or
+// replays its clip): a random video comes only after this long, or when the
+// description has no keyword left.
+const LONGEST_SECONDS = 120;
+let fallbackCause = '';
+// A successor takes over only when it can play on without stalling: enough
+// seconds already downloaded from its start (or all of its clip), or it has
+// been waiting long enough that the browser has stopped buffering it.
+const READY_SECONDS = ios ? 3 : 8, READY_PATIENCE_MS = 12000;
+function prontissimo(slot) {
+  if (!slot?.media) return false;
+  const want = Math.min(READY_SECONDS, slot.media.seconds - .2);
+  return bufferAhead(slot.video, slot.media.start) >= want || performance.now() - (slot.readyAt || 0) > READY_PATIENCE_MS;
+}
+// A keyword that already led somewhere recently goes after the fresh ones.
+const usedTerms = [];
+const freshFirst = terms => [...terms].sort((a, b) => Number(usedTerms.includes(a)) - Number(usedTerms.includes(b)));
+async function describeFrame(frame) {
+  await ensureModel();
+  const { pixels, ...shown } = frame;
+  const result = await rpc({ type: 'caption', pixels, width: frame.width, height: frame.height }, [pixels], 45000);
+  return { frame: shown, bars: shown.bars, caption: result.caption, terms: result.terms?.length ? result.terms : captionTerms(result.caption), inferenceMs: result.inferenceMs };
+}
+// One description per video, started as early as its frame is known: for a
+// scene thumbnail that is before the video has even buffered.
+function visionOf(item, getFrame) {
+  return item.vision ||= getFrame().then(describeFrame).then(vision => {
+    item.bars = vision.bars;
+    for (const slot of slots) if (slot.item?.id === item.id) { slot.bars = vision.bars; if (slot === active) applyCrop(slot); }
+    return vision;
+  }).catch(error => { item.vision = null; throw error; });
+}
+// Candidates of a keyword that keep failing must not hold the chain: move on.
+function missed(cycle) {
+  if (!cycle || cycle !== context || ++cycle.misses < 8 || !cycle.keywords.length) return;
+  for (const slot of slots) if (slot !== active && slot.kind === 'semantic' && slot.role !== 'ready') slot.controller?.abort();
+  cycle.pool = null; nextKeyword(cycle);
+}
+// Full-bleed: cover the screen, and enlarge further when the file itself
+// carries black bars, until they fall outside the screen.
+const OVERSCAN = 1.03;
+function applyCrop(slot) {
+  if (!slot?.video) return;
+  const video = slot.video, bars = slot.bars;
+  // Archive files often carry a few black pixels of blanking on the edges
+  // (DV, digitised tape): a small fixed overscan hides them, like a TV set.
+  let scale = state.fitMode === 'fill' ? OVERSCAN : 1;
+  if (state.fitMode === 'fill' && bars && video.videoWidth) {
+    const cover = Math.max(innerWidth / video.videoWidth, innerHeight / video.videoHeight);
+    const visibleX = innerWidth / (video.videoWidth * cover), visibleY = innerHeight / (video.videoHeight * cover);
+    scale = Math.min(1.6, Math.max(OVERSCAN, visibleX / (1 - 2 * bars.x), visibleY / (1 - 2 * bars.y)));
+  }
+  slot.crop = scale;
+  video.style.transform = scale > 1.001 ? `scale(${scale.toFixed(4)})` : '';
+}
+addEventListener('resize', () => applyCrop(active));
 function remember(id) {
+  markPlayed(id);
   recent.add(id); if (recent.size > 128) recent.delete(recent.values().next().value);
 }
 const readySlots = kind => slots.filter(slot => slot.role === 'ready' && (!kind || slot.kind === kind));
+// Never the same video twice, across sessions too.
+const playedKey = 'afterimage-coverage:played:v1', played = new Set();
+try { for (const id of JSON.parse(localStorage.getItem(playedKey) || '[]')) played.add(id); } catch {}
+function markPlayed(id) {
+  if (!id || played.has(id)) return; played.add(id);
+  try { localStorage.setItem(playedKey, JSON.stringify([...played].slice(-20000))); } catch {}
+}
 function excluded(id) {
-  return recent.has(id) || (failed.get(id) || 0) > performance.now() || slots.some(slot => slot.claim === id);
+  return played.has(id) || recent.has(id) || (failed.get(id) || 0) > performance.now() || slots.some(slot => slot.claim === id);
 }
 function invalidateSemantic() {
   context?.controller.abort();
@@ -125,33 +200,51 @@ function trimGeneral() {
     slot.controller?.abort();
   }
 }
-async function fill(slot, kind, cycle = context) {
+async function fill(slot, kind, cycle = context, keywordPool = cycle?.pool) {
   const token = slot.token = Symbol();
   const controller = slot.controller = new AbortController();
   const signal = kind === 'semantic' ? AbortSignal.any([controller.signal, cycle.controller.signal]) : controller.signal;
-  const pool = kind === 'semantic' ? cycle.pool : generalPool;
+  const pool = kind === 'semantic' ? keywordPool : generalPool;
   slot.role = 'resolving'; slot.kind = kind;
   try {
     for (let attempts = 0; attempts < 6 && !signal.aborted; attempts++) {
       const entry = await abortable(pool.take(excluded), signal);
-      if (!entry) { await delay(1200, signal); continue; }
+      if (!entry) {
+        // This keyword has no candidate left and none on its way: try the next
+        // keyword of the same description now instead of waiting on it.
+        if (kind === 'semantic' && cycle === context && cycle.backup === pool) { cycle.backup = null; return; }
+        if (kind === 'semantic' && cycle === context && cycle.pool === pool && !slots.some(s => s !== slot && s.kind === 'semantic' && ['buffering', 'ready'].includes(s.role))) { cycle.pool = null; nextKeyword(cycle); return; }
+        await delay(1200, signal); continue;
+      }
       slot.claim = entry.candidate.identifier;
       update({ checked: state.checked + 1 });
       try {
-        const candidate = await resolveItem(entry.candidate, pool.terms, signal);
-        if (!candidate) { failed.set(slot.claim, performance.now() + 60000); slot.claim = null; continue; }
+        const candidate = await resolveItem(entry.candidate, pool.terms, signal, fileLimits);
+        if (!candidate) { failed.set(slot.claim, performance.now() + 60000); slot.claim = null; if (kind === 'semantic') missed(cycle); continue; }
         slot.role = 'buffering';
         if (kind === 'semantic' || !active) update({ step: 'precaricamento', message: `preparo ${candidate.title}` });
         const began = performance.now();
-        slot.media = await network.run(() => prepare(slot.video, candidate.streamURL, signal, { startup: !active, middle: candidate.collections.includes('prelinger') }), signal, kind === 'semantic' ? 1 : 0);
+        const middle = candidate.collections.includes('prelinger');
+        // With a scene thumbnail the video starts on that scene through byte
+        // ranges, and the model can describe it while the stream buffers.
+        // The very first video starts from its beginning, the fastest point to reach.
+        const scene = needPixels() || !active && !middle ? null : pickScene(candidate, { middle });
+        const item = { ...candidate, scene };
+        if (scene && kind === 'semantic') visionOf(item, () => sceneFrame(item, scene, lifetime.signal)).then(vision => {
+          if (kind !== 'semantic' || cycle !== context || cycle.prefetched || !vision.terms.length) return;
+          cycle.prefetched = true; prefetchKeyword([freshFirst(vision.terms)[0]]);
+        }).catch(() => {});
+        const bitrate = candidate.duration ? candidate.bytes * 8 / candidate.duration : 1000000;
+        slot.media = await network.run(() => prepare(slot.video, candidate.streamURL, signal, { startup: !active, middle, startAt: scene ? scene.time : null, pixels: !scene, maxStart: 48000000 / bitrate }), signal, kind === 'semantic' ? 1 : 0);
         if (signal.aborted || kind === 'semantic' && cycle !== context) return;
-        slot.item = { ...candidate, incoming: kind === 'semantic' ? {
+        if (!scene && kind === 'semantic' && slot.media.readable) visionOf(item, async () => ({ ...capture(slot.video), source: 'fotogramma del lettore' })).catch(() => {});
+        slot.item = { ...item, incoming: kind === 'semantic' ? {
           parentID: cycle.parent.id, parentTitle: cycle.parent.title, terms: [...pool.terms],
           caption: cycle.caption, keywords: cycle.allKeywords, frameTime: cycle.frameTime,
-          query: entry.result.query, kind: 'query',
+          query: entry.result.query, kind: 'query', backup: pool === cycle.backup,
         } : null };
-        slot.role = 'ready';
-        update({ prepareMs: performance.now() - began });
+        slot.role = 'ready'; slot.readyAt = performance.now();
+        update({ prepareMs: performance.now() - began }); report.prepared(performance.now() - began);
         if (kind === 'semantic') update({ step: 'pronto', next: slot.item, query: entry.result.query, message: 'successore della query pronto' });
         if (!active && !switching && !state.paused) promote(slot, 'startup');
         return;
@@ -159,6 +252,7 @@ async function fill(slot, kind, cycle = context) {
         if (signal.aborted) return;
         failed.set(slot.claim, performance.now() + 60000);
         release(slot); slot.kind = kind; slot.role = 'resolving'; slot.claim = null;
+        if (kind === 'semantic') missed(cycle);
         if (kind === 'semantic' || !active) update({ message: `${error.message}; provo un altro candidato…` });
       }
     }
@@ -177,7 +271,11 @@ function pump() {
   // for another network search or preparation to finish.
   if(!active&&!switching&&!state.paused&&!document.hidden){const ready=readySlots('general')[0];if(ready)void promote(ready,'startup');}
   if (active) trimGeneral();
-  const generalTarget = active ? (state.paused?9:2) : 4;
+  // Many quick draws at startup; afterwards only what the reserve needs.
+  // Random videos are only the last resort once the chain runs: a single one in reserve.
+  generalPool.target = active && !state.paused ? 1 : 8; generalPool.inflight = active && !state.paused ? 1 : 5;
+  if (needPixels()) for (const slot of slots) if (slot !== active && slot.role === 'ready' && slot.media?.readable === false) { release(slot); slot.claim = null; }
+  const generalTarget = active ? (state.paused?9:1) : 4;
   // A stalled random search must never occupy every preparation lane.
   const semanticPreparing=slots.some(slot=>slot.kind==='semantic'&&['resolving','buffering'].includes(slot.role)&&!slot.controller?.signal.aborted);
   if(context?.pool&&!readySlots('semantic').length&&!semanticPreparing){
@@ -190,7 +288,15 @@ function pump() {
   for (const slot of slots) {
     if (preparing>=3)break;
     if (slot.role !== 'idle' || (slot.retryAt || 0) > performance.now()) continue;
-    if (context?.pool && semantic < 3 && (slots.filter(s=>s.kind==='semantic'&&['resolving','buffering'].includes(s.role)&&!s.controller?.signal.aborted).length<2 || readySlots('general').length)) { semantic++; preparing++; fill(slot, 'semantic'); }
+    if (context?.pool && semantic < 2 && (slots.filter(s=>s.kind==='semantic'&&['resolving','buffering'].includes(s.role)&&!s.controller?.signal.aborted).length<2 || readySlots('general').length)) { semantic++; preparing++;
+      // The second preparation goes to the backup keyword, if there is one.
+      const onMain = slots.filter(s => s !== slot && s !== active && s.kind === 'semantic' && s.keywordPool === context.pool && !s.controller?.signal.aborted).length;
+      const onBackup = slots.filter(s => s !== slot && s !== active && s.kind === 'semantic' && s.keywordPool === context.backup && !s.controller?.signal.aborted).length;
+      // Only when the first keyword struggles (failed candidates, or nothing
+      // ready after a while), to keep the number of searches low.
+      const struggling = context.misses >= 2 || active && performance.now() - active.startedAt > 16000;
+      slot.keywordPool = context.backup && struggling && onMain > onBackup ? context.backup : context.pool;
+      fill(slot, 'semantic', context, slot.keywordPool); }
     else if (general < generalTarget) { general++; preparing++; fill(slot, 'general'); }
   }
   state.queueTarget=state.paused?12:5;
@@ -200,48 +306,85 @@ function pump() {
   skipArea.disabled = false;
 }
 async function analyze(cycle) {
-  const signal = cycle.controller.signal;
+  const signal = cycle.controller.signal, slot = active, item = active.item;
   for (let attempt = 0; attempt < 3 && cycle === context; attempt++) {
     try {
-      await abortable(ensureModel(), signal);
-      const settle = Math.min(600, active.media.seconds * 120) - (performance.now() - active.startedAt);
-      if (settle > 0) await delay(settle, signal);
-      await waitFor(() => !active.video.seeking && active.video.readyState >= 2, signal);
-      const frame = await captureItemFrame(active, signal);
+      update({ step: 'modello', modelStatus: 'descrizione del fotogramma…' });
+      // Usually already under way (or done) since the video was a candidate.
+      const vision = await abortable(visionOf(item, async () => {
+        if (item.scene && attempt === 0) return sceneFrame(item, item.scene, signal);
+        const settle = Math.min(600, slot.media.seconds * 120) - (performance.now() - slot.startedAt);
+        if (settle > 0) await delay(settle, signal);
+        await waitFor(() => !slot.video.seeking && slot.video.readyState >= 2, signal);
+        return captureItemFrame(slot, signal);
+      }), signal);
       if (cycle !== context || signal.aborted) return;
+      // The single words of a compound tag stay as later attempts ("rain boot" → "boot").
+      const words = vision.terms.flatMap(term => term.includes(' ') ? term.split(' ').filter(word => word.length > 3) : []);
+      const frame = vision.frame, terms = [...new Set([...freshFirst(vision.terms), ...freshFirst(words)])];
       favicon.href = frame.preview; cycle.frameTime = frame.time;
-      update({ step: 'modello', preview: frame.preview, frameTime: frame.time, frameSource: frame.source, modelStatus: 'descrizione del fotogramma…' });
-      describeChain('', [], {time:frame.time,source:frame.source,preview:frame.preview,width:frame.width,height:frame.height});
-      const result = await abortable(rpc({ type: 'caption', pixels: frame.pixels, width: frame.width, height: frame.height }, [frame.pixels], 45000), signal);
-      if (cycle !== context || signal.aborted) return;
-      const terms = captionTerms(result.caption);
-      cycle.caption = result.caption; cycle.keywords = [...terms]; cycle.allKeywords = [...terms];
-      describeChain(result.caption, terms, { time: frame.time, source: frame.source, preview: frame.preview, width:frame.width,height:frame.height });
-      update({ step: 'keyword', caption: result.caption, terms, inferenceMs: result.inferenceMs, modelStatus: 'pronto · inferenza locale' });
-      if (!terms.length) { await delay(4000, signal); continue; }
+      cycle.caption = vision.caption; cycle.keywords = [...terms]; cycle.allKeywords = [...terms];
+      describeChain(vision.caption, terms, { time: frame.time, source: frame.source, preview: frame.preview, width: frame.width, height: frame.height });
+      typeCaption(vision.caption, terms[0]); report.caption(vision.caption, vision.inferenceMs);
+      update({ step: 'keyword', preview: frame.preview, frameTime: frame.time, frameSource: frame.source, caption: vision.caption, terms, inferenceMs: vision.inferenceMs, modelStatus: 'pronto · inferenza locale' });
+      if (!terms.length) { item.vision = null; await delay(4000, signal); continue; }
       nextKeyword(cycle); return;
     } catch (error) {
       if (signal.aborted || cycle !== context) return;
-      update({ message: error.message }); await delay(4500, signal).catch(() => {});
+      item.vision = null;
+      report.visionFailed(error.message); update({ message: error.message }); await delay(2500, signal).catch(() => {});
     }
   }
+  if (cycle === context) cycle.dead = true;
 }
-function nextKeyword(cycle) {
-  const term = cycle.keywords.shift(); if (!term) return;
-  cycle.pool = new CandidatePool([term], cycle.controller.signal, result => {
+// One search per keyword and description, shared by every slot that needs it.
+function keywordPool(cycle, term) {
+  let pool = cycle.pools.get(term);
+  if (!pool) cycle.pools.set(term, pool = new CandidatePool([term], cycle.controller.signal, result => {
     if (cycle !== context) return;
     queryChain(term, result.query, result.total);
-    update({ step: 'query', query: result.query, total: result.total, selectedTerm: term });
-    // An empty query can move to another literal keyword without re-running vision.
-    if (!result.total && cycle.keywords.length) setTimeout(() => {
-      if (cycle === context && !cycle.controller.signal.aborted) {
+    if (pool === cycle.pool) update({ step: 'query', query: result.query, total: result.total, selectedTerm: term });
+    if (result.total) return;
+    if (!pool.empty) report.emptyKeyword(term);
+    pool.empty = true;
+    if (pool === cycle.backup) { cycle.backup = null; return; }
+    // An empty query moves to another literal keyword without re-running vision.
+    if (pool === cycle.pool) setTimeout(() => {
+      if (cycle === context && cycle.pool === pool && !cycle.controller.signal.aborted) {
         for (const slot of slots) if (slot !== active && slot.kind === 'semantic' && slot.role !== 'ready') slot.controller?.abort();
         cycle.pool = null; nextKeyword(cycle);
       }
-    }, 1000);
-  });
+    }, 150);
+  }));
+  return pool;
+}
+// The chosen keyword and, side by side, the next one as a backup: if the first
+// gives nothing playable in time, the second is already being prepared.
+function nextKeyword(cycle) {
+  cycle.pools ||= new Map();
+  let term;
+  do term = cycle.keywords.shift(); while (term && cycle.pools.get(term)?.empty);
+  if (!term) { cycle.dead = true; cycle.pool = cycle.backup = null; return; }
+  cycle.misses = 0;
+  usedTerms.push(term); if (usedTerms.length > 40) usedTerms.shift();
+  cycle.pool = keywordPool(cycle, term);
+  const spare = cycle.keywords.find(t => !cycle.pools.get(t)?.empty);
+  cycle.backup = spare ? keywordPool(cycle, spare) : null;
   queryChain(term, queryFor([term]));
+  underline(term);
   update({ step: 'query', query: queryFor([term]), selectedTerm: term, total: null }); pump();
+}
+// The sound of the first video rises together with the picture fading in
+// (iOS ignores volume: there it simply starts with the video).
+function fadeInSound(slot) {
+  const video = slot.video, started = performance.now();
+  video.volume = 0;
+  const step = () => {
+    const k = Math.min(1, (performance.now() - started) / FADE_MS);
+    if (active && active !== slot || k >= 1) { video.volume = 1; return; }
+    video.volume = k; requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 async function promote(next, reason) {
   if (state.paused || switching || next.role !== 'ready') return;
@@ -259,8 +402,18 @@ async function promote(next, reason) {
     };
     recording.sample();if (old) finishChain(next.item, reason);
     beginChain(next.item, reason, next.media.start);
-    next.video.classList.toggle('fill', state.fitMode === 'fill');
+    next.video.classList.toggle('fill', state.fitMode === 'fill'); next.bars = next.item.bars || next.bars; applyCrop(next);
     next.video.classList.add('on'); old?.video.classList.remove('on');
+    // Title first; for a keyword successor the shared word sits where it was in the description.
+    const keyword = next.kind === 'semantic' ? next.item.incoming?.terms?.[0] || '' : '';
+    if (old?.stallAt) { report.stall(performance.now() - old.stallAt); old.stallAt = 0; }
+    report.video(next.item, reason, { keyword, cause: reason === 'fallback' ? fallbackCause : '' });
+    if (next.item.incoming?.backup) report.backup();
+    // The first video fades in from white; its subtitles wait until it is fully visible.
+    const reveal = setWaiting(false);
+    if (reveal) { revealAfter(reveal); fadeInSound(next); }
+    if (keyword) underline(keyword);
+    showTitle(next.item.title, { keyword, anchorX: keyword ? anchor() : null, newSession: !!old && next.kind !== 'semantic' });
     active = next; active.role = 'active'; active.startedAt = performance.now();active.recordingKey=Symbol();if(state.paused){pausedAt=performance.now();active.video.pause();}
     active.lastTime = next.video.currentTime; active.lastProgress = performance.now();
     invalidateSemantic();
@@ -268,8 +421,8 @@ async function promote(next, reason) {
     update({ switches: state.switches + Number(!!old), fallbacks: state.fallbacks + Number(!!old && next.kind !== 'semantic'),
       step: 'modello', caption: '', terms: [], selectedTerm: '', query: '', total: null, next: null, preview: '', frameTime: null, inferenceMs: null, message: 'analisi del video corrente…' });
     if (old) { release(old); old.claim = null; }
-    context = { id: ++generation, parent: next.item, controller: new AbortController(), pool: null, keywords: [] };
-    const reveal = setWaiting(false); analyze(context); await reveal;
+    context = { id: ++generation, parent: next.item, controller: new AbortController(), pool: null, keywords: [], misses: 0 };
+    analyze(context); await reveal;
   } catch (error) {
     release(next); next.claim = null; update({ message: error.message });
   } finally { switching = false; pump(); }
@@ -278,7 +431,7 @@ function tick() {
   if(state.paused){requestAnimationFrame(tick);return;}
   if(state.reviewing){if(active&&performance.now()-active.startedAt>=MAX_PLAY_SECONDS*1000)active.video.pause();requestAnimationFrame(tick);return;}
   // Enforce the cap even while the next decoder is starting asynchronously.
-  if (active && !document.hidden && performance.now() - active.startedAt >= MAX_PLAY_SECONDS * 1000) active.video.pause();
+  if (active && !document.hidden && performance.now() - active.startedAt >= LONGEST_SECONDS * 1000) active.video.pause();
   if (active && !switching && !document.hidden) {
     const video = active.video, now = performance.now();
     const elapsed = (now - active.startedAt) / 1000;
@@ -287,14 +440,30 @@ function tick() {
       active.lastTime = video.currentTime; active.lastProgress = now;
     }
     const stalled = !video.paused && now - active.lastProgress > 2200;
-    const ended = video.ended || video.currentTime >= active.media.start + active.media.seconds - .15;
-    const deadline = MAX_PLAY_SECONDS;
-    if (semantic) promote(semantic, 'query');
-    else if (general && (elapsed >= deadline || ended || stalled)) promote(general, 'fallback');
-    else if (elapsed >= deadline || ended || stalled) {
-      if (elapsed >= deadline || ended) video.pause();
-      setWaiting(true);
-    } else if (!video.paused && video.readyState >= 3) setWaiting(false);
+    // The clip of a scene is only where playback starts: the video goes on
+    // past it while the successor is prepared, until the file really ends.
+    const ended = video.ended || video.duration - video.currentTime < .2;
+    const over = elapsed >= MAX_PLAY_SECONDS, tooLong = elapsed >= LONGEST_SECONDS;
+    const chainAlive = context && !context.dead;
+    if (!stalled) active.heldAt = 0; else active.heldAt ||= now;
+    // Never before the subtitles have been read: the title for at least 3 s and
+    // the finished description for at least 2 s.
+    const read = readEnough();
+    // Interruptions the audience sees (the video stopped while loading), for the report.
+    if (stalled && !active.stallAt) active.stallAt = active.lastProgress;
+    else if (!stalled && active.stallAt) { report.stall(now - active.stallAt); active.stallAt = 0; }
+    if (over && !active.extended) { active.extended = true; report.extended(); }
+    // The successor takes over once well buffered (after MIN_PLAY_SECONDS),
+    // or at once when the current video stalls.
+    if (semantic && read && (elapsed >= MIN_PLAY_SECONDS && prontissimo(semantic) || stalled || tooLong)) promote(semantic, 'query');
+    // A random video only when the chain cannot go on: no keyword left, a
+    // stall that lasts, or the very long limit.
+    else if (general && read && (tooLong || !chainAlive && (over || ended) || stalled && now - active.heldAt > HOLD_MS)) {
+      fallbackCause = tooLong ? 'nessun successore dopo 2 minuti' : !chainAlive ? 'parole della descrizione esaurite' : 'video bloccato più di 10 s';
+      promote(general, 'fallback');
+    }
+    // A short video that ends while the chain is still searching plays its clip again.
+    else if (ended && !tooLong) { report.replay(); video.currentTime = active.media.start; video.play().catch(() => {}); active.lastProgress = now; }
     state.elapsed = elapsed; state.buffer = bufferAhead(video);
   }
   requestAnimationFrame(tick);
@@ -312,7 +481,7 @@ document.addEventListener('click', event => {
     state.muted = false;
     // Unlock audio inside the first user gesture, even during loading.
     for (const { video } of slots) video.muted = false;recording.syncAudioMonitor();
-    if (!state.paused && active && !active.video.ended && state.elapsed < MAX_PLAY_SECONDS) active.video.play().catch(() => {});
+    if (!state.paused && active && !active.video.ended && state.elapsed < LONGEST_SECONDS) active.video.play().catch(() => {});
     renderInfo(state, active);
     return;
   }
@@ -321,8 +490,8 @@ document.addEventListener('click', event => {
 });
 function togglePlaybackPause(){
  state.paused=!state.paused;const now=performance.now();
- if(state.paused){pausedAt=now;active?.video.pause();}
- else if(active){active.startedAt+=now-pausedAt;active.lastProgress=now;if(!document.hidden&&!active.video.ended&&state.elapsed<MAX_PLAY_SECONDS)active.video.play().catch(()=>{});}
+ if(state.paused){pausedAt=now;active?.video.pause();report.pause();}
+ else if(active){active.startedAt+=now-pausedAt;active.lastProgress=now;if(!document.hidden&&!active.video.ended&&state.elapsed<LONGEST_SECONDS)active.video.play().catch(()=>{});}
  else{const next=readySlots('general')[0];if(next)promote(next,'startup');}
  recording.sample();pump();renderInfo(state,active);
 }
@@ -331,7 +500,7 @@ document.addEventListener('keydown', event => {
   if(event.target.matches('input,textarea,select'))return;
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
-  if (['i', 'm', 'f', 'c', 's', 'p', 'e', 'arrowright', 'arrowleft'].includes(key)) {
+  if (['i', 'm', 'f', 'c', 's', 'p', 'e', '1', 'arrowright', 'arrowleft'].includes(key)) {
     event.preventDefault();
     if (document.activeElement === skipArea) skipArea.blur();
   }
@@ -346,13 +515,18 @@ document.addEventListener('keydown', event => {
     action.catch(error => update({ message: error.message }));
   }
   if (key === 's') exportChain();
+  // 1: a plain-text report of this session (interruptions, timings, every video).
+  if (key === '1') {
+    const stamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+    download(new Blob([report.text({ archive: archiveStats() })], { type: 'text/plain;charset=utf-8' }), `afterimage_report_${stamp}.txt`);
+  }
 });
-window.addEventListener('afterimage:fit',()=>{if(!active)return;const fill=active.video.classList.toggle('fill');update({fitMode:fill?'fill':'fit'});});
+window.addEventListener('afterimage:fit',()=>{if(!active)return;const fill=active.video.classList.toggle('fill');update({fitMode:fill?'fill':'fit'});applyCrop(active);});
 async function navigateHistory(delta){
  if(switching||!active)return;
  const records=historyState.records,index=(state.reviewIndex??records.length-1)+delta;
  if(index<0)return;
- if(index>=records.length){state.reviewing=false;state.reviewIndex=null;context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...state.terms],allKeywords:[...state.terms]};if(state.caption&&state.terms.length)nextKeyword(context);else analyze(context);pump();return;}
+ if(index>=records.length){state.reviewing=false;state.reviewIndex=null;context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...state.terms],allKeywords:[...state.terms],misses:0};if(state.caption&&state.terms.length)nextKeyword(context);else analyze(context);pump();return;}
  switching=true;context?.controller.abort();state.reviewing=true;
  for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}
  const old=active;let target;
@@ -360,17 +534,18 @@ async function navigateHistory(delta){
   const record=records[index];await hydrateFrames([record]);target=slots.find(slot=>slot!==old&&slot.role==='idle');if(!target)throw Error('attendo un posto libero per la cronologia');
   target.role='buffering';target.item=record.video.streamURL?{...record.video,streamURL:record.video.streamURL.replace('/download/','/cors/')} : await resolveItem({identifier:record.video.id},[],new AbortController().signal);
   if(!target.item)throw Error('video della cronologia non disponibile');
-  target.media=await prepare(target.video,target.item.streamURL,new AbortController().signal,{startup:true,startAt:record.playStart||0});await startPlaying(target.video);target.video.muted=state.muted;target.video.classList.toggle('fill',state.fitMode==='fill');target.video.classList.add('on');old.video.classList.remove('on');active=target;active.role='active';active.startedAt=performance.now();active.recordingKey=Symbol();if(state.paused){pausedAt=performance.now();active.video.pause();}release(old);old.claim=null;
-  update({reviewIndex:index,step:'cronologia',caption:record.description,terms:record.keywords||[],preview:record.frame?.preview||'',message:'cronologia · → prosegue; dopo l’ultimo video riprende il flusso'});
+  target.media=await prepare(target.video,target.item.streamURL,new AbortController().signal,{startup:true,startAt:record.playStart||0,pixels:needPixels()});await startPlaying(target.video);target.video.muted=state.muted;target.video.classList.toggle('fill',state.fitMode==='fill');target.video.classList.add('on');old.video.classList.remove('on');active=target;active.role='active';active.startedAt=performance.now();active.recordingKey=Symbol();if(state.paused){pausedAt=performance.now();active.video.pause();}release(old);old.claim=null;
+  showTitle(record.video.title);update({reviewIndex:index,step:'cronologia',caption:record.description,terms:record.keywords||[],preview:record.frame?.preview||'',message:'cronologia · → prosegue; dopo l’ultimo video riprende il flusso'});
  }catch(error){if(target&&target!==active)release(target);update({message:error.message});}finally{switching=false;}
 }
 window.addEventListener('afterimage:navigate',event=>{if(event.detail<0||state.reviewing)navigateHistory(event.detail);else skipReady();});
 window.addEventListener('afterimage:export-error',event=>update({message:event.detail}));
 window.addEventListener('afterimage:filters',()=>{
  invalidateSemantic();for(const slot of slots)if(slot!==active){slot.controller?.abort();if(slot.role==='ready'){release(slot);slot.claim=null;}}generalPool.queue.length=0;failed.clear();
- if(active&&!state.reviewing){context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...new Set([state.selectedTerm,...state.terms].filter(Boolean))],allKeywords:[...state.terms]};if(state.caption&&context.keywords.length)nextKeyword(context);else analyze(context);}pump();renderInfo(state,active);
+ if(active&&!state.reviewing){context={id:++generation,parent:active.item,controller:new AbortController(),pool:null,caption:state.caption,keywords:[...new Set([state.selectedTerm,...state.terms].filter(Boolean))],allKeywords:[...state.terms],misses:0};if(state.caption&&context.keywords.length)nextKeyword(context);else analyze(context);}pump();renderInfo(state,active);
 });
 document.addEventListener('visibilitychange', () => {
+  report.visibility(document.hidden);
   if (document.hidden) { active?.video.pause(); if (active) active.hiddenAt = performance.now(); }
   else if (active) {
     if(!state.paused)active.startedAt += performance.now() - (active.hiddenAt || performance.now());

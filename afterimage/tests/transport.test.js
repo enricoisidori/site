@@ -15,7 +15,7 @@ test('healthy Archive search makes only one request',async t=>{
 });
 test('a stalled fetch recovers through JSONP and cancels the loser',async t=>{
  let aborted=false,scrapes=0;environment(t,{fetcher:(u,{signal})=>{if(u.includes('/scrape'))scrapes++;return new Promise((_,reject)=>signal.addEventListener('abort',()=>{aborted=true;reject(signal.reason);}));},jsonp:u=>window[u.searchParams.get('callback')](result)});
- const start=Date.now();assert.deepEqual(await archiveJSON(url),result);assert.ok(Date.now()-start<2500);assert.equal(aborted,true);assert.equal(scrapes,0);
+ const start=Date.now();assert.deepEqual(await archiveJSON(url),result);const took=Date.now()-start;assert.ok(took>=3900&&took<5500,'JSONP starts after 4000 ms, got '+took);assert.equal(aborted,true);assert.ok(scrapes<=1);
 });
 test('file HTML uses JSONP without a failing cross-origin fetch',async t=>{
  let fetches=0;environment(t,{protocol:'file:',fetcher:async()=>{fetches++;throw Error('unexpected');},jsonp:u=>window[u.searchParams.get('callback')](result)});

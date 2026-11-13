@@ -1,6 +1,6 @@
 import { createSelectiveRecorder } from './recording/recorder.js';
 import { resolveItem, queryFor } from './archive.js';
-import { UniformPool, CandidatePool, Semaphore } from './pool.js';
+import { CandidatePool, Semaphore } from './pool.js';
 import { captionTerms } from './terms.js';
 import { prepare, startPlaying, release, captureItemFrame, waitFor, bufferAhead, MAX_PLAY_SECONDS, ios } from './media.js';
 import { renderInfo, toggleInfo } from './info.js';
@@ -40,10 +40,10 @@ const pending = new Map(), recent = new Set(), failed = new Map();
 const lifetime = new AbortController();
 // iPhone: fewer simultaneous video downloads and decoders.
 const network = new Semaphore(ios ? 2 : 3);
-const generalPool = new UniformPool([], lifetime.signal, result => {
+const generalPool = new CandidatePool([], lifetime.signal, result => {
   addLoadingImages(result.items);
   if (!active) update({ query: result.query, total: result.total, message: 'cerco derivati video leggeri…' });
-}, { inflight: 5, target: 8, onItem: item => addLoadingImages([item]) });
+});
 const update = changes => {
   Object.assign(state, changes);
   if (!active && /archive.*(?:http|disponibile|rispond|raggiung)|backend_error|timeout|failed to fetch/i.test(changes.message || '')) document.querySelector('#info').hidden = false;
@@ -105,19 +105,11 @@ async function ensureModel() {
 }
 
 function remember(id) {
-  markPlayed(id);
   recent.add(id); if (recent.size > 128) recent.delete(recent.values().next().value);
 }
 const readySlots = kind => slots.filter(slot => slot.role === 'ready' && (!kind || slot.kind === kind));
-// Never the same video twice, across sessions too.
-const playedKey = 'afterimage-coverage:played:v1', played = new Set();
-try { for (const id of JSON.parse(localStorage.getItem(playedKey) || '[]')) played.add(id); } catch {}
-function markPlayed(id) {
-  if (!id || played.has(id)) return; played.add(id);
-  try { localStorage.setItem(playedKey, JSON.stringify([...played].slice(-20000))); } catch {}
-}
 function excluded(id) {
-  return played.has(id) || recent.has(id) || (failed.get(id) || 0) > performance.now() || slots.some(slot => slot.claim === id);
+  return recent.has(id) || (failed.get(id) || 0) > performance.now() || slots.some(slot => slot.claim === id);
 }
 function invalidateSemantic() {
   context?.controller.abort();
