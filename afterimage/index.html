@@ -5,15 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#000000">
   <title>afterimage</title>
-  <!-- versione principale (ex afterimage-coverage); la precedente è in ../afterimage-backup/. Nessun redirect iOS verso il Worker. -->
+  <!-- versione principale (ex afterimage-coverage); la precedente è in ../afterimage-backup/ -->
+  <script>
+  // iPhone/iPad: Archive video needs byte ranges and same-origin pixels, served
+  // with a relay on Cloudflare. Desktop stays on this page unchanged.
+  if ((/iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) && !/\.workers\.dev$/.test(location.hostname) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) location.replace('https://afterimage.blueness-pages.workers.dev/' + location.search);
+  </script>
   <link id="favicon" rel="icon" href="data:,">
-  <link rel="stylesheet" href="./style.css?v=44">
+  <link rel="stylesheet" href="./style.css?v=45">
 </head>
 <body>
   <main id="stage" aria-label="flusso video internet archive"></main>
   <button id="skipArea" tabindex="-1" aria-label="passa a un video casuale già pronto"></button>
   <div id="loading" role="status" aria-label="caricamento"><img class="loading-picture" alt="" aria-hidden="true"><div class="loading-art" aria-hidden="true"></div></div>
   <aside id="info" hidden aria-label="stato del processo" aria-live="polite"></aside>
-  <script type="module" src="./app.js?v=44"></script>
+  <script type="module" src="./app.js?v=45"></script>
 </body>
 </html>

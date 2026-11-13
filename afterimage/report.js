@@ -46,7 +46,8 @@ export const report = {
     const by = r => videos.filter(v => v.reason === r).length;
     const linked = by('query'), random = by('fallback'), clicks = by('click');
     const switches = shown - 1;
-    const onScreen = videos.map(v => v.onScreen || 0).filter(Boolean);
+    // Only finished videos: the one still on screen would look short.
+    const onScreen = videos.slice(0, -1).map(v => v.onScreen || 0).filter(Boolean);
     const avg = onScreen.length ? onScreen.reduce((a, b) => a + b, 0) / onScreen.length : null;
     const stallTotal = stalls.reduce((a, s) => a + s[1], 0);
     const causes = {};
@@ -100,7 +101,7 @@ export const report = {
     L.push('ELENCO DEI VIDEO (ora · tempo sullo schermo · come è arrivato · titolo)');
     const how = v => v.reason === 'query' ? `parola "${v.keyword}"` : v.reason === 'fallback' ? `NEW SESSION${v.cause ? ' – ' + v.cause : ''}` : v.reason === 'click' ? 'clic' : 'avvio';
     for (const v of videos) {
-      L.push(`${clock(v.at)}  ${dur(v.onScreen).padEnd(8)}  ${how(v)}`);
+      L.push(`${clock(v.at)}  ${(dur(v.onScreen) + (v === current ? '+' : '')).padEnd(8)}  ${how(v)}${v === current ? '  (in corso)' : ''}`);
       L.push(`          ${v.title.slice(0, 100)}${v.stalls ? `  [${v.stalls} interruzioni]` : ''}`);
       L.push(`          https://archive.org/details/${v.id}`);
       if (v.caption) L.push(`          descrizione: ${v.caption}`);
