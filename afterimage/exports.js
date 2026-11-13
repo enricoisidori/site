@@ -28,6 +28,57 @@ export async function exportChainPDF(shape=exportOptions.shape){
   const blob=await buildAfterimagePDF(pages,{title:'afterimage '+stamp.replace('_',' ')});download(blob,`afterimage_${stamp}.pdf`);
  }finally{busy=false;}
 }
+// Book (B), 12 × 8 cm: one page per video, in the order they were shown. The screen the
+// model described sits at the top, as wide as the text column; the title and
+// the description follow, centred, always at the same distance below it.
+// Keywords are underlined: in the title the one that led to this video, in
+// the description the one that led to the next.
+// Page 12 × 8 cm (landscape), drawn at 1500 × 1000 px (about 320 dpi):
+// 125 px = 1 cm. Text 35 px ≈ 8 pt, always 0.4 cm (50 px) under the screen.
+const BOOK = { width: 1500, height: 1000, margin: 80, gap: 50, size: 35, line: 46, paragraph: 20, maxImage: 580, widthPoints: 12 / 2.54 * 72 };
+function centredLines(ctx, text, terms, y, texts) {
+  const width = BOOK.width - BOOK.margin * 2, words = String(text || '').split(/(\s+)/), lines = [];
+  let line = '';
+  for (const word of words) { if (ctx.measureText(line + word).width > width && line.trim()) { lines.push(line.trim()); line = word; } else line += word; }
+  if (line.trim()) lines.push(line.trim());
+  for (const text of lines) {
+    let x = (BOOK.width - ctx.measureText(text).width) / 2;
+    for (const part of highlightParts(text, terms)) { const w = ctx.measureText(part.text).width; texts.push({ text: part.text, x, y, size: BOOK.size, underline: part.match, width: w }); x += w; }
+    y += BOOK.line;
+  }
+  return y;
+}
+export async function exportChainBook() {
+  if (busy) return; busy = true;
+  try {
+    await hydrateFrames();
+    const records = historyState.records.filter(r => r.shown !== false && r.frame?.preview);
+    if (!records.length) throw Error('no video with a described frame yet');
+    const pages = [];
+    for (const record of records) {
+      const i = historyState.records.indexOf(record), previous = historyState.records[i - 1];
+      const inTerms = previous?.successor?.id === record.video.id ? previous.successor.matchTerms || [] : [];
+      const outTerms = record.successor?.matchTerms || [];
+      const c = document.createElement('canvas'); c.width = BOOK.width; c.height = BOOK.height;
+      const ctx = c.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.font = BOOK.size + 'px Helvetica, Arial, sans-serif';
+      const image = await bitmap(record.frame.preview), texts = [];
+      let bottom = BOOK.margin;
+      if (image) {
+        const ratio = Math.min((BOOK.width - BOOK.margin * 2) / image.width, BOOK.maxImage / image.height), w = image.width * ratio, h = image.height * ratio;
+        ctx.drawImage(image, (BOOK.width - w) / 2, BOOK.margin, w, h); image.close(); bottom = BOOK.margin + h;
+      }
+      // First baseline at a fixed distance under the screen, whatever its shape.
+      let y = bottom + BOOK.gap + BOOK.size;
+      y = centredLines(ctx, record.video.title, inTerms, y, texts);
+      if (record.description) centredLines(ctx, record.description, outTerms, y + BOOK.paragraph, texts);
+      const blob = await new Promise(resolve => c.toBlob(resolve, 'image/jpeg', .85));
+      pages.push({ blob, texts, w: c.width, h: c.height, source: record.video.source }); c.width = c.height = 0;
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+    const now = new Date(), pad = n => String(n).padStart(2, '0'), stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+    download(await buildAfterimagePDF(pages, { title: 'afterimage book ' + stamp.replace('_', ' '), wholePageLink: true, pageWidth: BOOK.widthPoints }), `afterimage_book_${stamp}.pdf`);
+  } finally { busy = false; }
+}
 let excelReady;
 function loadExcel(){if(!excelReady)excelReady=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';script.onload=()=>resolve(window.ExcelJS);script.onerror=()=>{excelReady=null;reject(Error('libreria Excel non disponibile'));};document.head.append(script);});return excelReady;}
 export async function exportChainExcel(){

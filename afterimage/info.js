@@ -1,7 +1,8 @@
 import { highlightParts } from './terms.js';
+import { recordingFormats, recordingFormat, setRecordingFormat } from './recording/recorder.js';
 import { historyState, exportChain, download } from './history.js';
 import { filterState, updateFilters, filterDefaultsCode } from './scope.js';
-import { copyChain, exportChainPDF, exportChainExcel, exportOptions } from './exports.js';
+import { copyChain, exportChainPDF, exportChainExcel, exportChainBook, exportOptions } from './exports.js';
 // Panel C: a short status and the actions on top, then every video of the
 // session, newest first; scrolling down goes back in time.
 const pane = document.querySelector('#info');
@@ -16,6 +17,7 @@ pane.addEventListener('change', event => {
   if (el.dataset.filter) updateFilters({ [el.dataset.filter]: el.checked });
   if (el.dataset.collection) { const set = new Set(filterState.collections); el.checked ? set.add(el.dataset.collection) : set.delete(el.dataset.collection); updateFilters({ collections: [...set] }); }
   if (el.id === 'pdfShape') exportOptions.shape = pdfShape = el.value;
+  if (el.id === 'recFormat') setRecordingFormat(el.value);
 });
 pane.addEventListener('click', async event => {
   const action = event.target.closest('[data-action]')?.dataset.action; if (!action) return;
@@ -27,6 +29,7 @@ pane.addEventListener('click', async event => {
     if (action === 'json') await exportChain();
     if (action === 'pdf') await exportChainPDF(pdfShape);
     if (action === 'excel') await exportChainExcel();
+    if (action === 'book') await exportChainBook();
     if (action === 'older') { shownCount += STEP; listKey = ''; lastRender = 0; window.dispatchEvent(new Event('afterimage:info')); }
     if (action === 'defaults') download(new Blob([filterDefaultsCode()], { type: 'text/javascript' }), 'filter-defaults.js');
   } catch (error) { window.dispatchEvent(new CustomEvent('afterimage:export-error', { detail: error.message })); }
@@ -56,10 +59,11 @@ export function renderInfo(state, active) {
   lastRender = performance.now();
   const records = historyState.records;
   if (!pane.querySelector('.status')) pane.innerHTML = `<div class="status"></div>
-    <p class="actions"><button data-action="back" aria-label="previous video">◀</button><button data-action="next" aria-label="next video">▶</button><button data-action="copy">copy chain</button><button data-action="json">json</button><button data-action="excel">excel</button><button data-action="pdf">pdf</button><select id="pdfShape" aria-label="pdf format"><option value="vertical">vertical</option><option value="square">square</option></select><button data-action="fit">fit / fill</button><button data-action="report">report</button></p>
+    <p class="actions"><button data-action="back" aria-label="previous video">◀</button><button data-action="next" aria-label="next video">▶</button><button data-action="copy">copy chain</button><button data-action="json">json</button><button data-action="excel">excel</button><button data-action="pdf">pdf</button><select id="pdfShape" aria-label="pdf format"><option value="vertical">vertical</option><option value="square">square</option></select><button data-action="book">book (b)</button><button data-action="fit">fit / fill</button><button data-action="report">report</button><label class="inline">recording (r) <select id="recFormat" aria-label="recording format">${recordingFormats.map(f => `<option value="${f}">${f}</option>`).join('')}</select></label></p>
     <textarea id="chainCopy" hidden readonly aria-label="chain to copy"></textarea>
     <div class="chain"></div><div class="more"></div><div class="filters"></div>`;
   pane.querySelector('#pdfShape').value = pdfShape;
+  const rec = pane.querySelector('#recFormat'); rec.value = recordingFormat(); rec.disabled = ['starting', 'recording', 'saving'].includes(state.recordingPhase);
   pane.querySelector('.status').innerHTML = `<p>${state.paused ? 'paused, preloading continues<br>' : ''}${state.queueSemantic} linked ready<br>${state.queueGeneral} random ready<br>${state.loading} preparing${state.message ? '<br>' + esc(state.message) : ''}</p>`;
 
   // The list changes only when a video or a description arrives; when it grows

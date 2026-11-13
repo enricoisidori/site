@@ -1,5 +1,5 @@
 // Tiny PDF writer with native selectable Helvetica text. Called only after the user requests an export.
-export async function buildAfterimagePDF(pages,{title='afterimage'}={}){
+export async function buildAfterimagePDF(pages,{title='afterimage',wholePageLink=false,pageWidth=960}={}){
  const encode=text=>new TextEncoder().encode(text),objects=[null,null,null],pageRefs=[];
  const escape=text=>String(text||'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[\r\n]/g,' ');
  const add=chunks=>{objects.push(chunks.map(c=>typeof c==='string'?encode(c):c));return objects.length-1;};
@@ -10,9 +10,9 @@ export async function buildAfterimagePDF(pages,{title='afterimage'}={}){
  for(const page of pages){
   const data=new Uint8Array(await page.blob.arrayBuffer());
   const image=add([`<< /Type /XObject /Subtype /Image /Width ${page.w} /Height ${page.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${data.length} >>\nstream\n`,data,'\nendstream']);
-  const width=960,height=+(width*page.h/page.w).toFixed(3),scale=width/page.w,commands=`q ${width} 0 0 ${height} 0 0 cm /Im0 Do Q\n`+(page.texts||[]).map(t=>`BT /F1 ${t.size*scale} Tf 0 g 1 0 0 1 ${t.x*scale} ${height-t.y*scale} Tm <${hex(t.text)}> Tj ET\n`+(t.underline?`0 G ${scale} w ${t.x*scale} ${height-(t.y+3)*scale} m ${(t.x+t.width)*scale} ${height-(t.y+3)*scale} l S\n`:'')).join('');
+  const width=+pageWidth.toFixed(3),height=+(width*page.h/page.w).toFixed(3),scale=width/page.w,commands=`q ${width} 0 0 ${height} 0 0 cm /Im0 Do Q\n`+(page.texts||[]).map(t=>`BT /F1 ${t.size*scale} Tf 0 g 1 0 0 1 ${t.x*scale} ${height-t.y*scale} Tm <${hex(t.text)}> Tj ET\n`+(t.underline?`0 G ${(t.size/16)*scale} w ${t.x*scale} ${height-(t.y+t.size*3/16)*scale} m ${(t.x+t.width)*scale} ${height-(t.y+t.size*3/16)*scale} l S\n`:'')).join('');
   const content=add([`<< /Length ${encode(commands).length} >>\nstream\n${commands}endstream`]);
-  const links=[[page.source,height/2,height],[page.nextSource,0,height/2]].filter(([source])=>source);
+  const links=(wholePageLink?[[page.source,0,height]]:[[page.source,height/2,height],[page.nextSource,0,height/2]]).filter(([source])=>source);
   const link=links.length?' /Annots ['+links.map(([source,low,high])=>`<< /Type /Annot /Subtype /Link /Rect [0 ${low} ${width} ${high}] /Border [0 0 0] /A << /S /URI /URI (${escape(source)}) >> >>`).join(' ')+']':'';
   pageRefs.push(add([`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] /Resources << /Font << /F1 ${font} 0 R >> /XObject << /Im0 ${image} 0 R >> >> /Contents ${content} 0 R${link} >>`]));
  }

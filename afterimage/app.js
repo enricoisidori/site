@@ -1,4 +1,4 @@
-import { createSelectiveRecorder } from './recording/recorder.js';
+import { createRecorder } from './recording/recorder.js';
 import { resolveItem, queryFor, prefetchKeyword } from './archive.js';
 import { UniformPool, CandidatePool, Semaphore } from './pool.js';
 import { captionTerms } from './terms.js';
@@ -6,7 +6,7 @@ import { prepare, startPlaying, release, capture, captureItemFrame, pickScene, s
 import { renderInfo, toggleInfo } from './info.js';
 import { setWaiting, addLoadingImages, finishLoading, FADE_MS } from './loading.js';
 import { showTitle, typeCaption, writeCaption, captionState, titleSeconds, underline, anchor, revealAfter, readEnough } from './subtitles.js';
-import { exportChainPDF, exportChainExcel } from './exports.js';
+import { exportChainPDF, exportChainExcel, exportChainBook } from './exports.js';
 import { historyState, hydrateFrames } from './history.js';
 import { beginChain, describeChain, queryChain, finishChain, exportChain, download } from './history.js';
 import { report } from './report.js';
@@ -29,7 +29,7 @@ const state = {
 };
 let pausedAt=0;
 let active, switching = false, generation = 0, context;
-const recording=createSelectiveRecorder({name:'afterimage',suspendPlayback:()=>{const was=state.paused;if(!was)togglePlaybackPause();return()=>{if(!was&&state.paused)togglePlaybackPause();};},getSnapshots:async()=>{await hydrateFrames();return historyState.records.filter(r=>r.shown!==false).map(r=>{const w=innerWidth,h=innerHeight,iw=r.frame?.width||r.video.width||4,ih=r.frame?.height||r.video.height||3,scale=state.fitMode==='fill'?Math.max(w/iw,h/ih):Math.min(w/iw,h/ih);return {preview:r.frame?.preview,source:{url:r.video.streamURL,archiveID:r.video.id,filename:r.video.filename},time:r.frame?.time??r.playStart??0,layout:{layers:[{source:{x:0,y:0,width:1,height:1},destination:{x:(w-iw*scale)/2,y:(h-ih*scale)/2,width:iw*scale,height:ih*scale}}]}};});},getScene:()=>{
+const recording=createRecorder({name:'afterimage',getScene:()=>{
  if(!active?.video||active.video.readyState<2||active.media?.readable===false)return null;
  const video=active.video,crop=active.crop||1;return {key:active.recordingKey||active.startedAt,video,muted:state.muted,paused:state.paused||document.hidden||video.paused||video.readyState<3,draw:(ctx,w,h)=>{
   ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);const ratio=state.fitMode==='fill'?Math.max(w/video.videoWidth,h/video.videoHeight)*crop:Math.min(w/video.videoWidth,h/video.videoHeight);
@@ -501,6 +501,24 @@ document.addEventListener('click', event => {
   if (event.target.closest('#info')) return;
   skipReady();
 });
+// Two fingers held still for 1 s open panel C; the same gesture closes it.
+const touchOnly = () => matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
+const HOLD_INFO_MS = 1000, HOLD_SLACK_PX = 30;
+let infoHold = null;
+const cancelInfoHold = () => { if (infoHold) clearTimeout(infoHold.timer); infoHold = null; };
+document.addEventListener('touchstart', event => {
+  if (event.touches.length !== 2) { cancelInfoHold(); return; }
+  const start = [...event.touches].map(t => [t.clientX, t.clientY]);
+  cancelInfoHold();
+  infoHold = { start, timer: setTimeout(() => { infoHold = null; toggleInfo(); renderInfo(state, active); }, HOLD_INFO_MS) };
+}, { passive: true });
+document.addEventListener('touchmove', event => {
+  if (!infoHold) return;
+  const moved = [...event.touches].some((t, i) => infoHold.start[i] && Math.hypot(t.clientX - infoHold.start[i][0], t.clientY - infoHold.start[i][1]) > HOLD_SLACK_PX);
+  if (moved || event.touches.length !== 2) cancelInfoHold();
+}, { passive: true });
+document.addEventListener('touchend', cancelInfoHold, { passive: true });
+document.addEventListener('touchcancel', cancelInfoHold, { passive: true });
 function togglePlaybackPause(){
  state.paused=!state.paused;const now=performance.now();
  if(state.paused){pausedAt=now;active?.video.pause();report.pause();}
@@ -513,15 +531,18 @@ document.addEventListener('keydown', event => {
   if(event.target.matches('input,textarea,select'))return;
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
-  if (['i', 'm', 'f', 'c', 's', 'p', '1', 'arrowright', 'arrowleft'].includes(key)) {
+  if (['i', 'm', 'f', 'c', 's', 'p', 'b', '1', 'arrowright', 'arrowleft'].includes(key)) {
     event.preventDefault();
     if (document.activeElement === skipArea) skipArea.blur();
   }
   if (key === 'arrowright') { event.preventDefault(); state.reviewing?navigateHistory(1):skipReady(); }
   if(key==='arrowleft')navigateHistory(-1);
   if(key==='p')exportChainPDF().catch(error=>update({message:error.message}));
+  if (key === 'b') exportChainBook().catch(error => update({ message: error.message }));
 
-  if (key === 'c' || key === 'i') { toggleInfo(); renderInfo(state, active); }
+  // Panel C is for the author: on a touch-only device (phone) it opens only
+  // with the two-finger hold below, never with a key.
+  if ((key === 'c' || key === 'i') && !touchOnly()) { toggleInfo(); renderInfo(state, active); }
   if (key === 'm') { state.muted = !state.muted; if (active) active.video.muted = state.muted; recording.syncAudioMonitor(); renderInfo(state, active); }
   if (key === 'f') {
     const action = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen({ navigationUI: 'hide' });
@@ -568,7 +589,7 @@ document.addEventListener('visibilitychange', () => {
     active.lastProgress = performance.now(); if(!state.paused)active.video.play().catch(() => {});
   }
 });
-setInterval(() => { pump(); renderInfo(state, active); }, 300);
+setInterval(() => { pump(); state.recordingPhase = recording.status.phase; renderInfo(state, active); }, 300);
 requestAnimationFrame(tick);
 // The first stream gets the connection first; analyze() starts the model once
 // a video is playing, independently from future random/semantic reserves.
