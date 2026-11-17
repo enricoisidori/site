@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counting by hands — difficoltà delle posizioni</title>
+<style>
+  :root { --ink: #111; --mute: #777; --line: #d6d6d6; --bg: #ececec; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.4 "Neue Haas Grotesk Text Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 14px 20px 10px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; }
+  header h1 { font-size: 15px; font-weight: 400; margin: 0; }
+  header a { color: var(--ink); }
+  .prog { font-variant-numeric: tabular-nums; }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  button { font: inherit; color: var(--ink); background: #fff; border: 1px solid var(--ink); border-radius: 4px; padding: 4px 10px; cursor: pointer; }
+  .intro { padding: 12px 20px 0; max-width: 900px; color: #333; }
+  .filters { padding: 8px 20px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; padding: 10px 20px 40px; }
+  .card { background: #fff; border-radius: 6px; padding: 10px; }
+  .card .k { color: var(--mute); font-size: 12px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hand { text-align: center; }
+  .hand svg { width: 100%; max-width: 130px; height: auto; display: block; margin: 0 auto; }
+  .hand .lab { font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: .05em; }
+  .hand .code { font-variant-numeric: tabular-nums; letter-spacing: .05em; margin: 2px 0 6px; }
+  .hand.used .lab::after { content: " · in use"; color: var(--ink); }
+  .rate { display: flex; gap: 4px; justify-content: center; }
+  .rate button { padding: 3px 7px; font-size: 12px; border-color: #bbb; position: relative; }
+  .rate button.auto[data-v="0"] { background: #dcefe1; border-color: #1d7a3a; }
+  .rate button.auto[data-v="1"] { background: #f6e7c4; border-color: #c98a00; }
+  .rate button.auto[data-v="3"] { background: #f3d3d0; border-color: #b3261e; }
+  .hand.cur { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 4px; }
+  .rate button.sugg::after { content: ""; position: absolute; top: 2px; right: 2px; width: 4px; height: 4px; border-radius: 50%; background: #999; }
+  .rate button.on[data-v="0"] { background: #1d7a3a; border-color: #1d7a3a; color: #fff; }
+  .rate button.on[data-v="1"] { background: #c98a00; border-color: #c98a00; color: #fff; }
+  .rate button.on[data-v="3"] { background: #b3261e; border-color: #b3261e; color: #fff; }
+  .hand.unrated .code { color: var(--mute); }
+  @media (max-width: 480px) { header, .intro, .filters, .grid { padding-left: 16px; padding-right: 16px; } }
+</style></head>
+<body>
+<script>if (location.protocol === 'file:') document.write('<div style="padding:16px 20px;background:#111;color:#fff">Opened as a file: if the page does not work, run <code>python3 serve.py</code> in the site folder and open http://localhost:8000/counting/difficulty.html</div>');</script>
+<header>
+  <h1>Counting by hands, 2026 — difficoltà delle posizioni</h1>
+  <a href="./">Animatic</a> <a href="sheets.html">Fogli</a>
+  <span class="prog" id="prog"></span>
+  <span class="tools"><button id="copy">Copia i punteggi</button><button id="reset">Azzera</button></span>
+</header>
+<div class="intro">
+  Prova ogni posizione con la mano e dai un voto: <b>F</b> facile, <b>M</b> media, <b>D</b> difficile.
+  Le mani sono disegnate come le vedi tu (palmo verso di te), come sui fogli.
+  Ogni posizione parte dal mio suggerimento (colore chiaro): se non la cambi vale quella. Il voto dato da te è a colore pieno.
+  <b>Tastiera:</b> ← → (o ↑ ↓) per passare alla posizione precedente / successiva, <b>1</b> facile, <b>2</b> media, <b>3</b> difficile (poi passa alla successiva), <b>0</b> torna al suggerimento.
+  Il programma usa i tuoi voti appena li dai (animatic e fogli in questo browser): sceglie solo posizioni facili, poi medie, e mai difficili se può evitarle.
+  Le posizioni "in use" compaiono nei fogli adesso; la mano destra della persona 6 conta e passa per forza da tutte.
+</div>
+<div class="filters">
+  <label><input type="checkbox" id="fUsed"> solo quelle in uso</label>
+  <label><input type="checkbox" id="fTodo"> solo quelle da votare</label>
+</div>
+<div class="grid" id="grid"></div>
+
+<script type="module">
+import { handSVG } from './hands.js';
+import { loadCfg, buildTimeline, handValues, modelDifficulty, RATINGS_KEY, setRatings, ratingKey } from './counting.js';
+
+const $ = (id) => document.getElementById(id);
+let R = {};
+try { R = JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}'); } catch {}
+const cfg = loadCfg();
+const mapping = cfg.mapping;
+const H = { L: 10, R: 11 }; // indici di mano usati da counting.js (pari = sinistra)
+const bits5 = (v) => v.toString(2).padStart(5, '0');
+
+// valore della mano (cifre sotto le dita) per un insieme di dita pollice→mignolo
+function valueOf(f, side) {
+  for (let v = 0; v < 32; v++) if (ratingKey(v, H[side], mapping) === side + f.join('')) return v;
+  return 0;
+}
+// posizioni usate nei fogli (escluse le persone non attive)
+const used = new Set();
+for (const video of [1, 2]) {
+  const tl = buildTimeline({ ...cfg, video });
+  for (const s of tl.segs) for (let n = s.n0; n <= s.nLast; n++) {
+    const hv = handValues(n);
+    for (let h = 12 - 2 * s.active; h < 12; h++) used.add(ratingKey(hv[h], h, mapping));
+  }
+}
+
+const patterns = [...Array(32)].map((_, i) => [4, 3, 2, 1, 0].map((b) => (i >> b) & 1).reverse())
+  .sort((a, b) => a.reduce((x, y) => x + y) - b.reduce((x, y) => x + y) || a.join('').localeCompare(b.join('')));
+const NAMES = ['thumb', 'index', 'middle', 'ring', 'pinky'];
+let order = [], cur = 0;
+
+function save() {
+  try { localStorage.setItem(RATINGS_KEY, JSON.stringify(R)); } catch {}
+  setRatings(R);
+  render();
+}
+function render() {
+  const onlyUsed = $('fUsed').checked, onlyTodo = $('fTodo').checked;
+  let done = 0;
+  for (const s of ['L', 'R']) for (const f of patterns) if (s + f.join('') in R) done++;
+  $('prog').textContent = `confermate da te ${done} / 64`;
+  order = [];
+  $('grid').innerHTML = patterns.map((f) => {
+    const keys = ['L', 'R'].map((s) => s + f.join(''));
+    if (onlyUsed && !keys.some((k) => used.has(k))) return '';
+    if (onlyTodo && keys.every((k) => k in R)) return '';
+    const up = f.map((x, i) => (x ? NAMES[i] : null)).filter(Boolean);
+    const hand = (side) => {
+      const k = side + f.join(''), v = valueOf(f, side), sug = modelDifficulty(v, H[side], mapping);
+      const sugV = sug === 0 ? 0 : sug === 1 ? 1 : 3;
+      const idx = order.push(k) - 1;
+      return `<div class="hand ${used.has(k) ? 'used' : ''} ${k in R ? '' : 'unrated'} ${idx === cur ? 'cur' : ''}" data-i="${idx}">
+        <div class="lab">${side === 'L' ? 'left' : 'right'}</div>
+        ${handSVG({ fingers: f, side: side === 'L' ? 'left' : 'right', view: 'palm', style: { sw: 2.4 } })}
+        <div class="code">${bits5(v)}</div>
+        <div class="rate">${[[0, 'F'], [1, 'M'], [3, 'D']].map(([val, t]) =>
+          `<button data-k="${k}" data-v="${val}" class="${R[k] === val ? 'on' : ''} ${!(k in R) && sugV === val ? 'auto' : ''} ${sugV === val ? 'sugg' : ''}">${t}</button>`).join('')}</div>
+      </div>`;
+    };
+    return `<div class="card"><div class="k"><span>${up.length ? up.join(' + ') + ' up' : 'fist'}</span><span>${f.join('')}</span></div>
+      <div class="pair">${hand('L')}${hand('R')}</div></div>`;
+  }).join('');
+}
+$('grid').onclick = (e) => {
+  const b = e.target.closest('button[data-k]');
+  if (!b) return;
+  const k = b.dataset.k, v = +b.dataset.v;
+  cur = +b.closest('.hand').dataset.i;
+  if (R[k] === v) delete R[k]; else R[k] = v;
+  save();
+};
+$('fUsed').onchange = $('fTodo').onchange = () => { cur = 0; render(); };
+function focusCur() {
+  const el = document.querySelector(`.hand[data-i="${cur}"]`);
+  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey || /INPUT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'checkbox') return;
+  const n = order.length;
+  if (!n) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') cur = Math.min(n - 1, cur + 1);
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') cur = Math.max(0, cur - 1);
+  else if (['1', '2', '3', '0'].includes(e.key)) {
+    const k = order[cur];
+    if (e.key === '0') delete R[k]; else R[k] = { 1: 0, 2: 1, 3: 3 }[e.key];
+    if (e.key !== '0') cur = Math.min(n - 1, cur + 1);
+    save();
+  } else return;
+  e.preventDefault();
+  render();
+  focusCur();
+});
+$('copy').onclick = async () => {
+  const txt = JSON.stringify(R);
+  try { await navigator.clipboard.writeText(txt); $('copy').textContent = 'Copiati ✓'; } catch { prompt('Copia questo testo:', txt); }
+  setTimeout(() => ($('copy').textContent = 'Copia i punteggi'), 1500);
+};
+$('reset').onclick = () => { if (confirm('Cancellare tutti i voti?')) { R = {}; save(); } };
+render();
+</script>
+</body></html>

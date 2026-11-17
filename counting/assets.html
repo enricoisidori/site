@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counting by hands — asset mani</title>
+<style>
+  body { margin: 0; background: #e1e1e1; color: #111; font: 13px/1.4 "Neue Haas Grotesk Text Pro", "NHaasGroteskTXPro-55Rg", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 16px 20px 40px; }
+  a { color: #111; }
+  h1 { font-size: 15px; font-weight: 400; margin: 0 0 4px; } h2 { font-size: 13px; margin: 24px 0 8px; }
+  p { color: #555; max-width: 900px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+  .grid a { display: block; text-align: center; text-decoration: none; background: #ececec; border-radius: 4px; padding: 6px 4px; font-variant-numeric: tabular-nums; }
+  .grid img { width: 100%; height: 110px; object-fit: contain; display: block; }
+  .grid a:hover { background: #fff; }
+</style>
+</head>
+<body>
+<script>if (location.protocol === 'file:') document.write('<div style="padding:16px 20px;background:#111;color:#fff;font:15px/1.4 Helvetica,Arial,sans-serif">Opened as a file: if the page does not work, the browser is blocking its scripts. In the Terminal, inside the <b>site</b> folder, run <code>python3 serve.py</code>, then open <a style="color:#fff" href="http://localhost:8000/counting/">http://localhost:8000/counting/</a></div>');</script>
+<p><a href="index.html">← animatic</a></p>
+<h1>Asset mani — 32 posizioni (2⁵) × dorso / palmo × sinistra / destra</h1>
+<p>File SVG in <code>counting/assets/</code> (si rigenerano con <code>node counting/build-assets.mjs</code>). Il numero nel nome è il valore che la mano rappresenta;
+mappatura “si legge da sinistra a destra”: mano destra pollice = 1 … mignolo = 16, mano sinistra mignolo = 1 … pollice = 16.
+Clic su una mano per scaricarla.</p>
+<div id="out"></div>
+<script>
+const sets = [['dorso-destra', 'Dorso, mano destra (animatic)'], ['dorso-sinistra', 'Dorso, mano sinistra (animatic)'], ['palmo-destra', 'Palmo, mano destra (fogli modelli)'], ['palmo-sinistra', 'Palmo, mano sinistra (fogli modelli)']];
+document.getElementById('out').innerHTML = sets.map(([d, t]) => `<h2>${t}</h2><div class="grid">` +
+  Array.from({ length: 32 }, (_, v) => { const b = v.toString(2).padStart(5, '0'); const f = `assets/${d}/${String(v).padStart(2, '0')}_${b}.svg`;
+    return `<a href="${f}" download="${d}_${String(v).padStart(2, '0')}_${b}.svg"><img src="${f}" loading="lazy" alt="${v}">${v} · ${b}</a>`; }).join('') + '</div>').join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counting by hands — animatic</title>
+<style>
+  :root { --bg:#e1e1e1; --ink:#111; --mute:#666; --line:#c9c9c9; --panel:#ececec; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:13px/1.4 "Neue Haas Grotesk Text Pro", "NHaasGroteskTXPro-55Rg", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  header { display:flex; gap:24px; align-items:baseline; padding:16px 20px 8px; }
+  header h1 { font-size:15px; font-weight:400; margin:0; }
+  header nav a { color:var(--ink); margin-right:14px; }
+  main { display:grid; grid-template-columns: 320px 1fr; gap:20px; padding:8px 20px 40px; }
+  aside { background:var(--panel); padding:14px; border-radius:6px; align-self:start; position:sticky; top:12px; max-height:calc(100vh - 24px); overflow:auto; }
+  fieldset { border:0; border-top:1px solid var(--line); margin:0 0 10px; padding:10px 0 0; }
+  legend { font-weight:700; padding:0 4px 0 0; }
+  label { display:flex; justify-content:space-between; align-items:center; gap:8px; margin:5px 0; }
+  label.col { flex-direction:column; align-items:stretch; }
+  input[type=text], input[type=number], select, textarea { font:inherit; padding:4px 6px; border:1px solid var(--line); border-radius:4px; background:#fff; width:150px; }
+  textarea { width:100%; height:120px; font:12px ui-monospace, Menlo, monospace; }
+  input[type=color] { width:40px; height:24px; border:0; padding:0; background:none; }
+  .seg { display:flex; gap:4px; } .seg button { flex:1; }
+  button { font:inherit; padding:6px 10px; border:1px solid var(--ink); background:#fff; border-radius:4px; cursor:pointer; }
+  button.on, button.primary { background:var(--ink); color:#fff; }
+  .hint { color:var(--mute); font-size:12px; margin:4px 0; }
+  #stage { width:100%; background:#000; }
+  canvas#cv { width:100%; display:block; }
+  .transport { display:flex; gap:10px; align-items:center; margin:10px 0; }
+  .transport input[type=range] { flex:1; }
+  #clock { font-variant-numeric: tabular-nums; min-width:90px; }
+  table { border-collapse:collapse; width:100%; margin-top:14px; font-variant-numeric: tabular-nums; }
+  th, td { text-align:left; padding:5px 8px; border-bottom:1px solid var(--line); }
+  th { font-weight:400; color:var(--mute); }
+  tr.cur td { background:#fff; }
+  #exportStatus { margin-left:8px; color:var(--mute); }
+  .row { display:flex; gap:8px; flex-wrap:wrap; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } aside { position:static; max-height:none; } }
+</style>
+</head>
+<body>
+<script>if (location.protocol === 'file:') document.write('<div style="padding:16px 20px;background:#111;color:#fff;font:15px/1.4 Helvetica,Arial,sans-serif">Opened as a file: if the page does not work, the browser is blocking its scripts. In the Terminal, inside the <b>site</b> folder, run <code>python3 serve.py</code>, then open <a style="color:#fff" href="http://localhost:8000/counting/">http://localhost:8000/counting/</a></div>');</script>
+<header>
+  <h1>Counting by hands, 2026 — animatic</h1>
+  <nav><a href="index.html">Animatic</a><a href="sheets.html" id="sheetsLink">Fogli modelli</a><a href="assets.html">Asset mani</a><a href="difficulty.html">Difficoltà posizioni</a></nav>
+</header>
+<main>
+<aside id="panel">
+  <fieldset><legend>Video</legend>
+    <div class="seg"><button data-video="1">1 · conteggio</button><button data-video="2">2 · scatti</button><button data-video="3">3 · inquadrature</button></div>
+  </fieldset>
+
+  <fieldset><legend>Numero</legend>
+    <label class="col">Secondi dall'inizio dell'universo (T)
+      <input type="text" id="T" style="width:100%"></label>
+    <label>…oppure età in miliardi di anni <input type="number" id="gyr" step="0.001" style="width:90px"></label>
+    <p class="hint" id="Tinfo"></p>
+  </fieldset>
+
+  <fieldset id="v1box"><legend>Video 1</legend>
+    <label>Conta da 0 fino a (s) <input type="number" id="v1dur" min="1" max="600"></label>
+    <p class="hint">Numero ≈ T con le mani della persona 6 a zero: la persona 6 mostra i secondi trascorsi (0 → 60, video di 61 s).</p>
+  </fieldset>
+
+  <fieldset id="v3box"><legend>Video 3 · inquadrature (16:9)</legend>
+    <p class="hint">Stessi scatti e stesse dita del video 2. A ogni cut l'inquadratura si allarga sulle persone attive: 2 mani, 4, 6 … fino alla fila intera.</p>
+    <label>Formato <select id="cutRes"><option value="1920x1080">1920 × 1080</option><option value="3840x2160">3840 × 2160</option><option value="1080x1080">1080 × 1080 (quadrato)</option><option value="1080x1920">1080 × 1920 (verticale)</option></select></label>
+    <label>Margine attorno alle mani <input type="number" id="cutPad" min="0" max="0.4" step="0.01" style="width:70px"></label>
+    <label>Passaggio tra inquadrature <select id="cutMove"><option value="cut">taglio netto</option><option value="zoom">zoom (movimento)</option></select></label>
+    <label>Durata zoom (ms) <input type="number" id="cutZoomMs" min="0" max="2000" step="50" style="width:70px"></label>
+    <label>Persone non attive ai lati <input type="checkbox" id="cutOthers"></label>
+    <label>Dimensione testo <input type="number" id="cutFont" min="0.01" max="0.08" step="0.002" style="width:70px"></label>
+  </fieldset>
+  <fieldset id="v2box"><legend>Video 2 · scatti</legend>
+    <label>Momenti
+      <select id="mode">
+        <option value="log">logaritmici (T^(k/5))</option>
+        <option value="carry">riporto a metà scatto</option>
+        <option value="custom">lista personalizzata</option>
+      </select></label>
+    <label>Numero scatti <input type="number" id="segCount" min="2" max="12"></label>
+    <label>Durata scatto (s) <input type="number" id="segDur" min="1" max="60"></label>
+    <label>Conta durante lo scatto <input type="checkbox" id="countInSeg"></label>
+    <label>Persona 6 continua, le altre cambiano <input type="checkbox" id="continuity"></label>
+    <p class="hint">Allo scatto la persona 6 prosegue la conta (+1); tutte le altre mani attive cambiano, nessuna posizione si ripete, nessuna persona attiva ha mani a 00000.</p>
+    <div id="customBox">
+      <textarea id="custom" spellcheck="false"></textarea>
+      <p class="hint">Una riga per scatto: <code>0</code>, <code>3min</code>, <code>380000y</code>, <code>200My</code>, <code>2^40</code>, <code>now-4.6Gy</code>, <code>now</code>. Dopo <code>#</code> l'etichetta.</p>
+      <button id="presetEpochs">Preset: epoche cosmiche</button>
+    </div>
+  </fieldset>
+
+  <fieldset><legend>Persone</legend>
+    <label>Persone non ancora attive
+      <select id="inactive"><option value="show">visibili (pugno)</option><option value="dim">attenuate</option><option value="hide">nascoste</option></select></label>
+    <label>Mappatura dita
+      <select id="mapping"><option value="spatial">si legge da sx a dx</option><option value="thumb">pollice = 1 su entrambe</option></select></label>
+    <label>Mani
+      <select id="handView"><option value="back">dorso</option><option value="palm">fronte (palmo)</option></select></label>
+    <label>Vista
+      <select id="view"><option value="final">finale (flippata in post)</option><option value="shot">come ripresa</option></select></label>
+  </fieldset>
+
+  <fieldset><legend>Testo</legend>
+    <label>Base 2 (sotto le dita) <input type="checkbox" id="showBin"></label>
+    <label>Base 10 <input type="checkbox" id="showDec"></label>
+    <label>Anni <input type="checkbox" id="showYears"></label>
+    <label>Etichette scatti <input type="checkbox" id="showLabels"></label>
+    <label>Tabella scatti (video 2) <input type="checkbox" id="showTable"></label>
+    <label>Lingua <select id="lang"><option value="it">italiano</option><option value="en">english</option></select></label>
+  </fieldset>
+
+  <fieldset><legend>Aspetto</legend>
+    <label>Sfondo <input type="color" id="bg"></label>
+    <label>Mano <input type="color" id="handFill"></label>
+    <label>Contorno <input type="color" id="handStroke"></label>
+    <label>Testo <input type="color" id="text"></label>
+    <label>Transizione dita (ms) <input type="number" id="tweenMs" min="0" max="900" step="10"></label>
+    <label>Transizione anche al cambio scatto <input type="checkbox" id="tweenOnCut"></label>
+  </fieldset>
+
+  <fieldset><legend>Export MP4</legend>
+    <label>Risoluzione
+      <select id="res"><option value="1920x320">1920 × 320</option><option value="2880x480">2880 × 480</option><option value="3840x640">3840 × 640</option></select></label>
+    <label>Fotogrammi/s <select id="fps"><option>25</option><option>30</option><option>50</option><option>60</option></select></label>
+    <label>Metronomo (audio) <input type="checkbox" id="metronome"></label>
+    <div class="row"><button class="primary" id="exportBtn">Esporta MP4</button><button id="pngBtn">PNG fotogramma</button></div>
+    <p class="hint" id="exportStatus"></p>
+    <button id="resetBtn" style="margin-top:8px">Ripristina predefiniti</button>
+  </fieldset>
+</aside>
+
+<section>
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <div class="transport">
+    <button id="play">▶︎</button>
+    <input type="range" id="scrub" min="0" max="1000" value="0">
+    <span id="clock">0:00</span>
+  </div>
+  <table id="segTable"></table>
+  <p class="hint" style="margin-top:12px">Anni giuliani (365,25 giorni). In <b>vista finale</b> la persona 1 (bit più alti) è a sinistra; in ripresa i modelli stanno in ordine inverso — la persona 6, che conta, è la prima a sinistra vista dalla camera e usa la mano destra — e il video si specchia in post.</p>
+</section>
+</main>
+
+<script src="vendor/mp4-muxer.min.js"></script>
+<script type="module">
+import { DEFAULT_CFG, EPOCH_PRESET, YEAR_S, buildTimeline, loadCfg, saveCfg, fmtDec, fmtYears, fmtHuman, fmtClock, toBin, cfgParam } from './counting.js';
+import { renderFrame, metronomePCM, frameSize } from './render.js';
+
+let cfg = loadCfg();
+let tl;
+const $ = (id) => document.getElementById(id);
+const canvas = $('cv'), ctx = canvas.getContext('2d');
+let t = 0, playing = false, last = 0;
+
+const BOOL = ['continuity', 'countInSeg', 'showBin', 'showDec', 'showYears', 'showLabels', 'showTable', 'tweenOnCut', 'metronome', 'cutOthers'];
+const NUM = ['v1dur', 'segCount', 'segDur', 'tweenMs', 'fps', 'cutPad', 'cutZoomMs', 'cutFont'];
+const STR = ['T', 'mode', 'custom', 'inactive', 'mapping', 'handView', 'view', 'lang', 'bg', 'handFill', 'handStroke', 'text', 'cutRes', 'cutMove'];
+
+function toUI() {
+  BOOL.forEach((k) => ($(k).checked = !!cfg[k]));
+  NUM.forEach((k) => ($(k).value = cfg[k]));
+  STR.forEach((k) => ($(k).value = cfg[k]));
+  $('res').value = `${cfg.width}x${cfg.height}`;
+  $('gyr').value = (Number(cfg.T) / YEAR_S / 1e9).toFixed(3);
+  document.querySelectorAll('[data-video]').forEach((b) => b.classList.toggle('on', +b.dataset.video === (cfg.video === 2 && cfg.framing === 'cuts' ? 3 : cfg.video)));
+}
+function fromUI() {
+  BOOL.forEach((k) => (cfg[k] = $(k).checked));
+  NUM.forEach((k) => (cfg[k] = +$(k).value));
+  STR.forEach((k) => (cfg[k] = $(k).value));
+  const [w, h] = $('res').value.split('x').map(Number); cfg.width = w; cfg.height = h;
+}
+function rebuild() {
+  try {
+    BigInt(cfg.T);
+    tl = buildTimeline(cfg);
+    $('Tinfo').textContent = `= ${fmtHuman(BigInt(cfg.T))} · ${toBin(BigInt(cfg.T)).replace(/^0+/, '').length} bit`;
+  } catch (e) { $('Tinfo').textContent = '⚠︎ ' + e.message; return; }
+  $('v1box').style.display = cfg.video === 1 ? '' : 'none';
+  $('v2box').style.display = cfg.video === 2 ? '' : 'none';
+  $('v3box').style.display = cfg.framing === 'cuts' ? '' : 'none';
+  $('customBox').style.display = cfg.mode === 'custom' ? '' : 'none';
+  $('segCount').disabled = cfg.mode === 'custom';
+  [canvas.width, canvas.height] = frameSize(cfg, tl);
+  t = Math.min(t, tl.duration - 1e-3);
+  saveCfg(cfg);
+  $('sheetsLink').href = 'sheets.html?cfg=' + cfgParam(cfg);
+  table();
+  draw();
+}
+function table() {
+  const rows = tl.segs.map((s) => `<tr data-k="${s.k}"><td>${s.k + 1}</td><td>${fmtClock(s.t0)}–${fmtClock(s.t1)}</td><td>${fmtDec(s.n0)}</td><td>${s.n0 === s.target || s.target === undefined ? '—' : (s.n0 > s.target ? '+' : '−') + fmtDec(s.n0 > s.target ? s.n0 - s.target : s.target - s.n0) + ' s'}</td><td>${fmtHuman(s.n0)}</td><td>${s.active}</td><td>${s.label || ''}</td></tr>`).join('');
+  $('segTable').innerHTML = `<tr><th>#</th><th>video</th><th>secondi (inizio)</th><th title="differenza tra il numero mostrato e il momento esatto calcolato (log o epoca)">scarto dal momento esatto</th><th>tempo cosmico</th><th>persone attive</th><th>etichetta</th></tr>${rows}`;
+}
+function draw() {
+  const st = renderFrame(ctx, cfg, tl, t);
+  $('clock').textContent = `${fmtClock(t)} / ${fmtClock(tl.duration)}`;
+  $('scrub').value = Math.round((t / tl.duration) * 1000);
+  document.querySelectorAll('#segTable tr[data-k]').forEach((r) => r.classList.toggle('cur', +r.dataset.k === st.k));
+}
+function loop(now) {
+  if (!playing) return;
+  t += (now - last) / 1000; last = now;
+  if (t >= tl.duration) t = 0;
+  draw();
+  requestAnimationFrame(loop);
+}
+
+$('panel').addEventListener('input', (e) => {
+  if (e.target.id === 'gyr') { cfg.T = BigInt(Math.round(+e.target.value * 1e9 * YEAR_S)).toString(); $('T').value = cfg.T; }
+  else fromUI();
+  rebuild();
+});
+document.querySelectorAll('[data-video]').forEach((b) => b.onclick = () => { const v = +b.dataset.video; cfg.video = v === 3 ? 2 : v; cfg.framing = v === 3 ? 'cuts' : 'strip'; t = 0; toUI(); rebuild(); });
+$('presetEpochs').onclick = () => { cfg.custom = EPOCH_PRESET; toUI(); rebuild(); };
+$('resetBtn').onclick = () => { cfg = { ...DEFAULT_CFG, video: cfg.video, framing: cfg.framing }; toUI(); rebuild(); };
+$('play').onclick = () => { playing = !playing; $('play').textContent = playing ? '❚❚' : '▶︎'; last = performance.now(); if (playing) requestAnimationFrame(loop); };
+$('scrub').oninput = (e) => { t = (e.target.value / 1000) * tl.duration; if (t >= tl.duration) t = tl.duration - 1e-3; draw(); };
+$('segTable').onclick = (e) => { const r = e.target.closest('tr[data-k]'); if (r) { t = tl.segs[+r.dataset.k].t0; draw(); } };
+document.addEventListener('keydown', (e) => { if (e.code === 'Space' && !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) { e.preventDefault(); $('play').click(); } });
+
+function fileBase() {
+  const v = cfg.video === 1 ? `video1-${cfg.v1dur}s` : `video${cfg.framing === 'cuts' ? 3 : 2}-${tl.segs.length}x${cfg.segDur}s-${cfg.mode}`;
+  return `counting-${v}${cfg.handView === 'palm' ? '-palm' : ''}-${frameSize(cfg, tl).join('x')}`;
+}
+function download(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+$('pngBtn').onclick = () => canvas.toBlob((b) => download(b, `${fileBase()}-${t.toFixed(2)}s.png`));
+
+// --- export MP4: WebCodecs (H.264 + AAC) + mp4-muxer, fotogramma per fotogramma
+async function pickVideoCodec(w, h, fps) {
+  for (const codec of ['avc1.640034', 'avc1.640033', 'avc1.4d0034', 'avc1.640028']) {
+    const c = { codec, width: w, height: h, bitrate: Math.round(w * h * fps * 0.12), framerate: fps, avc: { format: 'avc' } };
+    try { if ((await VideoEncoder.isConfigSupported(c)).supported) return c; } catch {}
+  }
+  return null;
+}
+async function exportMP4({ download: doDownload = true } = {}) {
+  if (!('VideoEncoder' in window)) throw new Error('WebCodecs non disponibile: usa Chrome o Safari recente');
+  await document.fonts.ready;
+  const [W, H] = frameSize(cfg, tl), fps = cfg.fps;
+  const vconf = await pickVideoCodec(W, H, fps);
+  if (!vconf) throw new Error(`H.264 ${W}×${H} non supportato da questo browser`);
+  let aconf = null;
+  if (cfg.metronome && 'AudioEncoder' in window) {
+    const c = { codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 1, bitrate: 128000 };
+    try { if ((await AudioEncoder.isConfigSupported(c)).supported) aconf = c; } catch {}
+  }
+  const muxer = new Mp4Muxer.Muxer({
+    target: new Mp4Muxer.ArrayBufferTarget(),
+    video: { codec: 'avc', width: W, height: H, frameRate: fps },
+    ...(aconf ? { audio: { codec: 'aac', numberOfChannels: 1, sampleRate: 48000 } } : {}),
+    fastStart: 'in-memory',
+  });
+  let err = null;
+  const venc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: (e) => (err = e) });
+  venc.configure(vconf);
+  const off = document.createElement('canvas'); off.width = W; off.height = H;
+  const octx = off.getContext('2d');
+  const total = Math.round(tl.duration * fps);
+  for (let i = 0; i < total; i++) {
+    if (err) throw err;
+    renderFrame(octx, cfg, tl, i / fps);
+    const frame = new VideoFrame(off, { timestamp: Math.round((i * 1e6) / fps), duration: Math.round(1e6 / fps) });
+    venc.encode(frame, { keyFrame: i % (fps * 2) === 0 });
+    frame.close();
+    if (venc.encodeQueueSize > 8) await new Promise((r) => setTimeout(r, 0));
+    if (i % 15 === 0) { $('exportStatus').textContent = `video ${Math.round((i / total) * 100)}%`; await new Promise((r) => setTimeout(r, 0)); }
+  }
+  await venc.flush();
+  if (aconf) {
+    $('exportStatus').textContent = 'audio…';
+    const aenc = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: (e) => (err = e) });
+    aenc.configure(aconf);
+    const pcm = metronomePCM(tl, 48000), CH = 4800;
+    for (let i = 0; i < pcm.length; i += CH) {
+      const data = pcm.slice(i, i + CH);
+      const ad = new AudioData({ format: 'f32-planar', sampleRate: 48000, numberOfFrames: data.length, numberOfChannels: 1, timestamp: Math.round((i / 48000) * 1e6), data });
+      aenc.encode(ad); ad.close();
+    }
+    await aenc.flush();
+  }
+  if (err) throw err;
+  muxer.finalize();
+  const blob = new Blob([muxer.target.buffer], { type: 'video/mp4' });
+  const info = `${(blob.size / 1e6).toFixed(1)} MB · ${vconf.codec}${aconf ? ' + AAC' : cfg.metronome ? ' (audio non supportato)' : ''}`;
+  $('exportStatus').textContent = 'fatto: ' + info;
+  if (doDownload) download(blob, fileBase() + '.mp4');
+  return { blob, size: blob.size, codec: vconf.codec, audio: !!aconf, frames: total };
+}
+window.exportMP4 = exportMP4; // utile per test
+$('exportBtn').onclick = async () => {
+  $('exportBtn').disabled = true;
+  try { await exportMP4(); } catch (e) { $('exportStatus').textContent = '⚠︎ ' + e.message; console.error(e); }
+  $('exportBtn').disabled = false;
+};
+
+toUI(); rebuild();
+document.fonts.ready.then(draw);
+</script>
+</body>
+</html>

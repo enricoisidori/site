@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Counting by hands — fotogramma</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style></head>
+<body><canvas id="cv"></canvas>
+<script type="module">
+// frame.html?t=23.5&video=2  → un fotogramma a piena risoluzione con la configurazione salvata (o ?cfg=)
+import { loadCfg, buildTimeline } from './counting.js';
+import { renderFrame, frameSize } from './render.js';
+const q = new URLSearchParams(location.search);
+const cfg = loadCfg();
+for (const [k, v] of q) if (k !== 'cfg' && k !== 't' && k in cfg) cfg[k] = typeof cfg[k] === 'number' ? +v : typeof cfg[k] === 'boolean' ? v === '1' : v;
+const cv = document.getElementById('cv');
+const tl = buildTimeline(cfg);
+[cv.width, cv.height] = frameSize(cfg, tl);
+await document.fonts.ready;
+renderFrame(cv.getContext('2d'), cfg, tl, +(q.get('t') || 0));
+document.title = 'ready';
+</script></body></html>

@@ -399,6 +399,9 @@
         tx.onabort = () =>
           reject(tx.error || new Error("FS context transaction aborted"));
       });
+      // Every project that becomes active (in any view) is also the one
+      // suggested next time the user opens something.
+      await saveRecentProject(context);
       return true;
     } catch (err) {
       console.warn("Unable to persist FS context", err);
@@ -521,59 +524,483 @@
     return true;
   }
 
+  /* ------------------------------------------------------------------
+   * Unified project open / save helpers
+   *
+   * A project can be:
+   *   - a folder containing a project JSON (any name, "project.json" preferred)
+   *     plus an optional assets/ directory;
+   *   - a single loose JSON file (any name), with assets embedded or by path.
+   * The last project opened or saved is remembered (handle + name) in a
+   * dedicated IndexedDB key that is never cleared by "New project", so every
+   * view can offer to reopen it and every picker starts from it.
+   * ------------------------------------------------------------------ */
+  const RECENT_STORE_KEY = "recent-project";
+  const PICKER_ID = "overtrace-project";
+  const PREFERRED_PROJECT_FILE = "project.json";
+
+  function looksLikeProject(value) {
+    return !!value && typeof value === "object" && Array.isArray(value.nodes);
+  }
+
+  function hasFsAccess() {
+    return "showDirectoryPicker" in window || "showOpenFilePicker" in window;
+  }
+
+  async function ensureHandlePermission(handle, mode = "readwrite") {
+    if (!handle) return false;
+    if (typeof handle.queryPermission !== "function") return true;
+    try {
+      const opts = { mode };
+      if ((await handle.queryPermission(opts)) === "granted") return true;
+      if (typeof handle.requestPermission !== "function") return false;
+      return (await handle.requestPermission(opts)) === "granted";
+    } catch (err) {
+      console.warn("Permission request failed", err);
+      return false;
+    }
+  }
+
+  async function readProjectFromFileHandle(fileHandle) {
+    const file = await fileHandle.getFile();
+    const text = await file.text();
+    let project;
+    try {
+      project = JSON.parse(text);
+    } catch (err) {
+      const e = new Error(`“${file.name}” is not valid JSON`);
+      e.name = "InvalidProjectError";
+      throw e;
+    }
+    if (!looksLikeProject(project)) {
+      const e = new Error(`“${file.name}” is not an Overtrace project`);
+      e.name = "InvalidProjectError";
+      throw e;
+    }
+    return { file, project };
+  }
+
+  // Finds the project JSON inside a folder. Order: the preferred name (e.g. the
+  // file used last time), project.json, then any other *.json at the root that
+  // contains a project (most recently modified wins).
+  async function findProjectFileInDirectory(dirHandle, preferredName = "") {
+    const tried = new Set();
+    const tryName = async (name) => {
+      if (!name || tried.has(name)) return null;
+      tried.add(name);
+      try {
+        const fileHandle = await dirHandle.getFileHandle(name, { create: false });
+        const { file, project } = await readProjectFromFileHandle(fileHandle);
+        return { fileHandle, file, project };
+      } catch (_) {
+        return null;
+      }
+    };
+    const direct =
+      (await tryName(preferredName)) || (await tryName(PREFERRED_PROJECT_FILE));
+    if (direct) return direct;
+
+    const candidates = [];
+    if (typeof dirHandle.values === "function") {
+      for await (const entry of dirHandle.values()) {
+        if (entry.kind !== "file") continue;
+        if (!/\.json$/i.test(entry.name) || entry.name.startsWith(".")) continue;
+        if (tried.has(entry.name)) continue;
+        candidates.push(entry);
+      }
+    }
+    let best = null;
+    for (const fileHandle of candidates) {
+      try {
+        const { file, project } = await readProjectFromFileHandle(fileHandle);
+        if (!best || file.lastModified > best.file.lastModified) {
+          best = { fileHandle, file, project };
+        }
+      } catch (_) {
+        // Not a project JSON: ignore.
+      }
+    }
+    return best;
+  }
+
+  async function directoryIsEmpty(dirHandle) {
+    if (typeof dirHandle?.values !== "function") return false;
+    for await (const entry of dirHandle.values()) {
+      if (entry.name === ".DS_Store") continue;
+      return false;
+    }
+    return true;
+  }
+
+  function entryFromParts({ kind, project, file, fileHandle, dirHandle }) {
+    const folderName = kind === "folder" ? dirHandle?.name || null : null;
+    return {
+      kind,
+      project,
+      file,
+      fileHandle,
+      dirHandle: kind === "folder" ? dirHandle : null,
+      folderName,
+      fileName: file?.name || fileHandle?.name || PREFERRED_PROJECT_FILE,
+      assetBase: folderName ? `${folderName}/` : "",
+    };
+  }
+
+  // Opens whatever handle the user picked or dropped: a folder or a JSON file.
+  async function openProjectFromHandle(handle, options = {}) {
+    if (!handle) return null;
+    const mode = options.mode || "readwrite";
+    if (handle.kind === "directory") {
+      if (options.requestPermission !== false) {
+        const ok = await ensureHandlePermission(handle, mode);
+        if (!ok) {
+          const e = new Error("Permission to the project folder was denied");
+          e.name = "NotAllowedError";
+          throw e;
+        }
+      }
+      const found = await findProjectFileInDirectory(
+        handle,
+        options.preferredFileName || "",
+      );
+      if (!found) {
+        const e = new Error(`No project JSON found in “${handle.name}”`);
+        e.name = "NotFoundError";
+        throw e;
+      }
+      return entryFromParts({ kind: "folder", ...found, dirHandle: handle });
+    }
+    if (options.requestPermission !== false) {
+      const ok = await ensureHandlePermission(handle, mode);
+      if (!ok) {
+        const e = new Error("Permission to the project file was denied");
+        e.name = "NotAllowedError";
+        throw e;
+      }
+    }
+    const { file, project } = await readProjectFromFileHandle(handle);
+    return entryFromParts({ kind: "file", project, file, fileHandle: handle });
+  }
+
+  async function saveRecentProject(entry) {
+    const db = await openFsDb();
+    const handle =
+      entry?.kind === "folder" ? entry.dirHandle || entry.handle : entry?.fileHandle || entry?.handle;
+    if (!db || !handle) return false;
+    const payload = {
+      version: 1,
+      savedAt: Date.now(),
+      kind: entry.kind,
+      name: entry.kind === "folder" ? handle.name : entry.fileName || handle.name,
+      fileName: entry.fileName || (entry.kind === "file" ? handle.name : null),
+      handle,
+    };
+    try {
+      const tx = db.transaction(FS_STORE_NAME, "readwrite");
+      tx.objectStore(FS_STORE_NAME).put(payload, RECENT_STORE_KEY);
+      await new Promise((resolve, reject) => {
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+      return true;
+    } catch (err) {
+      console.warn("Unable to remember recent project", err);
+      return false;
+    }
+  }
+
+  async function loadRecentProject() {
+    const db = await openFsDb();
+    if (!db) return null;
+    try {
+      const tx = db.transaction(FS_STORE_NAME, "readonly");
+      const recent = await withRequest(
+        tx.objectStore(FS_STORE_NAME).get(RECENT_STORE_KEY),
+      );
+      if (recent?.handle) return recent;
+      // Backward compatibility: before "recent-project" existed, the last
+      // project was only stored as the active cross-view context.
+      const active = await withRequest(
+        db
+          .transaction(FS_STORE_NAME, "readonly")
+          .objectStore(FS_STORE_NAME)
+          .get(FS_STORE_KEY),
+      );
+      if (!active?.handle) return null;
+      return {
+        version: 1,
+        savedAt: active.savedAt || 0,
+        kind: active.kind,
+        name:
+          active.kind === "folder"
+            ? active.folderName || active.handle.name
+            : active.fileName || active.handle.name,
+        fileName: active.fileName || null,
+        handle: active.handle,
+      };
+    } catch (err) {
+      console.warn("Unable to load recent project", err);
+      return null;
+    }
+  }
+
+  async function reopenRecentProject(options = {}) {
+    const recent = await loadRecentProject();
+    if (!recent) return null;
+    return openProjectFromHandle(recent.handle, {
+      ...options,
+      preferredFileName: recent.kind === "folder" ? recent.fileName : "",
+    });
+  }
+
+  async function pickerStartIn() {
+    const recent = await loadRecentProject();
+    return recent?.handle || "documents";
+  }
+
+  async function withStartInFallback(fn, startIn) {
+    try {
+      return await fn(startIn);
+    } catch (err) {
+      if (err?.name === "AbortError" || startIn === "documents") throw err;
+      // A stale handle (moved/deleted folder) cannot be used as startIn.
+      return fn("documents");
+    }
+  }
+
   async function openProjectFolder(options = {}) {
     if (!("showDirectoryPicker" in window)) {
       throw new Error("Directory picker unsupported");
     }
-    const dirHandle = await window.showDirectoryPicker({
-      mode: options.mode || "readwrite",
-    });
-    const fileHandle = await dirHandle.getFileHandle("project.json", {
-      create: false,
-    });
-    const file = await fileHandle.getFile();
-    const project = JSON.parse(await file.text());
-    const folderName = dirHandle?.name || null;
-    return {
-      kind: "folder",
-      project,
-      file,
-      fileHandle,
-      dirHandle,
-      folderName,
-      fileName: file.name || "project.json",
-      assetBase: folderName ? `${folderName}/` : "",
-    };
+    const mode = options.mode || "readwrite";
+    const startIn = options.startIn || (await pickerStartIn());
+    const dirHandle = await withStartInFallback(
+      (start) => window.showDirectoryPicker({ id: PICKER_ID, mode, startIn: start }),
+      startIn,
+    );
+    return openProjectFromHandle(dirHandle, { mode, requestPermission: false });
   }
 
   async function openProjectJsonFile(options = {}) {
     if (!("showOpenFilePicker" in window)) {
       throw new Error("File picker unsupported");
     }
-    const [fileHandle] = await window.showOpenFilePicker({
-      multiple: false,
-      types: [
-        {
-          description: options.description || "JSON Project",
-          accept: {
-            "application/json": [".json"],
-          },
-        },
-      ],
-    });
+    const startIn = options.startIn || (await pickerStartIn());
+    const [fileHandle] = await withStartInFallback(
+      (start) =>
+        window.showOpenFilePicker({
+          id: PICKER_ID,
+          startIn: start,
+          multiple: false,
+          types: [
+            {
+              description: options.description || "Overtrace project (JSON)",
+              accept: { "application/json": [".json"] },
+            },
+          ],
+        }),
+      startIn,
+    );
     if (!fileHandle) return null;
-    const file = await fileHandle.getFile();
-    const project = JSON.parse(await file.text());
+    return openProjectFromHandle(fileHandle, {
+      mode: options.mode || "readwrite",
+      requestPermission: options.mode === "read" ? false : undefined,
+    });
+  }
+
+  // Drag & drop of a folder or a JSON file (any name). Returns an entry (with
+  // live handles when the browser supports it) or { kind: "blob", file }.
+  async function projectEntryFromDataTransfer(dataTransfer, options = {}) {
+    const item = dataTransfer?.items?.[0];
+    if (item && typeof item.getAsFileSystemHandle === "function") {
+      const handlePromise = item.getAsFileSystemHandle();
+      const handle = await handlePromise;
+      if (handle) return openProjectFromHandle(handle, options);
+    }
+    const file = dataTransfer?.files?.[0];
+    if (!file) return null;
+    const text = await file.text();
+    let project;
+    try {
+      project = JSON.parse(text);
+    } catch (_) {
+      const e = new Error(`“${file.name}” is not a project JSON (or drop the folder)`);
+      e.name = "InvalidProjectError";
+      throw e;
+    }
+    if (!looksLikeProject(project)) {
+      const e = new Error(`“${file.name}” is not an Overtrace project`);
+      e.name = "InvalidProjectError";
+      throw e;
+    }
     return {
-      kind: "file",
+      kind: "blob",
       project,
       file,
-      fileHandle,
+      fileHandle: null,
       dirHandle: null,
       folderName: null,
-      fileName: file.name || null,
+      fileName: file.name,
       assetBase: "",
     };
+  }
+
+  function describeOpenError(err) {
+    if (!err) return "Unable to open project";
+    if (err.name === "NotFoundError") return err.message || "No project JSON found";
+    if (err.name === "NotAllowedError") return "Permission denied — choose the project again";
+    if (err.name === "InvalidProjectError") return err.message;
+    return "Unable to open project";
+  }
+
+  /* ---------- Open menu: reopen last · folder · file ---------- */
+  function injectOpenMenuStyle() {
+    if (document.getElementById("ot-open-menu-style")) return;
+    const style = document.createElement("style");
+    style.id = "ot-open-menu-style";
+    style.textContent = `
+      .ot-open-menu{position:fixed;z-index:10000;min-width:260px;max-width:340px;
+        background:#fff;color:#111;border:1px solid rgba(0,0,0,.14);border-radius:10px;
+        box-shadow:0 10px 30px rgba(0,0,0,.16);padding:6px;font:13px/1.35 system-ui,-apple-system,sans-serif}
+      .ot-open-menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+        border:0;background:transparent;color:inherit;padding:8px 10px;border-radius:7px;cursor:pointer;font:inherit}
+      .ot-open-menu button:hover,.ot-open-menu button:focus-visible{background:rgba(0,0,0,.06);outline:none}
+      .ot-open-menu .ot-k{margin-left:auto;opacity:.45;font-size:11px;white-space:nowrap}
+      .ot-open-menu .ot-sub{display:block;opacity:.55;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .ot-open-menu .ot-main{min-width:0;flex:1}
+      .ot-open-menu hr{border:0;border-top:1px solid rgba(0,0,0,.08);margin:4px 2px}
+      .ot-open-menu .ot-note{padding:6px 10px 4px;opacity:.5;font-size:11px}
+      @media (prefers-color-scheme: dark){.ot-open-menu{background:#1d1d1d;color:#eee;border-color:rgba(255,255,255,.14)}
+        .ot-open-menu button:hover,.ot-open-menu button:focus-visible{background:rgba(255,255,255,.08)}
+        .ot-open-menu hr{border-top-color:rgba(255,255,255,.1)}}`;
+    document.head.appendChild(style);
+  }
+
+  function closeOpenMenu() {
+    const menu = document.querySelector(".ot-open-menu");
+    if (menu) {
+      menu.__cleanup?.();
+      menu.remove();
+    }
+  }
+
+  // Shows the open menu. onChoice(action) is called synchronously inside the
+  // click/keydown gesture with "recent" | "folder" | "file" | "input", so the
+  // caller can launch a picker or a permission prompt immediately.
+  async function showOpenMenu({ anchor = null, onChoice } = {}) {
+    if (document.querySelector(".ot-open-menu")) {
+      closeOpenMenu();
+      return;
+    }
+    const recent = await loadRecentProject();
+    const canFolder = "showDirectoryPicker" in window;
+    const canFile = "showOpenFilePicker" in window;
+    if (!recent && !canFolder && !canFile) {
+      onChoice?.("input");
+      return;
+    }
+    injectOpenMenuStyle();
+    const esc = (s) =>
+      String(s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    const when = recent?.savedAt
+      ? new Date(recent.savedAt).toLocaleString(undefined, {
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "";
+    const menu = document.createElement("div");
+    menu.className = "ot-open-menu";
+    menu.setAttribute("role", "menu");
+    menu.innerHTML = `
+      ${
+        recent
+          ? `<button data-act="recent" role="menuitem"><span class="ot-main">Reopen <strong>${esc(
+              formatProjectDisplayName(recent.name, recent.name),
+            )}</strong><span class="ot-sub">${recent.kind === "folder" ? "Folder" : "File"}${
+              recent.kind === "folder" && recent.fileName && recent.fileName !== PREFERRED_PROJECT_FILE
+                ? ` · ${esc(recent.fileName)}`
+                : ""
+            }${when ? ` · ${esc(when)}` : ""}</span></span><span class="ot-k">↵</span></button><hr>`
+          : ""
+      }
+      ${canFolder ? `<button data-act="folder" role="menuitem"><span class="ot-main">Open project folder…</span><span class="ot-k">F</span></button>` : ""}
+      ${canFile ? `<button data-act="file" role="menuitem"><span class="ot-main">Open JSON file…</span><span class="ot-k">J</span></button>` : ""}
+      ${!canFolder && !canFile ? `<button data-act="input" role="menuitem"><span class="ot-main">Open JSON file…</span><span class="ot-k">J</span></button>` : ""}
+      <div class="ot-note">You can also drop a project folder or JSON file on the page.</div>`;
+    document.body.appendChild(menu);
+
+    const rect = anchor?.getBoundingClientRect?.();
+    const w = menu.offsetWidth;
+    const left = rect
+      ? Math.max(8, Math.min(rect.left, window.innerWidth - w - 8))
+      : Math.max(8, (window.innerWidth - w) / 2);
+    const top = rect ? rect.bottom + 6 : Math.max(8, window.innerHeight * 0.2);
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+
+    const choose = (act) => {
+      closeOpenMenu();
+      onChoice?.(act);
+    };
+    menu.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-act]");
+      if (btn) choose(btn.dataset.act);
+    });
+    const onKey = (e) => {
+      const k = e.key.toLowerCase();
+      if (k === "escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        closeOpenMenu();
+        return;
+      }
+      if (k === "enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        const focused = document.activeElement?.closest?.(".ot-open-menu button[data-act]");
+        choose(
+          focused?.dataset.act ||
+            (recent ? "recent" : canFolder ? "folder" : canFile ? "file" : "input"),
+        );
+        return;
+      }
+      if (k === "arrowdown" || k === "arrowup") {
+        e.preventDefault();
+        const items = [...menu.querySelectorAll("button[data-act]")];
+        const i = items.indexOf(document.activeElement);
+        const next = k === "arrowdown" ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+        items[next]?.focus();
+        return;
+      }
+      const map = { f: canFolder && "folder", j: canFile ? "file" : !canFolder && "input", r: recent && "recent" };
+      if (map[k] && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        choose(map[k]);
+      }
+    };
+    const onDown = (e) => {
+      if (!menu.contains(e.target)) closeOpenMenu();
+    };
+    window.addEventListener("keydown", onKey, true);
+    setTimeout(() => document.addEventListener("pointerdown", onDown, true), 0);
+    menu.__cleanup = () => {
+      window.removeEventListener("keydown", onKey, true);
+      document.removeEventListener("pointerdown", onDown, true);
+    };
+    menu.querySelector("button")?.focus();
+  }
+
+  // Runs one open-menu choice and returns an entry (or null if cancelled).
+  // Must be called synchronously from the gesture (onChoice of showOpenMenu).
+  async function openProjectByChoice(act, options = {}) {
+    if (act === "recent") return reopenRecentProject(options);
+    if (act === "folder") return openProjectFolder(options);
+    if (act === "file") return openProjectJsonFile(options);
+    return null;
   }
 
   function buildProjectFsContext(entry) {
@@ -602,6 +1029,22 @@
   }
 
   NS.attachToolbarTooltips = attachToolbarTooltips;
+  NS.closeOpenMenu = closeOpenMenu;
+  NS.describeOpenError = describeOpenError;
+  NS.directoryIsEmpty = directoryIsEmpty;
+  NS.ensureHandlePermission = ensureHandlePermission;
+  NS.findProjectFileInDirectory = findProjectFileInDirectory;
+  NS.hasFsAccess = hasFsAccess;
+  NS.loadRecentProject = loadRecentProject;
+  NS.looksLikeProject = looksLikeProject;
+  NS.openProjectByChoice = openProjectByChoice;
+  NS.openProjectFromHandle = openProjectFromHandle;
+  NS.pickerStartIn = pickerStartIn;
+  NS.projectEntryFromDataTransfer = projectEntryFromDataTransfer;
+  NS.reopenRecentProject = reopenRecentProject;
+  NS.saveRecentProject = saveRecentProject;
+  NS.showOpenMenu = showOpenMenu;
+  NS.PICKER_ID = PICKER_ID;
   NS.buildProjectFsContext = buildProjectFsContext;
   NS.clearProjectFsContext = clearProjectFsContext;
   NS.clearSharedProjectState = clearSharedProjectState;

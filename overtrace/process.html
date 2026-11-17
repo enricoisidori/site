@@ -3220,49 +3220,50 @@ function refreshDotTuningOutputs() {
  setHint(`Project loaded: ${label}`, "ok");
  }
 
-async function openJsonDialog() {
+async function loadOpenedEntry(entry) {
+ if (!entry) return;
+ if (entry.kind === "folder") {
+ await loadFromFolderContext(entry);
+ return;
+ }
+ await loadFromJsonFile(entry.file, entry.fileName || "");
+ if (entry.kind === "file") {
+ const fsContext = window.OvertraceUI?.buildProjectFsContext?.(entry);
+ if (fsContext) await window.OvertraceUI?.saveProjectFsContext?.(fsContext);
+ }
+ }
+
+ async function runOpenChoice(act) {
+ if (act === "input") {
+ dom.fileInput.value = "";
+ dom.fileInput.click();
+ return;
+ }
  if (state.openDialogPending) return;
  state.openDialogPending = true;
  try {
- if ("showDirectoryPicker" in window && window.OvertraceUI?.openProjectFolder) {
- try {
- const entry = await window.OvertraceUI.openProjectFolder({
- mode: "readwrite",
- });
- await loadFromFolderContext(entry);
- return;
+ const entry = await window.OvertraceUI.openProjectByChoice(act, { mode: "readwrite" });
+ await loadOpenedEntry(entry);
  } catch (err) {
  if (err && err.name === "AbortError") return;
- if (err && err.name === "NotFoundError") {
- setHint("project.json not found in the selected folder.", "warn");
- return;
- }
- console.warn("Folder open failed in Process view", err);
- setHint("Unable to open the project folder.", "warn");
- return;
- }
- }
- if ("showOpenFilePicker" in window && window.OvertraceUI?.openProjectJsonFile) {
- try {
- const entry = await window.OvertraceUI.openProjectJsonFile({
- description: "JSON",
- });
- if (!entry) return;
- await loadFromJsonFile(entry.file, entry.fileName || "");
- const fsContext = window.OvertraceUI?.buildProjectFsContext?.(entry);
- if (fsContext) {
- await window.OvertraceUI?.saveProjectFsContext?.(fsContext);
- }
- return;
- } catch (err) {
- if (err && err.name === "AbortError") return;
- }
- }
- dom.fileInput.value = "";
- dom.fileInput.click();
+ console.warn("Open failed", err);
+ setHint(window.OvertraceUI.describeOpenError(err), "warn");
  } finally {
  state.openDialogPending = false;
  }
+ }
+
+ // Same open menu as the Editor: reopen last project · folder · JSON file.
+ async function openJsonDialog() {
+ if (!window.OvertraceUI?.showOpenMenu) {
+ dom.fileInput.value = "";
+ dom.fileInput.click();
+ return;
+ }
+ await window.OvertraceUI.showOpenMenu({
+ anchor: dom.btnOpen,
+ onChoice: (act) => void runOpenChoice(act),
+ });
  }
 
  async function tryAutoloadFromQuery() {
@@ -3574,7 +3575,7 @@ dom.inpDotStroke?.addEventListener("input", () => {
 
  const enter = (e) => {
  e.preventDefault();
- setHint("Drop the project.json file", "ok");
+ setHint("Drop a project folder or JSON file", "ok");
  };
  const over = (e) => {
  e.preventDefault();
@@ -3585,17 +3586,13 @@ dom.inpDotStroke?.addEventListener("input", () => {
  };
  const drop = async (e) => {
  e.preventDefault();
- const files = e.dataTransfer && e.dataTransfer.files;
- const file = files && files[0];
- if (!file) return;
- if (!/\.json$/i.test(file.name)) {
- setHint("The dropped file is not a JSON file.", "warn");
- return;
- }
+ if (!e.dataTransfer?.files?.length) return;
  try {
- await loadFromJsonFile(file);
+ // Accepts a project folder or a JSON file with any name.
+ const entry = await window.OvertraceUI.projectEntryFromDataTransfer(e.dataTransfer, { mode: "readwrite" });
+ await loadOpenedEntry(entry);
  } catch (err) {
- setHint(`JSON open error: ${err.message || err}`, "warn");
+ setHint(window.OvertraceUI.describeOpenError(err), "warn");
  }
  };
  dom.viewWrap.addEventListener("dragenter", enter);

@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counting by hands — performer sheets</title>
+<style>
+  /* footer printed in the page margin: same distance from the bottom on every page */
+  /* A4: opening pages and "The row" landscape, person pages portrait (named page "person") */
+  @page { size: A4 landscape; margin: 10mm 12mm 18mm;
+    @bottom-left { content: "Contento360"; width: 50%; text-align: left; vertical-align: top; padding-top: 6mm; font: 9.5pt/1.35 "Neue Haas Grotesk Text Pro", "NHaasGroteskTXPro-55Rg", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #111; }
+    @bottom-right { content: "Enrico Isidori"; width: 50%; text-align: left; vertical-align: top; padding-top: 6mm; font: 9.5pt/1.35 "Neue Haas Grotesk Text Pro", "NHaasGroteskTXPro-55Rg", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #111; } }
+  @page person { size: A4 portrait; margin: 10mm 12mm 18mm;
+    @bottom-left { content: "Contento360"; width: 50%; text-align: left; vertical-align: top; padding-top: 6mm; font: 9.5pt/1.35 "Neue Haas Grotesk Text Pro", "NHaasGroteskTXPro-55Rg", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #111; }
+    @bottom-right { content: "Enrico Isidori"; width: 50%; text-align: left; vertical-align: top; padding-top: 6mm; font: 9.5pt/1.35 "Neue Haas Grotesk Text Pro", "NHaasGroteskTXPro-55Rg", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; color: #111; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e1e1e1; color: #111; font: 9.5pt/1.35 "Neue Haas Grotesk Text Pro", "NHaasGroteskTXPro-55Rg", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  .bar { padding: 12px 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .bar a, .bar button { font: inherit; color: #111; }
+  .bar button { padding: 5px 10px; border: 1px solid #111; background: #fff; border-radius: 4px; cursor: pointer; }
+  .bar a.btn { padding: 5px 10px; border: 1px solid #111; background: #111; color: #fff; border-radius: 4px; text-decoration: none; }
+  .bar button.on { background: #111; color: #fff; }
+  .page { background: #fff; width: 273mm; min-height: 190mm; margin: 0 auto 14px; padding: 8mm 10mm; }
+  .page.pp { page: person; width: 186mm; min-height: 269mm; }
+  @media screen { .page.pp { width: 206mm; } }
+  @media print { body { background: #fff; } .bar { display: none; } .page, .page.pp { margin: 0; padding: 0; width: auto; min-height: 0; } .page + .page { break-before: page; } .foot { display: none !important; } }
+  /* portrait person page */
+  .pp .head h1 { font-size: 24pt; }
+  .pp .head .kicker { margin-bottom: 5mm; }
+  .pp h2 { margin-top: 5mm; }
+  .pp .seg { grid-template-columns: 30mm 1fr; gap: 3mm; }
+  .pp .cells { max-width: none; }
+  .pp .pow { grid-template-columns: 1fr; gap: 3mm; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 4mm; }
+  .card { border-top: .5pt solid #ccc; padding: 2mm 0 3mm; break-inside: avoid; }
+  .card .when { font-weight: 700; }
+  .card .when small { display: block; font-weight: 400; color: #666; }
+  .card .cell { margin: 2mm 0 1mm; }
+  .card .cell.big svg { height: 21mm; }
+  .head { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 4mm; margin-bottom: 5mm; border-bottom: .5pt solid #ccc; }
+  .head .kicker { font-weight: 400; margin-bottom: 9mm; }
+  .head h1 { font-size: 30pt; font-weight: 400; margin: 0; line-height: 1; letter-spacing: -.01em; }
+  .head .meta { text-align: right; color: #444; }
+  .intro { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; color: #333; margin-bottom: 4mm; }
+  .intro b { color: #111; }
+  h2 { font-size: 9.5pt; font-weight: 700; margin: 7mm 0 0; padding: 2.5mm 0 2mm; border-top: 1.5pt solid #111; break-after: avoid; }
+  h2 + .seg, h2 + div .seg:first-child { border-top: 0; }
+  .seg.one { break-inside: avoid; } .seg { border-top: .5pt solid #ccc; padding: 2mm 0; display: grid; grid-template-columns: 40mm 1fr; gap: 4mm; align-items: start; }
+  .seg .when { font-weight: 700; }
+  .seg .when small { display: block; font-weight: 400; color: #666; }
+  .cells { display: flex; flex-wrap: wrap; gap: 2mm 1.8mm; max-width: 209mm; }
+  .cell { text-align: center; }
+  .cell .hands { display: flex; gap: .5mm; justify-content: center; }
+  .cell .hand { display: flex; flex-direction: column; align-items: center; }
+  .cell .hand .side { color: #888; font-size: 7pt; text-transform: uppercase; letter-spacing: .06em; }
+  .cell svg { display: block; }
+  .cell.big svg { height: 23mm; width: auto; }
+  .cell.small svg { height: 10.5mm; width: auto; }
+  .cell .t { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .cell .b { font-variant-numeric: tabular-nums; letter-spacing: .05em; color: #333; }
+  .cell.small .b { letter-spacing: 0; font-size: 6.6pt; }
+  .cell.big .b { font-size: 11pt; }
+  .cell.small { width: 19mm; font-size: 7.5pt; break-inside: avoid; }
+  .note { color: #666; }
+  .off { opacity: .45; }
+  /* lineup page */
+  .view { display: grid; grid-template-columns: 64mm 1fr; gap: 5mm; align-items: center; margin-top: 4mm; break-inside: avoid; }
+  .view .iso svg { width: 100%; height: auto; display: block; }
+  .view .vt { font-weight: 700; margin-bottom: 1mm; }
+  .view .vs { color: #666; margin-bottom: 2mm; }
+  .lineup { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0 1mm; }
+  .person { border-top: .5pt solid #ccc; padding-top: 1.5mm; text-align: center; }
+  .person.me { background: #f0f0f0; outline: 1.5px solid #111; }
+  .person .pn { font-weight: 700; }
+  .person .pb { color: #666; font-size: 8pt; }
+  .person .pair { display: flex; justify-content: center; margin: 0 -1mm; }
+  .oh { position: relative; width: 50%; }
+  .oh svg { display: block; width: 100%; height: auto; }
+  .oh .vals { position: relative; height: 4mm; font-size: 5pt; letter-spacing: -.02em; color: #444; font-variant-numeric: tabular-nums; }
+  .oh .vals span { position: absolute; transform: translateX(-50%); }
+  .oh .hn { font-size: 7pt; color: #888; text-transform: uppercase; letter-spacing: .05em; }
+  /* person 6: powers of two + tutorials */
+  .pow { display: grid; grid-template-columns: 1fr 70mm; gap: 8mm; border-top: 1.5pt solid #111; margin-top: 4mm; padding-top: 3mm; break-inside: avoid; }
+  .pow h3 { font-size: 9.5pt; font-weight: 700; margin: 0 0 2mm; }
+  .pow .ph { display: flex; gap: 6mm; }
+  .pow .ph2 { position: relative; width: 52mm; }
+  .pow .ph2 .hn { font-size: 7pt; color: #888; text-transform: uppercase; letter-spacing: .06em; text-align: center; }
+  .pow .ph2 .vals { position: relative; height: 9mm; font-variant-numeric: tabular-nums; }
+  .pow .ph2 .vals span { position: absolute; transform: translateX(-50%); text-align: center; line-height: 1.1; font-size: 10pt; }
+  .pow .ph2 .vals small { display: block; font-size: 6.5pt; color: #888; }
+  .pow .ph2 svg { display: block; width: 100%; height: auto; }
+  .pow .tx { color: #333; }
+  .pow .tx p { margin: 0 0 2.5mm; }
+  .pow a { color: #111; }
+  /* opening pages (general PDF) */
+  .head .sub { margin-top: 3mm; }
+  .lead { font-size: 20pt; line-height: 1.25; max-width: 210mm; margin: 0 0 6mm; }
+  .lead p { margin: 0 0 4mm; }
+  .prod { columns: 2; column-gap: 10mm; color: #222; }
+  .prod h3 { font-size: 9.5pt; font-weight: 700; margin: 0 0 1mm; break-after: avoid; }
+  .prod p { margin: 0 0 1.2mm; }
+  .prod section { break-inside: avoid; margin-bottom: 4mm; }
+  table.log { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; margin-top: 4mm; }
+  table.log th { text-align: left; font-weight: 400; color: #666; text-transform: uppercase; letter-spacing: .04em; font-size: 7.5pt; padding: 0 3mm 2mm 0; border-bottom: .5pt solid #111; }
+  table.log td { padding: 3mm 3mm 3mm 0; border-bottom: .5pt solid #ccc; white-space: nowrap; }
+  table.log td.g { color: #888; }
+  .foot { margin-top: 6mm; display: grid; grid-template-columns: 1fr 1fr; }
+</style>
+</head>
+<body>
+<script>if (location.protocol === 'file:') document.write('<div style="padding:16px 20px;background:#111;color:#fff;font:15px/1.4 Helvetica,Arial,sans-serif">Opened as a file: if the page does not work, the browser is blocking its scripts. In the Terminal, inside the <b>site</b> folder, run <code>python3 serve.py</code>, then open <a style="color:#fff" href="http://localhost:8000/counting/">http://localhost:8000/counting/</a></div>');</script>
+<div class="bar">
+  <a href="index.html">← animatic</a>
+  <span>Person:</span>
+  <span id="pick"></span>
+  <a id="dl" class="btn" download>Download PDF</a>
+  <span class="note">Download = the ready PDF in counting/pdf (default settings).</span>
+</div>
+<div id="out"></div>
+
+<script type="module">
+import { loadCfg, buildTimeline, stateAt, handValues, fmtClock, fmtHuman, groupInt } from './counting.js';
+import { handSVG, fingersFromValue, mirrorFor, DIGIT_X, VIEW_X0, VIEW_W } from './hands.js';
+
+const cfg = loadCfg();
+const q = new URLSearchParams(location.search);
+const sel = q.get('p') || '6';
+const bits5 = (v) => v.toString(2).padStart(5, '0');
+const fmtDecEn = (n) => groupInt(n.toString(), ',');
+const ord = (n) => n + (['th', 'st', 'nd', 'rd'][n] || 'th');
+const HEADER = 'Counting by hands, 2026';
+const FOOT = '<div class="foot"><span>Contento360</span><span>Enrico Isidori</span></div>';
+
+document.getElementById('dl').href = `pdf/counting-person-${sel === 'all' ? 'all' : Math.min(6, Math.max(1, +sel))}.pdf`;
+document.getElementById('pick').innerHTML = ['1', '2', '3', '4', '5', '6', 'all'].map((p) => {
+  const u = new URLSearchParams(location.search); u.set('p', p);
+  return `<button class="${p === sel ? 'on' : ''}" onclick="location.search='${u}'">${p}</button>`;
+}).join(' ');
+
+const pair = (L, R, big) => {
+  const st = { sw: big ? 2.4 : 3 };
+  const col = (v, side) => `<div class="hand">${big ? `<div class="side">${side}</div>` : ''}` +
+    `${handSVG({ fingers: fingersFromValue(v, side, cfg.mapping), side, view: 'palm', style: st })}<div class="b">${bits5(v)}</div></div>`;
+  return `<div class="hands">${col(L, 'left')}${col(R, 'right')}</div>`;
+};
+
+// one person's positions second by second, grouped by cut
+function runsFor(tl, p) {
+  return tl.segs.map((s) => {
+    const runs = [];
+    for (let t = s.t0; t < s.t1; t++) {
+      const hv = handValues(stateAt(tl, t + 0.5).n);
+      const L = hv[2 * (p - 1)], R = hv[2 * (p - 1) + 1];
+      const r = runs[runs.length - 1];
+      if (r && r.L === L && r.R === R) r.t1 = t + 1; else runs.push({ t0: t, t1: t + 1, L, R });
+    }
+    return { seg: s, runs, active: p > 6 - s.active };
+  });
+}
+
+const INACTIVE = {
+  hide: 'Not in frame yet (hidden in the video): fists closed, stay still.',
+  dim: 'Not active yet (faded in the video): fists closed, stay still.',
+  show: 'Not active yet: fists closed, stay still.',
+};
+
+function section(title, tl, p) {
+  const all = runsFor(tl, p);
+  if (tl.segs.length > 1 && all.every(({ runs }) => runs.length === 1)) {
+    return `<h2>${title}</h2><div class="cards">` + all.map(({ seg, runs: [r], active }) =>
+      `<div class="card"><div class="when">Cut ${seg.k + 1} · ${fmtClock(seg.t0)}–${fmtClock(seg.t1)}<small>${fmtHuman(seg.n0, 'en')} after the Big Bang${seg.label ? ' · ' + seg.label : ''}</small></div>` +
+      `<div class="cell big ${active ? '' : 'off'}">${pair(r.L, r.R, true)}</div>` +
+      `<div class="note">${active ? 'Hold this position.' : INACTIVE[cfg.inactive] || INACTIVE.show}</div></div>`).join('') + '</div>';
+  }
+  let h = '';
+  runsFor(tl, p).forEach(({ seg, runs, active }, i) => {
+    const when = tl.segs.length > 1
+      ? `Cut ${seg.k + 1} · ${fmtClock(seg.t0)}–${fmtClock(seg.t1)}<small>${fmtHuman(seg.n0, 'en')} after the Big Bang${seg.label ? ' · ' + seg.label : ''}</small>`
+      : `${fmtClock(seg.t0)}–${fmtClock(seg.t1)}<small>from ${fmtDecEn(seg.n0).replace(/,/g, ",<wbr>")} s</small>`;
+    let cells;
+    if (runs.length === 1) {
+      const r = runs[0];
+      cells = `<div class="cell big ${active ? '' : 'off'}">${pair(r.L, r.R, true)}</div>` +
+        `<div class="note" style="align-self:center;max-width:70mm">${active ? (tl.segs.length > 1 ? 'Hold this position.' : 'Hold this position the whole time.') : INACTIVE[cfg.inactive] || INACTIVE.show}</div>`;
+    } else {
+      cells = runs.map((r) => `<div class="cell small"><div class="t">${fmtClock(r.t0)}${r.t1 - r.t0 > 1 ? '–' + fmtClock(r.t1) : ''}</div>${pair(r.L, r.R, false)}</div>`).join('');
+    }
+    const block = `<div class="seg ${runs.length === 1 ? 'one' : ''}"><div class="when">${when}</div><div class="cells">${cells}</div></div>`;
+    h += i === 0 ? (runs.length === 1 ? `<div style="break-inside:avoid"><h2>${title}</h2>${block}</div>` : `<h2>${title}</h2>${block}`) : block;
+  });
+  return h;
+}
+
+function page(p) {
+  const hi = 59 - 10 * (p - 1), lo = hi - 9;
+  const pos = 7 - p;
+  const tl1 = buildTimeline({ ...cfg, video: 1 });
+  const tl2 = buildTimeline({ ...cfg, video: 2 });
+  return `<div class="page pp">
+    <div class="head"><div><div class="kicker">${HEADER}</div><h1>Person ${p} of 6</h1></div></div>
+    <div class="intro" style="grid-template-columns:1fr">
+      <div>The hands are drawn <b>the way you see them</b>: palms towards you, backs towards the camera. Left = your left hand.
+      Finger <b>up = 1</b>, down = 0. ${p === 6 ? 'Change position on the metronome click (once per second). ' : ''}<b>A different, higher sound marks each cut</b>: change to your next position on that sound${p === 6 ? ' (you keep counting on the clicks in between)' : ', then hold it'}.</div>
+    </div>
+    ${p === 6 ? powersBlock() : ''}
+    ${section(`Video 1 — counting (${fmtClock(tl1.duration)})`, tl1, p)}
+    ${section(`Video 2 — cuts (${fmtClock(tl2.duration)})`, tl2, p)}
+    ${FOOT}
+  </div>`;
+}
+
+// person 6: which number each raised finger is worth (palm view, as on the sheets)
+const sup = (n) => String(n).split('').map((d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]).join('');
+// fingertip directions (unmirrored geometry, fingers up): thumb, index, middle, ring, pinky
+const TIPS = [[60, 196, -44, 76], [67, 128, -7, 96], [91, 126, -1.5, 106], [114, 128, 4, 98], [136, 140, 11, 78]];
+function powHand(side, shift) {
+  const mirror = mirrorFor(side, 'palm');
+  const labels = [0, 1, 2, 3, 4].map((i) => {
+    const f = fingersFromValue(1 << i, side, cfg.mapping).indexOf(1);
+    const [bx, by, a, len] = TIPS[f], r = (a * Math.PI) / 180, d = len + 22;
+    let x = bx + Math.sin(r) * d; const y = by - Math.cos(r) * d;
+    if (mirror) x = 200 - x;
+    return `<text x="${x.toFixed(1)}" y="${(y + 2).toFixed(1)}" text-anchor="middle" font-size="17" fill="#111">${1 << (i + shift)}</text>` +
+      `<text x="${x.toFixed(1)}" y="${(y + 15).toFixed(1)}" text-anchor="middle" font-size="10" fill="#888">2${sup(i + shift)}</text>`;
+  }).join('');
+  const svg = handSVG({ fingers: [1, 1, 1, 1, 1], side, view: 'palm', style: { sw: 2.4 } })
+    .replace(/viewBox="[^"]*"/, 'viewBox="-34 -30 268 300"').replace(/<\/svg>$/, labels + '</svg>');
+  return `<div class="ph2"><div class="hn">${side} hand</div>${svg}</div>`;
+}
+const TUTORIALS = [
+  'https://www.youtube.com/watch?v=RbCbY2bJxEY',
+  'https://www.youtube.com/watch?v=1SMmc9gQmHQ',
+];
+function powersBlock() {
+  return `<div class="pow"><div><h3>Each finger is a power of 2</h3>
+    <div class="ph">${powHand('left', 5)}${powHand('right', 0)}</div></div>
+    <div class="tx"><h3>How to count</h3>
+    <p>Add up the fingers that are up. Right hand: 00101 = 4 + 1 = <b>5</b>. 01011 = 8 + 2 + 1 = <b>11</b>.</p>
+    <p>+1 every second: lower the fingers that are up, starting from 1, until you reach one that is down, and raise it.
+    When the right hand is full (31), the next click closes it and the left hand adds 32.</p>
+    <p><b>Practise first</b> (binary finger counting tutorials):<br>
+    ${TUTORIALS.map((u, i) => `${i + 1}. <a href="${u}">${u.replace('https://www.', '')}</a>`).join('<br>')}</p></div></div>`;
+}
+
+// ---- lineup page -------------------------------------------------------
+function overHand(side, view) {
+  const mirror = mirrorFor(side, view);
+  const vals = [0, 1, 2, 3, 4].map((i) => {
+    const f = fingersFromValue(1 << i, side, cfg.mapping).indexOf(1);
+    const x = mirror ? 200 - DIGIT_X[f] : DIGIT_X[f];
+    return `<span style="left:${((x - VIEW_X0) / VIEW_W) * 100}%">${1 << i}</span>`;
+  }).join('');
+  return `<div class="oh"><div class="hn">${side}</div>` +
+    `${handSVG({ fingers: [1, 1, 1, 1, 1], side, view, style: { sw: 2.6 } })}<div class="vals">${vals}</div></div>`;
+}
+function lineupRow(order, view, me) {
+  return `<div class="lineup">${order.map((p) => {
+    const hi = 59 - 10 * (p - 1);
+    // from the camera (backs): the performer's right hand is on the left; from behind (palms): left on the left
+    const hands = view === 'back' ? overHand('right', 'back') + overHand('left', 'back') : overHand('left', 'palm') + overHand('right', 'palm');
+    return `<div class="person ${p === me ? 'me' : ''}"><div class="pn">Person ${p}</div><div class="pb">bits ${hi}–${hi - 9}</div><div class="pair">${hands}</div></div>`;
+  }).join('')}</div>`;
+}
+
+// axonometric (oblique) sketch: the row runs left-right like the hands next to it,
+// the camera stands in front (bottom), "you" stand behind (top). Person 6 is on the camera's left.
+function isoDiagram(from, me) {
+  const S = 24;
+  const P = (x, y, z = 0) => [(x + 0.55 * y) * S, (-0.38 * y - z) * S];
+  const pt = (a) => `${a[0].toFixed(1)},${a[1].toFixed(1)}`;
+  const poly = (a, fill, stroke, w = 0.9) => `<polygon points="${a.map(pt).join(' ')}" fill="${fill}" stroke="${stroke}" stroke-width="${w}" stroke-linejoin="round"/>`;
+  const line = (a, b, col, w, dash) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${col}" stroke-width="${w}"${dash ? ' stroke-dasharray="3 2.5"' : ''}/>`;
+  const els = [], pts = [];
+  const add = (...a) => a.forEach((p) => pts.push(p));
+  const eyeIcon = (e) => `<g transform="translate(${e[0]},${e[1]})"><path d="M-7 0Q0 -6 7 0Q0 6 -7 0Z" fill="#fff" stroke="#111" stroke-width="1"/><circle r="2.2" fill="#111"/></g>`;
+  // each sketch is drawn from its own point of view (the viewer is always at the front/bottom):
+  // from the camera person 6 is on the left, from behind person 1 is on the left
+  const camActive = from === 'camera';
+  const px = (p) => (camActive ? 6 - p : p - 1);
+
+  const fl = [P(-0.9, -4.2), P(5.9, -4.2), P(5.9, 3.2), P(-0.9, 3.2)];
+  add(...fl);
+  els.push({ d: 0, s: poly(fl, '#f3f3f3', '#ddd', 0.8) });
+
+  const cam = camActive ? [2.5, -3.3, 0.9] : [3.1, 3.6, 0.9];
+  const sg = camActive ? 1 : -1; // lens direction (towards the row)
+  const cone = (o, col, w, dash) => line(P(...o), P(0, 0, 0.9), col, w, dash) + line(P(...o), P(5, 0, 0.9), col, w, dash);
+  els.push({ d: 1, s: cone(cam, camActive ? '#111' : '#bbb', camActive ? 1.1 : 0.7, !camActive) });
+
+  // camera: box + lens pointing at the row, on a tripod
+  const bx = (x, y, z) => P(cam[0] + x, cam[1] + y, cam[2] + z);
+  const w = 0.42, dp = 0.32, h = 0.26;
+  const C = (x, y, z) => bx(x * w, y * dp, z * h);
+  const fill = camActive ? '#111' : '#fff', stroke = camActive ? '#111' : '#999';
+  const lensTip = [bx(-0.18, sg * (dp + 0.35), -0.16), bx(0.18, sg * (dp + 0.35), -0.16), bx(0.18, sg * (dp + 0.35), 0.16), bx(-0.18, sg * (dp + 0.35), 0.16)];
+  const tri = [[-0.3, -0.25], [0.3, -0.25], [0, 0.3]].map(([dx, dy]) => line(bx(0, 0, -h), P(cam[0] + dx, cam[1] + dy, 0), stroke, 0.9)).join('');
+  const faces = [
+    poly([C(-1, 1, -1), C(1, 1, -1), C(1, 1, 1), C(-1, 1, 1)], fill, stroke),           // far face
+    sg > 0 ? poly(lensTip, fill, stroke) : '',                                           // lens pointing away
+    poly([C(1, -1, -1), C(1, 1, -1), C(1, 1, 1), C(1, -1, 1)], fill, stroke),            // right side
+    poly([C(-1, -1, 1), C(1, -1, 1), C(1, 1, 1), C(-1, 1, 1)], fill, stroke),            // top
+    poly([C(-1, -1, -1), C(1, -1, -1), C(1, -1, 1), C(-1, -1, 1)], fill, stroke),        // near face
+    sg < 0 ? poly(lensTip, fill, stroke) + (() => { const c = bx(0, -(dp + 0.35), 0); return `<circle cx="${c[0]}" cy="${c[1]}" r="2.2" fill="#999"/>`; })() : '',
+  ];
+  add(C(-1, -1, -1), C(1, 1, 1), P(cam[0], cam[1] - 0.6, 0));
+  els.push({ d: camActive ? 50 : -2, s: tri + faces.join('') });
+  const lab = camActive ? P(cam[0], cam[1] - 0.5, 0) : P(cam[0], cam[1] + 0.2, 1.75);
+  if (!camActive) add([lab[0], lab[1] - 4]);
+  els.push({ d: camActive ? 60 : -2, s: `<text x="${lab[0]}" y="${lab[1] + 11}" text-anchor="middle" font-size="8" font-weight="${camActive ? 700 : 400}" fill="${camActive ? '#111' : '#888'}">CAMERA</text>` });
+  if (camActive) {
+    els.push({ d: 61, s: eyeIcon(bx(0, 0, h + 0.5)) });
+    add(bx(0, 0, h + 0.8));
+  } else {
+    const eye = [2.5, -3.2, 1.15];
+    els.push({ d: 1, s: cone(eye, '#111', 1.1) });
+    const e = P(...eye);
+    add([e[0], e[1] + 18]);
+    els.push({ d: 61, s: eyeIcon(e) + `<text x="${e[0]}" y="${e[1] + 16}" text-anchor="middle" font-size="8" font-weight="700">YOU</text>` });
+  }
+  // performers, facing the camera
+  for (let p = 1; p <= 6; p++) {
+    const x = px(p);
+    const foot = P(x, 0, 0), sh = P(x, 0, 1.0), head = P(x, 0, 1.27);
+    const col = p === me ? '#111' : '#777';
+    add([head[0], head[1] - 16], foot);
+    els.push({ d: 10, s: `<ellipse cx="${foot[0]}" cy="${foot[1]}" rx="${S * 0.3}" ry="${S * 0.11}" fill="#ddd"/>` +
+      line(foot, sh, col, S * 0.3).replace('/>', ' stroke-linecap="round"/>') +
+      `<circle cx="${head[0]}" cy="${head[1]}" r="${S * 0.16}" fill="${p === me ? '#111' : '#fff'}" stroke="${col}" stroke-width="1"/>` +
+      `<text x="${head[0]}" y="${head[1] - S * 0.28}" text-anchor="middle" font-size="9" font-weight="700" fill="${col}">${p}</text>` });
+  }
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+  const x0 = Math.min(...xs) - 6, y0 = Math.min(...ys) - 6, x1 = Math.max(...xs) + 6, y1 = Math.max(...ys) + 14;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${x1 - x0} ${y1 - y0}" font-family='Helvetica Neue, Helvetica, Arial, sans-serif'>${els.sort((a, b) => a.d - b.d).map((e) => e.s).join('')}</svg>`;
+}
+
+function overview(me) {
+  return `<div class="page">
+    <div class="head"><div><div class="kicker">${HEADER}</div><h1>The row</h1></div>
+      <div class="meta">${me ? `You are <b>person ${me}</b> (framed)` : '6 people · 12 hands · 60 bits'}</div></div>
+    <div class="intro">
+      <div>Six people count on their fingers, in binary, the seconds that have passed since the birth of the universe:
+      435,400,207,208,642,900 seconds, 60 bits, 6 people × 2 hands × 5 fingers. Finger <b>up = 1</b>, down = 0.</div>
+      <div><b>Listen to the sound.</b> A click every second: person 6 changes position on each click.
+      Video 2 is made of cuts: at every cut there is <b>a different, higher sound</b>. That is when everyone changes to their next position, then holds it until the next cut.</div>
+    </div>
+    <div class="intro" style="grid-template-columns:1fr">
+      <div>Under each finger is its value: <b>a raised finger counts that number</b>. Person 6 holds the lowest bits and counts every second with the right hand (thumb = 1).
+      The video is mirrored in post: in the final result person 1 is on the left and the number reads left to right.</div>
+    </div>
+    <div class="view"><div class="iso">${isoDiagram('camera', me)}</div><div>
+      <div class="vt">Seen from the camera</div><div class="vs">You see the backs of the hands. Person 6 is on the left.</div>
+      ${lineupRow([6, 5, 4, 3, 2, 1], 'back', me)}</div></div>
+    <div class="view"><div class="iso">${isoDiagram('behind', me)}</div><div>
+      <div class="vt">Seen from behind — how you see your own hands</div><div class="vs">You see your palms; the camera is in front of you. Person 1 is on the left.</div>
+      ${lineupRow([1, 2, 3, 4, 5, 6], 'palm', me)}</div></div>
+    ${FOOT}
+  </div>`;
+}
+
+// ---- opening pages (only in the general PDF) -------------------------------
+const PRODUCTION = [
+  ['Date', ['26 Nov 2026']],
+  ['Requirements', ['6 performers standing in a row, hands raised, against a neutral background. 1 camera.']],
+  ['Casting', ['Six pairs of hands, as varied as possible: different genders and skin tones, tattoos, nails done, press-on nails, freckles.',
+    'Person 6 counts every second and needs good manual dexterity (e.g. piano training). Plan B: Enrico Isidori will be person 6.']],
+  ['Performance', ['Persons 1–5 do not count: each one holds a position, following a printed sheet, and changes only at the cut sound. Person 6 counts in binary on the metronome, one change per second.',
+    'Video 1 (1:01): person 6 counts from 0 to 60 seconds, everyone else holds today\'s number.',
+    'Video 2 (0:31): 6 cuts every 5 seconds, from the Big Bang to today on a logarithmic scale. A different sound marks each cut.']],
+  ['Filming', ['Framing: the raised hands in a single row on a neutral background (6:1). The shot is mirrored in post, so the number reads left to right.',
+    'Fixed shot: a single static camera from beginning to end. Multiple shots (optional): additional angles.',
+    'No time manipulation: the video lasts as long as the performance. A metronome on set (60 BPM) keeps the timing.',
+    'Light: setup and effect decided on the day of the shoot.', 'Sound: designed in post-production.']],
+  ['Outputs', ['Performance videos: video 1 and video 2, continuous recordings.',
+    'Edited performance video 2 (optional: multiple camera angles) with diagram and animation in overlay.',
+    'Extra explanatory materials.', 'Photographs.']],
+];
+function introPage() {
+  return `<div class="page">
+    <div class="head"><div><div class="kicker">${HEADER}</div><h1>Counting by hands</h1><div class="sub">Performance, two videos: 1 minute and 31 seconds.</div></div></div>
+    <div class="intro" style="grid-template-columns:1fr"><div>Six people count on their fingers, in binary, the seconds that have passed since the birth of the universe.</div></div>
+    <h2>Production</h2>
+    <div class="prod">${PRODUCTION.map(([h, ps]) => `<section><h3>${h}</h3>${ps.map((x) => `<p>${x}</p>`).join('')}</section>`).join('')}</div>
+    ${FOOT}
+  </div>`;
+}
+const sci = (n) => { const x = n.toString(); return `${x[0]}.${x.slice(1, 3)} × 10${sup(x.length - 1)}`; };
+function logPage() {
+  const c2 = { ...cfg, video: 2 };
+  const tl = buildTimeline(c2), T = BigInt(c2.T), K = tl.segs.length - 1;
+  const moment = (k) => k === 0 ? 0n : k === K ? T : BigInt(Math.round(Math.exp((Math.log(Number(T)) * k) / K)));
+  const rows = tl.segs.map((s, k) => { const m = moment(k); return `<tr><td>${k + 1}</td><td>${fmtClock(s.t0)}–${fmtClock(s.t1)}</td>
+    <td>${k ? fmtDecEn(m) + ' s' : '0'}</td><td class="g">${k ? '≈ ' + sci(m) + ' s' : ''}</td><td>${fmtDecEn(s.n0)} s</td><td>${fmtHuman(s.n0, 'en')}</td><td>${s.active} of 6</td></tr>`; }).join('');
+  return `<div class="page">
+    <div class="head"><div><div class="kicker">${HEADER}</div><h1>Video 2, the cuts</h1></div>
+      <div class="meta">From the Big Bang to today, on a logarithmic scale<br>${tl.segs.length} cuts × ${c2.segDur} s (${fmtClock(tl.duration)}) · each cut multiplies the time by T<sup>1/${K}</sup> ≈ ${sci(moment(1))} s</div></div>
+    <table class="log"><tr><th>Cut</th><th>In the video</th><th>Log moment T<sup>k/${K}</sup></th><th></th><th>Shown on the hands</th><th>After the Big Bang</th><th>People</th></tr>${rows}</table>
+    <p class="note" style="margin-top:4mm">Person 6 keeps counting through every cut; all the other hands change. The number on the hands is close to the log moment but never round. T = ${fmtDecEn(T)} s = ${fmtHuman(T, 'en')}.</p>
+    ${FOOT}
+  </div>`;
+}
+
+const list = sel === 'all' ? [1, 2, 3, 4, 5, 6] : [Math.min(6, Math.max(1, +sel))];
+document.getElementById('out').innerHTML = (sel === 'all' ? introPage() : '') + overview(sel === 'all' ? 0 : list[0]) + list.map(page).join('');
+await document.fonts.ready;
+document.title = 'ready';
+</script>
+</body>
+</html>

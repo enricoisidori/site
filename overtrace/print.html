@@ -968,9 +968,13 @@
      }
 
      try {
-      const raw = localStorage.getItem(SHARED_PROJECT_KEY);
-      if (!raw) return;
-      const payload = JSON.parse(raw);
+      // IndexedDB first (large projects never fit in localStorage), then the
+      // legacy localStorage copy.
+      let payload = await window.OvertraceUI?.loadSharedProjectState?.();
+      if (!payload) {
+       const raw = localStorage.getItem(SHARED_PROJECT_KEY);
+       payload = raw ? JSON.parse(raw) : null;
+      }
       if (!payload || !payload.project) return;
       const folderName =
        payload.folderName || inferFolderNameFromBase(payload.assetBase);

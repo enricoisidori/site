@@ -580,6 +580,18 @@
       .space-pan .handle {
         cursor: all-scroll !important;
       }
+      /* unsaved-changes dot on the Save button */
+      #btnSave { position: relative; }
+      #btnSave.dirty::after {
+        content: "";
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
     </style>
     <style>
       /* UI: upload button senza gap icona-testo, e label selezione coerente */
@@ -1905,7 +1917,7 @@
         <input
           id="openFile"
           type="file"
-          accept="application/json"
+          accept=".json,application/json"
           style="display: none"
         />
         <div id="helpPanel"></div>
@@ -2006,13 +2018,19 @@
             <h3><span class="material-symbols-outlined">save</span> Saving and Opening Projects</h3>
             <div class="doc-body">
               <ul>
-                <li><span class="material-symbols-outlined">folder</span><span><strong>Saving</strong> creates a folder with:</span></li>
-                <li style="margin-left:22px;"><span class="material-symbols-outlined">description</span><span><code>project.json</code> — nodes, connections, positions, text</span></li>
+                <li><span class="material-symbols-outlined">file_save</span><span><strong>Save — ⌘/Ctrl + S</strong>: the first time it asks <em>where</em>; after that it saves silently in the same place, no dialogs. The Save button shows a dot when there are unsaved changes.</span></li>
+                <li><span class="material-symbols-outlined">save_as</span><span><strong>Save As — ⌘/Ctrl + ⇧ + S</strong> (or ⇧ + click Save): choose another folder. An empty folder becomes the project folder; a folder that already holds a project is overwritten after confirmation; any other folder gets a new project subfolder inside it.</span></li>
+                <li><span class="material-symbols-outlined">folder</span><span>A project folder contains:</span></li>
+                <li style="margin-left:22px;"><span class="material-symbols-outlined">description</span><span>a project <code>.json</code> — nodes, connections, positions, text (usually <code>project.json</code>, but any name works and is kept)</span></li>
                 <li style="margin-left:22px;"><span class="material-symbols-outlined">folder_copy</span><span><code>assets/</code> — attached files</span></li>
-                <li><span class="material-symbols-outlined">image</span><span>New images are converted to <strong>JPEG</strong>, resized to a max of <strong>1500px</strong> (longest side), and compressed.</span></li>
+                <li><span class="material-symbols-outlined">image</span><span>New images are converted to <strong>JPEG</strong>, resized to a max of <strong>1500px</strong> (longest side), and compressed. Files already in <code>assets/</code> are copied as they are.</span></li>
                 <li><span class="material-symbols-outlined">download_done</span><span>No need to place files manually into <code>assets</code>.</span></li>
-                <li><span class="material-symbols-outlined">folder_open</span><span><strong>Open</strong>: select the project folder — Overtrace loads <code>project.json</code>.</span></li>
-                <li><span class="material-symbols-outlined">data_object</span><span>Lightweight JSON export (without files) is available for quick sharing.</span></li>
+                <li><span class="material-symbols-outlined">file_open</span><span><strong>Open — ⌘/Ctrl + O</strong>: the menu suggests the <strong>last project</strong> opened or saved (press ↵), or lets you pick a <strong>folder</strong> (F) or a single <strong>JSON file</strong> (J). Dialogs start from the last project location.</span></li>
+                <li><span class="material-symbols-outlined">drag_pan</span><span>You can also <strong>drop</strong> a project folder or a JSON file onto the editor.</span></li>
+                <li><span class="material-symbols-outlined">data_object</span><span>A JSON file opened on its own is saved back to the same file; new attachments are embedded in it. Old projects (any version) open as before.</span></li>
+                <li><span class="material-symbols-outlined">warning</span><span>Leaving or closing the page with unsaved changes asks for confirmation. Switching to Process/Space keeps your unsaved work.</span></li>
+                <li><span class="material-symbols-outlined">public</span><span>Safari/Firefox cannot write to folders: Save downloads the JSON instead.</span></li>
+                <li><span class="material-symbols-outlined">data_object</span><span>Lightweight JSON export (without files) — ⌘/Ctrl + P.</span></li>
               </ul>
             </div>
           </div>
@@ -2032,9 +2050,10 @@
             <h3><span class="material-symbols-outlined">keyboard</span> Toolbar and Shortcuts</h3>
             <div class="doc-body">
               <ul>
-                <li><span class="material-symbols-outlined">note_add</span><span>New Project — ⌘/Ctrl + N</span></li>
+                <li><span class="material-symbols-outlined">note_add</span><span>New Project — toolbar button (no shortcut)</span></li>
                 <li><span class="material-symbols-outlined">file_open</span><span>Open Project — ⌘/Ctrl + O</span></li>
                 <li><span class="material-symbols-outlined">file_save</span><span>Save Project — ⌘/Ctrl + S</span></li>
+                <li><span class="material-symbols-outlined">save_as</span><span>Save As — ⌘/Ctrl + ⇧ + S</span></li>
                 <li><span class="material-symbols-outlined">add_box</span><span>New Node — N</span></li>
                 <li><span class="material-symbols-outlined">bolt</span><span>Direct Connect (2 selected) — C</span></li>
                 <li><span class="material-symbols-outlined">account_tree</span><span>Auto Layout — ⇧ + A</span></li>
@@ -2075,13 +2094,62 @@
         const CLICK_THRESHOLD = 10;
 
         const projectCtx = {
-          mode: null,
+          mode: null, // "folder" | "file" | "embedded" | null
           dirHandle: null,
           fileHandle: null,
           folderName: null,
+          fileName: null, // JSON name inside the folder (any name), or the loose file name
           assetBase: "",
         };
         const SHARED_PROJECT_KEY = "overtrace.shared.project.v1";
+        const DIRTY_SESSION_KEY = "overtrace.editor.dirty";
+
+        /* ---------- unsaved-changes tracking ---------- */
+        let projectDirty = false;
+        let projectDirtySuspended = 0; // >0 while loading/restoring
+        let internalNavigation = false;
+        function currentProjectName() {
+          if (projectCtx.folderName) return projectCtx.folderName;
+          if (projectCtx.fileName)
+            return projectCtx.fileName.replace(/\.json$/i, "");
+          return projectCtx.folderName || "Untitled project";
+        }
+        function refreshProjectTitle() {
+          const name =
+            window.OvertraceUI?.formatProjectDisplayName?.(
+              currentProjectName(),
+              currentProjectName(),
+            ) || currentProjectName();
+          document.title = `${projectDirty ? "• " : ""}${name} — Overtrace Editor`;
+          const btn = document.getElementById("btnSave");
+          if (btn) {
+            btn.classList.toggle("dirty", projectDirty);
+            const where =
+              projectCtx.mode === "folder" && projectCtx.dirHandle
+                ? ` → ${projectCtx.folderName}/${projectCtx.fileName || "project.json"}`
+                : projectCtx.mode === "file" && projectCtx.fileHandle
+                  ? ` → ${projectCtx.fileName}`
+                  : " (choose where)";
+            btn.setAttribute("data-tip", `Save project (⌘S)${where} · Save As ⇧⌘S`);
+          }
+        }
+        function setProjectDirty(value) {
+          projectDirty = !!value;
+          try {
+            if (projectDirty) sessionStorage.setItem(DIRTY_SESSION_KEY, "1");
+            else sessionStorage.removeItem(DIRTY_SESSION_KEY);
+          } catch (_) {}
+          refreshProjectTitle();
+        }
+        function markProjectChanged() {
+          if (projectDirtySuspended > 0 || projectDirty) return;
+          setProjectDirty(true);
+        }
+        window.addEventListener("beforeunload", (e) => {
+          if (!projectDirty || internalNavigation) return;
+          e.preventDefault();
+          e.returnValue = "";
+        });
 
         function inferCurrentFolderName() {
           if (projectCtx?.dirHandle?.name) return projectCtx.dirHandle.name;
@@ -2107,14 +2175,15 @@
               dirHandle: projectCtx.dirHandle,
               folderName: folderName || projectCtx.dirHandle?.name || null,
               assetBase,
-              fileName: "project.json",
+              fileName: projectCtx.fileName || "project.json",
             };
           }
           if (projectCtx.mode === "file" && projectCtx.fileHandle) {
             return {
               kind: "file",
               fileHandle: projectCtx.fileHandle,
-              fileName: projectCtx.fileHandle?.name || "project.json",
+              fileName:
+                projectCtx.fileName || projectCtx.fileHandle?.name || "project.json",
             };
           }
           return null;
@@ -2161,6 +2230,7 @@
             source,
             savedAt: Date.now(),
             folderName: folderName || null,
+            fileName: projectCtx.fileName || null,
             assetBase,
             project: sharedProject,
           };
@@ -2217,11 +2287,25 @@
                 : null;
             projectCtx.folderName =
               payload.folderName || matchedFsContext?.folderName || routedFolder;
+            projectCtx.fileName =
+              matchedFsContext?.fileName ||
+              payload.fileName ||
+              (projectCtx.mode === "folder" ? "project.json" : null);
             projectCtx.assetBase =
               String(payload.assetBase || "").trim() ||
               matchedFsContext?.assetBase ||
               (projectCtx.folderName ? `${projectCtx.folderName}/` : "");
-            await loadProject(payload.project, projectCtx.dirHandle);
+            let wasDirty = false;
+            try {
+              wasDirty = sessionStorage.getItem(DIRTY_SESSION_KEY) === "1";
+            } catch (_) {}
+            projectDirtySuspended++;
+            try {
+              await loadProject(payload.project, projectCtx.dirHandle);
+            } finally {
+              projectDirtySuspended--;
+            }
+            setProjectDirty(wasDirty);
             const fromLabel =
               from === "space"
                 ? "Space analysis"
@@ -2245,6 +2329,7 @@
           const params = new URLSearchParams(window.location.search);
           const folder = params.get("project");
           if (!folder) return false;
+          let storedFolder = null;
           try {
             const fsContext = await window.OvertraceUI?.loadProjectFsContext?.();
             if (
@@ -2252,22 +2337,27 @@
               fsContext.handle &&
               fsContext.folderName === folder
             ) {
-              const fileHandle = await fsContext.handle.getFileHandle(
-                "project.json",
-                {
-                  create: false,
-                },
+              storedFolder = fsContext;
+              // No user gesture here: read only if permission is still granted.
+              const entry = await window.OvertraceUI.openProjectFromHandle(
+                fsContext.handle,
+                { requestPermission: false, preferredFileName: fsContext.fileName },
               );
-              const file = await fileHandle.getFile();
-              const project = JSON.parse(await file.text());
               projectCtx.mode = "folder";
               projectCtx.dirHandle = fsContext.handle;
               projectCtx.fileHandle = null;
               projectCtx.folderName = fsContext.folderName || folder;
+              projectCtx.fileName = entry.fileName;
               projectCtx.assetBase =
                 fsContext.assetBase || `${projectCtx.folderName}/`;
-              await loadProject(project, fsContext.handle);
-              setStatus(`Project opened from ${folder}/project.json`);
+              projectDirtySuspended++;
+              try {
+                await loadProject(entry.project, fsContext.handle);
+              } finally {
+                projectDirtySuspended--;
+              }
+              setProjectDirty(false);
+              setStatus(`Project opened from ${folder}/${entry.fileName}`);
               return true;
             }
           } catch (err) {
@@ -2280,12 +2370,21 @@
             });
             if (!res.ok) return false;
             const project = await res.json();
-            projectCtx.mode = "embedded";
-            projectCtx.dirHandle = null;
+            // If we still hold the folder handle, keep it: Cmd+S will ask for
+            // permission once and then save in place.
+            projectCtx.mode = storedFolder ? "folder" : "embedded";
+            projectCtx.dirHandle = storedFolder?.handle || null;
             projectCtx.fileHandle = null;
             projectCtx.folderName = folder;
+            projectCtx.fileName = storedFolder?.fileName || "project.json";
             projectCtx.assetBase = `${folder}/`;
-            await loadProject(project, null);
+            projectDirtySuspended++;
+            try {
+              await loadProject(project, null);
+            } finally {
+              projectDirtySuspended--;
+            }
+            setProjectDirty(false);
             setStatus(`Project opened from ${folder}/project.json`);
             return true;
           } catch (_) {
@@ -2311,6 +2410,7 @@
         });
         function pushHistory() {
           if (history.lock) return;
+          markProjectChanged();
           history.undo.push(snap());
           if (history.undo.length > history.limit) history.undo.shift();
           history.redo.length = 0;
@@ -2485,6 +2585,8 @@
             tag === "TEXTAREA" ||
             document.activeElement?.isContentEditable;
           if (inText) return;
+          // Already handled by the capture-phase hotkey guard (TS_SAFE_GUARD).
+          if (e.defaultPrevented) return;
           // Shift + C → comporta come pressione del pulsante Connect
           if (e.key.toLowerCase() === "c" && e.shiftKey) {
             e.preventDefault();
@@ -3315,21 +3417,8 @@
               return;
             }
             // RIMOSSO: Cmd/Ctrl+N (nessuna scorciatoia per New Project)
-            if (k === "o") {
-              e.preventDefault();
-              openProject();
-              return;
-            }
-            if (k === "s" && !e.shiftKey) {
-              e.preventDefault();
-              saveProjectSmart();
-              return;
-            }
-            if (k === "s" && e.shiftKey) {
-              e.preventDefault();
-              saveAs();
-              return;
-            }
+            // Cmd/Ctrl+O, Cmd/Ctrl+S, Cmd/Ctrl+Shift+S: see the global
+            // file-shortcut handler (works also while typing in a field).
             if (k === "p") {
               e.preventDefault();
               exportJSON();
@@ -4321,8 +4410,11 @@
         $("#btnDel").addEventListener("click", doDeleteSelection);
         $("#btnFit").addEventListener("click", fitView);
         $("#btnAuto").addEventListener("click", autoLayoutLeftToRight);
-        $("#btnOpen").addEventListener("click", openProject);
-        $("#btnSave").addEventListener("click", saveProjectSmart);
+        $("#btnOpen").addEventListener("click", () => openProject());
+        $("#btnSave").addEventListener("click", (e) => {
+          if (e.shiftKey || e.altKey) void saveAs();
+          else void saveProjectSmart();
+        });
         $("#btnProcessAnalysis")?.addEventListener("click", async () => {
           try {
             await persistSharedProjectState("editor");
@@ -4333,6 +4425,7 @@
           const qs = new URLSearchParams();
           qs.set("from", "editor");
           if (folderName) qs.set("project", folderName);
+          internalNavigation = true; // state travels via the shared store
           window.location.href = `./process.html?${qs.toString()}`;
         });
 
@@ -4349,13 +4442,13 @@
           const qs = new URLSearchParams();
           qs.set("from", "editor");
           if (folderName) qs.set("project", folderName);
+          internalNavigation = true; // state travels via the shared store
           window.location.href = `./space.html?${qs.toString()}`;
         });
         const toolbarStatus = [
           { id: "btnAdd", text: "New node" },
           { id: "btnFit", text: "Fit view" },
           { id: "btnAuto", text: "Auto layout" },
-          { id: "btnOpen", text: "Open project" },
           { id: "btnProcessAnalysis", text: "Process analysis" },
           { id: "btnAnalysis", text: "Space analysis" },
           { id: "btnResearch", text: "Atlas" },
@@ -5231,24 +5324,80 @@
           return m ? m[0].toLowerCase() : "";
         }
 
-        /* ---------- SAVE / OPEN (veloce per grafi grandi) ---------- */
+        /* ---------- SAVE / OPEN ----------
+         * Cmd/Ctrl+S  → saves in place, silently, to the folder or JSON file the
+         *               project came from (or was last saved to). Only when the
+         *               project has never been saved does it ask where.
+         * Shift+Cmd+S → Save As: choose a (new) folder.
+         * Cmd/Ctrl+O  → menu: reopen last project · open folder · open JSON file.
+         * A folder may contain a project JSON with any name; a loose JSON file
+         * with any name is accepted too (assets embedded or by path).
+         */
+        let __savePending = false;
+
+        // A pending debounced history snapshot (typing) would otherwise mark
+        // the project as modified right after it has been saved.
+        function flushPendingHistory() {
+          if (!history.debounce) return;
+          clearTimeout(history.debounce);
+          history.debounce = null;
+          pushHistory();
+        }
+
+        function markProjectSaved(label) {
+          setProjectDirty(false);
+          setStatus(`Saved “${label || currentProjectName()}” — ${fmtTime10()}`);
+        }
+
         async function saveProjectSmart() {
+          if (__savePending) return false;
+          finalizeEditsCurrentNode();
+          flushPendingHistory();
+          const UI = window.OvertraceUI;
           if (projectCtx.mode === "folder" && projectCtx.dirHandle) {
+            __savePending = true;
             try {
+              if (!(await UI.ensureHandlePermission(projectCtx.dirHandle))) {
+                setStatus("Permission denied — use Save As (⇧⌘S)");
+                return false;
+              }
+              const fileName = projectCtx.fileName || "project.json";
               await saveProjectToDir(projectCtx.dirHandle, {
                 copyExistingAssets: false,
+                fileName,
               });
-              setStatus(`Project saved — ${fmtTime10()}`);
+              projectCtx.fileName = fileName;
+              await syncProjectFsContext();
+              markProjectSaved(projectCtx.folderName);
               return true;
             } catch (err) {
               console.error("Unable to save project folder", err);
-              setStatus("Unable to save project");
+              setStatus(`Unable to save project — ${err?.message || err}`);
               return false;
+            } finally {
+              __savePending = false;
             }
           }
-          // A normal first save always creates a complete project folder. A JSON-only
-          // download remains available only as a compatibility fallback for browsers
-          // without the File System Access API.
+          if (projectCtx.mode === "file" && projectCtx.fileHandle) {
+            __savePending = true;
+            try {
+              if (!(await UI.ensureHandlePermission(projectCtx.fileHandle))) {
+                setStatus("Permission denied — use Save As (⇧⌘S)");
+                return false;
+              }
+              await saveProjectToFile(projectCtx.fileHandle);
+              await syncProjectFsContext();
+              markProjectSaved(projectCtx.fileName);
+              return true;
+            } catch (err) {
+              console.error("Unable to save project file", err);
+              setStatus(`Unable to save project — ${err?.message || err}`);
+              return false;
+            } finally {
+              __savePending = false;
+            }
+          }
+          // Never saved (new project, or opened from a plain upload/drop).
           return saveAs();
         }
 
@@ -5339,6 +5488,8 @@
         }
 
         async function saveProjectToFile(fileHandle) {
+          // Loose JSON file: existing path assets stay as paths, new assets are
+          // embedded so nothing is lost.
           const blob = await buildLosslessProjectBlob();
           const writable = await fileHandle.createWritable();
           await writable.write(blob);
@@ -5357,39 +5508,51 @@
             .trim();
         }
 
-        async function chooseNewProjectDirectory({
-          defaultName = "Untitled project",
-          cancelledStatus = "Save cancelled",
-        } = {}) {
-          // prompt() is synchronous, so the following directory picker still runs
-          // within the original click gesture required by the browser API.
-          const requestedName = window.prompt(
-            "Name the new project folder:",
-            defaultName,
-          );
-          if (requestedName === null) {
-            setStatus(cancelledStatus);
-            return null;
+        async function uniqueChildFolderName(parentDir, baseName) {
+          let name = baseName;
+          for (let i = 2; i < 500; i += 1) {
+            try {
+              await parentDir.getDirectoryHandle(name, { create: false });
+            } catch (err) {
+              if (err?.name === "NotFoundError") return name;
+              if (err?.name === "TypeMismatchError") {
+                // a file with that name exists
+              } else throw err;
+            }
+            name = `${baseName} ${i}`;
           }
-          const folderName = normalizeProjectFolderName(requestedName);
-          if (!folderName) {
-            setStatus("A project folder needs a name");
-            return null;
-          }
+          return `${baseName} ${Date.now()}`;
+        }
 
-          let parentDir;
-          try {
-            // The browser must receive permission for a parent directory, but the
-            // actual project directory is always created by Overtrace below. Start
-            // from Documents so a new project can be placed there immediately.
-            parentDir = await window.showDirectoryPicker({
-              id: "overtrace-project-location",
+        // Asks for a folder and decides where the project goes:
+        //  - the current project folder → save in place;
+        //  - a folder that already holds a project (any JSON name) → overwrite
+        //    after confirmation, keeping that JSON name;
+        //  - an empty folder → becomes the project folder;
+        //  - any other folder → a new project subfolder is created inside it.
+        async function chooseSaveDestination() {
+          const UI = window.OvertraceUI;
+          const startIn =
+            projectCtx.dirHandle ||
+            projectCtx.fileHandle ||
+            (await UI.pickerStartIn());
+          let picked;
+          const pick = (start) =>
+            window.showDirectoryPicker({
+              id: UI.PICKER_ID,
               mode: "readwrite",
-              startIn: "documents",
+              startIn: start,
             });
+          try {
+            try {
+              picked = await pick(startIn);
+            } catch (err) {
+              if (err?.name === "AbortError" || startIn === "documents") throw err;
+              picked = await pick("documents");
+            }
           } catch (err) {
             if (err?.name === "AbortError") {
-              setStatus(cancelledStatus);
+              setStatus("Save cancelled");
               return null;
             }
             console.error("Unable to choose project location", err);
@@ -5397,23 +5560,53 @@
             return null;
           }
 
-          try {
-            await parentDir.getDirectoryHandle(folderName, { create: false });
-            setStatus(`A project folder named “${folderName}” already exists`);
-            return null;
-          } catch (err) {
-            if (err?.name && err.name !== "NotFoundError") {
-              console.error("Unable to inspect project location", err);
-              setStatus("Unable to create project folder");
-              return null;
-            }
+          if (
+            projectCtx.dirHandle &&
+            (await projectCtx.dirHandle.isSameEntry?.(picked))
+          ) {
+            return {
+              dir: picked,
+              fileName: projectCtx.fileName || "project.json",
+              sameFolder: true,
+            };
           }
 
+          const existing = await UI.findProjectFileInDirectory(picked);
+          if (existing) {
+            const ok = window.confirm(
+              `“${picked.name}” already contains a project (${existing.fileHandle.name}).\nOverwrite it with the current project?`,
+            );
+            if (!ok) {
+              setStatus("Save cancelled");
+              return null;
+            }
+            return { dir: picked, fileName: existing.fileHandle.name };
+          }
+          if (await UI.directoryIsEmpty(picked)) {
+            return { dir: picked, fileName: "project.json" };
+          }
+
+          const requested = window.prompt(
+            `“${picked.name}” is not a project folder.\nCreate a new project folder inside it named:`,
+            projectCtx.folderName ||
+              (projectCtx.fileName || "").replace(/\.json$/i, "") ||
+              "Untitled project",
+          );
+          if (requested === null) {
+            setStatus("Save cancelled");
+            return null;
+          }
+          const baseName = normalizeProjectFolderName(requested);
+          if (!baseName) {
+            setStatus("A project folder needs a name");
+            return null;
+          }
           try {
-            const dir = await parentDir.getDirectoryHandle(folderName, {
+            const folderName = await uniqueChildFolderName(picked, baseName);
+            const dir = await picked.getDirectoryHandle(folderName, {
               create: true,
             });
-            return { dir, folderName };
+            return { dir, fileName: "project.json" };
           } catch (err) {
             console.error("Unable to create project folder", err);
             setStatus("Unable to create project folder");
@@ -5421,44 +5614,62 @@
           }
         }
 
-        function setProjectFolderContext(dir, folderName = dir?.name || null) {
+        function setProjectFolderContext(
+          dir,
+          folderName = dir?.name || null,
+          fileName = "project.json",
+        ) {
           projectCtx.mode = "folder";
           projectCtx.dirHandle = dir;
           projectCtx.fileHandle = null;
           projectCtx.folderName = folderName;
+          projectCtx.fileName = fileName || "project.json";
           projectCtx.assetBase = folderName ? `${folderName}/` : "";
         }
 
         async function saveAs() {
-          const supportsFS = "showDirectoryPicker" in window;
-          if (supportsFS) {
-            const destination = await chooseNewProjectDirectory({
-              defaultName: projectCtx.folderName || "Untitled project",
-            });
+          if (__savePending) return false;
+          finalizeEditsCurrentNode();
+          flushPendingHistory();
+          if (!("showDirectoryPicker" in window)) {
+            // Compatibility fallback: browsers without the File System Access
+            // API (Safari, Firefox) can only download the JSON.
+            await exportProjectJsonDownload(projectCtx.fileName || "project.json");
+            projectCtx.mode = "embedded";
+            projectCtx.dirHandle = null;
+            projectCtx.fileHandle = null;
+            projectCtx.assetBase = "";
+            await syncProjectFsContext();
+            setProjectDirty(false);
+            return true;
+          }
+          __savePending = true;
+          try {
+            const destination = await chooseSaveDestination();
             if (!destination) return false;
             try {
               await saveProjectToDir(destination.dir, {
-                copyExistingAssets: true,
+                // Copy every asset into a different folder so it is complete
+                // and portable; in place, only new assets are written.
+                copyExistingAssets: !destination.sameFolder,
+                fileName: destination.fileName,
               });
-              setProjectFolderContext(destination.dir, destination.folderName);
+              setProjectFolderContext(
+                destination.dir,
+                destination.dir.name,
+                destination.fileName,
+              );
               await syncProjectFsContext();
-              setStatus(`Project folder saved — ${fmtTime10()}`);
+              markProjectSaved(destination.dir.name);
               return true;
             } catch (err) {
               console.error("Unable to save project folder", err);
-              setStatus("Unable to save project folder");
+              setStatus(`Unable to save project folder — ${err?.message || err}`);
               return false;
             }
+          } finally {
+            __savePending = false;
           }
-          // Compatibility fallback: old browsers cannot grant a writable folder.
-          await exportProjectJsonDownload("project.json");
-          projectCtx.mode = "embedded";
-          projectCtx.dirHandle = null;
-          projectCtx.fileHandle = null;
-          projectCtx.folderName = null;
-          projectCtx.assetBase = "";
-          await syncProjectFsContext();
-          return true;
         }
 
         // filesMode: "none" | "paths" | "embedded" (noi usiamo "paths" o "none")
@@ -5563,7 +5774,7 @@
 
         async function saveProjectToDir(
           dir,
-          { copyExistingAssets = false } = {},
+          { copyExistingAssets = false, fileName = "project.json" } = {},
         ) {
           await ensureSubdir(dir, "assets");
           // On overwrite, copy only new files. On Save As/first Save, copy every
@@ -5578,7 +5789,24 @@
             }
           }
 
-          const reserveAssetPath = (preferredName, isImage, isPDF) => {
+          const reserveAssetPath = (preferredName, isImage, isPDF, existingPath) => {
+            // Already-saved assets keep their file name (and format) when the
+            // project is copied to another folder.
+            const existingBase = String(existingPath || "")
+              .split("/")
+              .pop();
+            if (existingBase) {
+              const noExt = existingBase.replace(/\.[a-z0-9]+$/i, "") || "file";
+              const ext = extFromName(existingBase) || "";
+              let index = 1;
+              let rel = `assets/${noExt}${ext}`;
+              while (reservedPaths.has(rel.toLowerCase())) {
+                index += 1;
+                rel = `assets/${noExt}_${index}${ext}`;
+              }
+              reservedPaths.add(rel.toLowerCase());
+              return rel;
+            }
             const baseName = sanitizeName(
               (preferredName || "file").replace(/\s+/g, "_"),
             );
@@ -5602,7 +5830,8 @@
               toCopy.push({
                 node: n,
                 file: f,
-                rel: reserveAssetPath(f.name, !!f.isImage, !!f.isPDF),
+                rel: reserveAssetPath(f.name, !!f.isImage, !!f.isPDF, f.path),
+                alreadySaved: !!f.path,
               });
             }
           }
@@ -5616,12 +5845,12 @@
           }
 
           const failures = [];
-          await asyncPool(2, toCopy, async ({ file, rel }) => {
+          await asyncPool(2, toCopy, async ({ file, rel, alreadySaved }) => {
             try {
               const blob = await assetBlobForSave(file);
               let savedBlob = blob;
 
-              if (file.isImage) {
+              if (file.isImage && !alreadySaved) {
                 // Ricompressione a JPG 1500px lato lungo
                 const jpg = await resizeImageBlob(blob, 1500, 512 * 1024);
                 await writeFileByPath(dir, rel, jpg);
@@ -5661,7 +5890,7 @@
           const jsonBlob = new Blob([JSON.stringify(project, null, 2)], {
             type: "application/json",
           });
-          await writeFileByPath(dir, "project.json", jsonBlob);
+          await writeFileByPath(dir, fileName || "project.json", jsonBlob);
         }
 
         async function exportJSONLight() {
@@ -5676,80 +5905,115 @@
           await exportJSONLight();
         }
 
-        async function openProject() {
+        function hasPathAssets(project) {
+          return (window.OvertraceUI?.projectFileEntries?.(project) || []).some(
+            (f) => f?.path && !f.dataUrl,
+          );
+        }
+
+        // Applies an entry returned by OvertraceUI (folder, file or plain blob).
+        async function applyOpenedProjectEntry(entry) {
+          if (!entry) return false;
+          if (
+            projectDirty &&
+            !window.confirm("Discard unsaved changes to the current project?")
+          ) {
+            setStatus("Open cancelled");
+            return false;
+          }
+          pushHistory();
+          if (entry.kind === "folder") {
+            setProjectFolderContext(
+              entry.dirHandle,
+              entry.folderName || entry.dirHandle?.name || null,
+              entry.fileName,
+            );
+          } else {
+            projectCtx.mode = entry.kind === "file" ? "file" : "embedded";
+            projectCtx.dirHandle = null;
+            projectCtx.fileHandle = entry.kind === "file" ? entry.fileHandle : null;
+            projectCtx.folderName = null;
+            projectCtx.fileName = entry.fileName || null;
+            projectCtx.assetBase = "";
+          }
+          projectDirtySuspended++;
+          try {
+            await loadProject(entry.project, entry.dirHandle || null);
+          } finally {
+            projectDirtySuspended--;
+          }
+          await syncProjectFsContext();
+          setProjectDirty(false);
+          const label =
+            entry.kind === "folder"
+              ? `${projectCtx.folderName}/${projectCtx.fileName}`
+              : projectCtx.fileName || "project";
+          if (entry.kind !== "folder" && hasPathAssets(entry.project)) {
+            setStatus(
+              `Opened “${label}” — its files live in a folder: open the folder to see them`,
+            );
+          } else {
+            setStatus(`Opened “${label}”`);
+          }
+          return true;
+        }
+
+        function openProjectViaFileInput() {
+          f.openFile.onchange = async () => {
+            const fl = f.openFile.files?.[0];
+            f.openFile.value = "";
+            if (!fl) return;
+            try {
+              const project = JSON.parse(await fl.text());
+              if (!window.OvertraceUI?.looksLikeProject?.(project)) {
+                setStatus(`“${fl.name}” is not an Overtrace project`);
+                return;
+              }
+              await applyOpenedProjectEntry({
+                kind: "blob",
+                project,
+                fileName: fl.name,
+              });
+            } catch (err) {
+              console.warn("Unable to open JSON", err);
+              setStatus(`“${fl.name}” is not valid JSON`);
+            }
+          };
+          f.openFile.click();
+        }
+
+        async function openProjectChoice(act) {
+          if (act === "input") {
+            openProjectViaFileInput();
+            return;
+          }
           if (__openProjectPending) return;
           __openProjectPending = true;
           try {
-            if ("showDirectoryPicker" in window && window.OvertraceUI?.openProjectFolder) {
-              try {
-                const entry = await window.OvertraceUI.openProjectFolder({
-                  mode: "readwrite",
-                });
-                pushHistory();
-                await loadProject(entry.project, entry.dirHandle || null);
-                projectCtx.mode = "folder";
-                projectCtx.dirHandle = entry.dirHandle || null;
-                projectCtx.fileHandle = null;
-                projectCtx.folderName =
-                  entry.folderName || entry.dirHandle?.name || null;
-                projectCtx.assetBase =
-                  entry.assetBase ||
-                  (entry.dirHandle?.name ? `${entry.dirHandle.name}/` : "");
-                await syncProjectFsContext();
-                setStatus("Project opened from folder");
-                return;
-              } catch (err) {
-                if (err && err.name === "AbortError") return;
-                if (err && err.name === "NotFoundError") {
-                  setStatus("project.json not found in selected folder");
-                  return;
-                }
-                console.warn("FS open error in Editor", err);
-                setStatus("Unable to open project folder");
-                return;
-              }
-            }
-            if ("showOpenFilePicker" in window && window.OvertraceUI?.openProjectJsonFile) {
-              try {
-                const entry = await window.OvertraceUI.openProjectJsonFile({
-                  description: "JSON Project",
-                });
-                if (!entry) return;
-                pushHistory();
-                await loadProject(entry.project, null);
-                projectCtx.mode = "file";
-                projectCtx.dirHandle = null;
-                projectCtx.fileHandle = entry.fileHandle || null;
-                projectCtx.folderName = null;
-                projectCtx.assetBase = "";
-                await syncProjectFsContext();
-                setStatus("Project opened from JSON file (linked)");
-                return;
-              } catch (err) {
-                if (err && err.name === "AbortError") return;
-                console.warn("Open file picker failed in Editor", err);
-              }
-            }
-            f.openFile.onchange = async () => {
-              const fl = f.openFile.files?.[0];
-              if (!fl) return;
-              const text = await fl.text();
-              const project = JSON.parse(text);
-              pushHistory();
-              await loadProject(project, null);
-              projectCtx.mode = "embedded";
-              projectCtx.dirHandle = null;
-              projectCtx.fileHandle = null;
-              projectCtx.folderName = null;
-              projectCtx.assetBase = "";
-              await syncProjectFsContext();
-              setStatus("Project opened from JSON file");
-              f.openFile.value = "";
-            };
-            f.openFile.click();
+            const entry = await window.OvertraceUI.openProjectByChoice(act, {
+              mode: "readwrite",
+            });
+            await applyOpenedProjectEntry(entry);
+          } catch (err) {
+            if (err?.name === "AbortError") return;
+            console.warn("Open failed in Editor", err);
+            setStatus(window.OvertraceUI.describeOpenError(err));
           } finally {
             __openProjectPending = false;
           }
+        }
+
+        function openProject() {
+          if (!window.OvertraceUI?.showOpenMenu) {
+            openProjectViaFileInput();
+            return;
+          }
+          // The menu calls back inside the click/keydown gesture, so pickers
+          // and permission prompts are allowed.
+          void window.OvertraceUI.showOpenMenu({
+            anchor: document.getElementById("btnOpen"),
+            onChoice: (act) => void openProjectChoice(act),
+          });
         }
 
         async function newProject() {
@@ -5770,7 +6034,10 @@
           projectCtx.dirHandle = null;
           projectCtx.fileHandle = null;
           projectCtx.folderName = null;
+          projectCtx.fileName = null;
           projectCtx.assetBase = "";
+          // Clears only the *active* context; the recent project is kept so
+          // Open can still suggest it.
           await syncProjectFsContext();
           vocab.areasMRU.clear();
           vocab.tagsMRU.clear();
@@ -5789,36 +6056,22 @@
         }
 
         async function createNewProject() {
-          const supportsFS = "showDirectoryPicker" in window;
-          if (!supportsFS) {
-            await newProject();
-            setStatus("New project created — use Save to download JSON");
-            return true;
-          }
-
-          // Ask for the destination before touching the current project: cancelling
-          // either dialog leaves the project currently open completely untouched.
-          const destination = await chooseNewProjectDirectory({
-            defaultName: "Untitled project",
-            cancelledStatus: "New project cancelled",
-          });
-          if (!destination) return false;
-
-          await newProject();
-          setProjectFolderContext(destination.dir, destination.folderName);
-          try {
-            // This creates both assets/ and the initial project.json immediately.
-            await saveProjectToDir(destination.dir, {
-              copyExistingAssets: false,
-            });
-            await syncProjectFsContext();
-            setStatus(`New project “${destination.folderName}” created`);
-            return true;
-          } catch (err) {
-            console.error("Unable to initialise new project folder", err);
-            setStatus("New project created, but its folder could not be initialised");
+          if (
+            projectDirty &&
+            !window.confirm("Discard unsaved changes to the current project?")
+          ) {
+            setStatus("New project cancelled");
             return false;
           }
+          projectDirtySuspended++;
+          try {
+            await newProject();
+          } finally {
+            projectDirtySuspended--;
+          }
+          setProjectDirty(false);
+          setStatus("New project — ⌘S asks where to save it the first time");
+          return true;
         }
 
         async function loadProject(project, dirHandle) {
@@ -6027,6 +6280,7 @@
           const prev = history.undo.pop();
           history.redo.push(cur);
           applySnapshot(prev);
+          markProjectChanged();
           setStatus("Undone");
         }
         function redo() {
@@ -6035,6 +6289,7 @@
           const next = history.redo.pop();
           history.undo.push(cur);
           applySnapshot(next);
+          markProjectChanged();
           setStatus("Redone");
         }
         function applySnapshot(s) {
@@ -6227,6 +6482,10 @@
           canvas.width = w;
           canvas.height = h;
           const ctx = canvas.getContext("2d");
+          // JPEG has no alpha: paint white first, otherwise transparent PNG/SVG
+          // areas turn black.
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, w, h);
           ctx.drawImage(img, 0, 0, w, h);
           let q = 0.92;
           let out = await canvasToBlob(canvas, "image/jpeg", q);
@@ -6303,6 +6562,7 @@
         }
 
         // Inizializzazione storia + primo nodo se necessario
+        projectDirtySuspended++;
         pushHistory();
         if (state.nodes.length === 0) {
           addNodeAt(80, 80, {});
@@ -6311,11 +6571,81 @@
           updateSidebarSelectionLabel();
           refreshSidebarForms();
         }
+        projectDirtySuspended--;
+        setProjectDirty(false);
         void (async () => {
           const restored = await restoreSharedProjectFromOtherView();
-          if (!restored) {
-            await tryAutoloadProjectFromQuery();
+          const loaded = restored || (await tryAutoloadProjectFromQuery());
+          if (!loaded) {
+            const recent = await window.OvertraceUI?.loadRecentProject?.();
+            if (recent) {
+              const name =
+                window.OvertraceUI.formatProjectDisplayName(recent.name, recent.name);
+              setStatus(`Last project: “${name}” — press ⌘O then ↵ to reopen`);
+            }
           }
+        })();
+
+        /* ---------- File shortcuts (also while typing in a field) ---------- */
+        window.addEventListener(
+          "keydown",
+          (e) => {
+            if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
+            const k = String(e.key || "").toLowerCase();
+            if (k === "s") {
+              e.preventDefault();
+              e.stopPropagation();
+              // Fields commit on "input"; type/areas/tags are committed by
+              // finalizeEditsCurrentNode() inside the save functions.
+              if (e.shiftKey) void saveAs();
+              else void saveProjectSmart();
+              return;
+            }
+            if (k === "o" && !e.shiftKey) {
+              e.preventDefault();
+              e.stopPropagation();
+              openProject();
+            }
+          },
+          { capture: true },
+        );
+
+        /* ---------- Drop a project folder or JSON file to open it ---------- */
+        (() => {
+          const isProjectDrag = (e) => {
+            const items = [...(e.dataTransfer?.items || [])];
+            if (!items.length) return false;
+            // Folders show up as kind "file" with an empty type.
+            return items.every(
+              (it) =>
+                it.kind === "file" &&
+                (it.type === "" || /json/i.test(it.type || "")),
+            );
+          };
+          window.addEventListener("dragover", (e) => {
+            if (!e.dataTransfer?.types?.includes("Files")) return;
+            // Never let the browser navigate away to the dropped file.
+            e.preventDefault();
+          });
+          window.addEventListener("drop", async (e) => {
+            if (!e.dataTransfer?.types?.includes("Files")) return;
+            e.preventDefault();
+            if (!isProjectDrag(e)) {
+              setStatus("Drop a project folder or JSON file here to open it");
+              return;
+            }
+            try {
+              const entry =
+                await window.OvertraceUI.projectEntryFromDataTransfer(
+                  e.dataTransfer,
+                  { mode: "readwrite" },
+                );
+              await applyOpenedProjectEntry(entry);
+            } catch (err) {
+              console.warn("Drop open failed", err);
+              setStatus(window.OvertraceUI.describeOpenError(err));
+            }
+          });
         })();
 
         resizeEdgeCanvasToStage();
@@ -6654,7 +6984,6 @@
         { id: "btnAnalysis", label: "Space analysis" },
         { id: "btnResearch", label: "Atlas" },
         { id: "btnOpen", label: "Open project (⌘O)" },
-        { id: "btnSave", label: "Save project (⌘S)" },
         { id: "btnNew", label: "New project" },
         { id: "btnConnect", label: "Connect nodes" },
         { id: "btnUndo", label: "Undo (⌘Z)" },
